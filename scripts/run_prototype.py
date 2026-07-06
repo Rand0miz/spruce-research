@@ -1,9 +1,11 @@
+import os, sys, torch
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
 from transformers import AutoTokenizer, AutoModelForCausalLM
 from teacher.extract import get_attentions
 from teacher.pool import pool_attention, rollup
 from teacher.validate import check_causal, check_causal
 import matplotlib.pyplot as plt
-import torch
 
 name = "Qwen/Qwen2.5-Coder-0.5B-Instruct"
 tok = AutoTokenizer.from_pretrained(name)
