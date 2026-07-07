@@ -1,6 +1,11 @@
 import os, sys, torch
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
+import numpy as np
+import matplotlib
+matplotlib.use("Agg")           # no display needed, write PNGs straight to disk
+import matplotlib.pyplot as plt
+
 from transformers import AutoTokenizer, AutoModelForCausalLM
 from teacher.extract import get_attentions
 from teacher.validate import check_causal
@@ -16,6 +21,7 @@ DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
 LENGTHS = [1024, 1500]
 DEPTHS  = [0.0, 0.25, 0.5, 0.75, 1.0]
 BUDGETS = (1, 2, 4, 8, 16)   # top-k block budgets to sweep
+HEATMAP_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "ks1_heatmaps")
 
 NEEDLE   = "The secret access code is heron-4417."
 FILLER   = "The quarterly logistics report noted no unusual activity."
@@ -47,7 +53,34 @@ def aggregate_pooled(attentions):
         agg = s if agg is None else agg + s
     return agg
 
-def ks1_lite(target_tokens, depth):
+def save_heatmap(agg, n_blk, target_tokens, depth):
+    """Block heatmap of aggregated attention mass [q_blocks, k_blocks].
+    Log-scaled (mass spans orders of magnitude). Marks the needle key-block
+    (vertical line) and the reader query-block = last row (horizontal line):
+    their crossing is where the model 'looks at the needle when answering'.
+    """
+    os.makedirs(HEATMAP_DIR, exist_ok=True)
+    grid = agg.detach().cpu().to(torch.float32).numpy()
+    grid = np.log1p(grid)                      # compress dynamic range
+
+    qb, kb = grid.shape
+    fig, ax = plt.subplots(figsize=(6, 6))
+    im = ax.imshow(grid, cmap="viridis", aspect="auto")
+    ax.axvline(n_blk + 0.5, color="red", lw=1.0, ls="--")   # needle key-block
+    ax.axvline(n_blk - 0.5, color="red", lw=1.0, ls="--")
+    ax.axhline(qb - 1, color="white", lw=1.0, ls=":")        # reader (question) row
+    ax.set_title(f"pooled attention mass  len={target_tokens} depth={depth}\n"
+                 f"needle key-block={n_blk}/{kb}  (red), reader row (white)")
+    ax.set_xlabel("key block")
+    ax.set_ylabel("query block")
+    fig.colorbar(im, ax=ax, label="log(1 + mass)")
+    path = os.path.join(HEATMAP_DIR, f"heatmap_{target_tokens}_{depth}.png")
+    fig.savefig(path, dpi=120, bbox_inches="tight")
+    plt.close(fig)
+    return path
+
+
+def ks1_lite(target_tokens, depth, plot=True):
     prompt, ndl = build_haystack(tok, target_tokens, NEEDLE, depth, FILLER)
     n_blk = needle_block_index(prompt, ndl, BLOCK)
     full = prompt + QUESTION
@@ -81,11 +114,14 @@ def ks1_lite(target_tokens, depth):
                 break
         traversal_safe[k] = safe
     
+    heatmap_path = save_heatmap(agg, n_blk, target_tokens, depth) if plot else None
+
     return {
         "target": target_tokens, "depth": depth,
         "needle_block": n_blk, "num_blocks": agg.shape[-1],
         "needle_rank": rank, "causal_ok": causal_ok,
         "hit@k": hit_at_k, "traversal_safe@k": traversal_safe,
+        "heatmap": heatmap_path,
     }
 
 if __name__ == "__main__":

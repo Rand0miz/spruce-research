@@ -1,0 +1,10 @@
+target=   1024, depth=0.0  needle_block=0   num_blocks=15  needle_rank=0   causal_ok=True hit@k={1: True, 2: True, 4: True, 8: True, 16: True} traversal_safe@k={1: True, 2: True, 4: True, 8: True, 16: True}
+target=   1024, depth=0.25 needle_block=3   num_blocks=15  needle_rank=3   causal_ok=True hit@k={1: False, 2: False, 4: True, 8: True, 16: True} traversal_safe@k={1: False, 2: False, 4: True, 8: True, 16: True}
+target=   1024, depth=0.5  needle_block=7   num_blocks=15  needle_rank=3   causal_ok=True hit@k={1: False, 2: False, 4: True, 8: True, 16: True} traversal_safe@k={1: False, 2: False, 4: True, 8: True, 16: True}
+target=   1024, depth=0.75 needle_block=10  num_blocks=15  needle_rank=3   causal_ok=True hit@k={1: False, 2: False, 4: True, 8: True, 16: True} traversal_safe@k={1: False, 2: False, 4: True, 8: True, 16: True}
+target=   1024, depth=1.0  needle_block=14  num_blocks=15  needle_rank=0   causal_ok=True hit@k={1: True, 2: True, 4: True, 8: True, 16: True} traversal_safe@k={1: True, 2: True, 4: True, 8: True, 16: True}
+target=   1500, depth=0.0  needle_block=0   num_blocks=22  needle_rank=0   causal_ok=True hit@k={1: True, 2: True, 4: True, 8: True, 16: True} traversal_safe@k={1: True, 2: True, 4: True, 8: True, 16: True}
+target=   1500, depth=0.25 needle_block=5   num_blocks=22  needle_rank=3   causal_ok=True hit@k={1: False, 2: False, 4: True, 8: True, 16: True} traversal_safe@k={1: False, 2: False, 4: True, 8: True, 16: True}
+target=   1500, depth=0.5  needle_block=10  num_blocks=22  needle_rank=3   causal_ok=True hit@k={1: False, 2: False, 4: True, 8: True, 16: True} traversal_safe@k={1: False, 2: False, 4: True, 8: True, 16: True}
+target=   1500, depth=0.75 needle_block=15  num_blocks=22  needle_rank=3   causal_ok=True hit@k={1: False, 2: False, 4: True, 8: True, 16: True} traversal_safe@k={1: False, 2: False, 4: True, 8: True, 16: True}
+target=   1500, depth=1.0  needle_block=20  num_blocks=22  needle_rank=0   causal_ok=True hit@k={1: True, 2: True, 4: True, 8: True, 16: True} traversal_safe@k={1: True, 2: True, 4: True, 8: True, 16: True}
