@@ -16,4 +16,4 @@ def score_retrival(model_awnser, needle):
     ans_words = set(ans.split())
     overlap = len(ndl_words & ans_words) / max(1, len(ndl_words))
 
-    return {"exact": exact, "fuzzy": overlap}
+    return {"exact": exact, "fuzzy": overlap, "answer": model_awnser, "needle": needle}
