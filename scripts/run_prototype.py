@@ -7,7 +7,7 @@ from teacher.pool import pool_attention, rollup
 from teacher.validate import check_causal, check_causal
 import matplotlib.pyplot as plt
 
-name = "Qwen/Qwen2.5-Coder-0.5B-Instruct"
+name = "Qwen/Qwen2.5-Coder-1.5B-Instruct"
 tok = AutoTokenizer.from_pretrained(name)
 model = AutoModelForCausalLM.from_pretrained(
     name, torch_dtype="auto", device_map="auto", attn_implementation="eager",

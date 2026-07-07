@@ -8,7 +8,7 @@ from eval.harness import run_needle_test
 load_dotenv()  # load HF_TOKEN (and friends) from .env into os.environ
 hf_token = os.environ.get("HF_TOKEN")
 
-name = "Qwen/Qwen2.5-Coder-0.5B-Instruct"
+name = "Qwen/Qwen2.5-Coder-1.5B-Instruct"
 tok = AutoTokenizer.from_pretrained(name, token=hf_token)
 model = AutoModelForCausalLM.from_pretrained(
     name, torch_dtype="auto", device_map="auto", token=hf_token,
