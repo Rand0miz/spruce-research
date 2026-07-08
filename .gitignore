@@ -1,3 +1,5 @@
 .env
 *.html
 CLAUDE.md
+graphify-out
+planV2.md
