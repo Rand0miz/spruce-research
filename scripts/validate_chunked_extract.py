@@ -29,7 +29,8 @@ def main():
     ).to(DEVICE).eval()
 
     ref, seq = eager_reference(model, tok, PROMPT)
-    chunk, seq2 = get_pooled_targets(model, tok, PROMPT, device=DEVICE, block_size=BLOCK)
+    chunk, _pooledQ, _pooledK, seq2 = get_pooled_targets(
+        model, tok, PROMPT, device=DEVICE, block_size=BLOCK)
 
     assert seq == seq2, (seq, seq2)
     assert ref.shape == chunk.shape, (ref.shape, chunk.shape)

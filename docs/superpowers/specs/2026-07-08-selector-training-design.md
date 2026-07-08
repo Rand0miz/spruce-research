@@ -48,7 +48,7 @@ teacher-normalized, summed over rows and layers, causal-masked.
 (softmax-then-sum-per-block == per-block marginal). SeerAttention's MaxPool2D target
 is looser; we keep the marginal (better). No new extraction of the *target* needed.
 
-Normalization and GQA aggregation live in `selectors/targets.py`:
+Normalization and GQA aggregation live in `selector/targets.py`:
 - Row-normalize teacher mass to a distribution over key-blocks (`pᵗ`).
 - Aggregate the H query-heads into `kv_head_group` groups (Qwen2.5-Coder-1.5B: 12
   query heads → 2 kv groups) by averaging the per-head mass within each group, so the
@@ -93,7 +93,7 @@ global level ranking).
 
 ## 6. Recall metric (separate from loss)
 
-Loss falling ≠ ranking correct. `selectors/recall.py` periodically checks: does the
+Loss falling ≠ ranking correct. `selector/recall.py` periodically checks: does the
 selector's predicted top-r at each level contain the teacher's true top-r? Reuse the
 `ks1_lite` hit@k and traversal-safe checks. This overlap is the real KS1 signal.
 
@@ -122,12 +122,12 @@ never extract 50 docs before the loop works.
 
 ```
 teacher/chunked_extract.py   +dump pooled Q/K alongside mass (small add; re-run 2 lengths)
-selectors/targets.py         load .pt, GQA-aggregate H→kv-group, row-normalize → pᵗ
-selectors/gate.py            SeerAttention flat gate: per-layer Wq, Wk + block dot-product score
-selectors/loss.py            forward KL(pᵗ || student), per-row, causal-masked, summed over layers
-selectors/train.py           loop; Adam on Wq/Wk only; frozen backbone; loads dumped features + targets
-selectors/recall.py          top-r recall + traversal-safe (reuse ks1_lite logic)
-selectors/tree.py            STEP 2: reuse teacher/pool.rollup + per-level (conditional) loss
+selector/targets.py         load .pt, GQA-aggregate H→kv-group, row-normalize → pᵗ
+selector/gate.py            SeerAttention flat gate: per-layer Wq, Wk + block dot-product score
+selector/loss.py            forward KL(pᵗ || student), per-row, causal-masked, summed over layers
+selector/train.py           loop; Adam on Wq/Wk only; frozen backbone; loads dumped features + targets
+selector/recall.py          top-r recall + traversal-safe (reuse ks1_lite logic)
+selector/tree.py            STEP 2: reuse teacher/pool.rollup + per-level (conditional) loss
 ```
 
 Selector code never reaches into kernel internals; the eventual hand-off to the

@@ -1,12 +1,33 @@
 import torch
 import torch.nn.functional as F
+from torch.nn.attention import sdpa_kernel, SDPBackend
 from transformers.modeling_utils import ALL_ATTENTION_FUNCTIONS
-from transformers.integrations.sdpa_attention import sdpa_attention_forward
 
 # layer_idx -> pooled [1, num_heads, q_blocks, k_blocks] (cpu, fp32)
 _CAPTURE = {}
+# layer_idx -> (pooledQ [1, H, q_blocks, d], pooledK [1, kv, k_blocks, d]) (cpu, fp32)
+# These are the SELECTOR INPUTS (SeerAttention scores Wq*pooledQ . Wk*pooledK), captured
+# here so training reads tensors only, no frozen Qwen in the loop. pooledK keeps the
+# original kv_head count (pre-GQA-repeat) to match the selected_blocks kv_head_group axis.
+_CAPTURE_QK = {}
 _BLOCK = 64
 _REGISTERED = False
+
+
+def _mean_pool_seq(x, block):
+    """[b, H, L, d] -> [b, H, nb, d]: mean of each block along the sequence dim.
+    Last block may be partial; average over its real rows only (not the zero pad)."""
+    b, H, L, d = x.shape
+    nb = (L + block - 1) // block
+    pad = nb * block - L
+    if pad:
+        x = F.pad(x, (0, 0, 0, pad))                # zero-pad the ragged tail
+    x = x.view(b, H, nb, block, d)
+    if pad:
+        counts = x.new_full((nb, 1), float(block))
+        counts[-1, 0] = block - pad                 # real rows in the last block
+        return x.sum(dim=3) / counts.view(1, 1, nb, 1)
+    return x.mean(dim=3)
 
 
 def _repeat_kv(key, n_rep):
@@ -60,12 +81,27 @@ def _capture_attention(module, query, key, value, attention_mask,
     if scaling is None:
         scaling = query.shape[-1] ** -0.5
     n_rep = query.shape[1] // key.shape[1]
-    pooled = chunked_pool(query, _repeat_kv(key, n_rep), scaling, _BLOCK)
+    key_rep = _repeat_kv(key, n_rep)
+    pooled = chunked_pool(query, key_rep, scaling, _BLOCK)
     _CAPTURE[module.layer_idx] = pooled.cpu()
-    # delegate the REAL attention so hidden states propagate (memory-safe)
-    return sdpa_attention_forward(module, query, key, value, attention_mask,
-                                  dropout=dropout, scaling=scaling,
-                                  sliding_window=sliding_window, **kwargs)
+    # Selector inputs: mean-pool post-RoPE Q per query-block and original K per key-block.
+    # K uses pre-repeat `key` -> [1, kv, kb, d] (one vector per kv_head_group).
+    pooledQ = _mean_pool_seq(query, _BLOCK).cpu()   # [1, H, qb, d]
+    pooledK = _mean_pool_seq(key, _BLOCK).cpu()     # [1, kv, kb, d]
+    _CAPTURE_QK[module.layer_idx] = (pooledQ, pooledK)
+    # Propagate through SDPA's FUSED CAUSAL path. We repeat KV to the full head
+    # count ourselves instead of letting sdpa_attention_forward set enable_gqa=True:
+    # on this build the only available fused kernel (mem-efficient) rejects GQA
+    # broadcast (unequal q/kv heads) -> "No available kernel". Equal heads + no dense
+    # mask keeps it on the fused path, so no [1,1,S,S] bias is materialized, and
+    # is_causal=True is correct since chunked_pool applied its own causal mask.
+    value_rep = _repeat_kv(value, n_rep)
+    attn_output = F.scaled_dot_product_attention(
+        query, key_rep, value_rep,
+        attn_mask=None, dropout_p=dropout, scale=scaling, is_causal=True,
+    )
+    attn_output = attn_output.transpose(1, 2).contiguous()
+    return attn_output, None
 
 
 def _ensure_registered():
@@ -79,13 +115,18 @@ def _ensure_registered():
 def get_pooled_targets(model, tok, prompt, device="cuda", block_size=_BLOCK):
     """
     One forward pass; captures chunked pooled block-mass per layer.
-    Returns (pooled_stack [1, num_layers, num_heads, q_blocks, k_blocks] fp32 cpu, seq_len).
+    Returns (pooled_stack [1, num_layers, num_heads, q_blocks, k_blocks] fp32 cpu,
+             pooledQ_stack [1, num_layers, H, q_blocks, d] fp32 cpu,
+             pooledK_stack [1, num_layers, kv, k_blocks, d] fp32 cpu,
+             seq_len).
+    pooled_stack is the training TARGET; the Q/K stacks are the selector INPUTS.
     Never materializes a full attention matrix -> fits 16K-32K on 8GB.
     """
     global _BLOCK
     _BLOCK = block_size
     _ensure_registered()
     _CAPTURE.clear()
+    _CAPTURE_QK.clear()
 
     prev = model.config._attn_implementation
     model.config._attn_implementation = "chunked_capture"
@@ -95,7 +136,13 @@ def get_pooled_targets(model, tok, prompt, device="cuda", block_size=_BLOCK):
             cfg._attn_implementation = "chunked_capture"
     try:
         inputs = tok(prompt, return_tensors="pt").to(device)
-        model(**inputs, use_cache=False)
+        # Force fused SDPA (flash/mem-efficient) for the forward-propagation path in
+        # _capture_attention. Excluding MATH stops the 13GB full [1,H,L,L] fp32 score
+        # matrix (SDPA's Windows fallback when flash isn't built) -> fits 8GB.
+        # If no fused kernel is available it errors loudly instead of silently OOMing.
+        backends = [SDPBackend.FLASH_ATTENTION, SDPBackend.EFFICIENT_ATTENTION]
+        with sdpa_kernel(backends):
+            model(**inputs, use_cache=False)
     finally:
         model.config._attn_implementation = prev
         for m in model.modules():
@@ -103,6 +150,8 @@ def get_pooled_targets(model, tok, prompt, device="cuda", block_size=_BLOCK):
             if cfg is not None:
                 cfg._attn_implementation = prev
 
-    layers = [_CAPTURE[i] for i in sorted(_CAPTURE)]   # each [1,H,qb,kb]
-    pooled_stack = torch.stack(layers, dim=1)          # [1, L, H, qb, kb]
-    return pooled_stack, inputs["input_ids"].shape[1]
+    order = sorted(_CAPTURE)
+    pooled_stack = torch.stack([_CAPTURE[i] for i in order], dim=1)        # [1, L, H, qb, kb]
+    pooledQ_stack = torch.stack([_CAPTURE_QK[i][0] for i in order], dim=1)  # [1, L, H, qb, d]
+    pooledK_stack = torch.stack([_CAPTURE_QK[i][1] for i in order], dim=1)  # [1, L, kv, kb, d]
+    return pooled_stack, pooledQ_stack, pooledK_stack, inputs["input_ids"].shape[1]
