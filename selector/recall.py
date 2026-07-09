@@ -32,6 +32,22 @@ def recall_metrics(scores, target, cmask, budgets=(1, 2, 4, 8, 16), needle_block
         m = valid & enough
         out[f"recall@{r}"] = float((overlap / rr * m).sum() / m.sum().clamp_min(1))
 
+        # Mass coverage: fraction of the teacher's attention mass that lands inside
+        # the student's top-r blocks. target rows sum to 1, so (target*member) is the
+        # captured mass. This is what actually matters for sparse attention — a
+        # rank-swap among near-tied blocks barely dents coverage but tanks set-recall.
+        coverage = (target * member).sum(dim=-1)                 # [L,G,qb] in [0,1]
+        out[f"coverage@{r}"] = float((coverage * m).sum() / m.sum().clamp_min(1))
+
+        # Oracle ceiling: coverage of the teacher's OWN top-r blocks. This is the max
+        # mass any top-r selection can capture. student coverage / oracle = how much of
+        # the achievable mass the gate got. If oracle itself is low, attention is
+        # diffuse and no small budget can cover it — a data property, not a gate fault.
+        omember = torch.zeros_like(target, dtype=torch.bool)
+        omember.scatter_(-1, t_top, True)
+        ocov = (target * omember).sum(dim=-1)                    # [L,G,qb] in [0,1]
+        out[f"oracle_cov@{r}"] = float((ocov * m).sum() / m.sum().clamp_min(1))
+
     if needle_block is not None and 0 <= needle_block < kb:
         reader = masked[:, :, -1, :]                        # [L,G,kb] last query block
         for k in budgets:

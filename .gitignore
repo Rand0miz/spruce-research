@@ -3,3 +3,5 @@
 CLAUDE.md
 graphify-out
 planV2.md
+teacher_targets/
+*.pt

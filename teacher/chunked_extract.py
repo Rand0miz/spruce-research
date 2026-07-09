@@ -11,6 +11,12 @@ _CAPTURE = {}
 # original kv_head count (pre-GQA-repeat) to match the selected_blocks kv_head_group axis.
 _CAPTURE_QK = {}
 _BLOCK = 64
+# How many heads to score at once inside chunked_pool. The last query block scores
+# against all keys -> a [b, H_CHUNK, block, k_len] fp32 strip (+ its softmax +
+# padded copy). At 32K that strip is ~1GB across all heads; chunking heads caps
+# the transient so it fits 8GB VRAM without spilling to shared RAM. Output is
+# bit-identical to processing all heads at once (heads are independent here).
+_HEAD_CHUNK = 2
 _REGISTERED = False
 
 
@@ -39,40 +45,45 @@ def _repeat_kv(key, n_rep):
 
 
 @torch.no_grad()
-def chunked_pool(query, key, scaling, block_size=_BLOCK):
+def chunked_pool(query, key, scaling, block_size=_BLOCK, head_chunk=None):
     """
     query: [b, H, q_len, d] post-RoPE
     key:   [b, H, k_len, d] post-RoPE, already repeated to H heads
     Returns pooled [b, H, q_blocks, k_blocks] == pool_attention(causal_softmax(q,k)),
-    but never materializes q_len x k_len. Peak = one [b,H,block,end] score strip.
+    but never materializes q_len x k_len. Peak = one [b,head_chunk,block,end] score
+    strip; head_chunk (default _HEAD_CHUNK) bounds the transient so 32K fits 8GB.
     """
+    if head_chunk is None:
+        head_chunk = _HEAD_CHUNK
     b, H, q_len, d = query.shape
     k_len = key.shape[2]
     qb = (q_len + block_size - 1) // block_size
     kb = (k_len + block_size - 1) // block_size
     pooled = query.new_zeros((b, H, qb, kb), dtype=torch.float32)
 
-    for I in range(qb):
-        r0 = I * block_size
-        r1 = min(r0 + block_size, q_len)
-        rows = r1 - r0
-        end = r1                                   # causal: keys 0..r1-1 reachable
-        kb_up = (end + block_size - 1) // block_size
+    for h0 in range(0, H, head_chunk):
+        h1 = min(h0 + head_chunk, H)               # heads are independent -> per-slice math
+        for I in range(qb):
+            r0 = I * block_size
+            r1 = min(r0 + block_size, q_len)
+            rows = r1 - r0
+            end = r1                               # causal: keys 0..r1-1 reachable
+            kb_up = (end + block_size - 1) // block_size
 
-        q_blk = query[:, :, r0:r1, :]              # [b,H,rows,d]
-        k_up = key[:, :, :end, :]                  # [b,H,end,d]
-        s = torch.matmul(q_blk, k_up.transpose(-1, -2)) * scaling  # [b,H,rows,end]
+            q_blk = query[:, h0:h1, r0:r1, :]      # [b,hc,rows,d]
+            k_up = key[:, h0:h1, :end, :]          # [b,hc,end,d]
+            s = torch.matmul(q_blk, k_up.transpose(-1, -2)) * scaling  # [b,hc,rows,end]
 
-        # intra-strip causal mask (only the diagonal block actually needs it)
-        g = torch.arange(r0, r1, device=query.device)[:, None]     # [rows,1] global q index
-        j = torch.arange(end, device=query.device)[None, :]        # [1,end]  key index
-        s = s.masked_fill((j > g)[None, None], float("-inf"))
+            # intra-strip causal mask (only the diagonal block actually needs it)
+            g = torch.arange(r0, r1, device=query.device)[:, None]     # [rows,1] global q index
+            j = torch.arange(end, device=query.device)[None, :]        # [1,end]  key index
+            s = s.masked_fill((j > g)[None, None], float("-inf"))
 
-        p = torch.softmax(s.float(), dim=-1)       # [b,H,rows,end]  rows sum to 1
-        pad = kb_up * block_size - end
-        p = F.pad(p, (0, pad))                      # [b,H,rows,kb_up*block]
-        p = p.view(b, H, rows, kb_up, block_size).sum(dim=-1)      # [b,H,rows,kb_up]
-        pooled[:, :, I, :kb_up] = p.sum(dim=2)     # sum over q-rows in block
+            p = torch.softmax(s.float(), dim=-1)   # [b,hc,rows,end]  rows sum to 1
+            pad = kb_up * block_size - end
+            p = F.pad(p, (0, pad))                  # [b,hc,rows,kb_up*block]
+            p = p.view(b, h1 - h0, rows, kb_up, block_size).sum(dim=-1)  # [b,hc,rows,kb_up]
+            pooled[:, h0:h1, I, :kb_up] = p.sum(dim=2)  # sum over q-rows in block
     return pooled
 
 
@@ -142,7 +153,13 @@ def get_pooled_targets(model, tok, prompt, device="cuda", block_size=_BLOCK):
         # If no fused kernel is available it errors loudly instead of silently OOMing.
         backends = [SDPBackend.FLASH_ATTENTION, SDPBackend.EFFICIENT_ATTENTION]
         with sdpa_kernel(backends):
-            model(**inputs, use_cache=False)
+            # Run the base decoder (model.model), NOT the full CausalLM. The attention
+            # hooks fire inside the layers, so we get every pooled target -- but we skip
+            # lm_head, which would project the final hidden state to logits
+            # [1, seq_len, vocab] ~= 10GB fp16 @ 32K/152K-vocab. We never use logits
+            # here (no next-token prediction), so dropping the head keeps peak in VRAM
+            # instead of spilling to shared RAM.
+            model.model(**inputs, use_cache=False)
     finally:
         model.config._attn_implementation = prev
         for m in model.modules():
