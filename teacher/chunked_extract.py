@@ -36,6 +36,46 @@ def _mean_pool_seq(x, block):
     return x.mean(dim=3)
 
 
+def _proto_pool_seq(x, block, P):
+    """[b,H,L,d] -> [b,H,nb,P,d]: P prototype vectors per block.
+    proto 0 = block mean (real rows only); protos 1..P-1 = the P-1 tokens
+    farthest (squared-L2) from that mean. Short/ragged blocks (fewer than P-1
+    real outlier rows) fill spare slots with the mean, so max-pooling over
+    prototypes is unaffected. Selection uses only x -> reproducible at inference."""
+    b, H, L, d = x.shape
+    nb = (L + block - 1) // block
+    pad = nb * block - L
+    if pad:
+        x = F.pad(x, (0, 0, 0, pad))                 # zero-pad ragged tail
+    xb = x.view(b, H, nb, block, d)                  # [b,H,nb,block,d]
+
+    counts = xb.new_full((nb,), float(block))
+    if pad:
+        counts[-1] = block - pad                     # real rows in last block
+    valid = (torch.arange(block, device=x.device)[None, None, None, :]
+             < counts.view(1, 1, nb, 1))             # [1,1,nb,block] bool
+    vf = valid.to(xb.dtype)[..., None]               # [1,1,nb,block,1]
+    mean = (xb * vf).sum(dim=3) / counts.view(1, 1, nb, 1)   # [b,H,nb,d]
+
+    dist = (xb - mean[:, :, :, None, :]).pow(2).sum(dim=-1)  # [b,H,nb,block]
+    dist = dist.masked_fill(~valid, float("-inf"))   # never pick a pad row
+    k = min(P - 1, block)
+    idx = dist.topk(k, dim=-1).indices               # [b,H,nb,k]
+    gidx = idx[..., None].expand(-1, -1, -1, -1, d)
+    outliers = xb.gather(3, gidx)                     # [b,H,nb,k,d]
+    # if a block had fewer than k real rows, some picked rows are pad (dist=-inf):
+    # replace those with the mean.
+    sel_dist = dist.gather(-1, idx)                   # [b,H,nb,k]
+    bad = torch.isinf(sel_dist)[..., None]            # [b,H,nb,k,1]
+    outliers = torch.where(bad, mean[:, :, :, None, :].expand_as(outliers), outliers)
+
+    protos = torch.cat([mean[:, :, :, None, :], outliers], dim=3)   # [b,H,nb,1+k,d]
+    if 1 + k < P:                                     # only if block < P-1 (not at 64/8)
+        extra = mean[:, :, :, None, :].expand(-1, -1, -1, P - (1 + k), -1)
+        protos = torch.cat([protos, extra], dim=3)
+    return protos                                     # [b,H,nb,P,d]
+
+
 def _repeat_kv(key, n_rep):
     """[b, n_kv, k, d] -> [b, n_kv*n_rep, k, d] (match eager pool_attention head count)."""
     if n_rep == 1:
