@@ -15,7 +15,7 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import torch
 from selector.targets import load_teacher
 from selector.gate import FlatGate
-from selector.loss import kl_loss
+from selector.loss import combined_loss
 from selector.recall import recall_metrics
 
 
@@ -25,6 +25,10 @@ def main():
                     help="teacher .pt paths or globs (must have pooledQ/pooledK)")
     ap.add_argument("--epochs", type=int, default=200)
     ap.add_argument("--lr", type=float, default=1e-3)
+    ap.add_argument("--lambda-topk", type=float, default=0.5,
+                    help="weight of the top-k membership term (needle retention)")
+    ap.add_argument("--topk", type=int, default=8,
+                    help="k for the membership term; match the KS1 budget")
     ap.add_argument("--proj-dim", type=int, default=None)
     ap.add_argument("--eval-every", type=int, default=25)
     ap.add_argument("--budgets", type=int, nargs="+", default=[1, 2, 4, 8, 16])
@@ -56,15 +60,20 @@ def main():
 
     for epoch in range(1, args.epochs + 1):
         gate.train()
-        tot, nrows = 0.0, 0
+        tot, kl_tot, bce_tot, nrows = 0.0, 0.0, 0.0, 0
         for doc in docs:
             scores = gate(doc["q_feat"], doc["k_feat"])
-            loss, nv = kl_loss(scores, doc["target"], doc["cmask"])
+            loss, parts = combined_loss(scores, doc["target"], doc["cmask"],
+                                        lambda_topk=args.lambda_topk, k=args.topk)
             opt.zero_grad(); loss.backward(); opt.step()
-            tot += loss.item() * nv; nrows += nv
+            nv = parts["n"]
+            tot += loss.item() * nv; kl_tot += parts["kl"] * nv
+            bce_tot += parts["bce"] * nv; nrows += nv
         if epoch % args.eval_every == 0 or epoch == 1 or epoch == args.epochs:
             gate.eval()
-            line = [f"epoch {epoch:>4}  KL={tot / max(nrows,1):.4f}"]
+            nr = max(nrows, 1)
+            line = [f"epoch {epoch:>4}  loss={tot/nr:.4f} KL={kl_tot/nr:.4f} "
+                    f"BCE={bce_tot/nr:.4f}"]
             with torch.no_grad():
                 for doc in docs:
                     sc = gate(doc["q_feat"], doc["k_feat"])

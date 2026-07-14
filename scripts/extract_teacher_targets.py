@@ -5,12 +5,12 @@ from transformers import AutoTokenizer, AutoModelForCausalLM
 from eval.haystack import build_haystack
 from teacher.chunked_extract import get_pooled_targets
 
-MODEL = "Qwen/Qwen2.5-Coder-1.5B-Instruct"
+MODEL = "Qwen/Qwen2.5-Coder-3B-Instruct"
 DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
 
-NEEDLE = "Bobs favorite color is blue."
-FILLER = "The quarterly logistics report noted no unusual activity. "
-QUESTION = "\n\nWhat is Bob's favorite color? Answer with the exact sentence."
+NEEDLE = "Myles was born in 1974. "
+FILLER = "The portfolio is underpreforming as of last quarter. "
+QUESTION = "\n\nWhat is the birth year of Myles? Answer with the exact sentence."
 
 
 def needle_block_index(tok, prompt, needle, block_size):
@@ -55,7 +55,7 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--lengths", type=int, nargs="+", default=[16384, 32768])
     ap.add_argument("--block", type=int, default=64)
-    ap.add_argument("--depth", type=float, default=0.7)
+    ap.add_argument("--depth", type=float, default=0.5)
     ap.add_argument("--store-dtype", default="float16", choices=["float16", "float32"])
     ap.add_argument("--out", default=os.path.join(
         os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "teacher_targets"))
@@ -97,9 +97,9 @@ def main():
 
         path = os.path.join(args.out, f"teacher_len{seq_len}_blk{args.block}_d{args.depth}.pt")
         torch.save({
-            "pooled": pooled_stack.to(store_dtype),      # [1, L, H, qb, kb]  TARGET
-            "pooledQ": pooledQ_stack.to(store_dtype),    # [1, L, H, qb, d]   selector input
-            "pooledK": pooledK_stack.to(store_dtype),    # [1, L, kv, kb, d]  selector input
+            "pooled": pooled_stack.to(store_dtype),      # [1, L, H, qb, kb]      TARGET
+            "pooledQ": pooledQ_stack.to(store_dtype),    # [1, L, G, qb, P, d]    selector input
+            "pooledK": pooledK_stack.to(store_dtype),    # [1, L, G, kb, P, d]    selector input
             "head_dim": pooledQ_stack.shape[-1],
             "num_kv_heads": pooledK_stack.shape[2],
             "seq_len": seq_len,
@@ -109,6 +109,7 @@ def main():
             "needle_block": n_blk,
             "num_layers": pooled_stack.shape[1],
             "num_heads": pooled_stack.shape[2],
+            "proto": pooledK_stack.shape[-2],
             "store_dtype": args.store_dtype,
         }, path)
         print(f"len={seq_len:>6}  blocks={pooled_stack.shape[-1]:>4}  "
