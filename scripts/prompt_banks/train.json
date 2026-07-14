@@ -1,0 +1,65 @@
+{
+  "description": "Training prompt cases for teacher target extraction. One case is randomly selected per requested context length unless --seed fixes the RNG.",
+  "cases": [
+    {
+      "id": "color_blue_bob",
+      "needle": "Bobs favorite color is blue.",
+      "filler": "The quarterly logistics report noted no unusual activity. ",
+      "question": "\n\nWhat is Bob's favorite color? Answer with the exact sentence."
+    },
+    {
+      "id": "birth_myles_1974",
+      "needle": "Myles was born in 1974.",
+      "filler": "The portfolio review mentioned routine allocation changes and ordinary paperwork. ",
+      "question": "\n\nWhat is the birth year of Myles? Answer with the exact sentence."
+    },
+    {
+      "id": "city_amelia_lisbon",
+      "needle": "Amelia keeps the spare key in Lisbon.",
+      "filler": "The maintenance bulletin described scheduled inspections and standard inventory updates. ",
+      "question": "\n\nWhere does Amelia keep the spare key? Answer with the exact sentence."
+    },
+    {
+      "id": "code_orion_7391",
+      "needle": "The Orion access code is 7391.",
+      "filler": "The meeting archive contained budget notes, calendar changes, and vendor summaries. ",
+      "question": "\n\nWhat is the Orion access code? Answer with the exact sentence."
+    },
+    {
+      "id": "animal_nora_otter",
+      "needle": "Nora selected the otter badge for the audit.",
+      "filler": "The compliance memo repeated ordinary review steps and noncritical status updates. ",
+      "question": "\n\nWhich badge did Nora select for the audit? Answer with the exact sentence."
+    },
+    {
+      "id": "warehouse_delta_42",
+      "needle": "Warehouse Delta holds crate 42.",
+      "filler": "The shipping digest listed standard routes, common delays, and routine receipt logs. ",
+      "question": "\n\nWhich warehouse holds crate 42? Answer with the exact sentence."
+    },
+    {
+      "id": "drink_ivy_oolong",
+      "needle": "Ivy ordered oolong tea before the briefing.",
+      "filler": "The office newsletter covered team updates, desk moves, and normal cafeteria notices. ",
+      "question": "\n\nWhat did Ivy order before the briefing? Answer with the exact sentence."
+    },
+    {
+      "id": "planet_survey_mars",
+      "needle": "The survey marker points to Mars.",
+      "filler": "The research appendix summarized baseline observations and routine calibration notes. ",
+      "question": "\n\nWhere does the survey marker point? Answer with the exact sentence."
+    },
+    {
+      "id": "vehicle_zephyr_2022",
+      "needle": "The Zephyr model year is 2022.",
+      "filler": "The automotive report included standard maintenance schedules and typical performance metrics. ",
+      "question": "\n\nWhat is the model year of the Zephyr? Answer with the exact sentence."
+    },
+    {
+      "id": "bookcase_section_7",
+      "needle": "Section 7 of the bookcase contains the manuals.",
+      "filler": "The library catalog listed common titles, regular checkouts, and standard shelving notes. ",
+      "question": "\n\nWhich section of the bookcase contains the manuals? Answer with the exact sentence."
+    }
+  ]
+}

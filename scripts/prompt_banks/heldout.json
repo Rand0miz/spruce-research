@@ -1,0 +1,41 @@
+{
+  "description": "Held-out prompt cases for teacher target extraction. Keep these separate from training cases.",
+  "cases": [
+    {
+      "id": "color_green_bob",
+      "needle": "Bobs favorite color is green.",
+      "filler": "The quarterly logistics report noted no unusual activity. ",
+      "question": "\n\nWhat is Bob's favorite color? Answer with the exact sentence."
+    },
+    {
+      "id": "birth_sara_1988",
+      "needle": "Sara was born in 1988.",
+      "filler": "The portfolio review mentioned routine allocation changes and ordinary paperwork. ",
+      "question": "\n\nWhat is the birth year of Sara? Answer with the exact sentence."
+    },
+    {
+      "id": "city_jules_oslo",
+      "needle": "Jules keeps the spare key in Oslo.",
+      "filler": "The maintenance bulletin described scheduled inspections and standard inventory updates. ",
+      "question": "\n\nWhere does Jules keep the spare key? Answer with the exact sentence."
+    },
+    {
+      "id": "code_nova_4816",
+      "needle": "The Nova access code is 4816.",
+      "filler": "The meeting archive contained budget notes, calendar changes, and vendor summaries. ",
+      "question": "\n\nWhat is the Nova access code? Answer with the exact sentence."
+    },
+    {
+      "id": "badge_elena_amber",
+      "needle": "Elena selected the amber badge for the audit.",
+      "filler": "The compliance memo repeated ordinary review steps and noncritical status updates. ",
+      "question": "\n\nWhich badge did Elena select for the audit? Answer with the exact sentence."
+    },
+    {
+      "id": "warehouse_sigma_17",
+      "needle": "Warehouse Sigma holds crate 17.",
+      "filler": "The shipping digest listed standard routes, common delays, and routine receipt logs. ",
+      "question": "\n\nWhich warehouse holds crate 17? Answer with the exact sentence."
+    }
+  ]
+}

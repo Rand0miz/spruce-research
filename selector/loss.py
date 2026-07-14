@@ -29,3 +29,38 @@ def kl_loss(scores, target, cmask, eps=1e-9, row_valid_thresh=0.5):
     n = valid.sum().clamp_min(1)
     loss = (kl_row * valid).sum() / n
     return loss, int(valid.sum())
+
+def topk_set_loss(scores, target, cmask, topk=8, margin=0.0, row_valid_thresh=0.5):
+    """Ranking auxiliary for set-recall@k.
+
+    For each valid row, take the teacher's top-k key blocks as positives and require
+    the weakest positive score to beat the strongest non-positive causal score. This
+    directly matches the recall@k failure mode that KL can miss when many nearby
+    blocks have almost tied teacher mass.
+    """
+    if topk <= 0:
+        return scores.sum() * 0.0, 0
+
+    L, G, qb, kb = scores.shape
+    k = min(topk, kb)
+    neg_inf = torch.finfo(scores.dtype).min
+    causal = cmask[None, None].expand(L, G, qb, kb)
+    masked = scores.masked_fill(~causal, neg_inf)
+
+    teacher_top = target.topk(k, dim=-1).indices             # [L,G,qb,k]
+    pos = masked.gather(-1, teacher_top)                     # [L,G,qb,k]
+    min_pos = pos.min(dim=-1).values                         # [L,G,qb]
+
+    is_pos = torch.zeros_like(target, dtype=torch.bool)
+    is_pos.scatter_(-1, teacher_top, True)
+    neg = masked.masked_fill(~causal | is_pos, neg_inf)
+    max_neg = neg.max(dim=-1).values                         # [L,G,qb]
+
+    has_negative = (causal & ~is_pos).any(dim=-1)
+    valid = (target.sum(dim=-1) > row_valid_thresh) & has_negative
+    n = valid.sum().clamp_min(1)
+
+    row_loss = F.softplus(max_neg - min_pos + margin)
+    loss = (row_loss * valid).sum() / n
+    return loss, int(valid.sum())
+

@@ -15,7 +15,7 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import torch
 from selector.targets import load_teacher
 from selector.gate import FlatGate
-from selector.loss import kl_loss
+from selector.loss import kl_loss, topk_set_loss
 from selector.recall import recall_metrics
 
 
@@ -27,6 +27,12 @@ def main():
     ap.add_argument("--lr", type=float, default=1e-3)
     ap.add_argument("--proj-dim", type=int, default=None)
     ap.add_argument("--eval-every", type=int, default=25)
+    ap.add_argument("--lambda-topk", type=float, default=0.0,
+                    help="weight for auxiliary teacher top-k ranking loss")
+    ap.add_argument("--topk", type=int, default=8,
+                    help="teacher top-k set size used by --lambda-topk")
+    ap.add_argument("--topk-margin", type=float, default=0.0,
+                    help="optional margin for the auxiliary top-k ranking loss")
     ap.add_argument("--budgets", type=int, nargs="+", default=[1, 2, 4, 8, 16])
     ap.add_argument("--device", default="cuda" if torch.cuda.is_available() else "cpu")
     ap.add_argument("--out", default=os.path.join(
@@ -57,14 +63,23 @@ def main():
     for epoch in range(1, args.epochs + 1):
         gate.train()
         tot, nrows = 0.0, 0
+        topk_tot, topk_rows = 0.0, 0
         for doc in docs:
             scores = gate(doc["q_feat"], doc["k_feat"])
-            loss, nv = kl_loss(scores, doc["target"], doc["cmask"])
+            kl, nv = kl_loss(scores, doc["target"], doc["cmask"])
+            loss = kl
+            if args.lambda_topk:
+                tk, tnv = topk_set_loss(scores, doc["target"], doc["cmask"],
+                                        topk=args.topk, margin=args.topk_margin)
+                loss = loss + args.lambda_topk * tk
+                topk_tot += tk.item() * tnv; topk_rows += tnv
             opt.zero_grad(); loss.backward(); opt.step()
-            tot += loss.item() * nv; nrows += nv
+            tot += kl.item() * nv; nrows += nv
         if epoch % args.eval_every == 0 or epoch == 1 or epoch == args.epochs:
             gate.eval()
             line = [f"epoch {epoch:>4}  KL={tot / max(nrows,1):.4f}"]
+            if args.lambda_topk:
+                line.append(f"topk={topk_tot / max(topk_rows,1):.4f}")
             with torch.no_grad():
                 for doc in docs:
                     sc = gate(doc["q_feat"], doc["k_feat"])

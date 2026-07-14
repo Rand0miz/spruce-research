@@ -1,4 +1,4 @@
-import os, sys, argparse, torch
+import os, sys, argparse, torch, json
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from transformers import AutoTokenizer, AutoModelForCausalLM
@@ -7,10 +7,32 @@ from teacher.chunked_extract import get_pooled_targets
 
 MODEL = "Qwen/Qwen2.5-Coder-1.5B-Instruct"
 DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
+ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+DEFAULT_TRAIN_BANK = os.path.join(ROOT, "scripts", "prompt_banks", "train.json")
+DEFAULT_HELDOUT_BANK = os.path.join(ROOT, "scripts", "prompt_banks", "heldout.json")
 
-NEEDLE = "Bobs favorite color is blue."
-FILLER = "The quarterly logistics report noted no unusual activity. "
-QUESTION = "\n\nWhat is Bob's favorite color? Answer with the exact sentence."
+
+def _safe_id(s):
+    """Filesystem-safe prompt id fragment."""
+    s = re.sub(r"[^A-Za-z0-9_.-]+", "-", s.strip())
+    return s.strip("-") or "prompt"
+
+
+def load_prompt_bank(path):
+    with open(path, "r", encoding="utf-8") as f:
+        data = json.load(f)
+    cases = data["cases"] if isinstance(data, dict) else data
+    if not isinstance(cases, list) or not cases:
+        raise ValueError(f"{path} must contain a non-empty 'cases' list")
+    required = {"id", "needle", "filler", "question"}
+    for i, case in enumerate(cases):
+        missing = required - set(case)
+        if missing:
+            raise ValueError(f"{path} case {i} missing keys: {sorted(missing)}")
+        for key in required:
+            if not isinstance(case[key], str) or not case[key]:
+                raise ValueError(f"{path} case {i} key {key!r} must be a non-empty string")
+    return cases
 
 
 def needle_block_index(tok, prompt, needle, block_size):
@@ -53,9 +75,16 @@ def save_heatmap(pooled_stack, n_blk, seq_len, depth, path):
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--lengths", type=int, nargs="+", default=[16384, 32768])
+    ap.add_argument("--lengths", type=int, nargs="+", default=[16384, 32768],
+                    help="context lengths to extract; defaults to 16k and 32k")
     ap.add_argument("--block", type=int, default=64)
-    ap.add_argument("--depth", type=float, default=0.7)
+    ap.add_argument("--depth", type=float, default=None,
+                    help="single fixed needle depth; overrides random depth and --depths")
+    ap.add_argument("--depths", type=float, nargs="+", default=None,
+                    help="candidate needle depths to randomly sample from; overrides random depth")
+    ap.add_argument("--depth-range", type=float, nargs=2, default=[0.05, 0.95],
+                    metavar=("MIN", "MAX"),
+                    help="continuous random depth range used when --depth/--depths are omitted; default: 0.05 0.95")
     ap.add_argument("--store-dtype", default="float16", choices=["float16", "float32"])
     ap.add_argument("--out", default=os.path.join(
         os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "teacher_targets"))
@@ -63,6 +92,8 @@ def main():
                     help="permit CPU run; default refuses to run without CUDA")
     ap.add_argument("--no-heatmap", action="store_true",
                     help="skip writing the per-length pooled-mass heatmap PNG")
+    ap.add_argument("--heldout", type=bool, default=False,
+                    help="if True, use the heldout needle for teacher target extraction")
     args = ap.parse_args()
 
     if not torch.cuda.is_available() and not args.allow_cpu:
@@ -84,8 +115,8 @@ def main():
 
     for L in args.lengths:
         assert L <= 32768, f"{L} > 32768 native max; needs YaRN rope_scaling (not set)."
-        prompt, ndl = build_haystack(tok, L - q_len, NEEDLE, args.depth, FILLER)
-        full = prompt + QUESTION
+        prompt, ndl = build_haystack(tok, L - q_len, NEEDLE if not args.heldout else HELDOUT_NEEDLE, args.depth, FILLER)
+        full = prompt + (QUESTION if not args.heldout else HELDOUT_QUESTION)
         n_blk = needle_block_index(tok, full, ndl, args.block)
 
         if DEVICE == "cuda":
