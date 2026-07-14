@@ -1,6 +1,6 @@
 """Flat selector gate — SeerAttention form, the leaf level of the tree.
 
-score(q, k) = (Wq . pooledQ[q]) . (Wk . pooledK[k])^T / sqrt(d_proj)
+score(q, k) = max over (query-proto i, key-proto j) of (Wq . q_i) . (Wk . k_j) / sqrt(d_proj)
 
 Wq, Wk are the ONLY trainable parameters. One (Wq, Wk) pair per layer (SeerAttention
 trains a per-layer gate); shared across the G kv-groups within a layer, since q_feat /
@@ -25,7 +25,15 @@ class FlatGate(nn.Module):
             nn.init.kaiming_uniform_(W, a=math.sqrt(5))
 
     def forward(self, q_feat, k_feat):
-        """q_feat [L,G,qb,d], k_feat [L,G,kb,d] -> raw scores [L,G,qb,kb]."""
-        qp = torch.einsum("lgqd,ldp->lgqp", q_feat, self.Wq)
-        kp = torch.einsum("lgkd,ldp->lgkp", k_feat, self.Wk)
-        return torch.einsum("lgqp,lgkp->lgqk", qp, kp) / math.sqrt(self.proj_dim)
+        """q_feat [L,G,qb,P,d], k_feat [L,G,kb,P,d] -> raw MaxSim scores [L,G,qb,kb].
+        score(q,k) = max over (query-proto i, key-proto j) of (Wq.q_i).(Wk.k_j).
+        Running max over key-prototypes so [L,G,qb,kb,P,P] is never materialized."""
+        qp = torch.einsum("lgqid,ldp->lgqip", q_feat, self.Wq)   # [L,G,qb,P,p]
+        kp = torch.einsum("lgkjd,ldp->lgkjp", k_feat, self.Wk)   # [L,G,kb,P,p]
+        best = None
+        for j in range(kp.shape[3]):                             # loop key-protos
+            kpj = kp[:, :, :, j, :]                              # [L,G,kb,p]
+            s = torch.einsum("lgqip,lgkp->lgqik", qp, kpj)       # [L,G,qb,P,kb]
+            s = s.amax(dim=3)                                    # max over query-protos
+            best = s if best is None else torch.maximum(best, s)
+        return best / math.sqrt(self.proj_dim)                   # [L,G,qb,kb]
