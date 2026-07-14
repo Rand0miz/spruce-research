@@ -97,9 +97,9 @@ def main():
 
         path = os.path.join(args.out, f"teacher_len{seq_len}_blk{args.block}_d{args.depth}.pt")
         torch.save({
-            "pooled": pooled_stack.to(store_dtype),      # [1, L, H, qb, kb]  TARGET
-            "pooledQ": pooledQ_stack.to(store_dtype),    # [1, L, H, qb, d]   selector input
-            "pooledK": pooledK_stack.to(store_dtype),    # [1, L, kv, kb, d]  selector input
+            "pooled": pooled_stack.to(store_dtype),      # [1, L, H, qb, kb]      TARGET
+            "pooledQ": pooledQ_stack.to(store_dtype),    # [1, L, G, qb, P, d]    selector input
+            "pooledK": pooledK_stack.to(store_dtype),    # [1, L, G, kb, P, d]    selector input
             "head_dim": pooledQ_stack.shape[-1],
             "num_kv_heads": pooledK_stack.shape[2],
             "seq_len": seq_len,
@@ -109,6 +109,7 @@ def main():
             "needle_block": n_blk,
             "num_layers": pooled_stack.shape[1],
             "num_heads": pooled_stack.shape[2],
+            "proto": pooledK_stack.shape[-2],
             "store_dtype": args.store_dtype,
         }, path)
         print(f"len={seq_len:>6}  blocks={pooled_stack.shape[-1]:>4}  "
