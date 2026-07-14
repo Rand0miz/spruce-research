@@ -36,8 +36,8 @@ def test_short_block_pads_with_mean():
     last = out[0, 0, 1]                             # [P,d]  last block
     real_mean = x[0, 0, 64:, :].mean(dim=0)
     assert torch.allclose(last[0], real_mean, atol=1e-5)   # proto 0 = real-row mean
-    # no proto is a zero-pad row (all pad rows were masked out of selection)
-    assert not torch.allclose(last, torch.zeros_like(last))
+    # no proto is a zero vector (all spare slots filled with mean, not pad rows)
+    assert not (last == 0).all(dim=-1).any()
 
 
 if __name__ == "__main__":
