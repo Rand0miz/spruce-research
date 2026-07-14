@@ -5,12 +5,12 @@ from transformers import AutoTokenizer, AutoModelForCausalLM
 from eval.haystack import build_haystack
 from teacher.chunked_extract import get_pooled_targets
 
-MODEL = "Qwen/Qwen2.5-Coder-1.5B-Instruct"
+MODEL = "Qwen/Qwen2.5-Coder-3B-Instruct"
 DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
 
-NEEDLE = "Bobs favorite color is blue."
-FILLER = "The quarterly logistics report noted no unusual activity. "
-QUESTION = "\n\nWhat is Bob's favorite color? Answer with the exact sentence."
+NEEDLE = "Myles was born in 1974. "
+FILLER = "The portfolio is underpreforming as of last quarter. "
+QUESTION = "\n\nWhat is the birth year of Myles? Answer with the exact sentence."
 
 
 def needle_block_index(tok, prompt, needle, block_size):
@@ -55,7 +55,7 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--lengths", type=int, nargs="+", default=[16384, 32768])
     ap.add_argument("--block", type=int, default=64)
-    ap.add_argument("--depth", type=float, default=0.7)
+    ap.add_argument("--depth", type=float, default=0.5)
     ap.add_argument("--store-dtype", default="float16", choices=["float16", "float32"])
     ap.add_argument("--out", default=os.path.join(
         os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "teacher_targets"))

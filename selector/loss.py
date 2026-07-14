@@ -29,3 +29,45 @@ def kl_loss(scores, target, cmask, eps=1e-9, row_valid_thresh=0.5):
     n = valid.sum().clamp_min(1)
     loss = (kl_row * valid).sum() / n
     return loss, int(valid.sum())
+
+
+def topk_membership_loss(scores, target, cmask, k=8, row_valid_thresh=0.5):
+    """Balanced BCE that forces the gate to rank the teacher's top-k blocks high.
+
+    KL matches attention *mass*, so a small-mass but retrieval-critical block (the
+    needle) can be dropped for near-zero KL cost. This term is mass-blind: it turns
+    the teacher's top-k blocks into POSITIVES (label 1) and the remaining causal
+    blocks into NEGATIVES (label 0), then pushes student scores up on positives and
+    down on negatives via logsigmoid. Positives and negatives are averaged separately
+    so the k positives are not drowned out by the many negatives (class balance).
+
+    scores/target [L,G,qb,kb], cmask [qb,kb]. Returns (loss, num_positive_blocks).
+    """
+    L, G, qb, kb = scores.shape
+    kk = min(k, kb)
+    t_top = target.topk(kk, dim=-1).indices                  # [L,G,qb,kk]
+    member = torch.zeros_like(target, dtype=torch.bool)
+    member.scatter_(-1, t_top, True)
+
+    # Restrict positives to blocks the teacher actually attends (target>0). On short
+    # query rows topk() would otherwise pad the set with zero-mass future blocks.
+    valid = (target.sum(dim=-1) > row_valid_thresh)[..., None]   # [L,G,qb,1]
+    pos = member & (target > 0) & valid                      # teacher top-k, causal
+    neg = cmask[None, None] & (~pos) & valid                 # other causal candidates
+
+    logp = F.logsigmoid(scores)                              # score high  -> loss low
+    logn = F.logsigmoid(-scores)                             # score low   -> loss low
+    p = pos.to(logp.dtype)
+    ng = neg.to(logn.dtype)
+    lp = -(logp * p).sum() / p.sum().clamp_min(1)            # avg over positives
+    ln = -(logn * ng).sum() / ng.sum().clamp_min(1)          # avg over negatives
+    return 0.5 * (lp + ln), int(pos.sum())
+
+
+def combined_loss(scores, target, cmask, lambda_topk=0.5, k=8):
+    """KL (mass matching) + lambda * top-k membership (needle retention).
+    Returns (total, {kl, bce, n_valid})."""
+    kl, nv = kl_loss(scores, target, cmask)
+    bce, _ = topk_membership_loss(scores, target, cmask, k=k)
+    total = kl + lambda_topk * bce
+    return total, {"kl": float(kl), "bce": float(bce), "n": nv}
