@@ -5,7 +5,9 @@ from transformers.modeling_utils import ALL_ATTENTION_FUNCTIONS
 
 # layer_idx -> pooled [1, num_heads, q_blocks, k_blocks] (cpu, fp32)
 _CAPTURE = {}
-# layer_idx -> (pooledQ [1, G, q_blocks, P, d], pooledK [1, G, k_blocks, P, d]) (cpu, fp32)
+# layer_idx -> (pooledQ [1, G, q_blocks, P, d], pooledK [1, G, k_blocks, P, d]) (cpu, MODEL
+# DTYPE, e.g. bf16 -- NOT fp32; _capture_attention .cpu()s these without a .float() cast,
+# so they carry whatever dtype the model ran in).
 # These are the SELECTOR INPUTS (SeerAttention scores Wq*pooledQ . Wk*pooledK), captured
 # here so training reads tensors only, no frozen Qwen in the loop. pooledK keeps the
 # original kv_head count (pre-GQA-repeat) to match the selected_blocks kv_head_group axis.
@@ -19,22 +21,6 @@ _PROTO = 8              # prototypes per block (1 mean + 7 outliers), both Q and
 # bit-identical to processing all heads at once (heads are independent here).
 _HEAD_CHUNK = 2
 _REGISTERED = False
-
-
-def _mean_pool_seq(x, block):
-    """[b, H, L, d] -> [b, H, nb, d]: mean of each block along the sequence dim.
-    Last block may be partial; average over its real rows only (not the zero pad)."""
-    b, H, L, d = x.shape
-    nb = (L + block - 1) // block
-    pad = nb * block - L
-    if pad:
-        x = F.pad(x, (0, 0, 0, pad))                # zero-pad the ragged tail
-    x = x.view(b, H, nb, block, d)
-    if pad:
-        counts = x.new_full((nb, 1), float(block))
-        counts[-1, 0] = block - pad                 # real rows in the last block
-        return x.sum(dim=3) / counts.view(1, 1, nb, 1)
-    return x.mean(dim=3)
 
 
 def _proto_pool_seq(x, block, P):
@@ -58,16 +44,24 @@ def _proto_pool_seq(x, block, P):
     vf = valid.to(xb.dtype)[..., None]               # [1,1,nb,block,1]
     mean = (xb * vf).sum(dim=3) / counts.view(1, 1, nb, 1)   # [b,H,nb,d]
 
-    dist = (xb - mean[:, :, :, None, :]).pow(2).sum(dim=-1)  # [b,H,nb,block]
+    # Distance math always in fp32, regardless of x's dtype: a squared-L2 distance
+    # overflows fp16 (max ~65504) for exactly the largest outliers -- the needles
+    # this pooling exists to preserve. fp32 is ~33MB transient at 32K -- free. The
+    # returned prototypes below still use x's original dtype; only this fp32 cast
+    # is local to the distance computation.
+    dist = (xb.float() - mean.float()[:, :, :, None, :]).pow(2).sum(dim=-1)  # [b,H,nb,block] fp32
     dist = dist.masked_fill(~valid, float("-inf"))   # never pick a pad row
     k = min(P - 1, block)
     idx = dist.topk(k, dim=-1).indices               # [b,H,nb,k]
     gidx = idx[..., None].expand(-1, -1, -1, -1, d)
     outliers = xb.gather(3, gidx)                     # [b,H,nb,k,d]
-    # if a block had fewer than k real rows, some picked rows are pad (dist=-inf):
-    # replace those with the mean.
-    sel_dist = dist.gather(-1, idx)                   # [b,H,nb,k]
-    bad = torch.isinf(sel_dist)[..., None]            # [b,H,nb,k,1]
+    # if a block had fewer than k real rows, some picked rows are pad: replace those
+    # with the mean. Derived from the validity mask itself, NOT from dist==-inf --
+    # a genuine (finite) distance can equal +inf under fp16 overflow for a real
+    # extreme outlier, which torch.isinf would also flag as "pad" and silently
+    # replace with the mean -- exactly inverting the point of this pooling.
+    sel_valid = valid.expand(b, H, nb, block).gather(-1, idx)  # [b,H,nb,k] bool
+    bad = (~sel_valid)[..., None]                      # [b,H,nb,k,1]
     outliers = torch.where(bad, mean[:, :, :, None, :].expand_as(outliers), outliers)
 
     protos = torch.cat([mean[:, :, :, None, :], outliers], dim=3)   # [b,H,nb,1+k,d]
@@ -178,8 +172,8 @@ def get_pooled_targets(model, tok, prompt, device="cuda", block_size=_BLOCK):
     """
     One forward pass; captures chunked pooled block-mass per layer.
     Returns (pooled_stack [1, num_layers, num_heads, q_blocks, k_blocks] fp32 cpu,
-             pooledQ_stack [1, num_layers, G, q_blocks, P, d] fp32 cpu,
-             pooledK_stack [1, num_layers, G, k_blocks, P, d] fp32 cpu,
+             pooledQ_stack [1, num_layers, G, q_blocks, P, d] model-dtype cpu (e.g. bf16),
+             pooledK_stack [1, num_layers, G, k_blocks, P, d] model-dtype cpu (e.g. bf16),
              seq_len).
     pooled_stack is the training TARGET; the Q/K stacks are the selector INPUTS.
     Never materializes a full attention matrix -> fits 16K-32K on 8GB.
