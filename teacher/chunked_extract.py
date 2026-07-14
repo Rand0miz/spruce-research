@@ -5,12 +5,13 @@ from transformers.modeling_utils import ALL_ATTENTION_FUNCTIONS
 
 # layer_idx -> pooled [1, num_heads, q_blocks, k_blocks] (cpu, fp32)
 _CAPTURE = {}
-# layer_idx -> (pooledQ [1, H, q_blocks, d], pooledK [1, kv, k_blocks, d]) (cpu, fp32)
+# layer_idx -> (pooledQ [1, G, q_blocks, P, d], pooledK [1, G, k_blocks, P, d]) (cpu, fp32)
 # These are the SELECTOR INPUTS (SeerAttention scores Wq*pooledQ . Wk*pooledK), captured
 # here so training reads tensors only, no frozen Qwen in the loop. pooledK keeps the
 # original kv_head count (pre-GQA-repeat) to match the selected_blocks kv_head_group axis.
 _CAPTURE_QK = {}
 _BLOCK = 64
+_PROTO = 8              # prototypes per block (1 mean + 7 outliers), both Q and K sides
 # How many heads to score at once inside chunked_pool. The last query block scores
 # against all keys -> a [b, H_CHUNK, block, k_len] fp32 strip (+ its softmax +
 # padded copy). At 32K that strip is ~1GB across all heads; chunking heads caps
@@ -76,6 +77,14 @@ def _proto_pool_seq(x, block, P):
     return protos                                     # [b,H,nb,P,d]
 
 
+def _group_avg_tokens(x, G):
+    """[b,H,L,d] -> [b,G,L,d]: average the H/G query heads inside each kv-group,
+    per token. Done pre-pool so each prototype is a real per-group token vector."""
+    b, H, L, d = x.shape
+    assert H % G == 0, f"H={H} not divisible by G={G}"
+    return x.view(b, G, H // G, L, d).mean(dim=2)
+
+
 def _repeat_kv(key, n_rep):
     """[b, n_kv, k, d] -> [b, n_kv*n_rep, k, d] (match eager pool_attention head count)."""
     if n_rep == 1:
@@ -135,10 +144,12 @@ def _capture_attention(module, query, key, value, attention_mask,
     key_rep = _repeat_kv(key, n_rep)
     pooled = chunked_pool(query, key_rep, scaling, _BLOCK)
     _CAPTURE[module.layer_idx] = pooled.cpu()
-    # Selector inputs: mean-pool post-RoPE Q per query-block and original K per key-block.
-    # K uses pre-repeat `key` -> [1, kv, kb, d] (one vector per kv_head_group).
-    pooledQ = _mean_pool_seq(query, _BLOCK).cpu()   # [1, H, qb, d]
-    pooledK = _mean_pool_seq(key, _BLOCK).cpu()     # [1, kv, kb, d]
+    # Selector inputs as P prototypes per block (mean + outliers), so a single-token
+    # spike (the needle) survives pooling. K is pre-GQA-repeat -> already per kv-group.
+    # Q is averaged H->G per token before pooling so prototypes are real per-group tokens.
+    q_grouped = _group_avg_tokens(query, key.shape[1])     # [1, G, q_len, d]
+    pooledQ = _proto_pool_seq(q_grouped, _BLOCK, _PROTO).cpu()   # [1, G, qb, P, d]
+    pooledK = _proto_pool_seq(key, _BLOCK, _PROTO).cpu()        # [1, G, kb, P, d]
     _CAPTURE_QK[module.layer_idx] = (pooledQ, pooledK)
     # Propagate through SDPA's FUSED CAUSAL path. We repeat KV to the full head
     # count ourselves instead of letting sdpa_attention_forward set enable_gqa=True:
@@ -167,8 +178,8 @@ def get_pooled_targets(model, tok, prompt, device="cuda", block_size=_BLOCK):
     """
     One forward pass; captures chunked pooled block-mass per layer.
     Returns (pooled_stack [1, num_layers, num_heads, q_blocks, k_blocks] fp32 cpu,
-             pooledQ_stack [1, num_layers, H, q_blocks, d] fp32 cpu,
-             pooledK_stack [1, num_layers, kv, k_blocks, d] fp32 cpu,
+             pooledQ_stack [1, num_layers, G, q_blocks, P, d] fp32 cpu,
+             pooledK_stack [1, num_layers, G, k_blocks, P, d] fp32 cpu,
              seq_len).
     pooled_stack is the training TARGET; the Q/K stacks are the selector INPUTS.
     Never materializes a full attention matrix -> fits 16K-32K on 8GB.
@@ -209,6 +220,6 @@ def get_pooled_targets(model, tok, prompt, device="cuda", block_size=_BLOCK):
 
     order = sorted(_CAPTURE)
     pooled_stack = torch.stack([_CAPTURE[i] for i in order], dim=1)        # [1, L, H, qb, kb]
-    pooledQ_stack = torch.stack([_CAPTURE_QK[i][0] for i in order], dim=1)  # [1, L, H, qb, d]
-    pooledK_stack = torch.stack([_CAPTURE_QK[i][1] for i in order], dim=1)  # [1, L, kv, kb, d]
+    pooledQ_stack = torch.stack([_CAPTURE_QK[i][0] for i in order], dim=1)  # [1, L, G, qb, P, d]
+    pooledK_stack = torch.stack([_CAPTURE_QK[i][1] for i in order], dim=1)  # [1, L, G, kb, P, d]
     return pooled_stack, pooledQ_stack, pooledK_stack, inputs["input_ids"].shape[1]
