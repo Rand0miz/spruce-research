@@ -7,3 +7,5 @@ paper-notes.md
 teacher_targets/
 *.pt
 docs/superpowers/
+__pycache__/
+*.py[cod]
