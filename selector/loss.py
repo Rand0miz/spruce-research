@@ -30,37 +30,44 @@ def kl_loss(scores, target, cmask, eps=1e-9, row_valid_thresh=0.5):
     loss = (kl_row * valid).sum() / n
     return loss, int(valid.sum())
 
-def topk_set_loss(scores, target, cmask, topk=8, margin=0.0, row_valid_thresh=0.5):
-    """Ranking auxiliary for set-recall@k.
 
-    For each valid row, take the teacher's top-k key blocks as positives and require
-    the weakest positive score to beat the strongest non-positive causal score. This
-    directly matches the recall@k failure mode that KL can miss when many nearby
-    blocks have almost tied teacher mass.
+def topk_membership_loss(scores, target, cmask, k=8, row_valid_thresh=0.5):
+    """Balanced BCE that forces the gate to rank the teacher's top-k blocks high.
+
+    KL matches attention *mass*, so a small-mass but retrieval-critical block (the
+    needle) can be dropped for near-zero KL cost. This term is mass-blind: it turns
+    the teacher's top-k blocks into POSITIVES (label 1) and the remaining causal
+    blocks into NEGATIVES (label 0), then pushes student scores up on positives and
+    down on negatives via logsigmoid. Positives and negatives are averaged separately
+    so the k positives are not drowned out by the many negatives (class balance).
+
+    scores/target [L,G,qb,kb], cmask [qb,kb]. Returns (loss, num_positive_blocks).
     """
-    if topk <= 0:
-        return scores.sum() * 0.0, 0
-
     L, G, qb, kb = scores.shape
-    k = min(topk, kb)
-    neg_inf = torch.finfo(scores.dtype).min
-    causal = cmask[None, None].expand(L, G, qb, kb)
-    masked = scores.masked_fill(~causal, neg_inf)
+    kk = min(k, kb)
+    t_top = target.topk(kk, dim=-1).indices                  # [L,G,qb,kk]
+    member = torch.zeros_like(target, dtype=torch.bool)
+    member.scatter_(-1, t_top, True)
 
-    teacher_top = target.topk(k, dim=-1).indices             # [L,G,qb,k]
-    pos = masked.gather(-1, teacher_top)                     # [L,G,qb,k]
-    min_pos = pos.min(dim=-1).values                         # [L,G,qb]
+    # Restrict positives to blocks the teacher actually attends (target>0). On short
+    # query rows topk() would otherwise pad the set with zero-mass future blocks.
+    valid = (target.sum(dim=-1) > row_valid_thresh)[..., None]   # [L,G,qb,1]
+    pos = member & (target > 0) & valid                      # teacher top-k, causal
+    neg = cmask[None, None] & (~pos) & valid                 # other causal candidates
 
-    is_pos = torch.zeros_like(target, dtype=torch.bool)
-    is_pos.scatter_(-1, teacher_top, True)
-    neg = masked.masked_fill(~causal | is_pos, neg_inf)
-    max_neg = neg.max(dim=-1).values                         # [L,G,qb]
+    logp = F.logsigmoid(scores)                              # score high  -> loss low
+    logn = F.logsigmoid(-scores)                             # score low   -> loss low
+    p = pos.to(logp.dtype)
+    ng = neg.to(logn.dtype)
+    lp = -(logp * p).sum() / p.sum().clamp_min(1)            # avg over positives
+    ln = -(logn * ng).sum() / ng.sum().clamp_min(1)          # avg over negatives
+    return 0.5 * (lp + ln), int(pos.sum())
 
-    has_negative = (causal & ~is_pos).any(dim=-1)
-    valid = (target.sum(dim=-1) > row_valid_thresh) & has_negative
-    n = valid.sum().clamp_min(1)
 
-    row_loss = F.softplus(max_neg - min_pos + margin)
-    loss = (row_loss * valid).sum() / n
-    return loss, int(valid.sum())
-
+def combined_loss(scores, target, cmask, lambda_topk=0.5, k=8):
+    """KL (mass matching) + lambda * top-k membership (needle retention).
+    Returns (total, {kl, bce, n_valid})."""
+    kl, nv = kl_loss(scores, target, cmask)
+    bce, _ = topk_membership_loss(scores, target, cmask, k=k)
+    total = kl + lambda_topk * bce
+    return total, {"kl": float(kl), "bce": float(bce), "n": nv}

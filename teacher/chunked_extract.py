@@ -5,12 +5,15 @@ from transformers.modeling_utils import ALL_ATTENTION_FUNCTIONS
 
 # layer_idx -> pooled [1, num_heads, q_blocks, k_blocks] (cpu, fp32)
 _CAPTURE = {}
-# layer_idx -> (pooledQ [1, H, q_blocks, d], pooledK [1, kv, k_blocks, d]) (cpu, fp32)
+# layer_idx -> (pooledQ [1, G, q_blocks, P, d], pooledK [1, G, k_blocks, P, d]) (cpu, MODEL
+# DTYPE, e.g. bf16 -- NOT fp32; _capture_attention .cpu()s these without a .float() cast,
+# so they carry whatever dtype the model ran in).
 # These are the SELECTOR INPUTS (SeerAttention scores Wq*pooledQ . Wk*pooledK), captured
 # here so training reads tensors only, no frozen Qwen in the loop. pooledK keeps the
 # original kv_head count (pre-GQA-repeat) to match the selected_blocks kv_head_group axis.
 _CAPTURE_QK = {}
 _BLOCK = 64
+_PROTO = 8              # prototypes per block (1 mean + 7 outliers), both Q and K sides
 # How many heads to score at once inside chunked_pool. The last query block scores
 # against all keys -> a [b, H_CHUNK, block, k_len] fp32 strip (+ its softmax +
 # padded copy). At 32K that strip is ~1GB across all heads; chunking heads caps
@@ -20,20 +23,60 @@ _HEAD_CHUNK = 2
 _REGISTERED = False
 
 
-def _mean_pool_seq(x, block):
-    """[b, H, L, d] -> [b, H, nb, d]: mean of each block along the sequence dim.
-    Last block may be partial; average over its real rows only (not the zero pad)."""
+def _proto_pool_seq(x, block, P):
+    """[b,H,L,d] -> [b,H,nb,P,d]: P prototype vectors per block.
+    proto 0 = block mean (real rows only); protos 1..P-1 = the P-1 tokens
+    farthest (squared-L2) from that mean. Short/ragged blocks (fewer than P-1
+    real outlier rows) fill spare slots with the mean, so max-pooling over
+    prototypes is unaffected. Selection uses only x -> reproducible at inference."""
     b, H, L, d = x.shape
     nb = (L + block - 1) // block
     pad = nb * block - L
     if pad:
-        x = F.pad(x, (0, 0, 0, pad))                # zero-pad the ragged tail
-    x = x.view(b, H, nb, block, d)
+        x = F.pad(x, (0, 0, 0, pad))                 # zero-pad ragged tail
+    xb = x.view(b, H, nb, block, d)                  # [b,H,nb,block,d]
+
+    counts = xb.new_full((nb,), float(block))
     if pad:
-        counts = x.new_full((nb, 1), float(block))
-        counts[-1, 0] = block - pad                 # real rows in the last block
-        return x.sum(dim=3) / counts.view(1, 1, nb, 1)
-    return x.mean(dim=3)
+        counts[-1] = block - pad                     # real rows in last block
+    valid = (torch.arange(block, device=x.device)[None, None, None, :]
+             < counts.view(1, 1, nb, 1))             # [1,1,nb,block] bool
+    vf = valid.to(xb.dtype)[..., None]               # [1,1,nb,block,1]
+    mean = (xb * vf).sum(dim=3) / counts.view(1, 1, nb, 1)   # [b,H,nb,d]
+
+    # Distance math always in fp32, regardless of x's dtype: a squared-L2 distance
+    # overflows fp16 (max ~65504) for exactly the largest outliers -- the needles
+    # this pooling exists to preserve. fp32 is ~33MB transient at 32K -- free. The
+    # returned prototypes below still use x's original dtype; only this fp32 cast
+    # is local to the distance computation.
+    dist = (xb.float() - mean.float()[:, :, :, None, :]).pow(2).sum(dim=-1)  # [b,H,nb,block] fp32
+    dist = dist.masked_fill(~valid, float("-inf"))   # never pick a pad row
+    k = min(P - 1, block)
+    idx = dist.topk(k, dim=-1).indices               # [b,H,nb,k]
+    gidx = idx[..., None].expand(-1, -1, -1, -1, d)
+    outliers = xb.gather(3, gidx)                     # [b,H,nb,k,d]
+    # if a block had fewer than k real rows, some picked rows are pad: replace those
+    # with the mean. Derived from the validity mask itself, NOT from dist==-inf --
+    # a genuine (finite) distance can equal +inf under fp16 overflow for a real
+    # extreme outlier, which torch.isinf would also flag as "pad" and silently
+    # replace with the mean -- exactly inverting the point of this pooling.
+    sel_valid = valid.expand(b, H, nb, block).gather(-1, idx)  # [b,H,nb,k] bool
+    bad = (~sel_valid)[..., None]                      # [b,H,nb,k,1]
+    outliers = torch.where(bad, mean[:, :, :, None, :].expand_as(outliers), outliers)
+
+    protos = torch.cat([mean[:, :, :, None, :], outliers], dim=3)   # [b,H,nb,1+k,d]
+    if 1 + k < P:                                     # only if block < P-1 (not at 64/8)
+        extra = mean[:, :, :, None, :].expand(-1, -1, -1, P - (1 + k), -1)
+        protos = torch.cat([protos, extra], dim=3)
+    return protos                                     # [b,H,nb,P,d]
+
+
+def _group_avg_tokens(x, G):
+    """[b,H,L,d] -> [b,G,L,d]: average the H/G query heads inside each kv-group,
+    per token. Done pre-pool so each prototype is a real per-group token vector."""
+    b, H, L, d = x.shape
+    assert H % G == 0, f"H={H} not divisible by G={G}"
+    return x.view(b, G, H // G, L, d).mean(dim=2)
 
 
 def _repeat_kv(key, n_rep):
@@ -95,10 +138,12 @@ def _capture_attention(module, query, key, value, attention_mask,
     key_rep = _repeat_kv(key, n_rep)
     pooled = chunked_pool(query, key_rep, scaling, _BLOCK)
     _CAPTURE[module.layer_idx] = pooled.cpu()
-    # Selector inputs: mean-pool post-RoPE Q per query-block and original K per key-block.
-    # K uses pre-repeat `key` -> [1, kv, kb, d] (one vector per kv_head_group).
-    pooledQ = _mean_pool_seq(query, _BLOCK).cpu()   # [1, H, qb, d]
-    pooledK = _mean_pool_seq(key, _BLOCK).cpu()     # [1, kv, kb, d]
+    # Selector inputs as P prototypes per block (mean + outliers), so a single-token
+    # spike (the needle) survives pooling. K is pre-GQA-repeat -> already per kv-group.
+    # Q is averaged H->G per token before pooling so prototypes are real per-group tokens.
+    q_grouped = _group_avg_tokens(query, key.shape[1])     # [1, G, q_len, d]
+    pooledQ = _proto_pool_seq(q_grouped, _BLOCK, _PROTO).cpu()   # [1, G, qb, P, d]
+    pooledK = _proto_pool_seq(key, _BLOCK, _PROTO).cpu()        # [1, G, kb, P, d]
     _CAPTURE_QK[module.layer_idx] = (pooledQ, pooledK)
     # Propagate through SDPA's FUSED CAUSAL path. We repeat KV to the full head
     # count ourselves instead of letting sdpa_attention_forward set enable_gqa=True:
@@ -127,8 +172,8 @@ def get_pooled_targets(model, tok, prompt, device="cuda", block_size=_BLOCK):
     """
     One forward pass; captures chunked pooled block-mass per layer.
     Returns (pooled_stack [1, num_layers, num_heads, q_blocks, k_blocks] fp32 cpu,
-             pooledQ_stack [1, num_layers, H, q_blocks, d] fp32 cpu,
-             pooledK_stack [1, num_layers, kv, k_blocks, d] fp32 cpu,
+             pooledQ_stack [1, num_layers, G, q_blocks, P, d] model-dtype cpu (e.g. bf16),
+             pooledK_stack [1, num_layers, G, k_blocks, P, d] model-dtype cpu (e.g. bf16),
              seq_len).
     pooled_stack is the training TARGET; the Q/K stacks are the selector INPUTS.
     Never materializes a full attention matrix -> fits 16K-32K on 8GB.
@@ -169,6 +214,6 @@ def get_pooled_targets(model, tok, prompt, device="cuda", block_size=_BLOCK):
 
     order = sorted(_CAPTURE)
     pooled_stack = torch.stack([_CAPTURE[i] for i in order], dim=1)        # [1, L, H, qb, kb]
-    pooledQ_stack = torch.stack([_CAPTURE_QK[i][0] for i in order], dim=1)  # [1, L, H, qb, d]
-    pooledK_stack = torch.stack([_CAPTURE_QK[i][1] for i in order], dim=1)  # [1, L, kv, kb, d]
+    pooledQ_stack = torch.stack([_CAPTURE_QK[i][0] for i in order], dim=1)  # [1, L, G, qb, P, d]
+    pooledK_stack = torch.stack([_CAPTURE_QK[i][1] for i in order], dim=1)  # [1, L, G, kb, P, d]
     return pooled_stack, pooledQ_stack, pooledK_stack, inputs["input_ids"].shape[1]

@@ -25,6 +25,10 @@ def main():
                     help="teacher .pt paths or globs (must have pooledQ/pooledK)")
     ap.add_argument("--epochs", type=int, default=200)
     ap.add_argument("--lr", type=float, default=1e-3)
+    ap.add_argument("--lambda-topk", type=float, default=0.5,
+                    help="weight of the top-k membership term (needle retention)")
+    ap.add_argument("--topk", type=int, default=8,
+                    help="k for the membership term; match the KS1 budget")
     ap.add_argument("--proj-dim", type=int, default=None)
     ap.add_argument("--eval-every", type=int, default=25)
     ap.add_argument("--lambda-topk", type=float, default=0.0,

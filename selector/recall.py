@@ -50,9 +50,17 @@ def recall_metrics(scores, target, cmask, budgets=(1, 2, 4, 8, 16), needle_block
 
     if needle_block is not None and 0 <= needle_block < kb:
         reader = masked[:, :, -1, :]                        # [L,G,kb] last query block
+        # Teacher oracle: does the teacher's OWN reader-row top-k keep the needle?
+        # If this is low, the mass target itself ranks the needle out -> the gate is
+        # being TAUGHT to drop it (mass-KL vs retrieval tension, not a recipe fault).
+        # If this is high but needle_hit is low, it's a gate/recipe problem.
+        treader = target.masked_fill(~cmask[None, None], 0.0)[:, :, -1, :]  # [L,G,kb]
         for k in budgets:
             kk = min(k, kb)
             top = reader.topk(kk, dim=-1).indices           # [L,G,kk]
             hit = (top == needle_block).any(dim=-1).float() # [L,G]
             out[f"needle_hit@{k}"] = float(hit.mean())
+            ttop = treader.topk(kk, dim=-1).indices          # [L,G,kk]
+            thit = (ttop == needle_block).any(dim=-1).float()
+            out[f"teacher_needle@{k}"] = float(thit.mean())
     return out

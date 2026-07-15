@@ -72,12 +72,16 @@ def main():
                             f"/{met[f'oracle_cov@{b}']:.3f}" for b in args.budgets)
             ndl = "  ".join(f"ndl@{b}={met[f'needle_hit@{b}']:.2f}"
                             for b in args.budgets if f"needle_hit@{b}" in met)
+            tndl = "  ".join(f"tndl@{b}={met[f'teacher_needle@{b}']:.2f}"
+                             for b in args.budgets if f"teacher_needle@{b}" in met)
             print(f"\n{os.path.basename(p)}  seq={m['seq_len']} "
                   f"needle_blk={m['needle_block']}")
             print(f"  {rec}")
             print(f"  {cov}")
             if ndl:
                 print(f"  {ndl}")
+            if tndl:
+                print(f"  {tndl}")
 
     ok = worst_r8 >= args.threshold
     print(f"\nworst recall@8 = {worst_r8:.3f}  "
