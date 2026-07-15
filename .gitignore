@@ -1,6 +1,7 @@
 .env
 *.html
 CLAUDE.md
+AGENTS.md
 graphify-out
 planV2.md
 paper-notes.md

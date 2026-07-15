@@ -140,6 +140,14 @@ def main():
                     help="use scripts/prompt_banks/heldout.json instead of train.json")
     ap.add_argument("--all", action="store_true",
                     help="run every scenario in the selected prompt bank; otherwise pick one randomly")
+    ap.add_argument("--offload", action="store_true",
+                    help="stream fp16 weights from CPU RAM layer-by-layer so a bigger model "
+                         "(3B/32k, 7B) fits 8GB VRAM. Targets are bit-identical to a full-GPU "
+                         "fp16 run -- only slower. Needs CPU RAM >= model size (3B=6GB, 7B=14GB).")
+    ap.add_argument("--gpu-budget", type=float, default=4.0,
+                    help="GiB of VRAM accelerate may fill with weights when --offload is set; "
+                         "the rest stream from CPU. Lower = smaller peak, more streaming. "
+                         "Leave headroom for activations (~1-2GB at 32k).")
     args = ap.parse_args()
 
     if not torch.cuda.is_available() and not args.allow_cpu:
@@ -160,9 +168,25 @@ def main():
 
     tok = AutoTokenizer.from_pretrained(args.model)
     # fp16 weights; <=32768 native context -> no rope_scaling. sdpa is the restore target.
-    model = AutoModelForCausalLM.from_pretrained(
-        args.model, torch_dtype="auto", attn_implementation="sdpa"
-    ).to(DEVICE).eval()
+    if args.offload:
+        # Stream weights: accelerate keeps ~gpu_budget GiB of layers resident and moves
+        # the rest to CPU RAM, shuttling each to VRAM only for its forward. Peak VRAM =
+        # resident weights + activation transient, not the whole model. Same fp16 numbers
+        # as a full-GPU run. NOTE: no .to(DEVICE) -- device_map owns placement.
+        if DEVICE != "cuda":
+            raise SystemExit("--offload needs a CUDA GPU to stream weights onto.")
+        offload_dir = os.path.join(args.out, "_offload")
+        os.makedirs(offload_dir, exist_ok=True)
+        model = AutoModelForCausalLM.from_pretrained(
+            args.model, torch_dtype="auto", attn_implementation="sdpa",
+            device_map="auto",
+            max_memory={0: f"{args.gpu_budget}GiB", "cpu": "48GiB"},
+            offload_folder=offload_dir,
+        ).eval()
+    else:
+        model = AutoModelForCausalLM.from_pretrained(
+            args.model, torch_dtype="auto", attn_implementation="sdpa"
+        ).to(DEVICE).eval()
 
     store_dtype = getattr(torch, args.store_dtype)
     jobs = []
