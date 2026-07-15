@@ -1,7 +1,6 @@
-"""Standalone test for _group_avg_tokens. Run: python scripts/test_group_avg.py"""
-import os, sys
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+"""Tests for _group_avg_tokens."""
 import torch
+
 from teacher.chunked_extract import _group_avg_tokens
 
 
@@ -13,8 +12,3 @@ def test_group_average():
     # group 0 == mean of the first rep=6 heads
     assert torch.allclose(out[:, 0], x[:, 0:6].mean(dim=1), atol=1e-6)
     assert torch.allclose(out[:, 1], x[:, 6:12].mean(dim=1), atol=1e-6)
-
-
-if __name__ == "__main__":
-    test_group_average()
-    print("OK test_group_avg")

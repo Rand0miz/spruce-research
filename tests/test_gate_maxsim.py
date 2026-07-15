@@ -1,8 +1,10 @@
-"""Standalone test for FlatGate MaxSim. Run: python scripts/test_gate_maxsim.py"""
-import os, sys, math
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+"""Tests for FlatGate MaxSim."""
+import math
+
 import torch
+
 from selector.gate import FlatGate
+
 
 L, G, qb, kb, P, d = 2, 2, 3, 3, 4, 5
 
@@ -42,10 +44,3 @@ def test_gradient_flow():
     assert gate.Wq.grad is not None and gate.Wk.grad is not None
     assert torch.count_nonzero(gate.Wq.grad) > 0, "Wq.grad is all zero"
     assert torch.count_nonzero(gate.Wk.grad) > 0, "Wk.grad is all zero"
-
-
-if __name__ == "__main__":
-    test_shape()
-    test_matches_bruteforce_maxsim()
-    test_gradient_flow()
-    print("OK test_gate_maxsim")

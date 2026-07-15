@@ -1,4 +1,4 @@
-"""Distillation loss — forward KL with the teacher as reference.
+"""Distillation loss -- forward KL with the teacher as reference.
 
 Verified against the anchor papers (not memory):
   SeerAttention (2410.13276):  loss = D_KL(gt || score)
@@ -6,7 +6,7 @@ Verified against the anchor papers (not memory):
 Both are forward KL, teacher normalized, student = softmax over the candidate keys.
 
 Here the candidate set per query-block is its causal key-blocks (k <= q). This is the
-flat / leaf-level loss; the tree sums the same KL across coarser levels (step 2).
+flat / leaf-level loss; the tree sums the same KL across coarser levels.
 """
 import torch
 import torch.nn.functional as F
@@ -25,7 +25,7 @@ def kl_loss(scores, target, cmask, eps=1e-9, row_valid_thresh=0.5):
     kl_row = contrib.sum(dim=-1)                             # [L,G,qb]
 
     # A row is valid only if the teacher gave it a real distribution (row-sum ~ 1).
-    valid = target.sum(dim=-1) > row_valid_thresh           # [L,G,qb]
+    valid = target.sum(dim=-1) > row_valid_thresh            # [L,G,qb]
     n = valid.sum().clamp_min(1)
     loss = (kl_row * valid).sum() / n
     return loss, int(valid.sum())
@@ -34,12 +34,10 @@ def kl_loss(scores, target, cmask, eps=1e-9, row_valid_thresh=0.5):
 def topk_membership_loss(scores, target, cmask, k=8, row_valid_thresh=0.5):
     """Balanced BCE that forces the gate to rank the teacher's top-k blocks high.
 
-    KL matches attention *mass*, so a small-mass but retrieval-critical block (the
-    needle) can be dropped for near-zero KL cost. This term is mass-blind: it turns
-    the teacher's top-k blocks into POSITIVES (label 1) and the remaining causal
-    blocks into NEGATIVES (label 0), then pushes student scores up on positives and
-    down on negatives via logsigmoid. Positives and negatives are averaged separately
-    so the k positives are not drowned out by the many negatives (class balance).
+    KL matches attention mass, so a small-mass but retrieval-critical block can be
+    dropped for near-zero KL cost. This term is mass-blind: it turns the teacher's
+    top-k blocks into positives and the remaining causal blocks into negatives,
+    then pushes student scores up on positives and down on negatives via logsigmoid.
 
     scores/target [L,G,qb,kb], cmask [qb,kb]. Returns (loss, num_positive_blocks).
     """
@@ -49,19 +47,33 @@ def topk_membership_loss(scores, target, cmask, k=8, row_valid_thresh=0.5):
     member = torch.zeros_like(target, dtype=torch.bool)
     member.scatter_(-1, t_top, True)
 
-    # Restrict positives to blocks the teacher actually attends (target>0). On short
-    # query rows topk() would otherwise pad the set with zero-mass future blocks.
+    # Restrict positives to blocks the teacher actually attends. On short query rows
+    # topk() would otherwise pad the set with zero-mass future blocks.
     valid = (target.sum(dim=-1) > row_valid_thresh)[..., None]   # [L,G,qb,1]
     pos = member & (target > 0) & valid                      # teacher top-k, causal
     neg = cmask[None, None] & (~pos) & valid                 # other causal candidates
 
-    logp = F.logsigmoid(scores)                              # score high  -> loss low
-    logn = F.logsigmoid(-scores)                             # score low   -> loss low
+    logp = F.logsigmoid(scores)                              # score high -> loss low
+    logn = F.logsigmoid(-scores)                             # score low -> loss low
     p = pos.to(logp.dtype)
     ng = neg.to(logn.dtype)
     lp = -(logp * p).sum() / p.sum().clamp_min(1)            # avg over positives
     ln = -(logn * ng).sum() / ng.sum().clamp_min(1)          # avg over negatives
     return 0.5 * (lp + ln), int(pos.sum())
+
+
+def topk_set_loss(scores, target, cmask, topk=8, margin=0.0, row_valid_thresh=0.5):
+    """Compatibility wrapper for older training/test code.
+
+    The bad merge path used a margin-ranking helper named topk_set_loss. The current
+    recipe uses the balanced top-k membership BCE above. Keep the old name callable
+    so stale scripts fail less often, but reject non-zero margins because they are
+    not part of this loss.
+    """
+    if margin:
+        raise ValueError("topk_set_loss no longer supports margin; use margin=0.0")
+    return topk_membership_loss(
+        scores, target, cmask, k=topk, row_valid_thresh=row_valid_thresh)
 
 
 def combined_loss(scores, target, cmask, lambda_topk=0.5, k=8):

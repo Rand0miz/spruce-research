@@ -2,12 +2,12 @@
 
 Full supervision, no pruning at train time: score every key-block for every query-block,
 forward-KL against the teacher marginal, backprop into Wq/Wk only. The base model is
-never loaded here — training reads the dumped tensors, so it is cheap to run many epochs
+never loaded here -- training reads the dumped tensors, so it is cheap to run many epochs
 on the laptop. Each document is one "batch"; the per-layer gate is shared across
 documents of different lengths (that is the whole point of pooling to fixed-dim features).
 
 Usage:
-  python -m selectors.train --targets teacher_targets/teacher_*.pt --epochs 200
+  python -m selector.train --targets teacher_targets/teacher_*.pt --epochs 200
 """
 import os, sys, glob, argparse
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -15,7 +15,7 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import torch
 from selector.targets import load_teacher
 from selector.gate import FlatGate
-from selector.loss import kl_loss, topk_set_loss
+from selector.loss import kl_loss, topk_membership_loss
 from selector.recall import recall_metrics
 
 
@@ -31,12 +31,6 @@ def main():
                     help="k for the membership term; match the KS1 budget")
     ap.add_argument("--proj-dim", type=int, default=None)
     ap.add_argument("--eval-every", type=int, default=25)
-    ap.add_argument("--lambda-topk", type=float, default=0.0,
-                    help="weight for auxiliary teacher top-k ranking loss")
-    ap.add_argument("--topk", type=int, default=8,
-                    help="teacher top-k set size used by --lambda-topk")
-    ap.add_argument("--topk-margin", type=float, default=0.0,
-                    help="optional margin for the auxiliary top-k ranking loss")
     ap.add_argument("--budgets", type=int, nargs="+", default=[1, 2, 4, 8, 16])
     ap.add_argument("--device", default="cuda" if torch.cuda.is_available() else "cpu")
     ap.add_argument("--out", default=os.path.join(
@@ -73,8 +67,8 @@ def main():
             kl, nv = kl_loss(scores, doc["target"], doc["cmask"])
             loss = kl
             if args.lambda_topk:
-                tk, tnv = topk_set_loss(scores, doc["target"], doc["cmask"],
-                                        topk=args.topk, margin=args.topk_margin)
+                tk, tnv = topk_membership_loss(
+                    scores, doc["target"], doc["cmask"], k=args.topk)
                 loss = loss + args.lambda_topk * tk
                 topk_tot += tk.item() * tnv; topk_rows += tnv
             opt.zero_grad(); loss.backward(); opt.step()

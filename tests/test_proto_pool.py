@@ -1,7 +1,6 @@
-"""Standalone test for _proto_pool_seq. Run: python scripts/test_proto_pool.py"""
-import os, sys
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+"""Tests for _proto_pool_seq."""
 import torch
+
 from teacher.chunked_extract import _proto_pool_seq
 
 
@@ -66,12 +65,3 @@ def test_short_block_pads_with_mean():
     assert torch.allclose(last[0], real_mean, atol=1e-5)   # proto 0 = real-row mean
     # no proto is a zero vector (all spare slots filled with mean, not pad rows)
     assert not (last == 0).all(dim=-1).any()
-
-
-if __name__ == "__main__":
-    test_shape_and_mean()
-    test_outlier_is_kept()
-    test_needle_survives_fp16()
-    test_needle_survives_bf16()
-    test_short_block_pads_with_mean()
-    print("OK test_proto_pool")

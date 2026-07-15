@@ -1,11 +1,11 @@
-import os, sys, torch
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+import pytest
+import torch
 
-from transformers import AutoTokenizer, AutoModelForCausalLM
 from teacher.extract import get_attentions
 from teacher.pool import pool_attention, rollup
 from teacher.validate import check_causal
 from teacher.chunked_extract import get_pooled_targets
+
 
 MODEL = "Qwen/Qwen2.5-Coder-1.5B-Instruct"
 BLOCK = 64
@@ -21,7 +21,12 @@ def eager_reference(model, tok, prompt):
     return torch.stack(layers, dim=1), seq   # [1,L,H,qb,kb]
 
 
-def main():
+@pytest.mark.integration
+def test_chunked_extract_matches_eager_reference():
+    transformers = pytest.importorskip("transformers")
+    AutoTokenizer = transformers.AutoTokenizer
+    AutoModelForCausalLM = transformers.AutoModelForCausalLM
+
     tok = AutoTokenizer.from_pretrained(MODEL)
     # fp32 + eager: exact reference on a short prompt (do NOT do this at 16K)
     model = AutoModelForCausalLM.from_pretrained(
@@ -36,20 +41,14 @@ def main():
     assert ref.shape == chunk.shape, (ref.shape, chunk.shape)
 
     diff = (ref - chunk).abs()
-    print(f"seq_len={seq}  shape={tuple(ref.shape)}")
-    print(f"max abs diff = {diff.max().item():.2e}   mean = {diff.mean().item():.2e}")
-    match = torch.allclose(ref, chunk, atol=1e-4, rtol=1e-3)
-    print("RESULT:", "MATCH" if match else "MISMATCH")
+    assert torch.allclose(ref, chunk, atol=1e-4, rtol=1e-3), (
+        diff.max().item(), diff.mean().item())
 
     # causal + diagonal-heavy checks on aggregated leaf (sum over layers+heads)
     agg = chunk.sum(dim=(1, 2))[0]                       # [qb,kb]
     causal_ok, viol = check_causal(agg[None, None])
     diag = agg.diagonal().sum().item()
     total = agg.sum().item()
-    print(f"causal_ok={causal_ok} first_violation={viol}")
-    print(f"diagonal mass fraction = {diag/total:.3f}")
-    print("rollup levels:", [tuple(l.shape) for l in rollup(agg[None, None])])
-
-
-if __name__ == "__main__":
-    main()
+    assert causal_ok, viol
+    assert diag / total > 0
+    assert rollup(agg[None, None])
