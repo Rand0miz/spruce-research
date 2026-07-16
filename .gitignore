@@ -10,3 +10,5 @@ teacher_targets/
 docs/superpowers/
 __pycache__/
 *.py[cod]
+*.zip
+*.ipynb
