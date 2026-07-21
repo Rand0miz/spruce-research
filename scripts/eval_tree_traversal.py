@@ -18,6 +18,7 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import torch
 
 from selector.gate import FlatGate
+from selector.plotting import save_tree_plot
 from selector.targets import load_teacher
 from selector.tree import build_key_tree
 
@@ -149,6 +150,8 @@ def main():
     ap.add_argument("--threshold", type=float, default=0.95,
                     help="worst traversal recall@8 pass bar")
     ap.add_argument("--device", default="cuda" if torch.cuda.is_available() else "cpu")
+    ap.add_argument("--plot", default=None,
+                    help="PNG output path; default is beside --gate")
     args = ap.parse_args()
 
     paths = expand_paths(args.targets)
@@ -193,15 +196,28 @@ def main():
                 print(f"  beam={beam:<3} selected={met['avg_selected']:.1f}  {rec}")
                 print(f"           cov={met['coverage']:.3f}/{met['oracle_coverage']:.3f}{ndl}")
 
+    averages = {
+        beam: {name: value / counts[beam] for name, value in sums[beam].items()}
+        for beam in args.beams
+    }
     if len(paths) > 1:
         print("\nmean over documents")
         for beam in args.beams:
             n = counts[beam]
-            avg = {name: val / n for name, val in sums[beam].items()}
+            avg = averages[beam]
             rec = format_budget_metrics(avg, args.budgets, "recall")
             ndl = f"  ndl={avg['needle_hit']:.2f}" if "needle_hit" in avg else ""
             print(f"  beam={beam:<3} selected={avg['avg_selected']:.1f}  {rec}")
             print(f"           cov={avg['coverage']:.3f}/{avg['oracle_coverage']:.3f}{ndl}")
+
+    model_name = os.path.splitext(os.path.basename(args.gate))[0]
+    plot_dir = os.path.join(os.path.dirname(args.gate) or ".", "eval_graphs", model_name)
+    plot_path = args.plot or os.path.join(plot_dir, "traversal_eval.png")
+    if save_tree_plot([averages[beam] for beam in args.beams], args.beams, args.budgets,
+                      plot_path, "Top-down traversal evaluation", "Beam width"):
+        print(f"evaluation graph -> {plot_path}")
+    else:
+        print("matplotlib not installed; skipped evaluation graph")
 
     print("\nworst traversal recall@8")
     ok_any = False

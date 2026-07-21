@@ -62,6 +62,50 @@ def topk_membership_loss(scores, target, cmask, k=8, row_valid_thresh=0.5):
     return 0.5 * (lp + ln), int(pos.sum())
 
 
+def needle_topk_loss(scores, target, cmask, needle_block, k=8,
+                     margin=0.0, row_valid_thresh=0.5):
+    """Encourage the reader row to retain a known needle in its top-k blocks.
+
+    Only the final query block (the question/reader row) is supervised. A group
+    participates only when the teacher itself puts ``needle_block`` in its top-k.
+    The softplus term compares the needle score with the k-th best other causal
+    block, a differentiable surrogate for student top-k membership.
+
+    Returns ``(loss, eligible_layer_groups)``. Invalid needle metadata or a
+    teacher that never selects the needle produces a zero, gradient-safe loss.
+    """
+    _, _, qb, kb = scores.shape
+    if needle_block is None or not 0 <= int(needle_block) < kb:
+        return scores.sum() * 0.0, 0
+
+    needle_block = int(needle_block)
+    visible = cmask[-1]
+    if not bool(visible[needle_block]):
+        return scores.sum() * 0.0, 0
+
+    # With fewer than k competing blocks, the needle is automatically top-k.
+    competitors = int(visible.sum()) - 1
+    kk = min(int(k), competitors)
+    if kk <= 0:
+        return scores.sum() * 0.0, 0
+
+    reader_scores = scores[:, :, qb - 1, :]
+    reader_target = target[:, :, qb - 1, :]
+    teacher_top = reader_target.topk(min(int(k), kb), dim=-1).indices
+    teacher_keeps_needle = (teacher_top == needle_block).any(dim=-1)
+    valid = reader_target.sum(dim=-1) > row_valid_thresh
+    eligible = teacher_keeps_needle & valid
+    n = int(eligible.sum())
+    if n == 0:
+        return scores.sum() * 0.0, 0
+
+    neg_inf = torch.finfo(scores.dtype).min
+    other_scores = reader_scores.masked_fill(~visible[None, None], neg_inf)
+    other_scores[:, :, needle_block] = neg_inf
+    threshold = other_scores.topk(kk, dim=-1).values[..., -1]
+    needle_scores = reader_scores[:, :, needle_block]
+    loss = F.softplus(threshold - needle_scores + margin)
+    return (loss * eligible).sum() / eligible.sum(), n
 def topk_set_loss(scores, target, cmask, topk=8, margin=0.0, row_valid_thresh=0.5):
     """Compatibility wrapper for older training/test code.
 
@@ -83,3 +127,4 @@ def combined_loss(scores, target, cmask, lambda_topk=0.5, k=8):
     bce, _ = topk_membership_loss(scores, target, cmask, k=k)
     total = kl + lambda_topk * bce
     return total, {"kl": float(kl), "bce": float(bce), "n": nv}
+

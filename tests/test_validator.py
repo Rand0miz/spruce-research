@@ -12,12 +12,12 @@ K = 4
 
 
 def test_valid_selected_blocks_passes():
-    # Valid: 4 query blocks, each causal. Query block 3 attends to 0, 2, 3.
+    # Valid: each row is causal, sorted, duplicate-free, and includes q-1/q local window.
     valid = torch.tensor([[[[
-        make_row([0], K),           # q=0 -> {0}
-        make_row([1], K),           # q=1 -> {1}
-        make_row([0, 2], K),        # q=2 -> {0,2}
-        make_row([0, 2, 3], K),     # q=3 -> {0,2,3}
+        make_row([0], K),
+        make_row([0, 1], K),
+        make_row([0, 1, 2], K),
+        make_row([0, 2, 3], K),
     ]]]], dtype=torch.int32)
     validate_selected_blocks(valid)
 
@@ -29,15 +29,34 @@ def test_rejects_future_block():
 
 
 def test_rejects_duplicate_block():
-    bad_dup = torch.tensor([[[[make_row([0], K), make_row([1, 1], K)]]]], dtype=torch.int32)
+    bad_dup = torch.tensor([[[[make_row([0], K), make_row([0, 1, 1], K)]]]], dtype=torch.int32)
     with pytest.raises(AssertionError, match="Duplicate"):
         validate_selected_blocks(bad_dup)
 
 
 def test_rejects_unsorted_blocks():
     bad_sort = torch.tensor(
-        [[[[make_row([0], K), make_row([1], K), make_row([2, 1], K)]]]],
+        [[[[make_row([0], K), make_row([0, 1], K), make_row([0, 2, 1], K)]]]],
         dtype=torch.int32,
     )
     with pytest.raises(AssertionError, match="Not sorted"):
         validate_selected_blocks(bad_sort)
+
+
+def test_rejects_missing_local_window_block():
+    missing_local = torch.tensor([[[[
+        make_row([0], K),
+        make_row([1], K),
+    ]]]], dtype=torch.int32)
+    with pytest.raises(AssertionError, match="Missing local-window"):
+        validate_selected_blocks(missing_local)
+
+
+def test_rejects_non_trailing_padding():
+    bad_pad = torch.tensor([[[[
+        make_row([0], K),
+        [0, PAD_VALUE, 1, PAD_VALUE],
+    ]]]], dtype=torch.int32)
+    with pytest.raises(AssertionError, match="trailing"):
+        validate_selected_blocks(bad_pad)
+

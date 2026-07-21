@@ -60,6 +60,306 @@
       "needle": "Section 7 of the bookcase contains the manuals.",
       "filler": "The library catalog listed common titles, regular checkouts, and standard shelving notes. ",
       "question": "\n\nWhich section of the bookcase contains the manuals? Answer with the exact sentence."
+    },
+    {
+      "id": "passport_lena_drawer_c",
+      "needle": "Lena stores her passport in drawer C.",
+      "filler": "The operations report noted routine reviews, standard inventory updates, and ordinary scheduling changes. ",
+      "question": "\n\nWhere does Lena store her passport? Answer with the exact sentence."
+    },
+    {
+      "id": "recipe_milo_saffron",
+      "needle": "Milo added saffron to the stew.",
+      "filler": "The operations report noted routine reviews, standard inventory updates, and ordinary scheduling changes. ",
+      "question": "\n\nWhat did Milo add to the stew? Answer with the exact sentence."
+    },
+    {
+      "id": "station_aurora_platform_6",
+      "needle": "The Aurora train departs from platform 6.",
+      "filler": "The operations report noted routine reviews, standard inventory updates, and ordinary scheduling changes. ",
+      "question": "\n\nWhich platform does the Aurora train depart from? Answer with the exact sentence."
+    },
+    {
+      "id": "folder_summit_red",
+      "needle": "The Summit contract is filed in the red folder.",
+      "filler": "The operations report noted routine reviews, standard inventory updates, and ordinary scheduling changes. ",
+      "question": "\n\nWhich folder contains the Summit contract? Answer with the exact sentence."
+    },
+    {
+      "id": "harbor_raven_east",
+      "needle": "The Raven boat is docked at the east harbor.",
+      "filler": "The operations report noted routine reviews, standard inventory updates, and ordinary scheduling changes. ",
+      "question": "\n\nWhere is the Raven boat docked? Answer with the exact sentence."
+    },
+    {
+      "id": "museum_tara_14",
+      "needle": "Tara's museum locker number is 14.",
+      "filler": "The operations report noted routine reviews, standard inventory updates, and ordinary scheduling changes. ",
+      "question": "\n\nWhat is Tara's museum locker number? Answer with the exact sentence."
+    },
+    {
+      "id": "garden_elm_olive",
+      "needle": "The elm sapling has an olive ribbon.",
+      "filler": "The operations report noted routine reviews, standard inventory updates, and ordinary scheduling changes. ",
+      "question": "\n\nWhat color ribbon does the elm sapling have? Answer with the exact sentence."
+    },
+    {
+      "id": "lab_sample_iris_81",
+      "needle": "Iris labeled the sample vial 81.",
+      "filler": "The operations report noted routine reviews, standard inventory updates, and ordinary scheduling changes. ",
+      "question": "\n\nWhat label did Iris give the sample vial? Answer with the exact sentence."
+    },
+    {
+      "id": "festival_kite_copper",
+      "needle": "The festival kite is painted copper.",
+      "filler": "The operations report noted routine reviews, standard inventory updates, and ordinary scheduling changes. ",
+      "question": "\n\nWhat color is the festival kite? Answer with the exact sentence."
+    },
+    {
+      "id": "archive_dorian_maple",
+      "needle": "Dorian checked out the Maple archive box.",
+      "filler": "The operations report noted routine reviews, standard inventory updates, and ordinary scheduling changes. ",
+      "question": "\n\nWhich archive box did Dorian check out? Answer with the exact sentence."
+    },
+    {
+      "id": "clinic_renee_tuesday",
+      "needle": "Renee's clinic appointment is on Tuesday.",
+      "filler": "The operations report noted routine reviews, standard inventory updates, and ordinary scheduling changes. ",
+      "question": "\n\nWhen is Renee's clinic appointment? Answer with the exact sentence."
+    },
+    {
+      "id": "observatory_comet_lyra",
+      "needle": "The observatory recorded comet Lyra at dawn.",
+      "filler": "The operations report noted routine reviews, standard inventory updates, and ordinary scheduling changes. ",
+      "question": "\n\nWhen did the observatory record comet Lyra? Answer with the exact sentence."
+    },
+    {
+      "id": "parcel_quentin_berlin",
+      "needle": "Quentin sent the parcel to Berlin.",
+      "filler": "The operations report noted routine reviews, standard inventory updates, and ordinary scheduling changes. ",
+      "question": "\n\nWhere did Quentin send the parcel? Answer with the exact sentence."
+    },
+    {
+      "id": "theater_seat_m22",
+      "needle": "The theater reservation is for seat M22.",
+      "filler": "The operations report noted routine reviews, standard inventory updates, and ordinary scheduling changes. ",
+      "question": "\n\nWhich seat is reserved at the theater? Answer with the exact sentence."
+    },
+    {
+      "id": "campus_kiro_physics",
+      "needle": "Kiro studies physics at the campus.",
+      "filler": "The operations report noted routine reviews, standard inventory updates, and ordinary scheduling changes. ",
+      "question": "\n\nWhat does Kiro study at the campus? Answer with the exact sentence."
+    },
+    {
+      "id": "bakery_rose_cardamom",
+      "needle": "Rose chose cardamom for the pastry filling.",
+      "filler": "The operations report noted routine reviews, standard inventory updates, and ordinary scheduling changes. ",
+      "question": "\n\nWhat did Rose choose for the pastry filling? Answer with the exact sentence."
+    },
+    {
+      "id": "workshop_hammer_peg_9",
+      "needle": "The brass hammer hangs on peg 9.",
+      "filler": "The operations report noted routine reviews, standard inventory updates, and ordinary scheduling changes. ",
+      "question": "\n\nWhere does the brass hammer hang? Answer with the exact sentence."
+    },
+    {
+      "id": "library_navin_river",
+      "needle": "Navin borrowed the book titled River Atlas.",
+      "filler": "The operations report noted routine reviews, standard inventory updates, and ordinary scheduling changes. ",
+      "question": "\n\nWhich book did Navin borrow? Answer with the exact sentence."
+    },
+    {
+      "id": "orchard_row_12_pears",
+      "needle": "Orchard row 12 grows pears.",
+      "filler": "The operations report noted routine reviews, standard inventory updates, and ordinary scheduling changes. ",
+      "question": "\n\nWhat grows in orchard row 12? Answer with the exact sentence."
+    },
+    {
+      "id": "signal_beacon_emerald",
+      "needle": "The signal beacon flashes emerald at night.",
+      "filler": "The operations report noted routine reviews, standard inventory updates, and ordinary scheduling changes. ",
+      "question": "\n\nWhat color does the signal beacon flash at night? Answer with the exact sentence."
+    },
+    {
+      "id": "office_petra_307",
+      "needle": "Petra works in office 307.",
+      "filler": "The operations report noted routine reviews, standard inventory updates, and ordinary scheduling changes. ",
+      "question": "\n\nWhich office does Petra work in? Answer with the exact sentence."
+    },
+    {
+      "id": "village_well_north",
+      "needle": "The village well stands north of the market.",
+      "filler": "The operations report noted routine reviews, standard inventory updates, and ordinary scheduling changes. ",
+      "question": "\n\nWhere does the village well stand? Answer with the exact sentence."
+    },
+    {
+      "id": "robot_ember_serial_55",
+      "needle": "Robot Ember has serial number 55.",
+      "filler": "The operations report noted routine reviews, standard inventory updates, and ordinary scheduling changes. ",
+      "question": "\n\nWhat is Robot Ember's serial number? Answer with the exact sentence."
+    },
+    {
+      "id": "ferry_celeste_friday",
+      "needle": "The Celeste ferry sails on Friday.",
+      "filler": "The operations report noted routine reviews, standard inventory updates, and ordinary scheduling changes. ",
+      "question": "\n\nWhen does the Celeste ferry sail? Answer with the exact sentence."
+    },
+    {
+      "id": "clocktower_chime_11",
+      "needle": "The clocktower chimes eleven times at noon.",
+      "filler": "The operations report noted routine reviews, standard inventory updates, and ordinary scheduling changes. ",
+      "question": "\n\nHow many times does the clocktower chime at noon? Answer with the exact sentence."
+    },
+    {
+      "id": "market_silas_apricots",
+      "needle": "Silas bought apricots at the market.",
+      "filler": "The operations report noted routine reviews, standard inventory updates, and ordinary scheduling changes. ",
+      "question": "\n\nWhat did Silas buy at the market? Answer with the exact sentence."
+    },
+    {
+      "id": "cabin_window_silver",
+      "needle": "The cabin's west window has silver curtains.",
+      "filler": "The operations report noted routine reviews, standard inventory updates, and ordinary scheduling changes. ",
+      "question": "\n\nWhat color curtains does the cabin's west window have? Answer with the exact sentence."
+    },
+    {
+      "id": "school_mina_violin",
+      "needle": "Mina practices the violin after school.",
+      "filler": "The operations report noted routine reviews, standard inventory updates, and ordinary scheduling changes. ",
+      "question": "\n\nWhich instrument does Mina practice after school? Answer with the exact sentence."
+    },
+    {
+      "id": "server_atlas_rack_b",
+      "needle": "Server Atlas is installed in rack B.",
+      "filler": "The operations report noted routine reviews, standard inventory updates, and ordinary scheduling changes. ",
+      "question": "\n\nWhich rack contains Server Atlas? Answer with the exact sentence."
+    },
+    {
+      "id": "relic_sable_roman",
+      "needle": "The Sable relic is from the Roman era.",
+      "filler": "The operations report noted routine reviews, standard inventory updates, and ordinary scheduling changes. ",
+      "question": "\n\nWhich era is the Sable relic from? Answer with the exact sentence."
+    },
+    {
+      "id": "survey_oak_3",
+      "needle": "The survey team marked oak tree 3.",
+      "filler": "The operations report noted routine reviews, standard inventory updates, and ordinary scheduling changes. ",
+      "question": "\n\nWhich tree did the survey team mark? Answer with the exact sentence."
+    },
+    {
+      "id": "calendar_noel_august",
+      "needle": "Noel's vacation begins in August.",
+      "filler": "The operations report noted routine reviews, standard inventory updates, and ordinary scheduling changes. ",
+      "question": "\n\nWhen does Noel's vacation begin? Answer with the exact sentence."
+    },
+    {
+      "id": "piano_studio_4",
+      "needle": "The grand piano is in studio 4.",
+      "filler": "The operations report noted routine reviews, standard inventory updates, and ordinary scheduling changes. ",
+      "question": "\n\nWhich studio contains the grand piano? Answer with the exact sentence."
+    },
+    {
+      "id": "hiker_felix_compass",
+      "needle": "Felix packed a compass for the hike.",
+      "filler": "The operations report noted routine reviews, standard inventory updates, and ordinary scheduling changes. ",
+      "question": "\n\nWhat did Felix pack for the hike? Answer with the exact sentence."
+    },
+    {
+      "id": "courtyard_fountain_marble",
+      "needle": "The courtyard fountain is made of marble.",
+      "filler": "The operations report noted routine reviews, standard inventory updates, and ordinary scheduling changes. ",
+      "question": "\n\nWhat is the courtyard fountain made of? Answer with the exact sentence."
+    },
+    {
+      "id": "invoice_lumen_624",
+      "needle": "The Lumen invoice totals 624 dollars.",
+      "filler": "The operations report noted routine reviews, standard inventory updates, and ordinary scheduling changes. ",
+      "question": "\n\nWhat is the total of the Lumen invoice? Answer with the exact sentence."
+    },
+    {
+      "id": "telescope_vega_lens_2",
+      "needle": "The Vega telescope uses lens 2.",
+      "filler": "The operations report noted routine reviews, standard inventory updates, and ordinary scheduling changes. ",
+      "question": "\n\nWhich lens does the Vega telescope use? Answer with the exact sentence."
+    },
+    {
+      "id": "garden_zoe_basil",
+      "needle": "Zoe planted basil beside the gate.",
+      "filler": "The operations report noted routine reviews, standard inventory updates, and ordinary scheduling changes. ",
+      "question": "\n\nWhat did Zoe plant beside the gate? Answer with the exact sentence."
+    },
+    {
+      "id": "gallery_aurora_wall_5",
+      "needle": "The Aurora painting hangs on wall 5.",
+      "filler": "The operations report noted routine reviews, standard inventory updates, and ordinary scheduling changes. ",
+      "question": "\n\nWhich wall holds the Aurora painting? Answer with the exact sentence."
+    },
+    {
+      "id": "medical_omar_type_o",
+      "needle": "Omar's blood type is O positive.",
+      "filler": "The operations report noted routine reviews, standard inventory updates, and ordinary scheduling changes. ",
+      "question": "\n\nWhat is Omar's blood type? Answer with the exact sentence."
+    },
+    {
+      "id": "bridge_inspection_november",
+      "needle": "The bridge inspection is scheduled for November.",
+      "filler": "The operations report noted routine reviews, standard inventory updates, and ordinary scheduling changes. ",
+      "question": "\n\nWhen is the bridge inspection scheduled? Answer with the exact sentence."
+    },
+    {
+      "id": "battery_helios_88",
+      "needle": "The Helios battery is charged to 88 percent.",
+      "filler": "The operations report noted routine reviews, standard inventory updates, and ordinary scheduling changes. ",
+      "question": "\n\nWhat percentage is the Helios battery charged to? Answer with the exact sentence."
+    },
+    {
+      "id": "tailor_ava_linen",
+      "needle": "Ava requested linen for the jacket.",
+      "filler": "The operations report noted routine reviews, standard inventory updates, and ordinary scheduling changes. ",
+      "question": "\n\nWhat fabric did Ava request for the jacket? Answer with the exact sentence."
+    },
+    {
+      "id": "shelter_dog_pip",
+      "needle": "The shelter dog Pip wears a yellow collar.",
+      "filler": "The operations report noted routine reviews, standard inventory updates, and ordinary scheduling changes. ",
+      "question": "\n\nWhat color collar does Pip wear? Answer with the exact sentence."
+    },
+    {
+      "id": "flight_nimbus_gate_18",
+      "needle": "Flight Nimbus boards at gate 18.",
+      "filler": "The operations report noted routine reviews, standard inventory updates, and ordinary scheduling changes. ",
+      "question": "\n\nWhich gate does Flight Nimbus board at? Answer with the exact sentence."
+    },
+    {
+      "id": "vault_token_ruby",
+      "needle": "The vault token is engraved with a ruby star.",
+      "filler": "The operations report noted routine reviews, standard inventory updates, and ordinary scheduling changes. ",
+      "question": "\n\nWhat is engraved on the vault token? Answer with the exact sentence."
+    },
+    {
+      "id": "studio_lyra_canvas_large",
+      "needle": "Lyra ordered a large canvas for the studio.",
+      "filler": "The operations report noted routine reviews, standard inventory updates, and ordinary scheduling changes. ",
+      "question": "\n\nWhat did Lyra order for the studio? Answer with the exact sentence."
+    },
+    {
+      "id": "reservoir_depth_19",
+      "needle": "The reservoir is 19 meters deep.",
+      "filler": "The operations report noted routine reviews, standard inventory updates, and ordinary scheduling changes. ",
+      "question": "\n\nHow deep is the reservoir? Answer with the exact sentence."
+    },
+    {
+      "id": "postcard_juno_kyoto",
+      "needle": "Juno mailed a postcard from Kyoto.",
+      "filler": "The operations report noted routine reviews, standard inventory updates, and ordinary scheduling changes. ",
+      "question": "\n\nWhere did Juno mail a postcard from? Answer with the exact sentence."
+    },
+    {
+      "id": "warehouse_crane_5",
+      "needle": "The loading crane is assigned to bay 5.",
+      "filler": "The operations report noted routine reviews, standard inventory updates, and ordinary scheduling changes. ",
+      "question": "\n\nWhich bay is the loading crane assigned to? Answer with the exact sentence."
     }
   ]
 }

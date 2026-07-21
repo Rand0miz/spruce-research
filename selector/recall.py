@@ -7,6 +7,14 @@ keep the needle block? Mirrors the checks in scripts/ks1_lite.py, now on the tra
 import torch
 
 
+def _ratio(student, teacher, eps=1e-9):
+    """student/teacher, clamped to [0,1]. Returns nan when the teacher itself is 0 --
+    there is nothing to preserve, so the gate can be neither right nor wrong."""
+    if teacher <= eps:
+        return float("nan")
+    return float(min(student / teacher, 1.0))
+
+
 @torch.no_grad()
 def recall_metrics(scores, target, cmask, budgets=(1, 2, 4, 8, 16), needle_block=None):
     """scores/target [L,G,qb,kb], cmask [qb,kb]. Returns dict:
@@ -48,6 +56,11 @@ def recall_metrics(scores, target, cmask, budgets=(1, 2, 4, 8, 16), needle_block
         ocov = (target * omember).sum(dim=-1)                    # [L,G,qb] in [0,1]
         out[f"oracle_cov@{r}"] = float((ocov * m).sum() / m.sum().clamp_min(1))
 
+        # Fraction of the ACHIEVABLE mass the gate got. This, not recall@r, is the
+        # honest "how close to the teacher" number: recall@r docks a full point for
+        # swapping two near-tied blocks carrying no mass; cov_ratio does not.
+        out[f"cov_ratio@{r}"] = _ratio(out[f"coverage@{r}"], out[f"oracle_cov@{r}"])
+
     if needle_block is not None and 0 <= needle_block < kb:
         reader = masked[:, :, -1, :]                        # [L,G,kb] last query block
         # Teacher oracle: does the teacher's OWN reader-row top-k keep the needle?
@@ -58,9 +71,26 @@ def recall_metrics(scores, target, cmask, budgets=(1, 2, 4, 8, 16), needle_block
         for k in budgets:
             kk = min(k, kb)
             top = reader.topk(kk, dim=-1).indices           # [L,G,kk]
-            hit = (top == needle_block).any(dim=-1).float() # [L,G]
-            out[f"needle_hit@{k}"] = float(hit.mean())
+            hit = (top == needle_block).any(dim=-1)         # [L,G] bool
+            out[f"needle_hit@{k}"] = float(hit.float().mean())
             ttop = treader.topk(kk, dim=-1).indices          # [L,G,kk]
-            thit = (ttop == needle_block).any(dim=-1).float()
-            out[f"teacher_needle@{k}"] = float(thit.mean())
+            thit = (ttop == needle_block).any(dim=-1)        # [L,G] bool
+            out[f"teacher_needle@{k}"] = float(thit.float().mean())
+
+            # The per-head mean above is pessimistic. Most heads are local/sink heads
+            # that were never going to read the needle -- they drag the mean down for
+            # teacher and gate alike. selected_blocks is per kv_head_group, so a layer
+            # reads the UNION of its groups' choices, and evidence only has to survive
+            # in ONE group per layer to reach the next layer. That is the quantity the
+            # retrieval-preservation claim rests on.
+            out[f"needle_union@{k}"] = float(hit.any(dim=1).float().mean())
+            out[f"teacher_needle_union@{k}"] = float(thit.any(dim=1).float().mean())
+
+            # Preservation THROUGH the conversion: the teacher is the ceiling, so score
+            # against it, not against 1.0. teacher_needle@k < 1 is a property of the
+            # backbone, not a gate failure.
+            out[f"ndl_ratio@{k}"] = _ratio(
+                out[f"needle_hit@{k}"], out[f"teacher_needle@{k}"])
+            out[f"ndl_union_ratio@{k}"] = _ratio(
+                out[f"needle_union@{k}"], out[f"teacher_needle_union@{k}"])
     return out

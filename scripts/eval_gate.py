@@ -20,6 +20,7 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import torch
 from selector.targets import load_teacher
 from selector.gate import FlatGate
+from selector.plotting import save_flat_eval_plot
 from selector.recall import recall_metrics
 
 
@@ -43,6 +44,8 @@ def main():
     ap.add_argument("--threshold", type=float, default=0.95,
                     help="recall@8 pass bar (KS1 proxy)")
     ap.add_argument("--device", default="cuda" if torch.cuda.is_available() else "cpu")
+    ap.add_argument("--plot", default=None,
+                    help="PNG output path; default is beside --gate")
     args = ap.parse_args()
 
     paths = []
@@ -56,6 +59,8 @@ def main():
           f"proj={cfg['proj_dim']}")
 
     worst_r8 = 1.0
+    worst = {"cov_ratio@8": 1.0, "ndl_ratio@8": 1.0, "ndl_union_ratio@8": 1.0}
+    results = {}
     with torch.no_grad():
         for p in paths:
             doc = load_teacher(p, device=args.device)
@@ -67,25 +72,46 @@ def main():
                                  tuple(args.budgets), m["needle_block"])
             r8 = met.get("recall@8", float("nan"))
             worst_r8 = min(worst_r8, r8)
+            for key in worst:
+                if key in met and met[key] == met[key]:      # skip nan
+                    worst[key] = min(worst[key], met[key])
+            results[os.path.basename(p)] = met
             rec = "  ".join(f"r@{b}={met[f'recall@{b}']:.3f}" for b in args.budgets)
             cov = "  ".join(f"cov@{b}={met[f'coverage@{b}']:.3f}"
-                            f"/{met[f'oracle_cov@{b}']:.3f}" for b in args.budgets)
+                            f"/{met[f'oracle_cov@{b}']:.3f}"
+                            f"={met[f'cov_ratio@{b}']:.3f}" for b in args.budgets)
             ndl = "  ".join(f"ndl@{b}={met[f'needle_hit@{b}']:.2f}"
-                            for b in args.budgets if f"needle_hit@{b}" in met)
-            tndl = "  ".join(f"tndl@{b}={met[f'teacher_needle@{b}']:.2f}"
-                             for b in args.budgets if f"teacher_needle@{b}" in met)
+                            f"/{met[f'teacher_needle@{b}']:.2f}"
+                            f"={met[f'ndl_ratio@{b}']:.2f}"
+                            for b in args.budgets if f"ndl_ratio@{b}" in met)
+            uni = "  ".join(f"uni@{b}={met[f'needle_union@{b}']:.2f}"
+                            f"/{met[f'teacher_needle_union@{b}']:.2f}"
+                            f"={met[f'ndl_union_ratio@{b}']:.2f}"
+                            for b in args.budgets if f"ndl_union_ratio@{b}" in met)
             print(f"\n{os.path.basename(p)}  seq={m['seq_len']} "
                   f"needle_blk={m['needle_block']}")
+            print("  (student/teacher-ceiling=ratio)")
             print(f"  {rec}")
             print(f"  {cov}")
             if ndl:
                 print(f"  {ndl}")
-            if tndl:
-                print(f"  {tndl}")
+            if uni:
+                print(f"  {uni}")
+
+    model_name = os.path.splitext(os.path.basename(args.gate))[0]
+    plot_dir = os.path.join(os.path.dirname(args.gate) or ".", "eval_graphs", model_name)
+    plot_path = args.plot or os.path.join(plot_dir, "flat_eval.png")
+    if save_flat_eval_plot(results, args.budgets, plot_path, "Flat gate held-out evaluation"):
+        print(f"evaluation graph -> {plot_path}")
+    else:
+        print("matplotlib not installed; skipped evaluation graph")
 
     ok = worst_r8 >= args.threshold
-    print(f"\nworst recall@8 = {worst_r8:.3f}  "
-          f"{'PASS' if ok else 'FAIL'} (bar {args.threshold})")
+    print(f"\nworst recall@8         = {worst_r8:.3f}  "
+          f"{'PASS' if ok else 'FAIL'} (bar {args.threshold}, exit code)")
+    print(f"worst cov_ratio@8      = {worst['cov_ratio@8']:.3f}")
+    print(f"worst ndl_ratio@8      = {worst['ndl_ratio@8']:.3f}  (per-head)")
+    print(f"worst ndl_union_ratio@8= {worst['ndl_union_ratio@8']:.3f}  (per-layer, any group)")
     sys.exit(0 if ok else 1)
 
 

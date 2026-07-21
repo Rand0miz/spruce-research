@@ -6,7 +6,7 @@ graphify-out
 planV2.md
 paper-notes.md
 teacher_targets/
-*.pt
+selector_ckpt/
 docs/superpowers/
 __pycache__/
 *.py[cod]

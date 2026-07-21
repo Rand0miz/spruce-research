@@ -21,8 +21,14 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import torch
 from selector.targets import load_teacher
 from selector.gate import FlatGate
-from selector.loss import kl_loss, topk_membership_loss
+from selector.loss import kl_loss, needle_topk_loss, topk_membership_loss
+from selector.plotting import load_json, save_training_plot, write_json
 from selector.recall import recall_metrics
+
+try:
+    from tqdm.auto import tqdm
+except ImportError:
+    tqdm = None
 
 
 def gate_config(num_layers, head_dim, proj_dim):
@@ -46,7 +52,7 @@ def save_gate(path, gate, config):
     atomic_torch_save({"state_dict": gate.state_dict(), "config": config}, path)
 
 
-def save_resume_checkpoint(path, gate, opt, config, args, epoch, paths):
+def save_resume_checkpoint(path, gate, opt, config, args, epoch, paths, history):
     atomic_torch_save({
         "kind": "spruce_selector_train_checkpoint",
         "epoch": int(epoch),
@@ -57,13 +63,17 @@ def save_resume_checkpoint(path, gate, opt, config, args, epoch, paths):
             "epochs": args.epochs,
             "lr": args.lr,
             "lambda_topk": args.lambda_topk,
+            "lambda_needle": args.lambda_needle,
             "topk": args.topk,
+            "needle_topk": args.needle_topk,
             "proj_dim": args.proj_dim,
             "eval_every": args.eval_every,
             "budgets": list(args.budgets),
             "out": args.out,
+            "seed": args.seed,
         },
         "targets": list(paths),
+        "history": history,
         "rng_state": torch.get_rng_state(),
         "cuda_rng_state_all": (
             torch.cuda.get_rng_state_all() if torch.cuda.is_available() else None),
@@ -86,7 +96,26 @@ def load_resume_checkpoint(path, gate, opt, config, device):
             and torch.cuda.is_available()):
         torch.cuda.set_rng_state_all(ckpt["cuda_rng_state_all"])
 
-    return int(ckpt.get("epoch", 0))
+    return int(ckpt.get("epoch", 0)), ckpt.get("history")
+
+
+def make_progress(args, start_epoch):
+    if args.progress == "off":
+        return None
+    if tqdm is None:
+        if args.progress == "on":
+            print("tqdm is not installed; progress bar disabled")
+        return None
+    total = max(args.epochs - start_epoch + 1, 0)
+    return tqdm(range(start_epoch, args.epochs + 1),
+                total=total, desc="training", unit="epoch")
+
+
+def emit(msg, progress):
+    if progress is not None:
+        progress.write(msg)
+    else:
+        print(msg)
 
 
 def main():
@@ -94,11 +123,17 @@ def main():
     ap.add_argument("--targets", nargs="+", required=True,
                     help="teacher .pt paths or globs (must have pooledQ/pooledK)")
     ap.add_argument("--epochs", type=int, default=200)
+    ap.add_argument("--seed", type=int, default=None,
+                    help="optional torch RNG seed; use one fixed seed for sweeps")
     ap.add_argument("--lr", type=float, default=1e-3)
     ap.add_argument("--lambda-topk", type=float, default=0.5,
                     help="weight of the top-k membership term (needle retention)")
+    ap.add_argument("--lambda-needle", type=float, default=0.0,
+                    help="weight of reader-row needle top-k retention; 0 disables it")
     ap.add_argument("--topk", type=int, default=8,
                     help="k for the membership term; match the KS1 budget")
+    ap.add_argument("--needle-topk", type=int, default=None,
+                    help="needle retention budget; defaults to --topk")
     ap.add_argument("--proj-dim", type=int, default=None)
     ap.add_argument("--eval-every", type=int, default=25)
     ap.add_argument("--budgets", type=int, nargs="+", default=[1, 2, 4, 8, 16])
@@ -114,7 +149,18 @@ def main():
                     help="path for resume checkpoints; default is --out with .resume.pt suffix")
     ap.add_argument("--keep-epoch-checkpoints", action="store_true",
                     help="also keep per-epoch checkpoint files beside the rolling resume file")
+    ap.add_argument("--progress", choices=["auto", "on", "off"], default="auto",
+                    help="show a tqdm epoch progress bar when available")
+    ap.add_argument("--plot", default=None,
+                    help="training graph path; default is --out with .training.png suffix")
+    ap.add_argument("--history", default=None,
+                    help="metric history JSON path; default is --out with .history.json suffix")
     args = ap.parse_args()
+
+    if args.seed is not None:
+        torch.manual_seed(args.seed)
+        if torch.cuda.is_available():
+            torch.cuda.manual_seed_all(args.seed)
 
     paths = []
     for p in args.targets:
@@ -138,9 +184,21 @@ def main():
     print(f"gate params: {sum(p.numel() for p in gate.parameters())}  device={args.device}")
 
     resume_path = args.resume_out or checkpoint_path(args.out)
+    graph_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "training_graphs")
+    model_name = os.path.splitext(os.path.basename(args.out))[0]
+    plot_path = args.plot or os.path.join(graph_dir, f"{model_name}.png")
+    history_path = args.history or os.path.join(graph_dir, f"{model_name}.json")
+    history = load_json(history_path, {
+        "epochs": [], "kl": [], "topk": [], "needle": [], "eval_epochs": [],
+        "eval_recall8": {}, "eval_needle8": {},
+    })
+    history.setdefault("needle", [])
     start_epoch = 1
     if args.resume:
-        resumed_epoch = load_resume_checkpoint(args.resume, gate, opt, config, args.device)
+        resumed_epoch, checkpoint_history = load_resume_checkpoint(
+            args.resume, gate, opt, config, args.device)
+        if checkpoint_history is not None:
+            history = checkpoint_history
         start_epoch = resumed_epoch + 1
         print(f"resumed checkpoint {args.resume} at epoch {resumed_epoch}; "
               f"continuing through epoch {args.epochs}")
@@ -149,10 +207,14 @@ def main():
         print(f"checkpoint is already past requested epochs "
               f"({start_epoch - 1} >= {args.epochs}); saving final gate")
 
-    for epoch in range(start_epoch, args.epochs + 1):
+    progress = make_progress(args, start_epoch)
+    epoch_iter = progress if progress is not None else range(start_epoch, args.epochs + 1)
+
+    for epoch in epoch_iter:
         gate.train()
         tot, nrows = 0.0, 0
         topk_tot, topk_rows = 0.0, 0
+        needle_tot, needle_groups = 0.0, 0
         for doc in docs:
             scores = gate(doc["q_feat"], doc["k_feat"])
             kl, nv = kl_loss(scores, doc["target"], doc["cmask"])
@@ -168,11 +230,30 @@ def main():
             opt.step()
             tot += kl.item() * nv
             nrows += nv
+
+        kl_avg = tot / max(nrows, 1)
+        topk_avg = topk_tot / max(topk_rows, 1) if args.lambda_topk else None
+        needle_avg = needle_tot / max(needle_groups, 1) if args.lambda_needle else None
+        history["epochs"].append(epoch)
+        history["kl"].append(kl_avg)
+        history["topk"].append(topk_avg)
+        history["needle"].append(needle_avg)
+        if progress is not None:
+            postfix = {"KL": f"{kl_avg:.4f}"}
+            if topk_avg is not None:
+                postfix["topk"] = f"{topk_avg:.4f}"
+            if needle_avg is not None:
+                postfix["needle"] = f"{needle_avg:.4f}"
+            progress.set_postfix(postfix)
+
         if epoch % args.eval_every == 0 or epoch == 1 or epoch == args.epochs:
             gate.eval()
-            line = [f"epoch {epoch:>4}  KL={tot / max(nrows, 1):.4f}"]
+            line = [f"epoch {epoch:>4}  KL={kl_avg:.4f}"]
             if args.lambda_topk:
-                line.append(f"topk={topk_tot / max(topk_rows, 1):.4f}")
+                line.append(f"topk={topk_avg:.4f}")
+            if args.lambda_needle:
+                line.append(f"needle={needle_avg:.4f}")
+            history["eval_epochs"].append(epoch)
             with torch.no_grad():
                 for doc in docs:
                     sc = gate(doc["q_feat"], doc["k_feat"])
@@ -181,23 +262,37 @@ def main():
                     r8 = met.get("recall@8", float("nan"))
                     nh = met.get("needle_hit@8", None)
                     tag = f"len{doc['meta']['seq_len']}"
+                    history["eval_recall8"].setdefault(tag, []).append(r8)
+                    history["eval_needle8"].setdefault(tag, []).append(nh)
                     line.append(f"{tag} r@8={r8:.3f}" +
                                 (f" ndl@8={nh:.2f}" if nh is not None else ""))
-            print("  ".join(line))
+            emit("  ".join(line), progress)
+            write_json(history_path, history)
+            if not save_training_plot(history, plot_path):
+                emit("matplotlib not installed; skipped training graph", progress)
 
         if args.save_every and (
                 epoch % args.save_every == 0 or epoch == 1 or epoch == args.epochs):
-            save_resume_checkpoint(resume_path, gate, opt, config, args, epoch, paths)
-            print(f"saved resume checkpoint -> {resume_path}")
+            save_resume_checkpoint(resume_path, gate, opt, config, args, epoch, paths, history)
+            emit(f"saved resume checkpoint -> {resume_path}", progress)
             if args.keep_epoch_checkpoints:
                 root, ext = os.path.splitext(resume_path)
                 epoch_path = f"{root}.e{epoch:04d}{ext or '.pt'}"
-                save_resume_checkpoint(epoch_path, gate, opt, config, args, epoch, paths)
-                print(f"saved epoch checkpoint -> {epoch_path}")
+                save_resume_checkpoint(epoch_path, gate, opt, config, args, epoch, paths, history)
+                emit(f"saved epoch checkpoint -> {epoch_path}", progress)
+
+    if progress is not None:
+        progress.close()
 
     save_gate(args.out, gate, config)
     print(f"saved gate -> {args.out}")
+    print(f"training history -> {history_path}")
+    if os.path.exists(plot_path):
+        print(f"training graph -> {plot_path}")
 
 
 if __name__ == "__main__":
     main()
+
+
+

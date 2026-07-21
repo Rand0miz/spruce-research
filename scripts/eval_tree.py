@@ -19,6 +19,7 @@ import torch
 
 from selector.gate import FlatGate
 from selector.loss import kl_loss
+from selector.plotting import save_tree_plot
 from selector.targets import load_teacher
 from selector.tree import build_key_tree, build_target_tree
 
@@ -111,6 +112,8 @@ def main():
     ap.add_argument("--threshold", type=float, default=0.95,
                     help="leaf-level recall@8 pass bar")
     ap.add_argument("--device", default="cuda" if torch.cuda.is_available() else "cpu")
+    ap.add_argument("--plot", default=None,
+                    help="PNG output path; default is beside --gate")
     args = ap.parse_args()
 
     paths = expand_paths(args.targets)
@@ -176,11 +179,15 @@ def main():
                 if tndl:
                     print(f"    {tndl}")
 
+    averages = {
+        level: {name: value / level_counts[level] for name, value in values.items()}
+        for level, values in level_sums.items()
+    }
     if len(paths) > 1:
         print("\nmean over documents")
         for level in sorted(level_sums):
             n = level_counts[level]
-            avg = {name: val / n for name, val in level_sums[level].items()}
+            avg = averages[level]
             rec = format_budget_metrics(avg, args.budgets, "recall")
             cov = "  ".join(f"cov@{b}={avg[f'coverage@{b}']:.3f}"
                             f"/{avg[f'oracle_cov@{b}']:.3f}"
@@ -188,6 +195,16 @@ def main():
             print(f"  level {level:<2} KL={avg['kl']:.4f}")
             print(f"    {rec}")
             print(f"    {cov}")
+
+    model_name = os.path.splitext(os.path.basename(args.gate))[0]
+    plot_dir = os.path.join(os.path.dirname(args.gate) or ".", "eval_graphs", model_name)
+    plot_path = args.plot or os.path.join(plot_dir, "tree_eval.png")
+    levels = sorted(averages)
+    if save_tree_plot([averages[level] for level in levels], levels, args.budgets,
+                      plot_path, "Tree level evaluation", "Tree level (0 = leaves)"):
+        print(f"evaluation graph -> {plot_path}")
+    else:
+        print("matplotlib not installed; skipped evaluation graph")
 
     ok = worst_leaf_r8 >= args.threshold
     print(f"\nworst leaf recall@8 = {worst_leaf_r8:.3f}  "
