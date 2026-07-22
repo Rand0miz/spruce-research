@@ -224,6 +224,8 @@ def main():
             "head_dim": pooledQ_stack.shape[-1],
             "num_kv_heads": pooledK_stack.shape[2],
             "seq_len": seq_len,
+            "requested_length": target_len,
+            "haystack_token_budget": target_len - q_len,
             "block_size": args.block,
             "model": args.model,
             "prompt_bank": selected_bank,

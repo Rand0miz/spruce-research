@@ -20,7 +20,7 @@ Rules (from CLAUDE.md):
 
 ## Status snapshot — 2026-07-21
 
-**Stage:** Stage 2 (train the selector). Flat MaxSim gate trained; tree structure + full-supervision tree loss + simulated tree traversal eval built. Stage 3 (Triton kernel, Qwen custom-attention swap, sparse generate) not started, so no true RULER number yet — recall/coverage proxy only.
+**Stage:** Stage 3.2 started. The tree export already produces validated `selected_blocks`; a correctness-first PyTorch sparse-prefill attention backend is now registered through Transformers' custom-attention interface. It is prefill-only and has unit coverage, but has not yet been exercised with an installed Qwen checkpoint. Stage 3.3 (Triton kernel) remains unstarted, so no true RULER number yet — recall/coverage proxy only.
 
 **Backbone:** Qwen2.5-Coder-1.5B (H=12, G=2 kv-groups). 3B = laptop ceiling; 7B = ARC only.
 
@@ -37,6 +37,12 @@ Rules (from CLAUDE.md):
 ## Entries
 
 <!-- Newest first. Paste eval_gate.py / eval_tree_traversal.py output into Number, distill to one line in Conclusion. -->
+
+## 2026-07-21 — Sparse-prefill reference seam
+**Question:** Can a validated `selected_blocks` tensor constrain Qwen-style grouped-query attention without materializing a full sequence-by-sequence score tensor?
+**Config:** PyTorch reference backend; blockwise query/KV-group loop; causal-mask + selected-block mask; unit tensors including Qwen-style 2:1 Q-to-KV heads.
+**Number:** 13/13 focused validator, tree, sparse-attention, and teacher-prompt-reconstruction tests passed; legacy held-out target reconstruction reproduced 30,573 tokens and needle block 74.
+**Conclusion:** The offline-routing-to-sparse-attention seam is correct at unit-test scale, and replay reconstructs its exact extraction prompt from target metadata. A Qwen sparse replay is the next integration check; this is not a latency result.
 
 ## 2026-07-21 — Log started
 **Question:** —

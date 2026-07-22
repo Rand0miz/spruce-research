@@ -1,12 +1,14 @@
 .env
+.claude
+.agents
 *.html
 CLAUDE.md
 AGENTS.md
 graphify-out
 planV2.md
 paper-notes.md
-teacher_targets/
-selector_ckpt/
+selected_blocks/
+teacher_targets/*/*.pt
 docs/superpowers/
 __pycache__/
 *.py[cod]
