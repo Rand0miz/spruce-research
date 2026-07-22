@@ -10,9 +10,11 @@ from sparse.attention import (
     register_sparse_prefill_attention,
     sparse_prefill_attention_forward,
 )
+from sparse.plotting import save_sparse_replay_plot
 
 __all__ = [
     "SPARSE_PREFILL_ATTENTION",
     "register_sparse_prefill_attention",
     "sparse_prefill_attention_forward",
+    "save_sparse_replay_plot",
 ]

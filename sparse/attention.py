@@ -146,7 +146,10 @@ def sparse_prefill_attention_forward(
                     probabilities, v
                 )
 
-    return output, None
+    # Transformers' Qwen attention module reshapes this directly to
+    # [batch, tokens, hidden_size] before its output projection.  Attention
+    # backends therefore return token-major [B, T, H, D], as SDPA does.
+    return output.transpose(1, 2).contiguous(), None
 
 
 def register_sparse_prefill_attention(name: str = SPARSE_PREFILL_ATTENTION) -> str:

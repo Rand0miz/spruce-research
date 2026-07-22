@@ -40,7 +40,8 @@ def test_all_causal_blocks_matches_dense_attention():
     )
     dense_scores = torch.matmul(query, key.repeat_interleave(2, dim=1).transpose(-1, -2)) / math.sqrt(3)
     expected = torch.softmax(dense_scores + _causal_mask(4), dim=-1) @ value.repeat_interleave(2, dim=1)
-    torch.testing.assert_close(output, expected)
+    assert output.shape == (1, 4, 2, 3)
+    torch.testing.assert_close(output, expected.transpose(1, 2))
     assert weights is None
 
 
@@ -55,7 +56,7 @@ def test_pruned_block_cannot_change_output():
         _AttentionModule(), query, key, value, _causal_mask(6),
         selected_blocks=selected, block_size=2,
     )
-    assert torch.equal(output[0, 0, 4:], torch.zeros_like(output[0, 0, 4:]))
+    assert torch.equal(output[0, 4:, 0], torch.zeros_like(output[0, 4:, 0]))
 
 
 def test_rejects_decode_shape_and_bad_group_count():
