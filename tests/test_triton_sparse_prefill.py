@@ -4,6 +4,7 @@ import pytest
 import torch
 
 from kernels.sparse_prefill import (
+    selected_blocks_to_head_indices,
     selected_blocks_to_block_mask,
     triton_sparse_prefill_attention_forward,
 )
@@ -39,6 +40,14 @@ def test_selected_blocks_adapter_ignores_padding():
     selected[0, 0, 0, 1, :2] = torch.tensor([0, 1], dtype=torch.int32)
     mask = selected_blocks_to_block_mask(selected, layer_idx=0, num_query_heads=1)
     assert mask[0, 0].tolist() == [[True, False], [True, True]]
+
+
+def test_selected_blocks_head_indices_preserve_compact_rows():
+    selected = torch.tensor([[[[[0, -1], [0, 1]]]]], dtype=torch.int32)
+    indices = selected_blocks_to_head_indices(selected, layer_idx=0, num_query_heads=2)
+    assert indices.shape == (1, 2, 2, 2)
+    assert indices[0, 0].tolist() == [[0, -1], [0, 1]]
+    torch.testing.assert_close(indices[0, 0], indices[0, 1])
 
 
 @pytest.mark.skipif(
