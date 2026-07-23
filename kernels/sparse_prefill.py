@@ -3,7 +3,10 @@ import math
 
 import torch
 
-from kernels.seerattention_direct_index_triton import direct_index_sparse_triton
+from kernels.seerattention_direct_index_triton import (
+    KERNEL_VARIANTS,
+    direct_index_sparse_triton,
+)
 
 
 SPRUCE_TRITON_SPARSE_PREFILL = "spruce_triton_sparse_prefill"
@@ -49,7 +52,8 @@ def selected_blocks_to_head_indices(selected_blocks, *, layer_idx, num_query_hea
 
 
 def triton_sparse_prefill_attention_forward(module, query, key, value, attention_mask, *,
-                                             selected_blocks, block_size, **kwargs):
+                                             selected_blocks, block_size,
+                                             kernel_variant="single_head", **kwargs):
     """Transformers AttentionInterface callback backed by Triton (prefill only)."""
     # SPRUCE deliberately keeps decode dense. ``generate`` keeps forwarding
     # selected_blocks after prefill, so dispatch one-token cached calls to the
@@ -77,7 +81,8 @@ def triton_sparse_prefill_attention_forward(module, query, key, value, attention
     # Qwen2.5-Coder-1.5B (12 query heads, 2 KV heads).
     indices = selected_blocks[:, layer_idx].contiguous()
     output = direct_index_sparse_triton(
-        query, key, value, indices, scale=D ** -0.5, block_size=block_size)
+        query, key, value, indices, scale=D ** -0.5,
+        block_size=block_size, kernel_variant=kernel_variant)
     return output, None
 
 

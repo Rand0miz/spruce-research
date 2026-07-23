@@ -20,7 +20,7 @@ Rules (from CLAUDE.md):
 
 ## Status snapshot — 2026-07-22
 
-**Stage:** Stage 3.3 active. The direct-index Triton sparse-prefill kernel is numerically matched to the PyTorch reference. Compact-ID candidate-only traversal, batched FP16 selector scoring, and K sweeps are implemented. A six-case 15K/30K K sweep preserves all generated answers down to K=10 and reaches 1.408× sum-weighted live-prefill speedup, but the new tiled/GQA kernel regresses K=18 kernel-only efficiency versus the prior comparable six-case run; isolate or revert the kernel regression before expanding the benchmark.
+**Stage:** Stage 3.3 active. The direct-index Triton sparse-prefill kernel is numerically matched to the PyTorch reference. Compact-ID candidate-only traversal, batched FP16 selector scoring, and K sweeps are implemented. A six-case 15K/30K K sweep preserves all generated answers down to K=10 and reaches 1.408× sum-weighted live-prefill speedup, but its tiled/GQA kernel regresses K=18 kernel-only efficiency. The previously measured faster single-head kernel is restored as the default and the tiled path retained as an explicit A/B variant; the recovery now needs a matched Colab measurement.
 
 **Backbone:** Qwen2.5-Coder-1.5B (H=12, G=2 kv-groups). 3B = laptop ceiling; 7B = ARC only.
 
@@ -37,6 +37,12 @@ Rules (from CLAUDE.md):
 ## Entries
 
 <!-- Newest first. Paste eval_gate.py / eval_tree_traversal.py output into Number, distill to one line in Conclusion. -->
+
+## 2026-07-23 — Restore measured-fast kernel as default
+**Question:** Can the run3 kernel-only regression be removed without discarding the successful compact-selector changes or losing the tiled kernel needed for a controlled A/B?
+**Config:** Restored the run2 direct-index kernel shape—one query head and one 64-token query block per Triton program, native GQA KV indexing, original three-config warp/stage autotune—as `single_head`, now the default. Preserved the run3 query/head-tiled implementation as opt-in `tiled_gqa`. Added `--kernel-variant {single_head,tiled_gqa}` to the live benchmark and serialized the choice in every sweep report. No model or long-context latency run locally.
+**Number:** Full normal suite 56 passed, 5 skipped. Explicit CUDA suite 7 passed, covering both kernel variants at 64-token single-block and 128-token two-block GQA sparse-reference parity. CLI/help and whitespace checks passed.
+**Conclusion:** Correctness is preserved and the empirically faster pre-run3 kernel is again the production default. Run the same six-case K10/K18 Colab benchmark with `single_head`; a speed recovery is expected from prior evidence but is not claimed until measured.
 
 ## 2026-07-23 — Run3 six-case K=10–18 optimization sweep
 **Question:** After compact route packing, batched selector scoring, and the tiled/GQA kernel changes, which K gives the best efficiency while preserving held-out retrieval, and did the K=18 implementation itself improve?

@@ -35,6 +35,7 @@ from benchmarks.compare_dense_sparse import (
 from eval.score import score_retrival
 from interfaces.validator import validate_selected_blocks
 from kernels.sparse_prefill import (
+    KERNEL_VARIANTS,
     SPRUCE_TRITON_SPARSE_PREFILL,
     register_triton_sparse_prefill_attention,
 )
@@ -213,6 +214,7 @@ def _run_sparse_cases(
                 prefill_kwargs={
                     "selected_blocks": selected,
                     "block_size": case["block_size"],
+                    "kernel_variant": args.kernel_variant,
                     "validate_selected_blocks_input": False,
                 },
             )
@@ -378,6 +380,9 @@ def main():
         "--selector-layer-chunk", type=int, default=4,
         help="selector layers scored per batched candidate operation")
     parser.add_argument("--dtype", choices=("auto", "float16", "bfloat16"), default="auto")
+    parser.add_argument(
+        "--kernel-variant", choices=KERNEL_VARIANTS, default="single_head",
+        help="single_head restores the measured run2 fast path; tiled_gqa is the run3 ablation")
     parser.add_argument("--out", required=True)
     parser.add_argument(
         "--plot", help="optional efficiency/accuracy PNG; also writes an adjacent CSV")
@@ -432,6 +437,7 @@ def main():
                     "selected_blocks": _warmup_selected(
                         cases[0], k_selected, warmup_tokens, device),
                     "block_size": cases[0]["block_size"],
+                    "kernel_variant": args.kernel_variant,
                     "validate_selected_blocks_input": False,
                 },
             )
@@ -461,6 +467,7 @@ def main():
             "gate": os.path.abspath(args.gate),
             "selector": selector_metadata(
                 args, beam=effective_beam, k_selected=k_selected),
+            "kernel": {"variant": args.kernel_variant},
             "repeats": args.repeats, "warmup_tokens": warmup_tokens,
             "cases": case_results,
             "aggregate": aggregate_results(case_results),

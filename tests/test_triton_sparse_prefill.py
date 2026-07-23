@@ -4,6 +4,7 @@ import pytest
 import torch
 
 from kernels.sparse_prefill import (
+    KERNEL_VARIANTS,
     selected_blocks_to_head_indices,
     selected_blocks_to_block_mask,
     triton_sparse_prefill_attention_forward,
@@ -54,7 +55,8 @@ def test_selected_blocks_head_indices_preserve_compact_rows():
     os.environ.get("RUN_TRITON_TESTS") != "1",
     reason="set RUN_TRITON_TESTS=1 on CUDA to compile and run Triton parity tests",
 )
-def test_triton_kernel_matches_pytorch_sparse_reference():
+@pytest.mark.parametrize("kernel_variant", KERNEL_VARIANTS)
+def test_triton_kernel_matches_pytorch_sparse_reference(kernel_variant):
     if not torch.cuda.is_available():
         pytest.skip("CUDA is required")
     torch.manual_seed(0)
@@ -72,6 +74,7 @@ def test_triton_kernel_matches_pytorch_sparse_reference():
     )
     actual, _ = triton_sparse_prefill_attention_forward(
         module, q, k, v, None, selected_blocks=selected, block_size=64,
+        kernel_variant=kernel_variant,
     )
     torch.testing.assert_close(actual, expected, atol=2e-2, rtol=2e-2)
 
@@ -80,7 +83,8 @@ def test_triton_kernel_matches_pytorch_sparse_reference():
     os.environ.get("RUN_TRITON_TESTS") != "1",
     reason="set RUN_TRITON_TESTS=1 on CUDA to compile and run Triton parity tests",
 )
-def test_triton_tiled_gqa_kernel_matches_reference_across_blocks():
+@pytest.mark.parametrize("kernel_variant", KERNEL_VARIANTS)
+def test_triton_tiled_gqa_kernel_matches_reference_across_blocks(kernel_variant):
     if not torch.cuda.is_available():
         pytest.skip("CUDA is required")
     torch.manual_seed(4)
@@ -100,5 +104,6 @@ def test_triton_tiled_gqa_kernel_matches_reference_across_blocks():
     )
     actual, _ = triton_sparse_prefill_attention_forward(
         module, q, k, v, None, selected_blocks=selected, block_size=64,
+        kernel_variant=kernel_variant,
     )
     torch.testing.assert_close(actual, expected, atol=2e-2, rtol=2e-2)
