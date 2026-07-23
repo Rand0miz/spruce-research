@@ -78,7 +78,7 @@ def triton_sparse_prefill_attention_forward(module, query, key, value, attention
     indices = selected_blocks[:, layer_idx].contiguous()
     output = direct_index_sparse_triton(
         query, key, value, indices, scale=D ** -0.5, block_size=block_size)
-    return output.transpose(1, 2).contiguous(), None
+    return output, None
 
 
 def _triton_attention_mask(*args, **kwargs):

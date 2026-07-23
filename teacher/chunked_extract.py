@@ -167,6 +167,23 @@ def _ensure_registered():
         _REGISTERED = True
 
 
+def _stack_and_clear_captures(order):
+    """Stack one target's layer captures, then release the layerwise copies."""
+    try:
+        pooled_stack = torch.stack(
+            [_CAPTURE[i] for i in order], dim=1)
+        pooledQ_stack = torch.stack(
+            [_CAPTURE_QK[i][0] for i in order], dim=1)
+        pooledK_stack = torch.stack(
+            [_CAPTURE_QK[i][1] for i in order], dim=1)
+        return pooled_stack, pooledQ_stack, pooledK_stack
+    finally:
+        # torch.stack owns new storage. Keeping the per-layer tensors here
+        # would otherwise retain a second full target until the next call.
+        _CAPTURE.clear()
+        _CAPTURE_QK.clear()
+
+
 @torch.no_grad()
 def get_pooled_targets(model, tok, prompt, device="cuda", block_size=_BLOCK):
     """
@@ -212,8 +229,8 @@ def get_pooled_targets(model, tok, prompt, device="cuda", block_size=_BLOCK):
             if cfg is not None:
                 cfg._attn_implementation = prev
 
+    seq_len = inputs["input_ids"].shape[1]
     order = sorted(_CAPTURE)
-    pooled_stack = torch.stack([_CAPTURE[i] for i in order], dim=1)        # [1, L, H, qb, kb]
-    pooledQ_stack = torch.stack([_CAPTURE_QK[i][0] for i in order], dim=1)  # [1, L, G, qb, P, d]
-    pooledK_stack = torch.stack([_CAPTURE_QK[i][1] for i in order], dim=1)  # [1, L, G, kb, P, d]
-    return pooled_stack, pooledQ_stack, pooledK_stack, inputs["input_ids"].shape[1]
+    pooled_stack, pooledQ_stack, pooledK_stack = _stack_and_clear_captures(order)
+    del inputs
+    return pooled_stack, pooledQ_stack, pooledK_stack, seq_len

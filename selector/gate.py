@@ -86,10 +86,90 @@ class FlatGate(nn.Module):
         L = q_feat.shape[0]
         outs = []
         for l in range(L):
-            out_l = checkpoint.checkpoint(
-                self._layer_scores, q_feat[l], k_feat[l], self.Wq[l], self.Wk[l],
-                use_reentrant=False,
-            )
+            if torch.is_grad_enabled():
+                out_l = checkpoint.checkpoint(
+                    self._layer_scores, q_feat[l], k_feat[l], self.Wq[l], self.Wk[l],
+                    use_reentrant=False,
+                )
+            else:
+                # Checkpointing only saves training activation memory. During
+                # inference it adds Python/autograd overhead without a benefit.
+                out_l = self._layer_scores(
+                    q_feat[l], k_feat[l], self.Wq[l], self.Wk[l])
             outs.append(out_l)
         scores = torch.stack(outs, dim=0)                     # [L,G,qb,kb]
         return scores / math.sqrt(self.proj_dim)
+
+    @staticmethod
+    def _layer_candidate_scores(q_feat_l, candidate_k_l, Wq_l, Wk_l):
+        """Score only paired candidate keys for inference-time traversal.
+
+        q_feat_l is [G,qb,P,d] and candidate_k_l is [G,qb,C,P,d].
+        Unlike the flat scorer, key candidate C is specific to each query row.
+        """
+        qp = torch.einsum("gqid,dp->gqip", q_feat_l, Wq_l)
+        kp = torch.einsum("gqcjd,dp->gqcjp", candidate_k_l, Wk_l)
+        best = None
+        for j in range(kp.shape[3]):
+            scores = torch.einsum("gqip,gqcp->gqic", qp, kp[:, :, :, j])
+            values = scores.amax(dim=2)
+            best = values if best is None else torch.maximum(best, values)
+        return best
+
+    @torch.no_grad()
+    def project_queries(self, q_feat):
+        """Project [L,G,qb,P,d] queries once for every tree level."""
+        return torch.einsum("lgqid,ldp->lgqip", q_feat, self.Wq)
+
+    @torch.no_grad()
+    def project_keys(self, k_feat):
+        """Project [L,G,nodes,P,d] keys once before per-query gathering."""
+        return torch.einsum("lgkjd,ldp->lgkjp", k_feat, self.Wk)
+
+    @torch.no_grad()
+    def score_projected_candidates(
+            self, projected_q, projected_k, candidate_ids, layer_chunk=1):
+        """Score already-projected per-query candidate node IDs.
+
+        projected_q: [L,G,qb,P,p], projected_k: [L,G,nodes,P,p],
+        candidate_ids: [L,G,qb,C]. Returns [L,G,qb,C]. Layer-wise
+        gathering keeps the temporary candidate feature tensor bounded.
+        """
+        if (projected_q.dim() != 5 or projected_k.dim() != 5
+                or candidate_ids.dim() != 4):
+            raise ValueError("candidate scoring expects q/k 5-D and IDs 4-D")
+        L, G, qb = projected_q.shape[:3]
+        if (projected_k.shape[:2] != (L, G)
+                or candidate_ids.shape[:3] != (L, G, qb)):
+            raise ValueError("candidate scoring layer/group/query dimensions mismatch")
+
+        if layer_chunk < 1:
+            raise ValueError("layer_chunk must be >= 1")
+        outputs = []
+        nodes, P, projection_dim = projected_k.shape[2:]
+        C = candidate_ids.shape[-1]
+        for layer_start in range(0, L, layer_chunk):
+            layer_end = min(layer_start + layer_chunk, L)
+            chunk_layers = layer_end - layer_start
+            ids = candidate_ids[layer_start:layer_end].clamp(
+                min=0, max=nodes - 1)
+            source = projected_k[layer_start:layer_end, :, None].expand(
+                chunk_layers, G, qb, nodes, P, projection_dim)
+            gather_ids = ids[..., None, None].expand(
+                chunk_layers, G, qb, C, P, projection_dim)
+            candidates = torch.gather(source, 3, gather_ids)
+            # [Lc,G,qb,1,P,p] @ [Lc,G,qb,C,p,P]
+            # -> [Lc,G,qb,C,P,P]. A small layer chunk amortizes Python/kernel
+            # launch overhead while bounding the gathered candidate storage.
+            pairwise = torch.matmul(
+                projected_q[layer_start:layer_end, :, :, None],
+                candidates.transpose(-1, -2),
+            )
+            outputs.append(pairwise.amax(dim=(-1, -2)))
+        return torch.cat(outputs, dim=0) / math.sqrt(self.proj_dim)
+
+    @torch.no_grad()
+    def score_candidates(self, q_feat, k_feat, candidate_ids):
+        """Convenience path that projects Q/K once before candidate scoring."""
+        return self.score_projected_candidates(
+            self.project_queries(q_feat), self.project_keys(k_feat), candidate_ids)

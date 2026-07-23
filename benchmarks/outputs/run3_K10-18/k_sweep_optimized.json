@@ -1,0 +1,3395 @@
+{
+  "model": "Qwen/Qwen2.5-Coder-1.5B-Instruct",
+  "gate": "/content/drive/MyDrive/SPRUCE_COLAB/selector_ckpt/flat_gate_lamt0.75_lamn0.25_lr5e4_e300.pt",
+  "k_values": [
+    10,
+    12,
+    14,
+    16,
+    18
+  ],
+  "repeats": 3,
+  "warmup_tokens": 64,
+  "sweeps": [
+    {
+      "model": "Qwen/Qwen2.5-Coder-1.5B-Instruct",
+      "gate": "/content/drive/MyDrive/SPRUCE_COLAB/selector_ckpt/flat_gate_lamt0.75_lamn0.25_lr5e4_e300.pt",
+      "selector": {
+        "mode": "live_candidate_only_tree_traversal",
+        "route_representation": "compact_leaf_ids",
+        "feature_source": "pooled_qk_loaded_from_teacher_target",
+        "feature_extraction_included": false,
+        "feature_file_loading_included": false,
+        "compute_dtype": "float16",
+        "layer_chunk": 4,
+        "beam": 8,
+        "radix": 2,
+        "k_selected": 10,
+        "local_window": 1
+      },
+      "repeats": 3,
+      "warmup_tokens": 64,
+      "cases": [
+        {
+          "case_id": "badge_elena_amber",
+          "seq_len": 15209,
+          "block_size": 64,
+          "needle_block": 60,
+          "teacher_target": "/content/SPRUCE/teacher_targets/1.5B_heldout_0.05-0.95/teacher_badge_elena_amber_len15209_blk64_d0.256369.pt",
+          "sparse": {
+            "exact": true,
+            "fuzzy": 1.0,
+            "answer": " Elena selected the amber badge for the audit. The compliance memo repeated ordinary review steps and noncritical status updates. The compliance memo repeated ordinary review steps and noncritical",
+            "needle": "elena selected the amber badge for the audit.",
+            "feature_load_seconds": 0.14158025899996574,
+            "tree_build_seconds": 0.006238648000362446,
+            "tree_traversal_seconds": 0.049988364000455476,
+            "route_pack_seconds": 0.0011733510000340175,
+            "route_transfer_seconds": 0.0,
+            "selector_seconds": 0.05740036300085194,
+            "prefill_seconds": 1.1805327720012428,
+            "decode_seconds": 0.9357653389997722,
+            "seconds": 2.116298111001015,
+            "live_prefill_seconds": 1.2379331350020948,
+            "live_total_seconds": 2.173698474001867,
+            "needle_layer_group_hit_rate": 0.8392857313156128,
+            "needle_any_group_all_layers_rate": 0.9285714626312256,
+            "answer_repeat_match": true,
+            "timing_samples": [
+              {
+                "feature_load_seconds": 0.14790342299966142,
+                "tree_build_seconds": 0.15208963899931405,
+                "tree_traversal_seconds": 0.24142475900043792,
+                "route_pack_seconds": 0.021889116000238573,
+                "route_transfer_seconds": 0.0,
+                "selector_seconds": 0.41540351399999054,
+                "needle_layer_group_hit_rate": 0.8392857313156128,
+                "needle_any_group_all_layers_rate": 0.9285714626312256,
+                "seconds": 2.892106393999711,
+                "prefill_seconds": 1.9516005689984013,
+                "decode_seconds": 0.9405058250013099,
+                "live_prefill_seconds": 2.367004082998392,
+                "live_total_seconds": 3.3075099079997017
+              },
+              {
+                "feature_load_seconds": 0.14158025899996574,
+                "tree_build_seconds": 0.006182290999277029,
+                "tree_traversal_seconds": 0.04985679300079937,
+                "route_pack_seconds": 0.0010767049989226507,
+                "route_transfer_seconds": 0.0,
+                "selector_seconds": 0.05711578899899905,
+                "needle_layer_group_hit_rate": 0.8392857313156128,
+                "needle_any_group_all_layers_rate": 0.9285714626312256,
+                "seconds": 2.109234302000914,
+                "prefill_seconds": 1.1744952379995084,
+                "decode_seconds": 0.9347390640014055,
+                "live_prefill_seconds": 1.2316110269985074,
+                "live_total_seconds": 2.166350090999913
+              },
+              {
+                "feature_load_seconds": 0.11973382900032448,
+                "tree_build_seconds": 0.006238648000362446,
+                "tree_traversal_seconds": 0.049988364000455476,
+                "route_pack_seconds": 0.0011733510000340175,
+                "route_transfer_seconds": 0.0,
+                "selector_seconds": 0.05740036300085194,
+                "needle_layer_group_hit_rate": 0.8392857313156128,
+                "needle_any_group_all_layers_rate": 0.9285714626312256,
+                "seconds": 2.116298111001015,
+                "prefill_seconds": 1.1805327720012428,
+                "decode_seconds": 0.9357653389997722,
+                "live_prefill_seconds": 1.2379331350020948,
+                "live_total_seconds": 2.173698474001867
+              }
+            ]
+          },
+          "dense": {
+            "exact": true,
+            "fuzzy": 1.0,
+            "answer": " Elena selected the amber badge for the audit. The compliance memo repeated ordinary review steps and noncritical status updates. The compliance memo repeated ordinary review steps and noncritical",
+            "needle": "elena selected the amber badge for the audit.",
+            "prefill_seconds": 1.5301610360002087,
+            "decode_seconds": 0.9207305849995464,
+            "seconds": 2.455018521000966,
+            "answer_repeat_match": true,
+            "timing_samples": [
+              {
+                "seconds": 2.460891320999508,
+                "prefill_seconds": 1.5297008260004077,
+                "decode_seconds": 0.9311904949991003
+              },
+              {
+                "seconds": 2.455018521000966,
+                "prefill_seconds": 1.537954389999868,
+                "decode_seconds": 0.9170641310010978
+              },
+              {
+                "seconds": 2.450891620999755,
+                "prefill_seconds": 1.5301610360002087,
+                "decode_seconds": 0.9207305849995464
+              }
+            ]
+          },
+          "answers_match": true,
+          "comparison": {
+            "kernel_prefill_speedup": 1.2961614215980426,
+            "live_prefill_speedup": 1.236061135077073,
+            "live_total_speedup": 1.129419995626706
+          }
+        },
+        {
+          "case_id": "badge_elena_amber",
+          "seq_len": 30419,
+          "block_size": 64,
+          "needle_block": 275,
+          "teacher_target": "/content/SPRUCE/teacher_targets/1.5B_heldout_0.05-0.95/teacher_badge_elena_amber_len30419_blk64_d0.579381.pt",
+          "sparse": {
+            "exact": true,
+            "fuzzy": 1.0,
+            "answer": " Elena selected the amber badge for the audit. The compliance memo repeated ordinary review steps and noncritical status updates. The compliance memo repeated ordinary review steps and noncritical",
+            "needle": "elena selected the amber badge for the audit.",
+            "feature_load_seconds": 0.32784190500024124,
+            "tree_build_seconds": 0.00694391399883898,
+            "tree_traversal_seconds": 0.11441037699842127,
+            "route_pack_seconds": 0.0016774129999248544,
+            "route_transfer_seconds": 0.0,
+            "selector_seconds": 0.12300331900223682,
+            "prefill_seconds": 2.348072189000959,
+            "decode_seconds": 0.9184443619997182,
+            "seconds": 3.2583275770011824,
+            "live_prefill_seconds": 2.471119457999521,
+            "live_total_seconds": 3.381374845999744,
+            "needle_layer_group_hit_rate": 0.8392857313156128,
+            "needle_any_group_all_layers_rate": 0.9642857313156128,
+            "answer_repeat_match": true,
+            "timing_samples": [
+              {
+                "feature_load_seconds": 0.3226770540004509,
+                "tree_build_seconds": 0.00694391399883898,
+                "tree_traversal_seconds": 0.1141922410006373,
+                "route_pack_seconds": 0.0015387229996122187,
+                "route_transfer_seconds": 0.0,
+                "selector_seconds": 0.1226748779990885,
+                "needle_layer_group_hit_rate": 0.8392857313156128,
+                "needle_any_group_all_layers_rate": 0.9642857313156128,
+                "seconds": 3.2557513079991622,
+                "prefill_seconds": 2.323703056999875,
+                "decode_seconds": 0.9320482509992871,
+                "live_prefill_seconds": 2.4463779349989636,
+                "live_total_seconds": 3.3784261859982507
+              },
+              {
+                "feature_load_seconds": 0.32784190500024124,
+                "tree_build_seconds": 0.0069594790002156515,
+                "tree_traversal_seconds": 0.11441037699842127,
+                "route_pack_seconds": 0.0016774129999248544,
+                "route_transfer_seconds": 0.0,
+                "selector_seconds": 0.12304726899856178,
+                "needle_layer_group_hit_rate": 0.8392857313156128,
+                "needle_any_group_all_layers_rate": 0.9642857313156128,
+                "seconds": 3.2583275770011824,
+                "prefill_seconds": 2.348072189000959,
+                "decode_seconds": 0.9102553880002233,
+                "live_prefill_seconds": 2.471119457999521,
+                "live_total_seconds": 3.381374845999744
+              },
+              {
+                "feature_load_seconds": 0.3334775200000877,
+                "tree_build_seconds": 0.006862819000161835,
+                "tree_traversal_seconds": 0.11444468800073082,
+                "route_pack_seconds": 0.0016958120013441658,
+                "route_transfer_seconds": 0.0,
+                "selector_seconds": 0.12300331900223682,
+                "needle_layer_group_hit_rate": 0.8392857313156128,
+                "needle_any_group_all_layers_rate": 0.9642857313156128,
+                "seconds": 3.280987820999144,
+                "prefill_seconds": 2.3625434589994256,
+                "decode_seconds": 0.9184443619997182,
+                "live_prefill_seconds": 2.4855467780016625,
+                "live_total_seconds": 3.4039911400013807
+              }
+            ]
+          },
+          "dense": {
+            "exact": true,
+            "fuzzy": 1.0,
+            "answer": " Elena selected the amber badge for the audit. The compliance memo repeated ordinary review steps and noncritical status updates. The compliance memo repeated ordinary review steps and noncritical",
+            "needle": "elena selected the amber badge for the audit.",
+            "prefill_seconds": 3.8135526470014156,
+            "decode_seconds": 0.9180508779991214,
+            "seconds": 4.731603525000537,
+            "answer_repeat_match": true,
+            "timing_samples": [
+              {
+                "seconds": 4.706321257999662,
+                "prefill_seconds": 3.7839336739998544,
+                "decode_seconds": 0.9223875839998072
+              },
+              {
+                "seconds": 4.731603525000537,
+                "prefill_seconds": 3.8135526470014156,
+                "decode_seconds": 0.9180508779991214
+              },
+              {
+                "seconds": 4.767964221000511,
+                "prefill_seconds": 3.8577843599996413,
+                "decode_seconds": 0.91017986100087
+              }
+            ]
+          },
+          "answers_match": true,
+          "comparison": {
+            "kernel_prefill_speedup": 1.6241206998938047,
+            "live_prefill_speedup": 1.5432490058933261,
+            "live_total_speedup": 1.3993135160977934
+          }
+        },
+        {
+          "case_id": "code_nova_4816",
+          "seq_len": 30573,
+          "block_size": 64,
+          "needle_block": 74,
+          "teacher_target": "/content/SPRUCE/teacher_targets/1.5B_heldout_0.05-0.95/teacher_code_nova_4816_len30573_blk64_d0.15631.pt",
+          "sparse": {
+            "exact": true,
+            "fuzzy": 1.0,
+            "answer": " The Nova access code is 4816. The meeting archive contained budget notes, calendar changes, and vendor summaries. The meeting archive contained budget notes,",
+            "needle": "the nova access code is 4816.",
+            "feature_load_seconds": 0.34431843099991966,
+            "tree_build_seconds": 0.0071436620000895346,
+            "tree_traversal_seconds": 0.11555547299940372,
+            "route_pack_seconds": 0.001796242000636994,
+            "route_transfer_seconds": 0.0,
+            "selector_seconds": 0.12442918799752078,
+            "prefill_seconds": 2.4157593510008155,
+            "decode_seconds": 0.9191487569987657,
+            "seconds": 3.331154121000509,
+            "live_prefill_seconds": 2.5400637820021075,
+            "live_total_seconds": 3.455458552001801,
+            "needle_layer_group_hit_rate": 0.8571429252624512,
+            "needle_any_group_all_layers_rate": 0.9285714626312256,
+            "answer_repeat_match": true,
+            "timing_samples": [
+              {
+                "feature_load_seconds": 0.34431843099991966,
+                "tree_build_seconds": 0.007566272000985919,
+                "tree_traversal_seconds": 0.11555547299940372,
+                "route_pack_seconds": 0.001854750000347849,
+                "route_transfer_seconds": 0.0,
+                "selector_seconds": 0.12497649500073749,
+                "needle_layer_group_hit_rate": 0.8571429252624512,
+                "needle_any_group_all_layers_rate": 0.9285714626312256,
+                "seconds": 3.3137970240004506,
+                "prefill_seconds": 2.3895431170003576,
+                "decode_seconds": 0.924253907000093,
+                "live_prefill_seconds": 2.514519612001095,
+                "live_total_seconds": 3.438773519001188
+              },
+              {
+                "feature_load_seconds": 0.3302883800006384,
+                "tree_build_seconds": 0.0071436620000895346,
+                "tree_traversal_seconds": 0.11536452700056543,
+                "route_pack_seconds": 0.001796242000636994,
+                "route_transfer_seconds": 0.0,
+                "selector_seconds": 0.12430443100129196,
+                "needle_layer_group_hit_rate": 0.8571429252624512,
+                "needle_any_group_all_layers_rate": 0.9285714626312256,
+                "seconds": 3.331154121000509,
+                "prefill_seconds": 2.4157593510008155,
+                "decode_seconds": 0.9153947699996934,
+                "live_prefill_seconds": 2.5400637820021075,
+                "live_total_seconds": 3.455458552001801
+              },
+              {
+                "feature_load_seconds": 0.36090606399920944,
+                "tree_build_seconds": 0.00713219899989781,
+                "tree_traversal_seconds": 0.11569302199859521,
+                "route_pack_seconds": 0.0016039669990277616,
+                "route_transfer_seconds": 0.0,
+                "selector_seconds": 0.12442918799752078,
+                "needle_layer_group_hit_rate": 0.8571429252624512,
+                "needle_any_group_all_layers_rate": 0.9285714626312256,
+                "seconds": 3.35327047499959,
+                "prefill_seconds": 2.4341217180008243,
+                "decode_seconds": 0.9191487569987657,
+                "live_prefill_seconds": 2.558550905998345,
+                "live_total_seconds": 3.477699662997111
+              }
+            ]
+          },
+          "dense": {
+            "exact": true,
+            "fuzzy": 1.0,
+            "answer": " The Nova access code is 4816. The meeting archive contained budget notes, calendar changes, and vendor summaries. The meeting archive contained budget notes,",
+            "needle": "the nova access code is 4816.",
+            "prefill_seconds": 3.86627537700042,
+            "decode_seconds": 0.9213493740007834,
+            "seconds": 4.789814905001549,
+            "answer_repeat_match": true,
+            "timing_samples": [
+              {
+                "seconds": 4.794876584001031,
+                "prefill_seconds": 3.86627537700042,
+                "decode_seconds": 0.9286012070006109
+              },
+              {
+                "seconds": 4.771224676000202,
+                "prefill_seconds": 3.8498753019994183,
+                "decode_seconds": 0.9213493740007834
+              },
+              {
+                "seconds": 4.789814905001549,
+                "prefill_seconds": 3.874446715000886,
+                "decode_seconds": 0.9153681900006632
+              }
+            ]
+          },
+          "answers_match": true,
+          "comparison": {
+            "kernel_prefill_speedup": 1.6004389573815272,
+            "live_prefill_speedup": 1.5221174383081741,
+            "live_total_speedup": 1.3861589809047876
+          }
+        },
+        {
+          "case_id": "code_nova_4816",
+          "seq_len": 30573,
+          "block_size": 64,
+          "needle_block": 245,
+          "teacher_target": "/content/SPRUCE/teacher_targets/1.5B_heldout_0.05-0.95/teacher_code_nova_4816_len30573_blk64_d0.514987.pt",
+          "sparse": {
+            "exact": true,
+            "fuzzy": 1.0,
+            "answer": " The Nova access code is 4816. The meeting archive contained budget notes, calendar changes, and vendor summaries. The meeting archive contained budget notes,",
+            "needle": "the nova access code is 4816.",
+            "feature_load_seconds": 0.3658410759999242,
+            "tree_build_seconds": 0.007161573999837856,
+            "tree_traversal_seconds": 0.11579684699972859,
+            "route_pack_seconds": 0.0017430360003345413,
+            "route_transfer_seconds": 0.0,
+            "selector_seconds": 0.12470145699990098,
+            "prefill_seconds": 2.46685993400024,
+            "decode_seconds": 0.9198656259995914,
+            "seconds": 3.3867255599998316,
+            "live_prefill_seconds": 2.591223811998134,
+            "live_total_seconds": 3.5110894379977253,
+            "needle_layer_group_hit_rate": 0.8392857313156128,
+            "needle_any_group_all_layers_rate": 0.9285714626312256,
+            "answer_repeat_match": true,
+            "timing_samples": [
+              {
+                "feature_load_seconds": 0.38467076099914266,
+                "tree_build_seconds": 0.007161573999837856,
+                "tree_traversal_seconds": 0.11579684699972859,
+                "route_pack_seconds": 0.0017430360003345413,
+                "route_transfer_seconds": 0.0,
+                "selector_seconds": 0.12470145699990098,
+                "needle_layer_group_hit_rate": 0.8392857313156128,
+                "needle_any_group_all_layers_rate": 0.9285714626312256,
+                "seconds": 3.3730161120001867,
+                "prefill_seconds": 2.4530119609989924,
+                "decode_seconds": 0.9200041510011943,
+                "live_prefill_seconds": 2.5777134179988934,
+                "live_total_seconds": 3.4977175690000877
+              },
+              {
+                "feature_load_seconds": 0.32959091599877866,
+                "tree_build_seconds": 0.007167273999584722,
+                "tree_traversal_seconds": 0.11552273799861723,
+                "route_pack_seconds": 0.0016738659996917704,
+                "route_transfer_seconds": 0.0,
+                "selector_seconds": 0.12436387799789372,
+                "needle_layer_group_hit_rate": 0.8392857313156128,
+                "needle_any_group_all_layers_rate": 0.9285714626312256,
+                "seconds": 3.3867255599998316,
+                "prefill_seconds": 2.46685993400024,
+                "decode_seconds": 0.9198656259995914,
+                "live_prefill_seconds": 2.591223811998134,
+                "live_total_seconds": 3.5110894379977253
+              },
+              {
+                "feature_load_seconds": 0.3658410759999242,
+                "tree_build_seconds": 0.007160659000874148,
+                "tree_traversal_seconds": 0.11607276200084016,
+                "route_pack_seconds": 0.00176749300044321,
+                "route_transfer_seconds": 0.0,
+                "selector_seconds": 0.12500091400215751,
+                "needle_layer_group_hit_rate": 0.8392857313156128,
+                "needle_any_group_all_layers_rate": 0.9285714626312256,
+                "seconds": 3.395241587999408,
+                "prefill_seconds": 2.47983284700058,
+                "decode_seconds": 0.9154087409988279,
+                "live_prefill_seconds": 2.6048337610027374,
+                "live_total_seconds": 3.5202425020015653
+              }
+            ]
+          },
+          "dense": {
+            "exact": true,
+            "fuzzy": 1.0,
+            "answer": " The Nova access code is 4816. The meeting archive contained budget notes, calendar changes, and vendor summaries. The meeting archive contained budget notes,",
+            "needle": "the nova access code is 4816.",
+            "prefill_seconds": 3.8611491410010785,
+            "decode_seconds": 0.9212329769998178,
+            "seconds": 4.782382118000896,
+            "answer_repeat_match": true,
+            "timing_samples": [
+              {
+                "seconds": 4.782382118000896,
+                "prefill_seconds": 3.8611491410010785,
+                "decode_seconds": 0.9212329769998178
+              },
+              {
+                "seconds": 4.767079047000152,
+                "prefill_seconds": 3.8545118830006686,
+                "decode_seconds": 0.9125671639994835
+              },
+              {
+                "seconds": 4.792921893000312,
+                "prefill_seconds": 3.8639557999995304,
+                "decode_seconds": 0.9289660930007813
+              }
+            ]
+          },
+          "answers_match": true,
+          "comparison": {
+            "kernel_prefill_speedup": 1.5652080962456065,
+            "live_prefill_speedup": 1.4900870866973412,
+            "live_total_speedup": 1.362079264129527
+          }
+        },
+        {
+          "case_id": "color_green_bob",
+          "seq_len": 14745,
+          "block_size": 64,
+          "needle_block": 59,
+          "teacher_target": "/content/SPRUCE/teacher_targets/1.5B_heldout_0.05-0.95/teacher_color_green_bob_len14745_blk64_d0.259059.pt",
+          "sparse": {
+            "exact": true,
+            "fuzzy": 1.0,
+            "answer": " Bob's favorite color is green. The quarterly logistics report noted no unusual activity. The quarterly logistics report noted no unusual activity. The quarterly logistics report noted no unusual",
+            "needle": "bobs favorite color is green.",
+            "feature_load_seconds": 0.1308136440002272,
+            "tree_build_seconds": 0.00616166500003601,
+            "tree_traversal_seconds": 0.04878515600103128,
+            "route_pack_seconds": 0.0011243959997955244,
+            "route_transfer_seconds": 0.0,
+            "selector_seconds": 0.056133578002118156,
+            "prefill_seconds": 1.1810875819992361,
+            "decode_seconds": 0.92686644800051,
+            "seconds": 2.111276870000438,
+            "live_prefill_seconds": 1.2374457019996044,
+            "live_total_seconds": 2.167386147999423,
+            "needle_layer_group_hit_rate": 0.785714328289032,
+            "needle_any_group_all_layers_rate": 0.8928571939468384,
+            "answer_repeat_match": true,
+            "timing_samples": [
+              {
+                "feature_load_seconds": 0.1308136440002272,
+                "tree_build_seconds": 0.00616166500003601,
+                "tree_traversal_seconds": 0.049168344999998226,
+                "route_pack_seconds": 0.0010281100003339816,
+                "route_transfer_seconds": 0.0,
+                "selector_seconds": 0.05635812000036822,
+                "needle_layer_group_hit_rate": 0.785714328289032,
+                "needle_any_group_all_layers_rate": 0.8928571939468384,
+                "seconds": 2.107954029999746,
+                "prefill_seconds": 1.1810875819992361,
+                "decode_seconds": 0.92686644800051,
+                "live_prefill_seconds": 1.2374457019996044,
+                "live_total_seconds": 2.1643121500001143
+              },
+              {
+                "feature_load_seconds": 0.13972366899906774,
+                "tree_build_seconds": 0.0062240260012913495,
+                "tree_traversal_seconds": 0.04878515600103128,
+                "route_pack_seconds": 0.0011243959997955244,
+                "route_transfer_seconds": 0.0,
+                "selector_seconds": 0.056133578002118156,
+                "needle_layer_group_hit_rate": 0.785714328289032,
+                "needle_any_group_all_layers_rate": 0.8928571939468384,
+                "seconds": 2.1118818520008062,
+                "prefill_seconds": 1.1884996720000345,
+                "decode_seconds": 0.9233821800007718,
+                "live_prefill_seconds": 1.2446332500021526,
+                "live_total_seconds": 2.1680154300029244
+              },
+              {
+                "feature_load_seconds": 0.12153498400039098,
+                "tree_build_seconds": 0.006156247000035364,
+                "tree_traversal_seconds": 0.048714884998844354,
+                "route_pack_seconds": 0.0012381460001051892,
+                "route_transfer_seconds": 0.0,
+                "selector_seconds": 0.05610927799898491,
+                "needle_layer_group_hit_rate": 0.785714328289032,
+                "needle_any_group_all_layers_rate": 0.8928571939468384,
+                "seconds": 2.111276870000438,
+                "prefill_seconds": 1.1782642799989844,
+                "decode_seconds": 0.9330125900014536,
+                "live_prefill_seconds": 1.2343735579979693,
+                "live_total_seconds": 2.167386147999423
+              }
+            ]
+          },
+          "dense": {
+            "exact": true,
+            "fuzzy": 1.0,
+            "answer": " Bob's favorite color is green. The quarterly logistics report noted no unusual activity. The quarterly logistics report noted no unusual activity. The quarterly logistics report noted no unusual",
+            "needle": "bobs favorite color is green.",
+            "prefill_seconds": 1.4381267839999055,
+            "decode_seconds": 0.9203829239995684,
+            "seconds": 2.358509707999474,
+            "answer_repeat_match": true,
+            "timing_samples": [
+              {
+                "seconds": 2.413480912000523,
+                "prefill_seconds": 1.488612359000399,
+                "decode_seconds": 0.9248685530001239
+              },
+              {
+                "seconds": 2.3398741940000036,
+                "prefill_seconds": 1.4352848090002226,
+                "decode_seconds": 0.904589384999781
+              },
+              {
+                "seconds": 2.358509707999474,
+                "prefill_seconds": 1.4381267839999055,
+                "decode_seconds": 0.9203829239995684
+              }
+            ]
+          },
+          "answers_match": true,
+          "comparison": {
+            "kernel_prefill_speedup": 1.2176292477528017,
+            "live_prefill_speedup": 1.1621736466303272,
+            "live_total_speedup": 1.0881815915343305
+          }
+        },
+        {
+          "case_id": "color_green_bob",
+          "seq_len": 14745,
+          "block_size": 64,
+          "needle_block": 80,
+          "teacher_target": "/content/SPRUCE/teacher_targets/1.5B_heldout_0.05-0.95/teacher_color_green_bob_len14745_blk64_d0.351676.pt",
+          "sparse": {
+            "exact": true,
+            "fuzzy": 1.0,
+            "answer": " Bob's favorite color is green. The quarterly logistics report noted no unusual activity. The quarterly logistics report noted no unusual activity. The quarterly logistics report noted no unusual",
+            "needle": "bobs favorite color is green.",
+            "feature_load_seconds": 0.1162136749990168,
+            "tree_build_seconds": 0.006130831001428305,
+            "tree_traversal_seconds": 0.04875284799891233,
+            "route_pack_seconds": 0.0010193170001002727,
+            "route_transfer_seconds": 0.0,
+            "selector_seconds": 0.05595529200218152,
+            "prefill_seconds": 1.1971443640013604,
+            "decode_seconds": 0.9125393400008761,
+            "seconds": 2.105477189001249,
+            "live_prefill_seconds": 1.253099656003542,
+            "live_total_seconds": 2.1614324810034304,
+            "needle_layer_group_hit_rate": 0.8571429252624512,
+            "needle_any_group_all_layers_rate": 0.9285714626312256,
+            "answer_repeat_match": true,
+            "timing_samples": [
+              {
+                "feature_load_seconds": 0.1273278249991563,
+                "tree_build_seconds": 0.006130831001428305,
+                "tree_traversal_seconds": 0.04875284799891233,
+                "route_pack_seconds": 0.001129940999817336,
+                "route_transfer_seconds": 0.0,
+                "selector_seconds": 0.05601362000015797,
+                "needle_layer_group_hit_rate": 0.8571429252624512,
+                "needle_any_group_all_layers_rate": 0.9285714626312256,
+                "seconds": 2.112822903000051,
+                "prefill_seconds": 1.1991509719991882,
+                "decode_seconds": 0.913671931000863,
+                "live_prefill_seconds": 1.2551645919993462,
+                "live_total_seconds": 2.168836523000209
+              },
+              {
+                "feature_load_seconds": 0.11584225700062234,
+                "tree_build_seconds": 0.006114435000199592,
+                "tree_traversal_seconds": 0.04882467500101484,
+                "route_pack_seconds": 0.0010161820009670919,
+                "route_transfer_seconds": 0.0,
+                "selector_seconds": 0.05595529200218152,
+                "needle_layer_group_hit_rate": 0.8571429252624512,
+                "needle_any_group_all_layers_rate": 0.9285714626312256,
+                "seconds": 2.105477189001249,
+                "prefill_seconds": 1.1971443640013604,
+                "decode_seconds": 0.9083328249998885,
+                "live_prefill_seconds": 1.253099656003542,
+                "live_total_seconds": 2.1614324810034304
+              },
+              {
+                "feature_load_seconds": 0.1162136749990168,
+                "tree_build_seconds": 0.006216530000529019,
+                "tree_traversal_seconds": 0.048681524000130594,
+                "route_pack_seconds": 0.0010193170001002727,
+                "route_transfer_seconds": 0.0,
+                "selector_seconds": 0.055917371000759886,
+                "needle_layer_group_hit_rate": 0.8571429252624512,
+                "needle_any_group_all_layers_rate": 0.9285714626312256,
+                "seconds": 2.0885914549999143,
+                "prefill_seconds": 1.1760521149990382,
+                "decode_seconds": 0.9125393400008761,
+                "live_prefill_seconds": 1.231969485999798,
+                "live_total_seconds": 2.144508826000674
+              }
+            ]
+          },
+          "dense": {
+            "exact": true,
+            "fuzzy": 1.0,
+            "answer": " Bob's favorite color is green. The quarterly logistics report noted no unusual activity. The quarterly logistics report noted no unusual activity. The quarterly logistics report noted no unusual",
+            "needle": "bobs favorite color is green.",
+            "prefill_seconds": 1.4396684280000045,
+            "decode_seconds": 0.9073930269987613,
+            "seconds": 2.3431687229985982,
+            "answer_repeat_match": true,
+            "timing_samples": [
+              {
+                "seconds": 2.33454631099994,
+                "prefill_seconds": 1.4271532840011787,
+                "decode_seconds": 0.9073930269987613
+              },
+              {
+                "seconds": 2.3431687229985982,
+                "prefill_seconds": 1.4396684280000045,
+                "decode_seconds": 0.9035002949985937
+              },
+              {
+                "seconds": 2.354886250999698,
+                "prefill_seconds": 1.4453113119998307,
+                "decode_seconds": 0.9095749389998673
+              }
+            ]
+          },
+          "answers_match": true,
+          "comparison": {
+            "kernel_prefill_speedup": 1.2025854786535741,
+            "live_prefill_speedup": 1.1488858217322304,
+            "live_total_speedup": 1.0840813875022355
+          }
+        }
+      ],
+      "aggregate": {
+        "cases": 6,
+        "answers_match_rate": 1.0,
+        "sparse_exact_rate": 1.0,
+        "dense_exact_rate": 1.0,
+        "mean_sparse_fuzzy": 1.0,
+        "mean_dense_fuzzy": 1.0,
+        "median_kernel_prefill_speedup": 1.4306847589218246,
+        "median_live_prefill_speedup": 1.363074110887207,
+        "median_live_total_speedup": 1.2457496298781163,
+        "sum_kernel_prefill_speedup": 1.4781962250166887,
+        "sum_live_prefill_speedup": 1.407562837843138
+      }
+    },
+    {
+      "model": "Qwen/Qwen2.5-Coder-1.5B-Instruct",
+      "gate": "/content/drive/MyDrive/SPRUCE_COLAB/selector_ckpt/flat_gate_lamt0.75_lamn0.25_lr5e4_e300.pt",
+      "selector": {
+        "mode": "live_candidate_only_tree_traversal",
+        "route_representation": "compact_leaf_ids",
+        "feature_source": "pooled_qk_loaded_from_teacher_target",
+        "feature_extraction_included": false,
+        "feature_file_loading_included": false,
+        "compute_dtype": "float16",
+        "layer_chunk": 4,
+        "beam": 10,
+        "radix": 2,
+        "k_selected": 12,
+        "local_window": 1
+      },
+      "repeats": 3,
+      "warmup_tokens": 64,
+      "cases": [
+        {
+          "case_id": "badge_elena_amber",
+          "seq_len": 15209,
+          "block_size": 64,
+          "needle_block": 60,
+          "teacher_target": "/content/SPRUCE/teacher_targets/1.5B_heldout_0.05-0.95/teacher_badge_elena_amber_len15209_blk64_d0.256369.pt",
+          "sparse": {
+            "exact": true,
+            "fuzzy": 1.0,
+            "answer": " Elena selected the amber badge for the audit. The compliance memo repeated ordinary review steps and noncritical status updates. The compliance memo repeated ordinary review steps and noncritical",
+            "needle": "elena selected the amber badge for the audit.",
+            "feature_load_seconds": 0.12327775099947758,
+            "tree_build_seconds": 0.006103329000325175,
+            "tree_traversal_seconds": 0.05759965099969122,
+            "route_pack_seconds": 0.0010223830013273982,
+            "route_transfer_seconds": 0.0,
+            "selector_seconds": 0.06472494399895368,
+            "prefill_seconds": 1.2546708859990758,
+            "decode_seconds": 0.9233634800002619,
+            "seconds": 2.184851340998648,
+            "live_prefill_seconds": 1.3195762539962743,
+            "live_total_seconds": 2.2497567089958466,
+            "needle_layer_group_hit_rate": 0.8392857313156128,
+            "needle_any_group_all_layers_rate": 0.9285714626312256,
+            "answer_repeat_match": true,
+            "timing_samples": [
+              {
+                "feature_load_seconds": 0.12885796400041727,
+                "tree_build_seconds": 0.006113917999755358,
+                "tree_traversal_seconds": 0.05752504100018996,
+                "route_pack_seconds": 0.0010223830013273982,
+                "route_transfer_seconds": 0.0,
+                "selector_seconds": 0.06466134200127271,
+                "needle_layer_group_hit_rate": 0.8392857313156128,
+                "needle_any_group_all_layers_rate": 0.9285714626312256,
+                "seconds": 2.9854652270005317,
+                "prefill_seconds": 2.065693229000317,
+                "decode_seconds": 0.9197719980002148,
+                "live_prefill_seconds": 2.1303545710015896,
+                "live_total_seconds": 3.0501265690018045
+              },
+              {
+                "feature_load_seconds": 0.12287573899993731,
+                "tree_build_seconds": 0.006103329000325175,
+                "tree_traversal_seconds": 0.05759965099969122,
+                "route_pack_seconds": 0.0010219639989372808,
+                "route_transfer_seconds": 0.0,
+                "selector_seconds": 0.06472494399895368,
+                "needle_layer_group_hit_rate": 0.8392857313156128,
+                "needle_any_group_all_layers_rate": 0.9285714626312256,
+                "seconds": 2.177807895999649,
+                "prefill_seconds": 1.2544444159993873,
+                "decode_seconds": 0.9233634800002619,
+                "live_prefill_seconds": 1.319169359998341,
+                "live_total_seconds": 2.242532839998603
+              },
+              {
+                "feature_load_seconds": 0.12327775099947758,
+                "tree_build_seconds": 0.0060685199987347005,
+                "tree_traversal_seconds": 0.05760855799962883,
+                "route_pack_seconds": 0.0012282899988349527,
+                "route_transfer_seconds": 0.0,
+                "selector_seconds": 0.06490536799719848,
+                "needle_layer_group_hit_rate": 0.8392857313156128,
+                "needle_any_group_all_layers_rate": 0.9285714626312256,
+                "seconds": 2.184851340998648,
+                "prefill_seconds": 1.2546708859990758,
+                "decode_seconds": 0.9301804549995722,
+                "live_prefill_seconds": 1.3195762539962743,
+                "live_total_seconds": 2.2497567089958466
+              }
+            ]
+          },
+          "dense": {
+            "exact": true,
+            "fuzzy": 1.0,
+            "answer": " Elena selected the amber badge for the audit. The compliance memo repeated ordinary review steps and noncritical status updates. The compliance memo repeated ordinary review steps and noncritical",
+            "needle": "elena selected the amber badge for the audit.",
+            "prefill_seconds": 1.5301610360002087,
+            "decode_seconds": 0.9207305849995464,
+            "seconds": 2.455018521000966,
+            "answer_repeat_match": true,
+            "timing_samples": [
+              {
+                "seconds": 2.460891320999508,
+                "prefill_seconds": 1.5297008260004077,
+                "decode_seconds": 0.9311904949991003
+              },
+              {
+                "seconds": 2.455018521000966,
+                "prefill_seconds": 1.537954389999868,
+                "decode_seconds": 0.9170641310010978
+              },
+              {
+                "seconds": 2.450891620999755,
+                "prefill_seconds": 1.5301610360002087,
+                "decode_seconds": 0.9207305849995464
+              }
+            ]
+          },
+          "answers_match": true,
+          "comparison": {
+            "kernel_prefill_speedup": 1.2195716447040725,
+            "live_prefill_speedup": 1.159585155739343,
+            "live_total_speedup": 1.0912373374349156
+          }
+        },
+        {
+          "case_id": "badge_elena_amber",
+          "seq_len": 30419,
+          "block_size": 64,
+          "needle_block": 275,
+          "teacher_target": "/content/SPRUCE/teacher_targets/1.5B_heldout_0.05-0.95/teacher_badge_elena_amber_len30419_blk64_d0.579381.pt",
+          "sparse": {
+            "exact": true,
+            "fuzzy": 1.0,
+            "answer": " Elena selected the amber badge for the audit. The compliance memo repeated ordinary review steps and noncritical status updates. The compliance memo repeated ordinary review steps and noncritical",
+            "needle": "elena selected the amber badge for the audit.",
+            "feature_load_seconds": 0.33976361300119606,
+            "tree_build_seconds": 0.006866461000754498,
+            "tree_traversal_seconds": 0.13551776399981463,
+            "route_pack_seconds": 0.0017983550005737925,
+            "route_transfer_seconds": 0.0,
+            "selector_seconds": 0.14453759700154478,
+            "prefill_seconds": 2.4984585950005567,
+            "decode_seconds": 0.9184087590001582,
+            "seconds": 3.411346863998915,
+            "live_prefill_seconds": 2.6429961920021015,
+            "live_total_seconds": 3.555529444000058,
+            "needle_layer_group_hit_rate": 0.8571429252624512,
+            "needle_any_group_all_layers_rate": 0.9642857313156128,
+            "answer_repeat_match": true,
+            "timing_samples": [
+              {
+                "feature_load_seconds": 0.33976361300119606,
+                "tree_build_seconds": 0.007255169999552891,
+                "tree_traversal_seconds": 0.13540992199887114,
+                "route_pack_seconds": 0.001890839999759919,
+                "route_transfer_seconds": 0.0,
+                "selector_seconds": 0.14455593199818395,
+                "needle_layer_group_hit_rate": 0.8571429252624512,
+                "needle_any_group_all_layers_rate": 0.9642857313156128,
+                "seconds": 4.2120343890001095,
+                "prefill_seconds": 3.2936256299999513,
+                "decode_seconds": 0.9184087590001582,
+                "live_prefill_seconds": 3.4381815619981353,
+                "live_total_seconds": 4.3565903209982935
+              },
+              {
+                "feature_load_seconds": 0.3268511890000809,
+                "tree_build_seconds": 0.006866461000754498,
+                "tree_traversal_seconds": 0.13551776399981463,
+                "route_pack_seconds": 0.0017983550005737925,
+                "route_transfer_seconds": 0.0,
+                "selector_seconds": 0.14418258000114292,
+                "needle_layer_group_hit_rate": 0.8571429252624512,
+                "needle_any_group_all_layers_rate": 0.9642857313156128,
+                "seconds": 3.411346863998915,
+                "prefill_seconds": 2.4827182429999084,
+                "decode_seconds": 0.9286286209990067,
+                "live_prefill_seconds": 2.6269008230010513,
+                "live_total_seconds": 3.555529444000058
+              },
+              {
+                "feature_load_seconds": 0.3719566269992356,
+                "tree_build_seconds": 0.0068411000011110445,
+                "tree_traversal_seconds": 0.13590735000070708,
+                "route_pack_seconds": 0.001789146999726654,
+                "route_transfer_seconds": 0.0,
+                "selector_seconds": 0.14453759700154478,
+                "needle_layer_group_hit_rate": 0.8571429252624512,
+                "needle_any_group_all_layers_rate": 0.9642857313156128,
+                "seconds": 3.4099116249999497,
+                "prefill_seconds": 2.4984585950005567,
+                "decode_seconds": 0.911453029999393,
+                "live_prefill_seconds": 2.6429961920021015,
+                "live_total_seconds": 3.5544492220014945
+              }
+            ]
+          },
+          "dense": {
+            "exact": true,
+            "fuzzy": 1.0,
+            "answer": " Elena selected the amber badge for the audit. The compliance memo repeated ordinary review steps and noncritical status updates. The compliance memo repeated ordinary review steps and noncritical",
+            "needle": "elena selected the amber badge for the audit.",
+            "prefill_seconds": 3.8135526470014156,
+            "decode_seconds": 0.9180508779991214,
+            "seconds": 4.731603525000537,
+            "answer_repeat_match": true,
+            "timing_samples": [
+              {
+                "seconds": 4.706321257999662,
+                "prefill_seconds": 3.7839336739998544,
+                "decode_seconds": 0.9223875839998072
+              },
+              {
+                "seconds": 4.731603525000537,
+                "prefill_seconds": 3.8135526470014156,
+                "decode_seconds": 0.9180508779991214
+              },
+              {
+                "seconds": 4.767964221000511,
+                "prefill_seconds": 3.8577843599996413,
+                "decode_seconds": 0.91017986100087
+              }
+            ]
+          },
+          "answers_match": true,
+          "comparison": {
+            "kernel_prefill_speedup": 1.5263621557036713,
+            "live_prefill_speedup": 1.442889951389829,
+            "live_total_speedup": 1.3307732644388868
+          }
+        },
+        {
+          "case_id": "code_nova_4816",
+          "seq_len": 30573,
+          "block_size": 64,
+          "needle_block": 74,
+          "teacher_target": "/content/SPRUCE/teacher_targets/1.5B_heldout_0.05-0.95/teacher_code_nova_4816_len30573_blk64_d0.15631.pt",
+          "sparse": {
+            "exact": true,
+            "fuzzy": 1.0,
+            "answer": " The Nova access code is 4816. The meeting archive contained budget notes, calendar changes, and vendor summaries. The meeting archive contained budget notes,",
+            "needle": "the nova access code is 4816.",
+            "feature_load_seconds": 0.33983213800092926,
+            "tree_build_seconds": 0.007175439999627997,
+            "tree_traversal_seconds": 0.13592765899920778,
+            "route_pack_seconds": 0.0017854180005087983,
+            "route_transfer_seconds": 0.0,
+            "selector_seconds": 0.1449104900002567,
+            "prefill_seconds": 2.5151522060004936,
+            "decode_seconds": 0.9165377030003583,
+            "seconds": 3.4310216779995244,
+            "live_prefill_seconds": 2.661587246999261,
+            "live_total_seconds": 3.5781249499996193,
+            "needle_layer_group_hit_rate": 0.8571429252624512,
+            "needle_any_group_all_layers_rate": 0.9285714626312256,
+            "answer_repeat_match": true,
+            "timing_samples": [
+              {
+                "feature_load_seconds": 0.33073876799971913,
+                "tree_build_seconds": 0.007126210000933497,
+                "tree_traversal_seconds": 0.13592765899920778,
+                "route_pack_seconds": 0.001763144000506145,
+                "route_transfer_seconds": 0.0,
+                "selector_seconds": 0.14481701300064742,
+                "needle_layer_group_hit_rate": 0.8571429252624512,
+                "needle_any_group_all_layers_rate": 0.9285714626312256,
+                "seconds": 3.4310216779995244,
+                "prefill_seconds": 2.520036251999045,
+                "decode_seconds": 0.9109854260004795,
+                "live_prefill_seconds": 2.6648532649996923,
+                "live_total_seconds": 3.575838691000172
+              },
+              {
+                "feature_load_seconds": 0.35913358699872333,
+                "tree_build_seconds": 0.009108325999477529,
+                "tree_traversal_seconds": 0.1370430299994041,
+                "route_pack_seconds": 0.0017854180005087983,
+                "route_transfer_seconds": 0.0,
+                "selector_seconds": 0.14793677399939043,
+                "needle_layer_group_hit_rate": 0.8571429252624512,
+                "needle_any_group_all_layers_rate": 0.9285714626312256,
+                "seconds": 3.430188176000229,
+                "prefill_seconds": 2.5136504729998705,
+                "decode_seconds": 0.9165377030003583,
+                "live_prefill_seconds": 2.661587246999261,
+                "live_total_seconds": 3.5781249499996193
+              },
+              {
+                "feature_load_seconds": 0.33983213800092926,
+                "tree_build_seconds": 0.007175439999627997,
+                "tree_traversal_seconds": 0.13590509200002998,
+                "route_pack_seconds": 0.0018299580005987082,
+                "route_transfer_seconds": 0.0,
+                "selector_seconds": 0.1449104900002567,
+                "needle_layer_group_hit_rate": 0.8571429252624512,
+                "needle_any_group_all_layers_rate": 0.9285714626312256,
+                "seconds": 3.4336999999995896,
+                "prefill_seconds": 2.5151522060004936,
+                "decode_seconds": 0.918547793999096,
+                "live_prefill_seconds": 2.6600626960007503,
+                "live_total_seconds": 3.5786104899998463
+              }
+            ]
+          },
+          "dense": {
+            "exact": true,
+            "fuzzy": 1.0,
+            "answer": " The Nova access code is 4816. The meeting archive contained budget notes, calendar changes, and vendor summaries. The meeting archive contained budget notes,",
+            "needle": "the nova access code is 4816.",
+            "prefill_seconds": 3.86627537700042,
+            "decode_seconds": 0.9213493740007834,
+            "seconds": 4.789814905001549,
+            "answer_repeat_match": true,
+            "timing_samples": [
+              {
+                "seconds": 4.794876584001031,
+                "prefill_seconds": 3.86627537700042,
+                "decode_seconds": 0.9286012070006109
+              },
+              {
+                "seconds": 4.771224676000202,
+                "prefill_seconds": 3.8498753019994183,
+                "decode_seconds": 0.9213493740007834
+              },
+              {
+                "seconds": 4.789814905001549,
+                "prefill_seconds": 3.874446715000886,
+                "decode_seconds": 0.9153681900006632
+              }
+            ]
+          },
+          "answers_match": true,
+          "comparison": {
+            "kernel_prefill_speedup": 1.5371934023620921,
+            "live_prefill_speedup": 1.4526201917143067,
+            "live_total_speedup": 1.3386382454313281
+          }
+        },
+        {
+          "case_id": "code_nova_4816",
+          "seq_len": 30573,
+          "block_size": 64,
+          "needle_block": 245,
+          "teacher_target": "/content/SPRUCE/teacher_targets/1.5B_heldout_0.05-0.95/teacher_code_nova_4816_len30573_blk64_d0.514987.pt",
+          "sparse": {
+            "exact": true,
+            "fuzzy": 1.0,
+            "answer": " The Nova access code is 4816. The meeting archive contained budget notes, calendar changes, and vendor summaries. The meeting archive contained budget notes,",
+            "needle": "the nova access code is 4816.",
+            "feature_load_seconds": 0.38628609300030803,
+            "tree_build_seconds": 0.0071570909985894104,
+            "tree_traversal_seconds": 0.135922544001005,
+            "route_pack_seconds": 0.0018626620003487915,
+            "route_transfer_seconds": 0.0,
+            "selector_seconds": 0.1449422969999432,
+            "prefill_seconds": 2.5050726410008792,
+            "decode_seconds": 0.9155272009993496,
+            "seconds": 3.4194003560005513,
+            "live_prefill_seconds": 2.6500149380008224,
+            "live_total_seconds": 3.5643426530004945,
+            "needle_layer_group_hit_rate": 0.8392857313156128,
+            "needle_any_group_all_layers_rate": 0.9285714626312256,
+            "answer_repeat_match": true,
+            "timing_samples": [
+              {
+                "feature_load_seconds": 0.36211507999905734,
+                "tree_build_seconds": 0.007153517000915599,
+                "tree_traversal_seconds": 0.13616111800001818,
+                "route_pack_seconds": 0.0018740619998425245,
+                "route_transfer_seconds": 0.0,
+                "selector_seconds": 0.1451886970007763,
+                "needle_layer_group_hit_rate": 0.8392857313156128,
+                "needle_any_group_all_layers_rate": 0.9285714626312256,
+                "seconds": 3.414889748999485,
+                "prefill_seconds": 2.499142890999792,
+                "decode_seconds": 0.915746857999693,
+                "live_prefill_seconds": 2.6443315880005684,
+                "live_total_seconds": 3.5600784460002615
+              },
+              {
+                "feature_load_seconds": 0.3963856370010035,
+                "tree_build_seconds": 0.007159722999858786,
+                "tree_traversal_seconds": 0.13590153500081215,
+                "route_pack_seconds": 0.0017265059996134369,
+                "route_transfer_seconds": 0.0,
+                "selector_seconds": 0.14478776400028437,
+                "needle_layer_group_hit_rate": 0.8392857313156128,
+                "needle_any_group_all_layers_rate": 0.9285714626312256,
+                "seconds": 3.420980007000253,
+                "prefill_seconds": 2.5054528060009034,
+                "decode_seconds": 0.9155272009993496,
+                "live_prefill_seconds": 2.6502405700011877,
+                "live_total_seconds": 3.5657677710005373
+              },
+              {
+                "feature_load_seconds": 0.38628609300030803,
+                "tree_build_seconds": 0.0071570909985894104,
+                "tree_traversal_seconds": 0.135922544001005,
+                "route_pack_seconds": 0.0018626620003487915,
+                "route_transfer_seconds": 0.0,
+                "selector_seconds": 0.1449422969999432,
+                "needle_layer_group_hit_rate": 0.8392857313156128,
+                "needle_any_group_all_layers_rate": 0.9285714626312256,
+                "seconds": 3.4194003560005513,
+                "prefill_seconds": 2.5050726410008792,
+                "decode_seconds": 0.914327714999672,
+                "live_prefill_seconds": 2.6500149380008224,
+                "live_total_seconds": 3.5643426530004945
+              }
+            ]
+          },
+          "dense": {
+            "exact": true,
+            "fuzzy": 1.0,
+            "answer": " The Nova access code is 4816. The meeting archive contained budget notes, calendar changes, and vendor summaries. The meeting archive contained budget notes,",
+            "needle": "the nova access code is 4816.",
+            "prefill_seconds": 3.8611491410010785,
+            "decode_seconds": 0.9212329769998178,
+            "seconds": 4.782382118000896,
+            "answer_repeat_match": true,
+            "timing_samples": [
+              {
+                "seconds": 4.782382118000896,
+                "prefill_seconds": 3.8611491410010785,
+                "decode_seconds": 0.9212329769998178
+              },
+              {
+                "seconds": 4.767079047000152,
+                "prefill_seconds": 3.8545118830006686,
+                "decode_seconds": 0.9125671639994835
+              },
+              {
+                "seconds": 4.792921893000312,
+                "prefill_seconds": 3.8639557999995304,
+                "decode_seconds": 0.9289660930007813
+              }
+            ]
+          },
+          "answers_match": true,
+          "comparison": {
+            "kernel_prefill_speedup": 1.5413322064219228,
+            "live_prefill_speedup": 1.4570291984519674,
+            "live_total_speedup": 1.3417290601887126
+          }
+        },
+        {
+          "case_id": "color_green_bob",
+          "seq_len": 14745,
+          "block_size": 64,
+          "needle_block": 59,
+          "teacher_target": "/content/SPRUCE/teacher_targets/1.5B_heldout_0.05-0.95/teacher_color_green_bob_len14745_blk64_d0.259059.pt",
+          "sparse": {
+            "exact": true,
+            "fuzzy": 1.0,
+            "answer": " Bob's favorite color is green. The quarterly logistics report noted no unusual activity. The quarterly logistics report noted no unusual activity. The quarterly logistics report noted no unusual",
+            "needle": "bobs favorite color is green.",
+            "feature_load_seconds": 0.13087379900025553,
+            "tree_build_seconds": 0.006224624999958905,
+            "tree_traversal_seconds": 0.056127301999367774,
+            "route_pack_seconds": 0.0012238960007380228,
+            "route_transfer_seconds": 0.0,
+            "selector_seconds": 0.06362552199789206,
+            "prefill_seconds": 1.178288565000912,
+            "decode_seconds": 0.9132259260004503,
+            "seconds": 2.0860618260012416,
+            "live_prefill_seconds": 1.2417239930000505,
+            "live_total_seconds": 2.1496873479991336,
+            "needle_layer_group_hit_rate": 0.8035714626312256,
+            "needle_any_group_all_layers_rate": 0.9285714626312256,
+            "answer_repeat_match": true,
+            "timing_samples": [
+              {
+                "feature_load_seconds": 0.13087379900025553,
+                "tree_build_seconds": 0.006283660000917735,
+                "tree_traversal_seconds": 0.05615852299888502,
+                "route_pack_seconds": 0.0012238960007380228,
+                "route_transfer_seconds": 0.0,
+                "selector_seconds": 0.06366607900054078,
+                "needle_layer_group_hit_rate": 0.8035714626312256,
+                "needle_any_group_all_layers_rate": 0.9285714626312256,
+                "seconds": 2.1074793770003453,
+                "prefill_seconds": 1.186759730000631,
+                "decode_seconds": 0.9207196469997143,
+                "live_prefill_seconds": 1.2504258090011717,
+                "live_total_seconds": 2.171145456000886
+              },
+              {
+                "feature_load_seconds": 0.12099140700047428,
+                "tree_build_seconds": 0.006224624999958905,
+                "tree_traversal_seconds": 0.05605008999918937,
+                "route_pack_seconds": 0.00116071299999021,
+                "route_transfer_seconds": 0.0,
+                "selector_seconds": 0.06343542799913848,
+                "needle_layer_group_hit_rate": 0.8035714626312256,
+                "needle_any_group_all_layers_rate": 0.9285714626312256,
+                "seconds": 2.085113690000071,
+                "prefill_seconds": 1.178288565000912,
+                "decode_seconds": 0.906825124999159,
+                "live_prefill_seconds": 1.2417239930000505,
+                "live_total_seconds": 2.1485491179992096
+              },
+              {
+                "feature_load_seconds": 0.1350702120016649,
+                "tree_build_seconds": 0.006204617999173934,
+                "tree_traversal_seconds": 0.056127301999367774,
+                "route_pack_seconds": 0.0012936019993503578,
+                "route_transfer_seconds": 0.0,
+                "selector_seconds": 0.06362552199789206,
+                "needle_layer_group_hit_rate": 0.8035714626312256,
+                "needle_any_group_all_layers_rate": 0.9285714626312256,
+                "seconds": 2.0860618260012416,
+                "prefill_seconds": 1.1728359000007913,
+                "decode_seconds": 0.9132259260004503,
+                "live_prefill_seconds": 1.2364614219986834,
+                "live_total_seconds": 2.1496873479991336
+              }
+            ]
+          },
+          "dense": {
+            "exact": true,
+            "fuzzy": 1.0,
+            "answer": " Bob's favorite color is green. The quarterly logistics report noted no unusual activity. The quarterly logistics report noted no unusual activity. The quarterly logistics report noted no unusual",
+            "needle": "bobs favorite color is green.",
+            "prefill_seconds": 1.4381267839999055,
+            "decode_seconds": 0.9203829239995684,
+            "seconds": 2.358509707999474,
+            "answer_repeat_match": true,
+            "timing_samples": [
+              {
+                "seconds": 2.413480912000523,
+                "prefill_seconds": 1.488612359000399,
+                "decode_seconds": 0.9248685530001239
+              },
+              {
+                "seconds": 2.3398741940000036,
+                "prefill_seconds": 1.4352848090002226,
+                "decode_seconds": 0.904589384999781
+              },
+              {
+                "seconds": 2.358509707999474,
+                "prefill_seconds": 1.4381267839999055,
+                "decode_seconds": 0.9203829239995684
+              }
+            ]
+          },
+          "answers_match": true,
+          "comparison": {
+            "kernel_prefill_speedup": 1.2205217182929993,
+            "live_prefill_speedup": 1.158169441926735,
+            "live_total_speedup": 1.0971408052406812
+          }
+        },
+        {
+          "case_id": "color_green_bob",
+          "seq_len": 14745,
+          "block_size": 64,
+          "needle_block": 80,
+          "teacher_target": "/content/SPRUCE/teacher_targets/1.5B_heldout_0.05-0.95/teacher_color_green_bob_len14745_blk64_d0.351676.pt",
+          "sparse": {
+            "exact": true,
+            "fuzzy": 1.0,
+            "answer": " Bob's favorite color is green. The quarterly logistics report noted no unusual activity. The quarterly logistics report noted no unusual activity. The quarterly logistics report noted no unusual",
+            "needle": "bobs favorite color is green.",
+            "feature_load_seconds": 0.13339631499911775,
+            "tree_build_seconds": 0.006142932001239387,
+            "tree_traversal_seconds": 0.05607395600054588,
+            "route_pack_seconds": 0.0010601500016491627,
+            "route_transfer_seconds": 0.0,
+            "selector_seconds": 0.06339424500038149,
+            "prefill_seconds": 1.1747109909993014,
+            "decode_seconds": 0.9126960980011063,
+            "seconds": 2.0913622219995887,
+            "live_prefill_seconds": 1.238340497999161,
+            "live_total_seconds": 2.1549917289994482,
+            "needle_layer_group_hit_rate": 0.8750000596046448,
+            "needle_any_group_all_layers_rate": 0.9642857313156128,
+            "answer_repeat_match": true,
+            "timing_samples": [
+              {
+                "feature_load_seconds": 0.1250042770006985,
+                "tree_build_seconds": 0.006110713999078143,
+                "tree_traversal_seconds": 0.05607395600054588,
+                "route_pack_seconds": 0.0010601500016491627,
+                "route_transfer_seconds": 0.0,
+                "selector_seconds": 0.06324482000127318,
+                "needle_layer_group_hit_rate": 0.8750000596046448,
+                "needle_any_group_all_layers_rate": 0.9642857313156128,
+                "seconds": 2.0931695039998885,
+                "prefill_seconds": 1.1804734059987823,
+                "decode_seconds": 0.9126960980011063,
+                "live_prefill_seconds": 1.2437182260000554,
+                "live_total_seconds": 2.1564143240011617
+              },
+              {
+                "feature_load_seconds": 0.14484692599944538,
+                "tree_build_seconds": 0.006142932001239387,
+                "tree_traversal_seconds": 0.05606685299972014,
+                "route_pack_seconds": 0.0011844599994219607,
+                "route_transfer_seconds": 0.0,
+                "selector_seconds": 0.06339424500038149,
+                "needle_layer_group_hit_rate": 0.8750000596046448,
+                "needle_any_group_all_layers_rate": 0.9642857313156128,
+                "seconds": 2.0679579970001214,
+                "prefill_seconds": 1.1668330330012395,
+                "decode_seconds": 0.9011249639988819,
+                "live_prefill_seconds": 1.230227278001621,
+                "live_total_seconds": 2.131352242000503
+              },
+              {
+                "feature_load_seconds": 0.13339631499911775,
+                "tree_build_seconds": 0.0064218869993055705,
+                "tree_traversal_seconds": 0.05618118399979721,
+                "route_pack_seconds": 0.001026436000756803,
+                "route_transfer_seconds": 0.0,
+                "selector_seconds": 0.06362950699985959,
+                "needle_layer_group_hit_rate": 0.8750000596046448,
+                "needle_any_group_all_layers_rate": 0.9642857313156128,
+                "seconds": 2.0913622219995887,
+                "prefill_seconds": 1.1747109909993014,
+                "decode_seconds": 0.9166512310002872,
+                "live_prefill_seconds": 1.238340497999161,
+                "live_total_seconds": 2.1549917289994482
+              }
+            ]
+          },
+          "dense": {
+            "exact": true,
+            "fuzzy": 1.0,
+            "answer": " Bob's favorite color is green. The quarterly logistics report noted no unusual activity. The quarterly logistics report noted no unusual activity. The quarterly logistics report noted no unusual",
+            "needle": "bobs favorite color is green.",
+            "prefill_seconds": 1.4396684280000045,
+            "decode_seconds": 0.9073930269987613,
+            "seconds": 2.3431687229985982,
+            "answer_repeat_match": true,
+            "timing_samples": [
+              {
+                "seconds": 2.33454631099994,
+                "prefill_seconds": 1.4271532840011787,
+                "decode_seconds": 0.9073930269987613
+              },
+              {
+                "seconds": 2.3431687229985982,
+                "prefill_seconds": 1.4396684280000045,
+                "decode_seconds": 0.9035002949985937
+              },
+              {
+                "seconds": 2.354886250999698,
+                "prefill_seconds": 1.4453113119998307,
+                "decode_seconds": 0.9095749389998673
+              }
+            ]
+          },
+          "answers_match": true,
+          "comparison": {
+            "kernel_prefill_speedup": 1.2255511687817864,
+            "live_prefill_speedup": 1.1625788144102027,
+            "live_total_speedup": 1.0873214460486675
+          }
+        }
+      ],
+      "aggregate": {
+        "cases": 6,
+        "answers_match_rate": 1.0,
+        "sparse_exact_rate": 1.0,
+        "dense_exact_rate": 1.0,
+        "mean_sparse_fuzzy": 1.0,
+        "mean_dense_fuzzy": 1.0,
+        "median_kernel_prefill_speedup": 1.3759566622427288,
+        "median_live_prefill_speedup": 1.3027343829000158,
+        "median_live_total_speedup": 1.2139570348397841,
+        "sum_kernel_prefill_speedup": 1.4334375465026585,
+        "sum_live_prefill_speedup": 1.356866509815606
+      }
+    },
+    {
+      "model": "Qwen/Qwen2.5-Coder-1.5B-Instruct",
+      "gate": "/content/drive/MyDrive/SPRUCE_COLAB/selector_ckpt/flat_gate_lamt0.75_lamn0.25_lr5e4_e300.pt",
+      "selector": {
+        "mode": "live_candidate_only_tree_traversal",
+        "route_representation": "compact_leaf_ids",
+        "feature_source": "pooled_qk_loaded_from_teacher_target",
+        "feature_extraction_included": false,
+        "feature_file_loading_included": false,
+        "compute_dtype": "float16",
+        "layer_chunk": 4,
+        "beam": 12,
+        "radix": 2,
+        "k_selected": 14,
+        "local_window": 1
+      },
+      "repeats": 3,
+      "warmup_tokens": 64,
+      "cases": [
+        {
+          "case_id": "badge_elena_amber",
+          "seq_len": 15209,
+          "block_size": 64,
+          "needle_block": 60,
+          "teacher_target": "/content/SPRUCE/teacher_targets/1.5B_heldout_0.05-0.95/teacher_badge_elena_amber_len15209_blk64_d0.256369.pt",
+          "sparse": {
+            "exact": true,
+            "fuzzy": 1.0,
+            "answer": " Elena selected the amber badge for the audit. The compliance memo repeated ordinary review steps and noncritical status updates. The compliance memo repeated ordinary review steps and noncritical",
+            "needle": "elena selected the amber badge for the audit.",
+            "feature_load_seconds": 0.13140460700014955,
+            "tree_build_seconds": 0.006083951999244164,
+            "tree_traversal_seconds": 0.06507958799920743,
+            "route_pack_seconds": 0.0012246410005900543,
+            "route_transfer_seconds": 0.0,
+            "selector_seconds": 0.07240527999965707,
+            "prefill_seconds": 1.2523192450007627,
+            "decode_seconds": 0.9101117509999312,
+            "seconds": 2.162430996000694,
+            "live_prefill_seconds": 1.3245179770001414,
+            "live_total_seconds": 2.2346297280000726,
+            "needle_layer_group_hit_rate": 0.8392857313156128,
+            "needle_any_group_all_layers_rate": 0.9285714626312256,
+            "answer_repeat_match": true,
+            "timing_samples": [
+              {
+                "feature_load_seconds": 0.13468788399950427,
+                "tree_build_seconds": 0.006654126000285032,
+                "tree_traversal_seconds": 0.06532134000008227,
+                "route_pack_seconds": 0.0012246410005900543,
+                "route_transfer_seconds": 0.0,
+                "selector_seconds": 0.07320010700095736,
+                "needle_layer_group_hit_rate": 0.8392857313156128,
+                "needle_any_group_all_layers_rate": 0.9285714626312256,
+                "seconds": 2.9872950939989096,
+                "prefill_seconds": 2.0663526129992533,
+                "decode_seconds": 0.9209424809996563,
+                "live_prefill_seconds": 2.1395527200002107,
+                "live_total_seconds": 3.060495200999867
+              },
+              {
+                "feature_load_seconds": 0.13017721500000334,
+                "tree_build_seconds": 0.006083951999244164,
+                "tree_traversal_seconds": 0.06502835900028003,
+                "route_pack_seconds": 0.0012929690001328709,
+                "route_transfer_seconds": 0.0,
+                "selector_seconds": 0.07240527999965707,
+                "needle_layer_group_hit_rate": 0.8392857313156128,
+                "needle_any_group_all_layers_rate": 0.9285714626312256,
+                "seconds": 2.156333621998783,
+                "prefill_seconds": 1.2488502699998207,
+                "decode_seconds": 0.9074833519989625,
+                "live_prefill_seconds": 1.3212555499994778,
+                "live_total_seconds": 2.2287389019984403
+              },
+              {
+                "feature_load_seconds": 0.13140460700014955,
+                "tree_build_seconds": 0.006070298999475199,
+                "tree_traversal_seconds": 0.06507958799920743,
+                "route_pack_seconds": 0.0010488450006960193,
+                "route_transfer_seconds": 0.0,
+                "selector_seconds": 0.07219873199937865,
+                "needle_layer_group_hit_rate": 0.8392857313156128,
+                "needle_any_group_all_layers_rate": 0.9285714626312256,
+                "seconds": 2.162430996000694,
+                "prefill_seconds": 1.2523192450007627,
+                "decode_seconds": 0.9101117509999312,
+                "live_prefill_seconds": 1.3245179770001414,
+                "live_total_seconds": 2.2346297280000726
+              }
+            ]
+          },
+          "dense": {
+            "exact": true,
+            "fuzzy": 1.0,
+            "answer": " Elena selected the amber badge for the audit. The compliance memo repeated ordinary review steps and noncritical status updates. The compliance memo repeated ordinary review steps and noncritical",
+            "needle": "elena selected the amber badge for the audit.",
+            "prefill_seconds": 1.5301610360002087,
+            "decode_seconds": 0.9207305849995464,
+            "seconds": 2.455018521000966,
+            "answer_repeat_match": true,
+            "timing_samples": [
+              {
+                "seconds": 2.460891320999508,
+                "prefill_seconds": 1.5297008260004077,
+                "decode_seconds": 0.9311904949991003
+              },
+              {
+                "seconds": 2.455018521000966,
+                "prefill_seconds": 1.537954389999868,
+                "decode_seconds": 0.9170641310010978
+              },
+              {
+                "seconds": 2.450891620999755,
+                "prefill_seconds": 1.5301610360002087,
+                "decode_seconds": 0.9207305849995464
+              }
+            ]
+          },
+          "answers_match": true,
+          "comparison": {
+            "kernel_prefill_speedup": 1.2218617913192549,
+            "live_prefill_speedup": 1.1552587904211173,
+            "live_total_speedup": 1.0986243001421692
+          }
+        },
+        {
+          "case_id": "badge_elena_amber",
+          "seq_len": 30419,
+          "block_size": 64,
+          "needle_block": 275,
+          "teacher_target": "/content/SPRUCE/teacher_targets/1.5B_heldout_0.05-0.95/teacher_badge_elena_amber_len30419_blk64_d0.579381.pt",
+          "sparse": {
+            "exact": true,
+            "fuzzy": 1.0,
+            "answer": " Elena selected the amber badge for the audit. The compliance memo repeated ordinary review steps and noncritical status updates. The compliance memo repeated ordinary review steps and noncritical",
+            "needle": "elena selected the amber badge for the audit.",
+            "feature_load_seconds": 0.31391679300031683,
+            "tree_build_seconds": 0.006850511999800801,
+            "tree_traversal_seconds": 0.15482879399860394,
+            "route_pack_seconds": 0.001787756998965051,
+            "route_transfer_seconds": 0.0,
+            "selector_seconds": 0.16352174099847616,
+            "prefill_seconds": 2.531493100001171,
+            "decode_seconds": 0.9196157009992021,
+            "seconds": 3.451108801000373,
+            "live_prefill_seconds": 2.6950148409996473,
+            "live_total_seconds": 3.6146305419988494,
+            "needle_layer_group_hit_rate": 0.8571429252624512,
+            "needle_any_group_all_layers_rate": 0.9642857313156128,
+            "answer_repeat_match": true,
+            "timing_samples": [
+              {
+                "feature_load_seconds": 0.3431689829994866,
+                "tree_build_seconds": 0.006852329999674112,
+                "tree_traversal_seconds": 0.15434272400125337,
+                "route_pack_seconds": 0.0017286040001636138,
+                "route_transfer_seconds": 0.0,
+                "selector_seconds": 0.1629236580010911,
+                "needle_layer_group_hit_rate": 0.8571429252624512,
+                "needle_any_group_all_layers_rate": 0.9642857313156128,
+                "seconds": 3.4196329249989503,
+                "prefill_seconds": 2.508456866000415,
+                "decode_seconds": 0.9111760589985352,
+                "live_prefill_seconds": 2.6713805240015063,
+                "live_total_seconds": 3.5825565830000414
+              },
+              {
+                "feature_load_seconds": 0.31391679300031683,
+                "tree_build_seconds": 0.006850511999800801,
+                "tree_traversal_seconds": 0.15482879399860394,
+                "route_pack_seconds": 0.0018424350000714185,
+                "route_transfer_seconds": 0.0,
+                "selector_seconds": 0.16352174099847616,
+                "needle_layer_group_hit_rate": 0.8571429252624512,
+                "needle_any_group_all_layers_rate": 0.9642857313156128,
+                "seconds": 3.451108801000373,
+                "prefill_seconds": 2.531493100001171,
+                "decode_seconds": 0.9196157009992021,
+                "live_prefill_seconds": 2.6950148409996473,
+                "live_total_seconds": 3.6146305419988494
+              },
+              {
+                "feature_load_seconds": 0.31329609400017944,
+                "tree_build_seconds": 0.006830516000263742,
+                "tree_traversal_seconds": 0.1562011080004595,
+                "route_pack_seconds": 0.001787756998965051,
+                "route_transfer_seconds": 0.0,
+                "selector_seconds": 0.1648193809996883,
+                "needle_layer_group_hit_rate": 0.8571429252624512,
+                "needle_any_group_all_layers_rate": 0.9642857313156128,
+                "seconds": 3.4963221229991177,
+                "prefill_seconds": 2.5632049389987515,
+                "decode_seconds": 0.9331171840003663,
+                "live_prefill_seconds": 2.7280243199984398,
+                "live_total_seconds": 3.661141503998806
+              }
+            ]
+          },
+          "dense": {
+            "exact": true,
+            "fuzzy": 1.0,
+            "answer": " Elena selected the amber badge for the audit. The compliance memo repeated ordinary review steps and noncritical status updates. The compliance memo repeated ordinary review steps and noncritical",
+            "needle": "elena selected the amber badge for the audit.",
+            "prefill_seconds": 3.8135526470014156,
+            "decode_seconds": 0.9180508779991214,
+            "seconds": 4.731603525000537,
+            "answer_repeat_match": true,
+            "timing_samples": [
+              {
+                "seconds": 4.706321257999662,
+                "prefill_seconds": 3.7839336739998544,
+                "decode_seconds": 0.9223875839998072
+              },
+              {
+                "seconds": 4.731603525000537,
+                "prefill_seconds": 3.8135526470014156,
+                "decode_seconds": 0.9180508779991214
+              },
+              {
+                "seconds": 4.767964221000511,
+                "prefill_seconds": 3.8577843599996413,
+                "decode_seconds": 0.91017986100087
+              }
+            ]
+          },
+          "answers_match": true,
+          "comparison": {
+            "kernel_prefill_speedup": 1.5064440219093038,
+            "live_prefill_speedup": 1.4150395719479136,
+            "live_total_speedup": 1.3090144262389856
+          }
+        },
+        {
+          "case_id": "code_nova_4816",
+          "seq_len": 30573,
+          "block_size": 64,
+          "needle_block": 74,
+          "teacher_target": "/content/SPRUCE/teacher_targets/1.5B_heldout_0.05-0.95/teacher_code_nova_4816_len30573_blk64_d0.15631.pt",
+          "sparse": {
+            "exact": true,
+            "fuzzy": 1.0,
+            "answer": " The Nova access code is 4816. The meeting archive contained budget notes, calendar changes, and vendor summaries. The meeting archive contained budget notes,",
+            "needle": "the nova access code is 4816.",
+            "feature_load_seconds": 0.3578551700011303,
+            "tree_build_seconds": 0.007146981999540003,
+            "tree_traversal_seconds": 0.15699457900154812,
+            "route_pack_seconds": 0.0018509100009396207,
+            "route_transfer_seconds": 0.0,
+            "selector_seconds": 0.1659615330027009,
+            "prefill_seconds": 2.618748962000609,
+            "decode_seconds": 0.9197691660010605,
+            "seconds": 3.5385181280016695,
+            "live_prefill_seconds": 2.784765980000884,
+            "live_total_seconds": 3.704590896002628,
+            "needle_layer_group_hit_rate": 0.8571429252624512,
+            "needle_any_group_all_layers_rate": 0.9285714626312256,
+            "answer_repeat_match": true,
+            "timing_samples": [
+              {
+                "feature_load_seconds": 0.3576154170004884,
+                "tree_build_seconds": 0.007135595000363537,
+                "tree_traversal_seconds": 0.15699457900154812,
+                "route_pack_seconds": 0.0018313590007892344,
+                "route_transfer_seconds": 0.0,
+                "selector_seconds": 0.1659615330027009,
+                "needle_layer_group_hit_rate": 0.8571429252624512,
+                "needle_any_group_all_layers_rate": 0.9285714626312256,
+                "seconds": 3.5158099309992394,
+                "prefill_seconds": 2.6076950160004344,
+                "decode_seconds": 0.908114914998805,
+                "live_prefill_seconds": 2.7736565490031353,
+                "live_total_seconds": 3.6817714640019403
+              },
+              {
+                "feature_load_seconds": 0.3930309429997578,
+                "tree_build_seconds": 0.007163186000980204,
+                "tree_traversal_seconds": 0.15703158200085454,
+                "route_pack_seconds": 0.0018779999991238583,
+                "route_transfer_seconds": 0.0,
+                "selector_seconds": 0.1660727680009586,
+                "needle_layer_group_hit_rate": 0.8571429252624512,
+                "needle_any_group_all_layers_rate": 0.9285714626312256,
+                "seconds": 3.5385181280016695,
+                "prefill_seconds": 2.618748962000609,
+                "decode_seconds": 0.9197691660010605,
+                "live_prefill_seconds": 2.7848217300015676,
+                "live_total_seconds": 3.704590896002628
+              },
+              {
+                "feature_load_seconds": 0.3578551700011303,
+                "tree_build_seconds": 0.007146981999540003,
+                "tree_traversal_seconds": 0.15674269199917035,
+                "route_pack_seconds": 0.0018509100009396207,
+                "route_transfer_seconds": 0.0,
+                "selector_seconds": 0.16574058399964997,
+                "needle_layer_group_hit_rate": 0.8571429252624512,
+                "needle_any_group_all_layers_rate": 0.9285714626312256,
+                "seconds": 3.5571132420009235,
+                "prefill_seconds": 2.619025396001234,
+                "decode_seconds": 0.9380878459996893,
+                "live_prefill_seconds": 2.784765980000884,
+                "live_total_seconds": 3.7228538260005735
+              }
+            ]
+          },
+          "dense": {
+            "exact": true,
+            "fuzzy": 1.0,
+            "answer": " The Nova access code is 4816. The meeting archive contained budget notes, calendar changes, and vendor summaries. The meeting archive contained budget notes,",
+            "needle": "the nova access code is 4816.",
+            "prefill_seconds": 3.86627537700042,
+            "decode_seconds": 0.9213493740007834,
+            "seconds": 4.789814905001549,
+            "answer_repeat_match": true,
+            "timing_samples": [
+              {
+                "seconds": 4.794876584001031,
+                "prefill_seconds": 3.86627537700042,
+                "decode_seconds": 0.9286012070006109
+              },
+              {
+                "seconds": 4.771224676000202,
+                "prefill_seconds": 3.8498753019994183,
+                "decode_seconds": 0.9213493740007834
+              },
+              {
+                "seconds": 4.789814905001549,
+                "prefill_seconds": 3.874446715000886,
+                "decode_seconds": 0.9153681900006632
+              }
+            ]
+          },
+          "answers_match": true,
+          "comparison": {
+            "kernel_prefill_speedup": 1.4763825907339954,
+            "live_prefill_speedup": 1.3883663491893106,
+            "live_total_speedup": 1.2929403109449715
+          }
+        },
+        {
+          "case_id": "code_nova_4816",
+          "seq_len": 30573,
+          "block_size": 64,
+          "needle_block": 245,
+          "teacher_target": "/content/SPRUCE/teacher_targets/1.5B_heldout_0.05-0.95/teacher_code_nova_4816_len30573_blk64_d0.514987.pt",
+          "sparse": {
+            "exact": true,
+            "fuzzy": 1.0,
+            "answer": " The Nova access code is 4816. The meeting archive contained budget notes, calendar changes, and vendor summaries. The meeting archive contained budget notes,",
+            "needle": "the nova access code is 4816.",
+            "feature_load_seconds": 0.3522876000006363,
+            "tree_build_seconds": 0.007172727000579471,
+            "tree_traversal_seconds": 0.15682641199964564,
+            "route_pack_seconds": 0.001807185000870959,
+            "route_transfer_seconds": 0.0,
+            "selector_seconds": 0.16615259500031243,
+            "prefill_seconds": 2.5982619450005586,
+            "decode_seconds": 0.916523193998728,
+            "seconds": 3.512829019000492,
+            "live_prefill_seconds": 2.764414540000871,
+            "live_total_seconds": 3.6789816140008043,
+            "needle_layer_group_hit_rate": 0.8392857313156128,
+            "needle_any_group_all_layers_rate": 0.9285714626312256,
+            "answer_repeat_match": true,
+            "timing_samples": [
+              {
+                "feature_load_seconds": 0.35464602899992315,
+                "tree_build_seconds": 0.007172727000579471,
+                "tree_traversal_seconds": 0.15728100599881145,
+                "route_pack_seconds": 0.001807185000870959,
+                "route_transfer_seconds": 0.0,
+                "selector_seconds": 0.16626091800026188,
+                "needle_layer_group_hit_rate": 0.8392857313156128,
+                "needle_any_group_all_layers_rate": 0.9285714626312256,
+                "seconds": 3.5319759029989655,
+                "prefill_seconds": 2.6154527090002375,
+                "decode_seconds": 0.916523193998728,
+                "live_prefill_seconds": 2.7817136270004994,
+                "live_total_seconds": 3.6982368209992273
+              },
+              {
+                "feature_load_seconds": 0.3522876000006363,
+                "tree_build_seconds": 0.007479028001398547,
+                "tree_traversal_seconds": 0.15682641199964564,
+                "route_pack_seconds": 0.0018471549992682412,
+                "route_transfer_seconds": 0.0,
+                "selector_seconds": 0.16615259500031243,
+                "needle_layer_group_hit_rate": 0.8392857313156128,
+                "needle_any_group_all_layers_rate": 0.9285714626312256,
+                "seconds": 3.512829019000492,
+                "prefill_seconds": 2.5982619450005586,
+                "decode_seconds": 0.9145670739999332,
+                "live_prefill_seconds": 2.764414540000871,
+                "live_total_seconds": 3.6789816140008043
+              },
+              {
+                "feature_load_seconds": 0.332551550000062,
+                "tree_build_seconds": 0.0071704689999023685,
+                "tree_traversal_seconds": 0.1562982049999846,
+                "route_pack_seconds": 0.0017651189991738647,
+                "route_transfer_seconds": 0.0,
+                "selector_seconds": 0.16523379299906082,
+                "needle_layer_group_hit_rate": 0.8392857313156128,
+                "needle_any_group_all_layers_rate": 0.9285714626312256,
+                "seconds": 3.501002093000352,
+                "prefill_seconds": 2.578656535000846,
+                "decode_seconds": 0.9223455579995061,
+                "live_prefill_seconds": 2.7438903279999067,
+                "live_total_seconds": 3.666235885999413
+              }
+            ]
+          },
+          "dense": {
+            "exact": true,
+            "fuzzy": 1.0,
+            "answer": " The Nova access code is 4816. The meeting archive contained budget notes, calendar changes, and vendor summaries. The meeting archive contained budget notes,",
+            "needle": "the nova access code is 4816.",
+            "prefill_seconds": 3.8611491410010785,
+            "decode_seconds": 0.9212329769998178,
+            "seconds": 4.782382118000896,
+            "answer_repeat_match": true,
+            "timing_samples": [
+              {
+                "seconds": 4.782382118000896,
+                "prefill_seconds": 3.8611491410010785,
+                "decode_seconds": 0.9212329769998178
+              },
+              {
+                "seconds": 4.767079047000152,
+                "prefill_seconds": 3.8545118830006686,
+                "decode_seconds": 0.9125671639994835
+              },
+              {
+                "seconds": 4.792921893000312,
+                "prefill_seconds": 3.8639557999995304,
+                "decode_seconds": 0.9289660930007813
+              }
+            ]
+          },
+          "answers_match": true,
+          "comparison": {
+            "kernel_prefill_speedup": 1.4860507611368832,
+            "live_prefill_speedup": 1.396733046050272,
+            "live_total_speedup": 1.2999200919626697
+          }
+        },
+        {
+          "case_id": "color_green_bob",
+          "seq_len": 14745,
+          "block_size": 64,
+          "needle_block": 59,
+          "teacher_target": "/content/SPRUCE/teacher_targets/1.5B_heldout_0.05-0.95/teacher_color_green_bob_len14745_blk64_d0.259059.pt",
+          "sparse": {
+            "exact": true,
+            "fuzzy": 1.0,
+            "answer": " Bob's favorite color is green. The quarterly logistics report noted no unusual activity. The quarterly logistics report noted no unusual activity. The quarterly logistics report noted no unusual",
+            "needle": "bobs favorite color is green.",
+            "feature_load_seconds": 0.13270701699912024,
+            "tree_build_seconds": 0.006209451999893645,
+            "tree_traversal_seconds": 0.06346389800091856,
+            "route_pack_seconds": 0.001157279999461025,
+            "route_transfer_seconds": 0.0,
+            "selector_seconds": 0.07079442400026892,
+            "prefill_seconds": 1.2051753329997155,
+            "decode_seconds": 0.9228946769999311,
+            "seconds": 2.1280700099996466,
+            "live_prefill_seconds": 1.2760182399997575,
+            "live_total_seconds": 2.1989129169996886,
+            "needle_layer_group_hit_rate": 0.8392857313156128,
+            "needle_any_group_all_layers_rate": 0.9285714626312256,
+            "answer_repeat_match": true,
+            "timing_samples": [
+              {
+                "feature_load_seconds": 0.13632063099976222,
+                "tree_build_seconds": 0.006209451999893645,
+                "tree_traversal_seconds": 0.06340893599917763,
+                "route_pack_seconds": 0.001048320000336389,
+                "route_transfer_seconds": 0.0,
+                "selector_seconds": 0.07066670799940766,
+                "needle_layer_group_hit_rate": 0.8392857313156128,
+                "needle_any_group_all_layers_rate": 0.9285714626312256,
+                "seconds": 2.158712586000547,
+                "prefill_seconds": 1.2139848000006168,
+                "decode_seconds": 0.9447277859999303,
+                "live_prefill_seconds": 1.2846515080000245,
+                "live_total_seconds": 2.229379293999955
+              },
+              {
+                "feature_load_seconds": 0.13270701699912024,
+                "tree_build_seconds": 0.00621453600069799,
+                "tree_traversal_seconds": 0.06347109099988302,
+                "route_pack_seconds": 0.001157279999461025,
+                "route_transfer_seconds": 0.0,
+                "selector_seconds": 0.07084290700004203,
+                "needle_layer_group_hit_rate": 0.8392857313156128,
+                "needle_any_group_all_layers_rate": 0.9285714626312256,
+                "seconds": 2.1280700099996466,
+                "prefill_seconds": 1.2051753329997155,
+                "decode_seconds": 0.9228946769999311,
+                "live_prefill_seconds": 1.2760182399997575,
+                "live_total_seconds": 2.1989129169996886
+              },
+              {
+                "feature_load_seconds": 0.1266690739994374,
+                "tree_build_seconds": 0.006130501000370714,
+                "tree_traversal_seconds": 0.06346389800091856,
+                "route_pack_seconds": 0.001200024998979643,
+                "route_transfer_seconds": 0.0,
+                "selector_seconds": 0.07079442400026892,
+                "needle_layer_group_hit_rate": 0.8392857313156128,
+                "needle_any_group_all_layers_rate": 0.9285714626312256,
+                "seconds": 2.1105457640005625,
+                "prefill_seconds": 1.2043179550000787,
+                "decode_seconds": 0.9062278090004838,
+                "live_prefill_seconds": 1.2751123790003476,
+                "live_total_seconds": 2.1813401880008314
+              }
+            ]
+          },
+          "dense": {
+            "exact": true,
+            "fuzzy": 1.0,
+            "answer": " Bob's favorite color is green. The quarterly logistics report noted no unusual activity. The quarterly logistics report noted no unusual activity. The quarterly logistics report noted no unusual",
+            "needle": "bobs favorite color is green.",
+            "prefill_seconds": 1.4381267839999055,
+            "decode_seconds": 0.9203829239995684,
+            "seconds": 2.358509707999474,
+            "answer_repeat_match": true,
+            "timing_samples": [
+              {
+                "seconds": 2.413480912000523,
+                "prefill_seconds": 1.488612359000399,
+                "decode_seconds": 0.9248685530001239
+              },
+              {
+                "seconds": 2.3398741940000036,
+                "prefill_seconds": 1.4352848090002226,
+                "decode_seconds": 0.904589384999781
+              },
+              {
+                "seconds": 2.358509707999474,
+                "prefill_seconds": 1.4381267839999055,
+                "decode_seconds": 0.9203829239995684
+              }
+            ]
+          },
+          "answers_match": true,
+          "comparison": {
+            "kernel_prefill_speedup": 1.1932925812714463,
+            "live_prefill_speedup": 1.1270424974490794,
+            "live_total_speedup": 1.0725798596961027
+          }
+        },
+        {
+          "case_id": "color_green_bob",
+          "seq_len": 14745,
+          "block_size": 64,
+          "needle_block": 80,
+          "teacher_target": "/content/SPRUCE/teacher_targets/1.5B_heldout_0.05-0.95/teacher_color_green_bob_len14745_blk64_d0.351676.pt",
+          "sparse": {
+            "exact": true,
+            "fuzzy": 1.0,
+            "answer": " Bob's favorite color is green. The quarterly logistics report noted no unusual activity. The quarterly logistics report noted no unusual activity. The quarterly logistics report noted no unusual",
+            "needle": "bobs favorite color is green.",
+            "feature_load_seconds": 0.12279649399897608,
+            "tree_build_seconds": 0.006173677998958738,
+            "tree_traversal_seconds": 0.06339648799985298,
+            "route_pack_seconds": 0.0010633190013322746,
+            "route_transfer_seconds": 0.0,
+            "selector_seconds": 0.07059905499954766,
+            "prefill_seconds": 1.1990049329997419,
+            "decode_seconds": 0.9192117279999366,
+            "seconds": 2.118867028999375,
+            "live_prefill_seconds": 1.2696039879992895,
+            "live_total_seconds": 2.189454263998414,
+            "needle_layer_group_hit_rate": 0.8750000596046448,
+            "needle_any_group_all_layers_rate": 0.9642857313156128,
+            "answer_repeat_match": true,
+            "timing_samples": [
+              {
+                "feature_load_seconds": 0.12279649399897608,
+                "tree_build_seconds": 0.006173677998958738,
+                "tree_traversal_seconds": 0.06335023799874762,
+                "route_pack_seconds": 0.0010633190013322746,
+                "route_transfer_seconds": 0.0,
+                "selector_seconds": 0.07058723499903863,
+                "needle_layer_group_hit_rate": 0.8750000596046448,
+                "needle_any_group_all_layers_rate": 0.9642857313156128,
+                "seconds": 2.118867028999375,
+                "prefill_seconds": 1.2065320940000674,
+                "decode_seconds": 0.9123349349993077,
+                "live_prefill_seconds": 1.277119328999106,
+                "live_total_seconds": 2.189454263998414
+              },
+              {
+                "feature_load_seconds": 0.12861681499998667,
+                "tree_build_seconds": 0.00614332899931469,
+                "tree_traversal_seconds": 0.06339648799985298,
+                "route_pack_seconds": 0.0010592380003799917,
+                "route_transfer_seconds": 0.0,
+                "selector_seconds": 0.07059905499954766,
+                "needle_layer_group_hit_rate": 0.8750000596046448,
+                "needle_any_group_all_layers_rate": 0.9642857313156128,
+                "seconds": 2.1182166609996784,
+                "prefill_seconds": 1.1990049329997419,
+                "decode_seconds": 0.9192117279999366,
+                "live_prefill_seconds": 1.2696039879992895,
+                "live_total_seconds": 2.188815715999226
+              },
+              {
+                "feature_load_seconds": 0.12230771900067339,
+                "tree_build_seconds": 0.006683124998744461,
+                "tree_traversal_seconds": 0.06352410900035466,
+                "route_pack_seconds": 0.001157467999291839,
+                "route_transfer_seconds": 0.0,
+                "selector_seconds": 0.07136470199839096,
+                "needle_layer_group_hit_rate": 0.8750000596046448,
+                "needle_any_group_all_layers_rate": 0.9642857313156128,
+                "seconds": 2.120652356001301,
+                "prefill_seconds": 1.1974982900010218,
+                "decode_seconds": 0.9231540660002793,
+                "live_prefill_seconds": 1.2688629919994128,
+                "live_total_seconds": 2.192017057999692
+              }
+            ]
+          },
+          "dense": {
+            "exact": true,
+            "fuzzy": 1.0,
+            "answer": " Bob's favorite color is green. The quarterly logistics report noted no unusual activity. The quarterly logistics report noted no unusual activity. The quarterly logistics report noted no unusual",
+            "needle": "bobs favorite color is green.",
+            "prefill_seconds": 1.4396684280000045,
+            "decode_seconds": 0.9073930269987613,
+            "seconds": 2.3431687229985982,
+            "answer_repeat_match": true,
+            "timing_samples": [
+              {
+                "seconds": 2.33454631099994,
+                "prefill_seconds": 1.4271532840011787,
+                "decode_seconds": 0.9073930269987613
+              },
+              {
+                "seconds": 2.3431687229985982,
+                "prefill_seconds": 1.4396684280000045,
+                "decode_seconds": 0.9035002949985937
+              },
+              {
+                "seconds": 2.354886250999698,
+                "prefill_seconds": 1.4453113119998307,
+                "decode_seconds": 0.9095749389998673
+              }
+            ]
+          },
+          "answers_match": true,
+          "comparison": {
+            "kernel_prefill_speedup": 1.2007193535043734,
+            "live_prefill_speedup": 1.133950776469056,
+            "live_total_speedup": 1.0702067458214308
+          }
+        }
+      ],
+      "aggregate": {
+        "cases": 6,
+        "answers_match_rate": 1.0,
+        "sparse_exact_rate": 1.0,
+        "dense_exact_rate": 1.0,
+        "mean_sparse_fuzzy": 1.0,
+        "mean_dense_fuzzy": 1.0,
+        "median_kernel_prefill_speedup": 1.3491221910266251,
+        "median_live_prefill_speedup": 1.2718125698052138,
+        "median_live_total_speedup": 1.1957823055435703,
+        "sum_kernel_prefill_speedup": 1.3984154750875768,
+        "sum_live_prefill_speedup": 1.3165338970603067
+      }
+    },
+    {
+      "model": "Qwen/Qwen2.5-Coder-1.5B-Instruct",
+      "gate": "/content/drive/MyDrive/SPRUCE_COLAB/selector_ckpt/flat_gate_lamt0.75_lamn0.25_lr5e4_e300.pt",
+      "selector": {
+        "mode": "live_candidate_only_tree_traversal",
+        "route_representation": "compact_leaf_ids",
+        "feature_source": "pooled_qk_loaded_from_teacher_target",
+        "feature_extraction_included": false,
+        "feature_file_loading_included": false,
+        "compute_dtype": "float16",
+        "layer_chunk": 4,
+        "beam": 14,
+        "radix": 2,
+        "k_selected": 16,
+        "local_window": 1
+      },
+      "repeats": 3,
+      "warmup_tokens": 64,
+      "cases": [
+        {
+          "case_id": "badge_elena_amber",
+          "seq_len": 15209,
+          "block_size": 64,
+          "needle_block": 60,
+          "teacher_target": "/content/SPRUCE/teacher_targets/1.5B_heldout_0.05-0.95/teacher_badge_elena_amber_len15209_blk64_d0.256369.pt",
+          "sparse": {
+            "exact": true,
+            "fuzzy": 1.0,
+            "answer": " Elena selected the amber badge for the audit. The compliance memo repeated ordinary review steps and noncritical status updates. The compliance memo repeated ordinary review steps and noncritical",
+            "needle": "elena selected the amber badge for the audit.",
+            "feature_load_seconds": 0.12756834399988293,
+            "tree_build_seconds": 0.006151344001409598,
+            "tree_traversal_seconds": 0.07278922000114108,
+            "route_pack_seconds": 0.0012553629985632142,
+            "route_transfer_seconds": 0.0,
+            "selector_seconds": 0.08016110799871967,
+            "prefill_seconds": 1.2546018089997233,
+            "decode_seconds": 0.9149741790006374,
+            "seconds": 2.1695759880003607,
+            "live_prefill_seconds": 1.334762916998443,
+            "live_total_seconds": 2.2497370959990803,
+            "needle_layer_group_hit_rate": 0.8392857313156128,
+            "needle_any_group_all_layers_rate": 0.9285714626312256,
+            "answer_repeat_match": true,
+            "timing_samples": [
+              {
+                "feature_load_seconds": 0.13885421200029668,
+                "tree_build_seconds": 0.006190160000187461,
+                "tree_traversal_seconds": 0.07264409399977012,
+                "route_pack_seconds": 0.001284939000470331,
+                "route_transfer_seconds": 0.0,
+                "selector_seconds": 0.08011919300042791,
+                "needle_layer_group_hit_rate": 0.8392857313156128,
+                "needle_any_group_all_layers_rate": 0.9285714626312256,
+                "seconds": 2.992292812999949,
+                "prefill_seconds": 2.073416912000539,
+                "decode_seconds": 0.9188759009994101,
+                "live_prefill_seconds": 2.153536105000967,
+                "live_total_seconds": 3.072412006000377
+              },
+              {
+                "feature_load_seconds": 0.12756834399988293,
+                "tree_build_seconds": 0.006151344001409598,
+                "tree_traversal_seconds": 0.07288584700108913,
+                "route_pack_seconds": 0.0011783950012613786,
+                "route_transfer_seconds": 0.0,
+                "selector_seconds": 0.08021558600376011,
+                "needle_layer_group_hit_rate": 0.8392857313156128,
+                "needle_any_group_all_layers_rate": 0.9285714626312256,
+                "seconds": 2.1639698920007504,
+                "prefill_seconds": 1.2517330500013486,
+                "decode_seconds": 0.9122368419994018,
+                "live_prefill_seconds": 1.3319486360051087,
+                "live_total_seconds": 2.2441854780045105
+              },
+              {
+                "feature_load_seconds": 0.11652271899947664,
+                "tree_build_seconds": 0.0061165249990153825,
+                "tree_traversal_seconds": 0.07278922000114108,
+                "route_pack_seconds": 0.0012553629985632142,
+                "route_transfer_seconds": 0.0,
+                "selector_seconds": 0.08016110799871967,
+                "needle_layer_group_hit_rate": 0.8392857313156128,
+                "needle_any_group_all_layers_rate": 0.9285714626312256,
+                "seconds": 2.1695759880003607,
+                "prefill_seconds": 1.2546018089997233,
+                "decode_seconds": 0.9149741790006374,
+                "live_prefill_seconds": 1.334762916998443,
+                "live_total_seconds": 2.2497370959990803
+              }
+            ]
+          },
+          "dense": {
+            "exact": true,
+            "fuzzy": 1.0,
+            "answer": " Elena selected the amber badge for the audit. The compliance memo repeated ordinary review steps and noncritical status updates. The compliance memo repeated ordinary review steps and noncritical",
+            "needle": "elena selected the amber badge for the audit.",
+            "prefill_seconds": 1.5301610360002087,
+            "decode_seconds": 0.9207305849995464,
+            "seconds": 2.455018521000966,
+            "answer_repeat_match": true,
+            "timing_samples": [
+              {
+                "seconds": 2.460891320999508,
+                "prefill_seconds": 1.5297008260004077,
+                "decode_seconds": 0.9311904949991003
+              },
+              {
+                "seconds": 2.455018521000966,
+                "prefill_seconds": 1.537954389999868,
+                "decode_seconds": 0.9170641310010978
+              },
+              {
+                "seconds": 2.450891620999755,
+                "prefill_seconds": 1.5301610360002087,
+                "decode_seconds": 0.9207305849995464
+              }
+            ]
+          },
+          "answers_match": true,
+          "comparison": {
+            "kernel_prefill_speedup": 1.2196387929810057,
+            "live_prefill_speedup": 1.1463916299391719,
+            "live_total_speedup": 1.0912468507395627
+          }
+        },
+        {
+          "case_id": "badge_elena_amber",
+          "seq_len": 30419,
+          "block_size": 64,
+          "needle_block": 275,
+          "teacher_target": "/content/SPRUCE/teacher_targets/1.5B_heldout_0.05-0.95/teacher_badge_elena_amber_len30419_blk64_d0.579381.pt",
+          "sparse": {
+            "exact": true,
+            "fuzzy": 1.0,
+            "answer": " Elena selected the amber badge for the audit. The compliance memo repeated ordinary review steps and noncritical status updates. The compliance memo repeated ordinary review steps and noncritical",
+            "needle": "elena selected the amber badge for the audit.",
+            "feature_load_seconds": 0.3161409519998415,
+            "tree_build_seconds": 0.0068564899993361905,
+            "tree_traversal_seconds": 0.17468599099993298,
+            "route_pack_seconds": 0.0018482260002201656,
+            "route_transfer_seconds": 0.0,
+            "selector_seconds": 0.1833906770007161,
+            "prefill_seconds": 2.5332181049998326,
+            "decode_seconds": 0.9220180240008631,
+            "seconds": 3.4525357829988934,
+            "live_prefill_seconds": 2.7166087820005487,
+            "live_total_seconds": 3.6359264599996095,
+            "needle_layer_group_hit_rate": 0.8571429252624512,
+            "needle_any_group_all_layers_rate": 0.9642857313156128,
+            "answer_repeat_match": true,
+            "timing_samples": [
+              {
+                "feature_load_seconds": 0.3531184719995508,
+                "tree_build_seconds": 0.0068564899993361905,
+                "tree_traversal_seconds": 0.17406618099994375,
+                "route_pack_seconds": 0.001722424998661154,
+                "route_transfer_seconds": 0.0,
+                "selector_seconds": 0.1826450959979411,
+                "needle_layer_group_hit_rate": 0.8571429252624512,
+                "needle_any_group_all_layers_rate": 0.9642857313156128,
+                "seconds": 3.4439378660008515,
+                "prefill_seconds": 2.5219198419999884,
+                "decode_seconds": 0.9220180240008631,
+                "live_prefill_seconds": 2.7045649379979295,
+                "live_total_seconds": 3.6265829619987926
+              },
+              {
+                "feature_load_seconds": 0.3161409519998415,
+                "tree_build_seconds": 0.006850648000181536,
+                "tree_traversal_seconds": 0.17468599099993298,
+                "route_pack_seconds": 0.0018540380006015766,
+                "route_transfer_seconds": 0.0,
+                "selector_seconds": 0.1833906770007161,
+                "needle_layer_group_hit_rate": 0.8571429252624512,
+                "needle_any_group_all_layers_rate": 0.9642857313156128,
+                "seconds": 3.4525357829988934,
+                "prefill_seconds": 2.5332181049998326,
+                "decode_seconds": 0.9193176779990608,
+                "live_prefill_seconds": 2.7166087820005487,
+                "live_total_seconds": 3.6359264599996095
+              },
+              {
+                "feature_load_seconds": 0.3094061960000545,
+                "tree_build_seconds": 0.006917982000231859,
+                "tree_traversal_seconds": 0.1753219700003683,
+                "route_pack_seconds": 0.0018482260002201656,
+                "route_transfer_seconds": 0.0,
+                "selector_seconds": 0.18408817800082034,
+                "needle_layer_group_hit_rate": 0.8571429252624512,
+                "needle_any_group_all_layers_rate": 0.9642857313156128,
+                "seconds": 3.4966989620006643,
+                "prefill_seconds": 2.5718698270011373,
+                "decode_seconds": 0.924829134999527,
+                "live_prefill_seconds": 2.7559580050019576,
+                "live_total_seconds": 3.6807871400014847
+              }
+            ]
+          },
+          "dense": {
+            "exact": true,
+            "fuzzy": 1.0,
+            "answer": " Elena selected the amber badge for the audit. The compliance memo repeated ordinary review steps and noncritical status updates. The compliance memo repeated ordinary review steps and noncritical",
+            "needle": "elena selected the amber badge for the audit.",
+            "prefill_seconds": 3.8135526470014156,
+            "decode_seconds": 0.9180508779991214,
+            "seconds": 4.731603525000537,
+            "answer_repeat_match": true,
+            "timing_samples": [
+              {
+                "seconds": 4.706321257999662,
+                "prefill_seconds": 3.7839336739998544,
+                "decode_seconds": 0.9223875839998072
+              },
+              {
+                "seconds": 4.731603525000537,
+                "prefill_seconds": 3.8135526470014156,
+                "decode_seconds": 0.9180508779991214
+              },
+              {
+                "seconds": 4.767964221000511,
+                "prefill_seconds": 3.8577843599996413,
+                "decode_seconds": 0.91017986100087
+              }
+            ]
+          },
+          "answers_match": true,
+          "comparison": {
+            "kernel_prefill_speedup": 1.50541820282848,
+            "live_prefill_speedup": 1.4037916214763402,
+            "live_total_speedup": 1.3013474219170662
+          }
+        },
+        {
+          "case_id": "code_nova_4816",
+          "seq_len": 30573,
+          "block_size": 64,
+          "needle_block": 74,
+          "teacher_target": "/content/SPRUCE/teacher_targets/1.5B_heldout_0.05-0.95/teacher_code_nova_4816_len30573_blk64_d0.15631.pt",
+          "sparse": {
+            "exact": true,
+            "fuzzy": 1.0,
+            "answer": " The Nova access code is 4816. The meeting archive contained budget notes, calendar changes, and vendor summaries. The meeting archive contained budget notes,",
+            "needle": "the nova access code is 4816.",
+            "feature_load_seconds": 0.3264899410005455,
+            "tree_build_seconds": 0.007167783000113559,
+            "tree_traversal_seconds": 0.17736426800001936,
+            "route_pack_seconds": 0.0018727530004980508,
+            "route_transfer_seconds": 0.0,
+            "selector_seconds": 0.18705653399956645,
+            "prefill_seconds": 2.6209280469993246,
+            "decode_seconds": 0.9238056850008434,
+            "seconds": 3.5689059889991768,
+            "live_prefill_seconds": 2.8071969100001297,
+            "live_total_seconds": 3.7559625229987432,
+            "needle_layer_group_hit_rate": 0.8571429252624512,
+            "needle_any_group_all_layers_rate": 0.9285714626312256,
+            "answer_repeat_match": true,
+            "timing_samples": [
+              {
+                "feature_load_seconds": 0.3264899410005455,
+                "tree_build_seconds": 0.007991153999682865,
+                "tree_traversal_seconds": 0.17736426800001936,
+                "route_pack_seconds": 0.0018693849997362122,
+                "route_transfer_seconds": 0.0,
+                "selector_seconds": 0.18722480699943844,
+                "needle_layer_group_hit_rate": 0.8571429252624512,
+                "needle_any_group_all_layers_rate": 0.9285714626312256,
+                "seconds": 3.571714363000865,
+                "prefill_seconds": 2.618127456000366,
+                "decode_seconds": 0.9535869070004992,
+                "live_prefill_seconds": 2.8053522629998042,
+                "live_total_seconds": 3.7589391700003034
+              },
+              {
+                "feature_load_seconds": 0.3393606480003655,
+                "tree_build_seconds": 0.007142086000385461,
+                "tree_traversal_seconds": 0.17725402399992163,
+                "route_pack_seconds": 0.0018727530004980508,
+                "route_transfer_seconds": 0.0,
+                "selector_seconds": 0.18626886300080514,
+                "needle_layer_group_hit_rate": 0.8571429252624512,
+                "needle_any_group_all_layers_rate": 0.9285714626312256,
+                "seconds": 3.544733732000168,
+                "prefill_seconds": 2.6209280469993246,
+                "decode_seconds": 0.9238056850008434,
+                "live_prefill_seconds": 2.8071969100001297,
+                "live_total_seconds": 3.731002595000973
+              },
+              {
+                "feature_load_seconds": 0.3229670500004431,
+                "tree_build_seconds": 0.007167783000113559,
+                "tree_traversal_seconds": 0.17801003999920795,
+                "route_pack_seconds": 0.001878711000244948,
+                "route_transfer_seconds": 0.0,
+                "selector_seconds": 0.18705653399956645,
+                "needle_layer_group_hit_rate": 0.8571429252624512,
+                "needle_any_group_all_layers_rate": 0.9285714626312256,
+                "seconds": 3.5689059889991768,
+                "prefill_seconds": 2.6498409699997865,
+                "decode_seconds": 0.9190650189993903,
+                "live_prefill_seconds": 2.836897503999353,
+                "live_total_seconds": 3.7559625229987432
+              }
+            ]
+          },
+          "dense": {
+            "exact": true,
+            "fuzzy": 1.0,
+            "answer": " The Nova access code is 4816. The meeting archive contained budget notes, calendar changes, and vendor summaries. The meeting archive contained budget notes,",
+            "needle": "the nova access code is 4816.",
+            "prefill_seconds": 3.86627537700042,
+            "decode_seconds": 0.9213493740007834,
+            "seconds": 4.789814905001549,
+            "answer_repeat_match": true,
+            "timing_samples": [
+              {
+                "seconds": 4.794876584001031,
+                "prefill_seconds": 3.86627537700042,
+                "decode_seconds": 0.9286012070006109
+              },
+              {
+                "seconds": 4.771224676000202,
+                "prefill_seconds": 3.8498753019994183,
+                "decode_seconds": 0.9213493740007834
+              },
+              {
+                "seconds": 4.789814905001549,
+                "prefill_seconds": 3.874446715000886,
+                "decode_seconds": 0.9153681900006632
+              }
+            ]
+          },
+          "answers_match": true,
+          "comparison": {
+            "kernel_prefill_speedup": 1.4751551006624855,
+            "live_prefill_speedup": 1.3772725964564565,
+            "live_total_speedup": 1.2752563093141256
+          }
+        },
+        {
+          "case_id": "code_nova_4816",
+          "seq_len": 30573,
+          "block_size": 64,
+          "needle_block": 245,
+          "teacher_target": "/content/SPRUCE/teacher_targets/1.5B_heldout_0.05-0.95/teacher_code_nova_4816_len30573_blk64_d0.514987.pt",
+          "sparse": {
+            "exact": true,
+            "fuzzy": 1.0,
+            "answer": " The Nova access code is 4816. The meeting archive contained budget notes, calendar changes, and vendor summaries. The meeting archive contained budget notes,",
+            "needle": "the nova access code is 4816.",
+            "feature_load_seconds": 0.33055403099933756,
+            "tree_build_seconds": 0.007169292000980931,
+            "tree_traversal_seconds": 0.1774496559992258,
+            "route_pack_seconds": 0.0018946109994431026,
+            "route_transfer_seconds": 0.0,
+            "selector_seconds": 0.18655096699876594,
+            "prefill_seconds": 2.6148406750016875,
+            "decode_seconds": 0.9356740889998036,
+            "seconds": 3.550514764001491,
+            "live_prefill_seconds": 2.8007562970033177,
+            "live_total_seconds": 3.7364303860031214,
+            "needle_layer_group_hit_rate": 0.8571429252624512,
+            "needle_any_group_all_layers_rate": 0.9285714626312256,
+            "answer_repeat_match": true,
+            "timing_samples": [
+              {
+                "feature_load_seconds": 0.32825742900058685,
+                "tree_build_seconds": 0.007162264999351464,
+                "tree_traversal_seconds": 0.17881605599905015,
+                "route_pack_seconds": 0.0018946109994431026,
+                "route_transfer_seconds": 0.0,
+                "selector_seconds": 0.18787293199784472,
+                "needle_layer_group_hit_rate": 0.8571429252624512,
+                "needle_any_group_all_layers_rate": 0.9285714626312256,
+                "seconds": 3.5683892069992,
+                "prefill_seconds": 2.6307958959987445,
+                "decode_seconds": 0.9375933110004553,
+                "live_prefill_seconds": 2.8186688279965892,
+                "live_total_seconds": 3.7562621389970445
+              },
+              {
+                "feature_load_seconds": 0.3435708209999575,
+                "tree_build_seconds": 0.007196462000138126,
+                "tree_traversal_seconds": 0.1774496559992258,
+                "route_pack_seconds": 0.0019048489994020201,
+                "route_transfer_seconds": 0.0,
+                "selector_seconds": 0.18655096699876594,
+                "needle_layer_group_hit_rate": 0.8571429252624512,
+                "needle_any_group_all_layers_rate": 0.9285714626312256,
+                "seconds": 3.533871913999974,
+                "prefill_seconds": 2.61171038700013,
+                "decode_seconds": 0.9221615269998438,
+                "live_prefill_seconds": 2.798261353998896,
+                "live_total_seconds": 3.72042288099874
+              },
+              {
+                "feature_load_seconds": 0.33055403099933756,
+                "tree_build_seconds": 0.007169292000980931,
+                "tree_traversal_seconds": 0.1768769970003632,
+                "route_pack_seconds": 0.001869333000286133,
+                "route_transfer_seconds": 0.0,
+                "selector_seconds": 0.18591562200163025,
+                "needle_layer_group_hit_rate": 0.8571429252624512,
+                "needle_any_group_all_layers_rate": 0.9285714626312256,
+                "seconds": 3.550514764001491,
+                "prefill_seconds": 2.6148406750016875,
+                "decode_seconds": 0.9356740889998036,
+                "live_prefill_seconds": 2.8007562970033177,
+                "live_total_seconds": 3.7364303860031214
+              }
+            ]
+          },
+          "dense": {
+            "exact": true,
+            "fuzzy": 1.0,
+            "answer": " The Nova access code is 4816. The meeting archive contained budget notes, calendar changes, and vendor summaries. The meeting archive contained budget notes,",
+            "needle": "the nova access code is 4816.",
+            "prefill_seconds": 3.8611491410010785,
+            "decode_seconds": 0.9212329769998178,
+            "seconds": 4.782382118000896,
+            "answer_repeat_match": true,
+            "timing_samples": [
+              {
+                "seconds": 4.782382118000896,
+                "prefill_seconds": 3.8611491410010785,
+                "decode_seconds": 0.9212329769998178
+              },
+              {
+                "seconds": 4.767079047000152,
+                "prefill_seconds": 3.8545118830006686,
+                "decode_seconds": 0.9125671639994835
+              },
+              {
+                "seconds": 4.792921893000312,
+                "prefill_seconds": 3.8639557999995304,
+                "decode_seconds": 0.9289660930007813
+              }
+            ]
+          },
+          "answers_match": true,
+          "comparison": {
+            "kernel_prefill_speedup": 1.4766288355211497,
+            "live_prefill_speedup": 1.3786094652834782,
+            "live_total_speedup": 1.2799334187827958
+          }
+        },
+        {
+          "case_id": "color_green_bob",
+          "seq_len": 14745,
+          "block_size": 64,
+          "needle_block": 59,
+          "teacher_target": "/content/SPRUCE/teacher_targets/1.5B_heldout_0.05-0.95/teacher_color_green_bob_len14745_blk64_d0.259059.pt",
+          "sparse": {
+            "exact": true,
+            "fuzzy": 1.0,
+            "answer": " Bob's favorite color is green. The quarterly logistics report noted no unusual activity. The quarterly logistics report noted no unusual activity. The quarterly logistics report noted no unusual",
+            "needle": "bobs favorite color is green.",
+            "feature_load_seconds": 0.11539254799936316,
+            "tree_build_seconds": 0.0062118269997881725,
+            "tree_traversal_seconds": 0.070994449999489,
+            "route_pack_seconds": 0.0010934950005321298,
+            "route_transfer_seconds": 0.0,
+            "selector_seconds": 0.07829977199980931,
+            "prefill_seconds": 1.2253238980010792,
+            "decode_seconds": 0.9320340799986297,
+            "seconds": 2.157671169999958,
+            "live_prefill_seconds": 1.3036236700008885,
+            "live_total_seconds": 2.2365293519997067,
+            "needle_layer_group_hit_rate": 0.8571429252624512,
+            "needle_any_group_all_layers_rate": 0.9285714626312256,
+            "answer_repeat_match": true,
+            "timing_samples": [
+              {
+                "feature_load_seconds": 0.11778119100017648,
+                "tree_build_seconds": 0.006505285000457661,
+                "tree_traversal_seconds": 0.07109443999979703,
+                "route_pack_seconds": 0.0012584569994942285,
+                "route_transfer_seconds": 0.0,
+                "selector_seconds": 0.07885818199974892,
+                "needle_layer_group_hit_rate": 0.8571429252624512,
+                "needle_any_group_all_layers_rate": 0.9285714626312256,
+                "seconds": 2.157671169999958,
+                "prefill_seconds": 1.225637090001328,
+                "decode_seconds": 0.9320340799986297,
+                "live_prefill_seconds": 1.304495272001077,
+                "live_total_seconds": 2.2365293519997067
+              },
+              {
+                "feature_load_seconds": 0.11539254799936316,
+                "tree_build_seconds": 0.006152833999294671,
+                "tree_traversal_seconds": 0.07091204499920423,
+                "route_pack_seconds": 0.0010205549988313578,
+                "route_transfer_seconds": 0.0,
+                "selector_seconds": 0.07808543399733026,
+                "needle_layer_group_hit_rate": 0.8571429252624512,
+                "needle_any_group_all_layers_rate": 0.9285714626312256,
+                "seconds": 2.1721370909999678,
+                "prefill_seconds": 1.223678796999593,
+                "decode_seconds": 0.9484582940003747,
+                "live_prefill_seconds": 1.3017642309969233,
+                "live_total_seconds": 2.250222524997298
+              },
+              {
+                "feature_load_seconds": 0.11453811300089001,
+                "tree_build_seconds": 0.0062118269997881725,
+                "tree_traversal_seconds": 0.070994449999489,
+                "route_pack_seconds": 0.0010934950005321298,
+                "route_transfer_seconds": 0.0,
+                "selector_seconds": 0.07829977199980931,
+                "needle_layer_group_hit_rate": 0.8571429252624512,
+                "needle_any_group_all_layers_rate": 0.9285714626312256,
+                "seconds": 2.1434914780002146,
+                "prefill_seconds": 1.2253238980010792,
+                "decode_seconds": 0.9181675799991353,
+                "live_prefill_seconds": 1.3036236700008885,
+                "live_total_seconds": 2.221791250000024
+              }
+            ]
+          },
+          "dense": {
+            "exact": true,
+            "fuzzy": 1.0,
+            "answer": " Bob's favorite color is green. The quarterly logistics report noted no unusual activity. The quarterly logistics report noted no unusual activity. The quarterly logistics report noted no unusual",
+            "needle": "bobs favorite color is green.",
+            "prefill_seconds": 1.4381267839999055,
+            "decode_seconds": 0.9203829239995684,
+            "seconds": 2.358509707999474,
+            "answer_repeat_match": true,
+            "timing_samples": [
+              {
+                "seconds": 2.413480912000523,
+                "prefill_seconds": 1.488612359000399,
+                "decode_seconds": 0.9248685530001239
+              },
+              {
+                "seconds": 2.3398741940000036,
+                "prefill_seconds": 1.4352848090002226,
+                "decode_seconds": 0.904589384999781
+              },
+              {
+                "seconds": 2.358509707999474,
+                "prefill_seconds": 1.4381267839999055,
+                "decode_seconds": 0.9203829239995684
+              }
+            ]
+          },
+          "answers_match": true,
+          "comparison": {
+            "kernel_prefill_speedup": 1.1736707219584799,
+            "live_prefill_speedup": 1.1031763361576008,
+            "live_total_speedup": 1.0545400201838189
+          }
+        },
+        {
+          "case_id": "color_green_bob",
+          "seq_len": 14745,
+          "block_size": 64,
+          "needle_block": 80,
+          "teacher_target": "/content/SPRUCE/teacher_targets/1.5B_heldout_0.05-0.95/teacher_color_green_bob_len14745_blk64_d0.351676.pt",
+          "sparse": {
+            "exact": true,
+            "fuzzy": 1.0,
+            "answer": " Bob's favorite color is green. The quarterly logistics report noted no unusual activity. The quarterly logistics report noted no unusual activity. The quarterly logistics report noted no unusual",
+            "needle": "bobs favorite color is green.",
+            "feature_load_seconds": 0.1399339770014194,
+            "tree_build_seconds": 0.006173575000502751,
+            "tree_traversal_seconds": 0.07099956400088558,
+            "route_pack_seconds": 0.0012063020003552083,
+            "route_transfer_seconds": 0.0,
+            "selector_seconds": 0.07843324500026938,
+            "prefill_seconds": 1.2152717930002837,
+            "decode_seconds": 0.9132906340000773,
+            "seconds": 2.1328889160013205,
+            "live_prefill_seconds": 1.2932916039990232,
+            "live_total_seconds": 2.211494624001716,
+            "needle_layer_group_hit_rate": 0.8928571939468384,
+            "needle_any_group_all_layers_rate": 1.0,
+            "answer_repeat_match": true,
+            "timing_samples": [
+              {
+                "feature_load_seconds": 0.14395256599891582,
+                "tree_build_seconds": 0.006173575000502751,
+                "tree_traversal_seconds": 0.07102657900031772,
+                "route_pack_seconds": 0.0014055539995752042,
+                "route_transfer_seconds": 0.0,
+                "selector_seconds": 0.07860570800039568,
+                "needle_layer_group_hit_rate": 0.8928571939468384,
+                "needle_any_group_all_layers_rate": 1.0,
+                "seconds": 2.1328889160013205,
+                "prefill_seconds": 1.220829441001115,
+                "decode_seconds": 0.9120594750002056,
+                "live_prefill_seconds": 1.2994351490015106,
+                "live_total_seconds": 2.211494624001716
+              },
+              {
+                "feature_load_seconds": 0.1399339770014194,
+                "tree_build_seconds": 0.006162020999909146,
+                "tree_traversal_seconds": 0.07081666900012351,
+                "route_pack_seconds": 0.0010411209987069014,
+                "route_transfer_seconds": 0.0,
+                "selector_seconds": 0.07801981099873956,
+                "needle_layer_group_hit_rate": 0.8928571939468384,
+                "needle_any_group_all_layers_rate": 1.0,
+                "seconds": 2.128562427000361,
+                "prefill_seconds": 1.2152717930002837,
+                "decode_seconds": 0.9132906340000773,
+                "live_prefill_seconds": 1.2932916039990232,
+                "live_total_seconds": 2.2065822379991005
+              },
+              {
+                "feature_load_seconds": 0.1245009599988407,
+                "tree_build_seconds": 0.006227378999028588,
+                "tree_traversal_seconds": 0.07099956400088558,
+                "route_pack_seconds": 0.0012063020003552083,
+                "route_transfer_seconds": 0.0,
+                "selector_seconds": 0.07843324500026938,
+                "needle_layer_group_hit_rate": 0.8928571939468384,
+                "needle_any_group_all_layers_rate": 1.0,
+                "seconds": 2.1347154539998883,
+                "prefill_seconds": 1.2101498410011118,
+                "decode_seconds": 0.9245656129987765,
+                "live_prefill_seconds": 1.2885830860013812,
+                "live_total_seconds": 2.2131486990001576
+              }
+            ]
+          },
+          "dense": {
+            "exact": true,
+            "fuzzy": 1.0,
+            "answer": " Bob's favorite color is green. The quarterly logistics report noted no unusual activity. The quarterly logistics report noted no unusual activity. The quarterly logistics report noted no unusual",
+            "needle": "bobs favorite color is green.",
+            "prefill_seconds": 1.4396684280000045,
+            "decode_seconds": 0.9073930269987613,
+            "seconds": 2.3431687229985982,
+            "answer_repeat_match": true,
+            "timing_samples": [
+              {
+                "seconds": 2.33454631099994,
+                "prefill_seconds": 1.4271532840011787,
+                "decode_seconds": 0.9073930269987613
+              },
+              {
+                "seconds": 2.3431687229985982,
+                "prefill_seconds": 1.4396684280000045,
+                "decode_seconds": 0.9035002949985937
+              },
+              {
+                "seconds": 2.354886250999698,
+                "prefill_seconds": 1.4453113119998307,
+                "decode_seconds": 0.9095749389998673
+              }
+            ]
+          },
+          "answers_match": true,
+          "comparison": {
+            "kernel_prefill_speedup": 1.1846472832597608,
+            "live_prefill_speedup": 1.1131816085006394,
+            "live_total_speedup": 1.0595407728184376
+          }
+        }
+      ],
+      "aggregate": {
+        "cases": 6,
+        "answers_match_rate": 1.0,
+        "sparse_exact_rate": 1.0,
+        "dense_exact_rate": 1.0,
+        "mean_sparse_fuzzy": 1.0,
+        "mean_dense_fuzzy": 1.0,
+        "median_kernel_prefill_speedup": 1.3473969468217457,
+        "median_live_prefill_speedup": 1.2618321131978143,
+        "median_live_total_speedup": 1.1832515800268442,
+        "sum_kernel_prefill_speedup": 1.3911965263362034,
+        "sum_live_prefill_speedup": 1.3012908672453882
+      }
+    },
+    {
+      "model": "Qwen/Qwen2.5-Coder-1.5B-Instruct",
+      "gate": "/content/drive/MyDrive/SPRUCE_COLAB/selector_ckpt/flat_gate_lamt0.75_lamn0.25_lr5e4_e300.pt",
+      "selector": {
+        "mode": "live_candidate_only_tree_traversal",
+        "route_representation": "compact_leaf_ids",
+        "feature_source": "pooled_qk_loaded_from_teacher_target",
+        "feature_extraction_included": false,
+        "feature_file_loading_included": false,
+        "compute_dtype": "float16",
+        "layer_chunk": 4,
+        "beam": 16,
+        "radix": 2,
+        "k_selected": 18,
+        "local_window": 1
+      },
+      "repeats": 3,
+      "warmup_tokens": 64,
+      "cases": [
+        {
+          "case_id": "badge_elena_amber",
+          "seq_len": 15209,
+          "block_size": 64,
+          "needle_block": 60,
+          "teacher_target": "/content/SPRUCE/teacher_targets/1.5B_heldout_0.05-0.95/teacher_badge_elena_amber_len15209_blk64_d0.256369.pt",
+          "sparse": {
+            "exact": true,
+            "fuzzy": 1.0,
+            "answer": " Elena selected the amber badge for the audit. The compliance memo repeated ordinary review steps and noncritical status updates. The compliance memo repeated ordinary review steps and noncritical",
+            "needle": "elena selected the amber badge for the audit.",
+            "feature_load_seconds": 0.13236258899996756,
+            "tree_build_seconds": 0.006205050000062329,
+            "tree_traversal_seconds": 0.07959272600055556,
+            "route_pack_seconds": 0.0013921709996793652,
+            "route_transfer_seconds": 0.0,
+            "selector_seconds": 0.0871815640002751,
+            "prefill_seconds": 1.2752862099987397,
+            "decode_seconds": 0.9152676899993821,
+            "seconds": 2.1888071229986963,
+            "live_prefill_seconds": 1.3624677739990148,
+            "live_total_seconds": 2.2759886869989714,
+            "needle_layer_group_hit_rate": 0.8571429252624512,
+            "needle_any_group_all_layers_rate": 0.9642857313156128,
+            "answer_repeat_match": true,
+            "timing_samples": [
+              {
+                "feature_load_seconds": 0.13136743899849535,
+                "tree_build_seconds": 0.006205050000062329,
+                "tree_traversal_seconds": 0.07922888700159092,
+                "route_pack_seconds": 0.001320969000516925,
+                "route_transfer_seconds": 0.0,
+                "selector_seconds": 0.08675490600217017,
+                "needle_layer_group_hit_rate": 0.8571429252624512,
+                "needle_any_group_all_layers_rate": 0.9642857313156128,
+                "seconds": 3.0319186670003546,
+                "prefill_seconds": 2.1014011900006153,
+                "decode_seconds": 0.9305174769997393,
+                "live_prefill_seconds": 2.1881560960027855,
+                "live_total_seconds": 3.118673573002525
+              },
+              {
+                "feature_load_seconds": 0.13735856200037233,
+                "tree_build_seconds": 0.00702918700153532,
+                "tree_traversal_seconds": 0.0796351009994396,
+                "route_pack_seconds": 0.0013921709996793652,
+                "route_transfer_seconds": 0.0,
+                "selector_seconds": 0.08805645900065429,
+                "needle_layer_group_hit_rate": 0.8571429252624512,
+                "needle_any_group_all_layers_rate": 0.9642857313156128,
+                "seconds": 2.1769401309993555,
+                "prefill_seconds": 1.2616724409999733,
+                "decode_seconds": 0.9152676899993821,
+                "live_prefill_seconds": 1.3497289000006276,
+                "live_total_seconds": 2.2649965900000097
+              },
+              {
+                "feature_load_seconds": 0.13236258899996756,
+                "tree_build_seconds": 0.006165598000734462,
+                "tree_traversal_seconds": 0.07959272600055556,
+                "route_pack_seconds": 0.001423239998985082,
+                "route_transfer_seconds": 0.0,
+                "selector_seconds": 0.0871815640002751,
+                "needle_layer_group_hit_rate": 0.8571429252624512,
+                "needle_any_group_all_layers_rate": 0.9642857313156128,
+                "seconds": 2.1888071229986963,
+                "prefill_seconds": 1.2752862099987397,
+                "decode_seconds": 0.9135209129999566,
+                "live_prefill_seconds": 1.3624677739990148,
+                "live_total_seconds": 2.2759886869989714
+              }
+            ]
+          },
+          "dense": {
+            "exact": true,
+            "fuzzy": 1.0,
+            "answer": " Elena selected the amber badge for the audit. The compliance memo repeated ordinary review steps and noncritical status updates. The compliance memo repeated ordinary review steps and noncritical",
+            "needle": "elena selected the amber badge for the audit.",
+            "prefill_seconds": 1.5301610360002087,
+            "decode_seconds": 0.9207305849995464,
+            "seconds": 2.455018521000966,
+            "answer_repeat_match": true,
+            "timing_samples": [
+              {
+                "seconds": 2.460891320999508,
+                "prefill_seconds": 1.5297008260004077,
+                "decode_seconds": 0.9311904949991003
+              },
+              {
+                "seconds": 2.455018521000966,
+                "prefill_seconds": 1.537954389999868,
+                "decode_seconds": 0.9170641310010978
+              },
+              {
+                "seconds": 2.450891620999755,
+                "prefill_seconds": 1.5301610360002087,
+                "decode_seconds": 0.9207305849995464
+              }
+            ]
+          },
+          "answers_match": true,
+          "comparison": {
+            "kernel_prefill_speedup": 1.1998569607380298,
+            "live_prefill_speedup": 1.1230805346015584,
+            "live_total_speedup": 1.0786602477528375
+          }
+        },
+        {
+          "case_id": "badge_elena_amber",
+          "seq_len": 30419,
+          "block_size": 64,
+          "needle_block": 275,
+          "teacher_target": "/content/SPRUCE/teacher_targets/1.5B_heldout_0.05-0.95/teacher_badge_elena_amber_len30419_blk64_d0.579381.pt",
+          "sparse": {
+            "exact": true,
+            "fuzzy": 1.0,
+            "answer": " Elena selected the amber badge for the audit. The compliance memo repeated ordinary review steps and noncritical status updates. The compliance memo repeated ordinary review steps and noncritical",
+            "needle": "elena selected the amber badge for the audit.",
+            "feature_load_seconds": 0.32387678700069955,
+            "tree_build_seconds": 0.00685140400128148,
+            "tree_traversal_seconds": 0.19316173900006106,
+            "route_pack_seconds": 0.0018366539989074226,
+            "route_transfer_seconds": 0.0,
+            "selector_seconds": 0.20175142100015364,
+            "prefill_seconds": 2.5750628230016446,
+            "decode_seconds": 0.9206766759998573,
+            "seconds": 3.495739499001502,
+            "live_prefill_seconds": 2.776814244001798,
+            "live_total_seconds": 3.6974909200016555,
+            "needle_layer_group_hit_rate": 0.8571429252624512,
+            "needle_any_group_all_layers_rate": 0.9642857313156128,
+            "answer_repeat_match": true,
+            "timing_samples": [
+              {
+                "feature_load_seconds": 0.32629582099980325,
+                "tree_build_seconds": 0.006863644000986824,
+                "tree_traversal_seconds": 0.1922431589991902,
+                "route_pack_seconds": 0.001867506000053254,
+                "route_transfer_seconds": 0.0,
+                "selector_seconds": 0.20097430900023028,
+                "needle_layer_group_hit_rate": 0.8571429252624512,
+                "needle_any_group_all_layers_rate": 0.9642857313156128,
+                "seconds": 3.482074333000128,
+                "prefill_seconds": 2.563884306999171,
+                "decode_seconds": 0.918190026000957,
+                "live_prefill_seconds": 2.764858615999401,
+                "live_total_seconds": 3.683048642000358
+              },
+              {
+                "feature_load_seconds": 0.32387678700069955,
+                "tree_build_seconds": 0.006815509001171449,
+                "tree_traversal_seconds": 0.19316173900006106,
+                "route_pack_seconds": 0.0017741729989211308,
+                "route_transfer_seconds": 0.0,
+                "selector_seconds": 0.20175142100015364,
+                "needle_layer_group_hit_rate": 0.8571429252624512,
+                "needle_any_group_all_layers_rate": 0.9642857313156128,
+                "seconds": 3.495739499001502,
+                "prefill_seconds": 2.5750628230016446,
+                "decode_seconds": 0.9206766759998573,
+                "live_prefill_seconds": 2.776814244001798,
+                "live_total_seconds": 3.6974909200016555
+              },
+              {
+                "feature_load_seconds": 0.3167655500001274,
+                "tree_build_seconds": 0.00685140400128148,
+                "tree_traversal_seconds": 0.19326746700062358,
+                "route_pack_seconds": 0.0018366539989074226,
+                "route_transfer_seconds": 0.0,
+                "selector_seconds": 0.20195552500081249,
+                "needle_layer_group_hit_rate": 0.8571429252624512,
+                "needle_any_group_all_layers_rate": 0.9642857313156128,
+                "seconds": 3.532431629000712,
+                "prefill_seconds": 2.6115622540000913,
+                "decode_seconds": 0.9208693750006205,
+                "live_prefill_seconds": 2.813517779000904,
+                "live_total_seconds": 3.7343871540015243
+              }
+            ]
+          },
+          "dense": {
+            "exact": true,
+            "fuzzy": 1.0,
+            "answer": " Elena selected the amber badge for the audit. The compliance memo repeated ordinary review steps and noncritical status updates. The compliance memo repeated ordinary review steps and noncritical",
+            "needle": "elena selected the amber badge for the audit.",
+            "prefill_seconds": 3.8135526470014156,
+            "decode_seconds": 0.9180508779991214,
+            "seconds": 4.731603525000537,
+            "answer_repeat_match": true,
+            "timing_samples": [
+              {
+                "seconds": 4.706321257999662,
+                "prefill_seconds": 3.7839336739998544,
+                "decode_seconds": 0.9223875839998072
+              },
+              {
+                "seconds": 4.731603525000537,
+                "prefill_seconds": 3.8135526470014156,
+                "decode_seconds": 0.9180508779991214
+              },
+              {
+                "seconds": 4.767964221000511,
+                "prefill_seconds": 3.8577843599996413,
+                "decode_seconds": 0.91017986100087
+              }
+            ]
+          },
+          "answers_match": true,
+          "comparison": {
+            "kernel_prefill_speedup": 1.4809551879422167,
+            "live_prefill_speedup": 1.3733553316499576,
+            "live_total_speedup": 1.2796795522620021
+          }
+        },
+        {
+          "case_id": "code_nova_4816",
+          "seq_len": 30573,
+          "block_size": 64,
+          "needle_block": 74,
+          "teacher_target": "/content/SPRUCE/teacher_targets/1.5B_heldout_0.05-0.95/teacher_code_nova_4816_len30573_blk64_d0.15631.pt",
+          "sparse": {
+            "exact": true,
+            "fuzzy": 1.0,
+            "answer": " The Nova access code is 4816. The meeting archive contained budget notes, calendar changes, and vendor summaries. The meeting archive contained budget notes,",
+            "needle": "the nova access code is 4816.",
+            "feature_load_seconds": 0.3235144890004449,
+            "tree_build_seconds": 0.0071610699997108895,
+            "tree_traversal_seconds": 0.1965074409999943,
+            "route_pack_seconds": 0.0019390429988561664,
+            "route_transfer_seconds": 0.0,
+            "selector_seconds": 0.20560968100107857,
+            "prefill_seconds": 2.660274677999041,
+            "decode_seconds": 0.9169751890003681,
+            "seconds": 3.5797898920009175,
+            "live_prefill_seconds": 2.8651715599989984,
+            "live_total_seconds": 3.785504329000105,
+            "needle_layer_group_hit_rate": 0.8571429252624512,
+            "needle_any_group_all_layers_rate": 0.9285714626312256,
+            "answer_repeat_match": true,
+            "timing_samples": [
+              {
+                "feature_load_seconds": 0.3270440470005269,
+                "tree_build_seconds": 0.007176857001468306,
+                "tree_traversal_seconds": 0.19578098199963279,
+                "route_pack_seconds": 0.0019390429988561664,
+                "route_transfer_seconds": 0.0,
+                "selector_seconds": 0.20489688199995726,
+                "needle_layer_group_hit_rate": 0.8571429252624512,
+                "needle_any_group_all_layers_rate": 0.9285714626312256,
+                "seconds": 3.5772498669994093,
+                "prefill_seconds": 2.660274677999041,
+                "decode_seconds": 0.9169751890003681,
+                "live_prefill_seconds": 2.8651715599989984,
+                "live_total_seconds": 3.7821467489993665
+              },
+              {
+                "feature_load_seconds": 0.3210128610007814,
+                "tree_build_seconds": 0.0071566879996680655,
+                "tree_traversal_seconds": 0.1965074409999943,
+                "route_pack_seconds": 0.0019455520014162175,
+                "route_transfer_seconds": 0.0,
+                "selector_seconds": 0.20560968100107857,
+                "needle_layer_group_hit_rate": 0.8571429252624512,
+                "needle_any_group_all_layers_rate": 0.9285714626312256,
+                "seconds": 3.5893135420010367,
+                "prefill_seconds": 2.676566009000453,
+                "decode_seconds": 0.9127475330005836,
+                "live_prefill_seconds": 2.8821756900015316,
+                "live_total_seconds": 3.7949232230021153
+              },
+              {
+                "feature_load_seconds": 0.3235144890004449,
+                "tree_build_seconds": 0.0071610699997108895,
+                "tree_traversal_seconds": 0.1966664169995056,
+                "route_pack_seconds": 0.001886949999970966,
+                "route_transfer_seconds": 0.0,
+                "selector_seconds": 0.20571443699918746,
+                "needle_layer_group_hit_rate": 0.8571429252624512,
+                "needle_any_group_all_layers_rate": 0.9285714626312256,
+                "seconds": 3.5797898920009175,
+                "prefill_seconds": 2.6577649179998843,
+                "decode_seconds": 0.9220249740010331,
+                "live_prefill_seconds": 2.863479354999072,
+                "live_total_seconds": 3.785504329000105
+              }
+            ]
+          },
+          "dense": {
+            "exact": true,
+            "fuzzy": 1.0,
+            "answer": " The Nova access code is 4816. The meeting archive contained budget notes, calendar changes, and vendor summaries. The meeting archive contained budget notes,",
+            "needle": "the nova access code is 4816.",
+            "prefill_seconds": 3.86627537700042,
+            "decode_seconds": 0.9213493740007834,
+            "seconds": 4.789814905001549,
+            "answer_repeat_match": true,
+            "timing_samples": [
+              {
+                "seconds": 4.794876584001031,
+                "prefill_seconds": 3.86627537700042,
+                "decode_seconds": 0.9286012070006109
+              },
+              {
+                "seconds": 4.771224676000202,
+                "prefill_seconds": 3.8498753019994183,
+                "decode_seconds": 0.9213493740007834
+              },
+              {
+                "seconds": 4.789814905001549,
+                "prefill_seconds": 3.874446715000886,
+                "decode_seconds": 0.9153681900006632
+              }
+            ]
+          },
+          "answers_match": true,
+          "comparison": {
+            "kernel_prefill_speedup": 1.4533369087693182,
+            "live_prefill_speedup": 1.3494044932519753,
+            "live_total_speedup": 1.2653042999601378
+          }
+        },
+        {
+          "case_id": "code_nova_4816",
+          "seq_len": 30573,
+          "block_size": 64,
+          "needle_block": 245,
+          "teacher_target": "/content/SPRUCE/teacher_targets/1.5B_heldout_0.05-0.95/teacher_code_nova_4816_len30573_blk64_d0.514987.pt",
+          "sparse": {
+            "exact": true,
+            "fuzzy": 1.0,
+            "answer": " The Nova access code is 4816. The meeting archive contained budget notes, calendar changes, and vendor summaries. The meeting archive contained budget notes,",
+            "needle": "the nova access code is 4816.",
+            "feature_load_seconds": 0.32856548199924873,
+            "tree_build_seconds": 0.007196250000561122,
+            "tree_traversal_seconds": 0.19549489000019094,
+            "route_pack_seconds": 0.0019232459999329876,
+            "route_transfer_seconds": 0.0,
+            "selector_seconds": 0.20458771999983583,
+            "prefill_seconds": 2.639204040999175,
+            "decode_seconds": 0.9152996379998513,
+            "seconds": 3.5545036789990263,
+            "live_prefill_seconds": 2.843709028000376,
+            "live_total_seconds": 3.759008666000227,
+            "needle_layer_group_hit_rate": 0.8571429252624512,
+            "needle_any_group_all_layers_rate": 0.9285714626312256,
+            "answer_repeat_match": true,
+            "timing_samples": [
+              {
+                "feature_load_seconds": 0.32856548199924873,
+                "tree_build_seconds": 0.008060733000093023,
+                "tree_traversal_seconds": 0.19732649999968999,
+                "route_pack_seconds": 0.0020523560015135445,
+                "route_transfer_seconds": 0.0,
+                "selector_seconds": 0.20743958900129655,
+                "needle_layer_group_hit_rate": 0.8571429252624512,
+                "needle_any_group_all_layers_rate": 0.9285714626312256,
+                "seconds": 3.5922083769983146,
+                "prefill_seconds": 2.665387272998487,
+                "decode_seconds": 0.9268211039998278,
+                "live_prefill_seconds": 2.8728268619997834,
+                "live_total_seconds": 3.799647965999611
+              },
+              {
+                "feature_load_seconds": 0.325757866999993,
+                "tree_build_seconds": 0.007147271000576438,
+                "tree_traversal_seconds": 0.19549489000019094,
+                "route_pack_seconds": 0.0018628260004334152,
+                "route_transfer_seconds": 0.0,
+                "selector_seconds": 0.2045049870012008,
+                "needle_layer_group_hit_rate": 0.8571429252624512,
+                "needle_any_group_all_layers_rate": 0.9285714626312256,
+                "seconds": 3.5545036789990263,
+                "prefill_seconds": 2.639204040999175,
+                "decode_seconds": 0.9152996379998513,
+                "live_prefill_seconds": 2.843709028000376,
+                "live_total_seconds": 3.759008666000227
+              },
+              {
+                "feature_load_seconds": 0.32972143000006326,
+                "tree_build_seconds": 0.007196250000561122,
+                "tree_traversal_seconds": 0.19546822399934172,
+                "route_pack_seconds": 0.0019232459999329876,
+                "route_transfer_seconds": 0.0,
+                "selector_seconds": 0.20458771999983583,
+                "needle_layer_group_hit_rate": 0.8571429252624512,
+                "needle_any_group_all_layers_rate": 0.9285714626312256,
+                "seconds": 3.5383920750009565,
+                "prefill_seconds": 2.623525786000755,
+                "decode_seconds": 0.9148662890002015,
+                "live_prefill_seconds": 2.828113506000591,
+                "live_total_seconds": 3.7429797950007924
+              }
+            ]
+          },
+          "dense": {
+            "exact": true,
+            "fuzzy": 1.0,
+            "answer": " The Nova access code is 4816. The meeting archive contained budget notes, calendar changes, and vendor summaries. The meeting archive contained budget notes,",
+            "needle": "the nova access code is 4816.",
+            "prefill_seconds": 3.8611491410010785,
+            "decode_seconds": 0.9212329769998178,
+            "seconds": 4.782382118000896,
+            "answer_repeat_match": true,
+            "timing_samples": [
+              {
+                "seconds": 4.782382118000896,
+                "prefill_seconds": 3.8611491410010785,
+                "decode_seconds": 0.9212329769998178
+              },
+              {
+                "seconds": 4.767079047000152,
+                "prefill_seconds": 3.8545118830006686,
+                "decode_seconds": 0.9125671639994835
+              },
+              {
+                "seconds": 4.792921893000312,
+                "prefill_seconds": 3.8639557999995304,
+                "decode_seconds": 0.9289660930007813
+              }
+            ]
+          },
+          "answers_match": true,
+          "comparison": {
+            "kernel_prefill_speedup": 1.4629975860219158,
+            "live_prefill_speedup": 1.3577862935281184,
+            "live_total_speedup": 1.272245568693937
+          }
+        },
+        {
+          "case_id": "color_green_bob",
+          "seq_len": 14745,
+          "block_size": 64,
+          "needle_block": 59,
+          "teacher_target": "/content/SPRUCE/teacher_targets/1.5B_heldout_0.05-0.95/teacher_color_green_bob_len14745_blk64_d0.259059.pt",
+          "sparse": {
+            "exact": true,
+            "fuzzy": 1.0,
+            "answer": " Bob's favorite color is green. The quarterly logistics report noted no unusual activity. The quarterly logistics report noted no unusual activity. The quarterly logistics report noted no unusual",
+            "needle": "bobs favorite color is green.",
+            "feature_load_seconds": 0.1214645969994308,
+            "tree_build_seconds": 0.0062191850011004135,
+            "tree_traversal_seconds": 0.07753370399950654,
+            "route_pack_seconds": 0.0011104069999419153,
+            "route_transfer_seconds": 0.0,
+            "selector_seconds": 0.08486329600054887,
+            "prefill_seconds": 1.2317420409999613,
+            "decode_seconds": 0.9325676540011045,
+            "seconds": 2.164309695001066,
+            "live_prefill_seconds": 1.3168830220001837,
+            "live_total_seconds": 2.2494506760012882,
+            "needle_layer_group_hit_rate": 0.8750000596046448,
+            "needle_any_group_all_layers_rate": 0.9642857313156128,
+            "answer_repeat_match": true,
+            "timing_samples": [
+              {
+                "feature_load_seconds": 0.12374087500029418,
+                "tree_build_seconds": 0.0062191850011004135,
+                "tree_traversal_seconds": 0.07753370399950654,
+                "route_pack_seconds": 0.0011104069999419153,
+                "route_transfer_seconds": 0.0,
+                "selector_seconds": 0.08486329600054887,
+                "needle_layer_group_hit_rate": 0.8750000596046448,
+                "needle_any_group_all_layers_rate": 0.9642857313156128,
+                "seconds": 2.1568440749997535,
+                "prefill_seconds": 1.237397623999641,
+                "decode_seconds": 0.9194464510001126,
+                "live_prefill_seconds": 1.3222609200001898,
+                "live_total_seconds": 2.2417073710003024
+              },
+              {
+                "feature_load_seconds": 0.1214645969994308,
+                "tree_build_seconds": 0.006127013999503106,
+                "tree_traversal_seconds": 0.0774489840005117,
+                "route_pack_seconds": 0.0010952869997709058,
+                "route_transfer_seconds": 0.0,
+                "selector_seconds": 0.08467128499978571,
+                "needle_layer_group_hit_rate": 0.8750000596046448,
+                "needle_any_group_all_layers_rate": 0.9642857313156128,
+                "seconds": 2.1861135919989465,
+                "prefill_seconds": 1.2309085590004543,
+                "decode_seconds": 0.9552050329984922,
+                "live_prefill_seconds": 1.31557984400024,
+                "live_total_seconds": 2.270784876998732
+              },
+              {
+                "feature_load_seconds": 0.11895141400054854,
+                "tree_build_seconds": 0.006268142999033444,
+                "tree_traversal_seconds": 0.07760651700118615,
+                "route_pack_seconds": 0.0012663210000027902,
+                "route_transfer_seconds": 0.0,
+                "selector_seconds": 0.08514098100022238,
+                "needle_layer_group_hit_rate": 0.8750000596046448,
+                "needle_any_group_all_layers_rate": 0.9642857313156128,
+                "seconds": 2.164309695001066,
+                "prefill_seconds": 1.2317420409999613,
+                "decode_seconds": 0.9325676540011045,
+                "live_prefill_seconds": 1.3168830220001837,
+                "live_total_seconds": 2.2494506760012882
+              }
+            ]
+          },
+          "dense": {
+            "exact": true,
+            "fuzzy": 1.0,
+            "answer": " Bob's favorite color is green. The quarterly logistics report noted no unusual activity. The quarterly logistics report noted no unusual activity. The quarterly logistics report noted no unusual",
+            "needle": "bobs favorite color is green.",
+            "prefill_seconds": 1.4381267839999055,
+            "decode_seconds": 0.9203829239995684,
+            "seconds": 2.358509707999474,
+            "answer_repeat_match": true,
+            "timing_samples": [
+              {
+                "seconds": 2.413480912000523,
+                "prefill_seconds": 1.488612359000399,
+                "decode_seconds": 0.9248685530001239
+              },
+              {
+                "seconds": 2.3398741940000036,
+                "prefill_seconds": 1.4352848090002226,
+                "decode_seconds": 0.904589384999781
+              },
+              {
+                "seconds": 2.358509707999474,
+                "prefill_seconds": 1.4381267839999055,
+                "decode_seconds": 0.9203829239995684
+              }
+            ]
+          },
+          "answers_match": true,
+          "comparison": {
+            "kernel_prefill_speedup": 1.167555166690905,
+            "live_prefill_speedup": 1.0920687410910404,
+            "live_total_speedup": 1.0484825176038326
+          }
+        },
+        {
+          "case_id": "color_green_bob",
+          "seq_len": 14745,
+          "block_size": 64,
+          "needle_block": 80,
+          "teacher_target": "/content/SPRUCE/teacher_targets/1.5B_heldout_0.05-0.95/teacher_color_green_bob_len14745_blk64_d0.351676.pt",
+          "sparse": {
+            "exact": true,
+            "fuzzy": 1.0,
+            "answer": " Bob's favorite color is green. The quarterly logistics report noted no unusual activity. The quarterly logistics report noted no unusual activity. The quarterly logistics report noted no unusual",
+            "needle": "bobs favorite color is green.",
+            "feature_load_seconds": 0.11688173100083077,
+            "tree_build_seconds": 0.006264462999752141,
+            "tree_traversal_seconds": 0.07756408299974282,
+            "route_pack_seconds": 0.0012594969994097482,
+            "route_transfer_seconds": 0.0,
+            "selector_seconds": 0.0850910829994973,
+            "prefill_seconds": 1.2231632570001238,
+            "decode_seconds": 0.9239984390005702,
+            "seconds": 2.14712844099995,
+            "live_prefill_seconds": 1.3082543399996212,
+            "live_total_seconds": 2.2318201160014723,
+            "needle_layer_group_hit_rate": 0.9285714626312256,
+            "needle_any_group_all_layers_rate": 1.0,
+            "answer_repeat_match": true,
+            "timing_samples": [
+              {
+                "feature_load_seconds": 0.11302059400077269,
+                "tree_build_seconds": 0.006267503000344732,
+                "tree_traversal_seconds": 0.07756408299974282,
+                "route_pack_seconds": 0.0012594969994097482,
+                "route_transfer_seconds": 0.0,
+                "selector_seconds": 0.0850910829994973,
+                "needle_layer_group_hit_rate": 0.9285714626312256,
+                "needle_any_group_all_layers_rate": 1.0,
+                "seconds": 2.1467045250010415,
+                "prefill_seconds": 1.2231632570001238,
+                "decode_seconds": 0.9235412680009176,
+                "live_prefill_seconds": 1.3082543399996212,
+                "live_total_seconds": 2.2317956080005388
+              },
+              {
+                "feature_load_seconds": 0.12596006199964904,
+                "tree_build_seconds": 0.006196977999934461,
+                "tree_traversal_seconds": 0.07742676400084747,
+                "route_pack_seconds": 0.0010679330007405952,
+                "route_transfer_seconds": 0.0,
+                "selector_seconds": 0.08469167500152253,
+                "needle_layer_group_hit_rate": 0.9285714626312256,
+                "needle_any_group_all_layers_rate": 1.0,
+                "seconds": 2.14712844099995,
+                "prefill_seconds": 1.2231300019993796,
+                "decode_seconds": 0.9239984390005702,
+                "live_prefill_seconds": 1.3078216770009021,
+                "live_total_seconds": 2.2318201160014723
+              },
+              {
+                "feature_load_seconds": 0.11688173100083077,
+                "tree_build_seconds": 0.006264462999752141,
+                "tree_traversal_seconds": 0.07764955399943574,
+                "route_pack_seconds": 0.0013425459983409382,
+                "route_transfer_seconds": 0.0,
+                "selector_seconds": 0.08525656299752882,
+                "needle_layer_group_hit_rate": 0.9285714626312256,
+                "needle_any_group_all_layers_rate": 1.0,
+                "seconds": 2.1486974630006443,
+                "prefill_seconds": 1.2233743510005297,
+                "decode_seconds": 0.9253231120001146,
+                "live_prefill_seconds": 1.3086309139980585,
+                "live_total_seconds": 2.233954025998173
+              }
+            ]
+          },
+          "dense": {
+            "exact": true,
+            "fuzzy": 1.0,
+            "answer": " Bob's favorite color is green. The quarterly logistics report noted no unusual activity. The quarterly logistics report noted no unusual activity. The quarterly logistics report noted no unusual",
+            "needle": "bobs favorite color is green.",
+            "prefill_seconds": 1.4396684280000045,
+            "decode_seconds": 0.9073930269987613,
+            "seconds": 2.3431687229985982,
+            "answer_repeat_match": true,
+            "timing_samples": [
+              {
+                "seconds": 2.33454631099994,
+                "prefill_seconds": 1.4271532840011787,
+                "decode_seconds": 0.9073930269987613
+              },
+              {
+                "seconds": 2.3431687229985982,
+                "prefill_seconds": 1.4396684280000045,
+                "decode_seconds": 0.9035002949985937
+              },
+              {
+                "seconds": 2.354886250999698,
+                "prefill_seconds": 1.4453113119998307,
+                "decode_seconds": 0.9095749389998673
+              }
+            ]
+          },
+          "answers_match": true,
+          "comparison": {
+            "kernel_prefill_speedup": 1.1770043121887683,
+            "live_prefill_speedup": 1.1004499537914174,
+            "live_total_speedup": 1.0498913896325202
+          }
+        }
+      ],
+      "aggregate": {
+        "cases": 6,
+        "answers_match_rate": 1.0,
+        "sparse_exact_rate": 1.0,
+        "dense_exact_rate": 1.0,
+        "mean_sparse_fuzzy": 1.0,
+        "mean_dense_fuzzy": 1.0,
+        "median_kernel_prefill_speedup": 1.326596934753674,
+        "median_live_prefill_speedup": 1.2362425139267668,
+        "median_live_total_speedup": 1.1719822738564876,
+        "sum_kernel_prefill_speedup": 1.3743472895315623,
+        "sum_live_prefill_speedup": 1.278645863878822
+      }
+    }
+  ]
+}

@@ -2,6 +2,7 @@
 import argparse
 import gc
 import json
+import math
 import os
 import sys
 import tempfile
@@ -97,6 +98,15 @@ def _free_model(model):
     gc.collect()
     if torch.cuda.is_available():
         torch.cuda.empty_cache()
+    return None
+
+
+def _warmup(model, inputs, *, prefill_kwargs=None):
+    """Compile/initialize the active backend without charging the measured run."""
+    _generate(model, inputs, 1, prefill_kwargs=prefill_kwargs)
+    gc.collect()
+    if torch.cuda.is_available():
+        torch.cuda.synchronize()
 
 
 def main():
@@ -106,6 +116,10 @@ def main():
     parser.add_argument("--teacher-target", help="defaults to source recorded in selected-block artifact")
     parser.add_argument("--prompt-bank")
     parser.add_argument("--max-new-tokens", type=int, default=32)
+    parser.add_argument(
+        "--warmup-tokens", type=int, default=64,
+        help="untimed prompt-prefix length used to initialize each backend; 0 disables warm-up",
+    )
     parser.add_argument("--dtype", choices=("auto", "float16", "bfloat16"), default="auto")
     parser.add_argument("--out", required=True, help="JSON result path")
     parser.add_argument(
@@ -126,9 +140,30 @@ def main():
     if encoded.input_ids.shape[1] != meta["seq_len"]:
         raise SystemExit("reconstructed prompt token count does not match selected-block artifact")
     dtype = {"auto": "auto", "float16": torch.float16, "bfloat16": torch.bfloat16}[args.dtype]
+    if args.warmup_tokens < 0:
+        raise SystemExit("--warmup-tokens must be non-negative")
+    warmup_tokens = min(args.warmup_tokens, encoded.input_ids.shape[1])
+    warmup_inputs = {
+        name: value[:, :warmup_tokens] for name, value in encoded.items()
+    } if warmup_tokens else None
 
     register_triton_sparse_prefill_attention()
     sparse_model = _load_model(args.model, SPRUCE_TRITON_SPARSE_PREFILL, dtype, args.load_offload_dir)
+    if warmup_inputs is not None:
+        # Repeating causal block 0 is warm-up-only: it exercises all K kernel
+        # slots so Triton autotunes the real loop workload at only 64 tokens.
+        warmup_blocks = selected.new_zeros(
+            (*selected.shape[:3], math.ceil(warmup_tokens / int(meta["block_size"])), selected.shape[-1]),
+        )
+        _warmup(
+            sparse_model,
+            warmup_inputs,
+            prefill_kwargs={
+                "selected_blocks": warmup_blocks.to(_model_device(sparse_model)),
+                "block_size": int(meta["block_size"]),
+                "validate_selected_blocks_input": False,
+            },
+        )
     sparse_ids, sparse_timing = _generate(
         sparse_model, encoded, args.max_new_tokens,
         prefill_kwargs={
@@ -138,16 +173,19 @@ def main():
         },
     )
     sparse_answer = tokenizer.decode(sparse_ids, skip_special_tokens=True)
-    _free_model(sparse_model)
+    sparse_model = _free_model(sparse_model)
 
     dense_model = _load_model(args.model, "sdpa", dtype, args.load_offload_dir)
+    if warmup_inputs is not None:
+        _warmup(dense_model, warmup_inputs)
     dense_ids, dense_timing = _generate(dense_model, encoded, args.max_new_tokens)
     dense_answer = tokenizer.decode(dense_ids, skip_special_tokens=True)
-    _free_model(dense_model)
+    dense_model = _free_model(dense_model)
 
     result = {
         "model": args.model, "case_id": teacher["case_id"], "seq_len": int(meta["seq_len"]),
         "block_size": int(meta["block_size"]), "needle_block": int(teacher["needle_block"]),
+        "warmup_tokens": warmup_tokens,
         "sparse": {**score_retrival(sparse_answer, teacher["needle"]), **sparse_timing},
         "dense": {**score_retrival(dense_answer, teacher["needle"]), **dense_timing},
         "answers_match": sparse_answer.strip() == dense_answer.strip(),

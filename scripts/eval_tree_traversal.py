@@ -41,50 +41,104 @@ def expand_paths(patterns):
 
 def child_parent_index(parent_level, child_level):
     """Map each child node to its parent node in the next coarser level."""
-    parent_for_child = []
-    for cs, ce in zip(child_level.starts.tolist(), child_level.ends.tolist()):
-        matches = ((parent_level.starts <= cs) & (ce <= parent_level.ends)).nonzero()
-        if matches.numel() != 1:
-            raise ValueError(
-                f"child range [{cs}, {ce}) matched {matches.numel()} parents")
-        parent_for_child.append(int(matches[0]))
-    return torch.tensor(parent_for_child, device=child_level.starts.device)
+    # Parent ranges are sorted, non-overlapping, and use exclusive ends.
+    # searchsorted avoids per-node .tolist() calls and GPU/CPU synchronization.
+    parent_for_child = torch.searchsorted(
+        parent_level.ends, child_level.starts, right=True)
+    if torch.any(parent_for_child >= parent_level.ends.numel()):
+        raise ValueError("a child range falls outside all parent ranges")
+    parent_starts = parent_level.starts.index_select(0, parent_for_child)
+    parent_ends = parent_level.ends.index_select(0, parent_for_child)
+    valid = ((parent_starts <= child_level.starts)
+             & (child_level.ends <= parent_ends))
+    if not bool(valid.all()):
+        raise ValueError("a child range does not fit exactly one parent range")
+    return parent_for_child
 
 
 @torch.no_grad()
-def traverse_to_leaf(gate, q_feat, key_levels, beam):
-    """Return final selected leaf mask [L,G,qb,kb] from root-to-leaf traversal."""
+def traverse_to_leaf_ids(
+        gate, q_feat, key_levels, beam, radix=2, layer_chunk=1):
+    """Return compact selected leaf IDs ``[L,G,qb,C]``.
+
+    Invalid tail slots are ``-1``. Keeping IDs compact avoids materializing the
+    quadratic-in-block-count leaf mask on the deployed inference path.
+    """
     if beam < 1:
         raise ValueError(f"beam must be >= 1, got {beam}")
+    if radix < 2:
+        raise ValueError(f"radix must be >= 2, got {radix}")
+    if layer_chunk < 1:
+        raise ValueError(f"layer_chunk must be >= 1, got {layer_chunk}")
 
     device = q_feat.device
     L, G, qb = q_feat.shape[:3]
     root_level = key_levels[-1]
-    root_nodes = root_level.features.shape[2]
+    if root_level.features.shape[2] != 1:
+        raise ValueError("key tree must end in exactly one root node")
 
-    selected = torch.ones((L, G, qb, root_nodes), dtype=torch.bool, device=device)
-    q = torch.arange(qb, device=device)
+    # Fixed-width IDs avoid materializing a [L,G,qb,nodes] mask at each level.
+    selected_ids = torch.zeros((L, G, qb, 1), dtype=torch.long, device=device)
+    query_ids = torch.arange(qb, device=device)
+    child_offsets = torch.arange(radix, device=device)
+    projected_q = gate.project_queries(q_feat)
 
     for child_level_idx in range(len(key_levels) - 2, -1, -1):
         child_level = key_levels[child_level_idx]
-        parent_level = key_levels[child_level_idx + 1]
-        parent_for_child = child_parent_index(parent_level, child_level)
+        child_count = child_level.features.shape[2]
+        candidates = (
+            selected_ids[..., None] * radix + child_offsets
+        ).flatten(start_dim=-2)
+        valid_parent = (selected_ids[..., None] >= 0).expand(
+            *selected_ids.shape, radix).flatten(start_dim=-2)
+        valid = valid_parent & (candidates < child_count)
+        safe_candidates = candidates.clamp(min=0, max=child_count - 1)
+        candidate_starts = child_level.starts.index_select(
+            0, safe_candidates.reshape(-1)).reshape_as(safe_candidates)
+        valid = valid & (candidate_starts <= query_ids[None, None, :, None])
 
-        parent_selected = selected.index_select(-1, parent_for_child)
-        causal = child_level.starts[None, :] <= q[:, None]
-        candidates = parent_selected & causal[None, None]
-
-        scores = gate(q_feat, child_level.features)
+        projected_k = gate.project_keys(child_level.features)
+        scores = gate.score_projected_candidates(
+            projected_q, projected_k, safe_candidates,
+            layer_chunk=layer_chunk)
         neg_inf = torch.finfo(scores.dtype).min
-        masked = scores.masked_fill(~candidates, neg_inf)
+        masked = scores.masked_fill(~valid, neg_inf)
 
-        k = min(beam, child_level.features.shape[2])
+        k = min(beam, candidates.shape[-1], child_count)
         top = masked.topk(k, dim=-1).indices
-        selected = torch.zeros_like(candidates)
-        selected.scatter_(-1, top, True)
-        selected &= candidates
+        selected_ids = candidates.gather(-1, top)
+        selected_valid = valid.gather(-1, top)
+        selected_ids = selected_ids.masked_fill(~selected_valid, -1)
 
-    return selected
+    return selected_ids
+
+
+@torch.no_grad()
+def leaf_ids_to_mask(selected_ids, leaf_count):
+    """Convert compact ``[L,G,qb,C]`` IDs to an evaluation-only leaf mask."""
+    if selected_ids.dim() != 4:
+        raise ValueError(
+            f"selected_ids must be [L,G,qb,C], got {tuple(selected_ids.shape)}")
+    if leaf_count < 1:
+        raise ValueError(f"leaf_count must be >= 1, got {leaf_count}")
+    L, G, qb = selected_ids.shape[:3]
+    device = selected_ids.device
+    safe_ids = selected_ids.clamp(min=0, max=leaf_count)
+    safe_ids = safe_ids.masked_fill(selected_ids < 0, leaf_count)
+    with_pad = torch.zeros(
+        (L, G, qb, leaf_count + 1), dtype=torch.bool, device=device)
+    with_pad.scatter_(-1, safe_ids, True)
+    return with_pad[..., :leaf_count]
+
+
+@torch.no_grad()
+def traverse_to_leaf(gate, q_feat, key_levels, beam, radix=2, layer_chunk=1):
+    """Return evaluation mask ``[L,G,qb,kb]`` using compact traversal."""
+    selected_ids = traverse_to_leaf_ids(
+        gate, q_feat, key_levels, beam, radix=radix,
+        layer_chunk=layer_chunk)
+    return leaf_ids_to_mask(
+        selected_ids, key_levels[0].features.shape[2])
 
 
 @torch.no_grad()
@@ -179,7 +233,8 @@ def main():
                   f"kb={m['kb']} levels={len(key_levels)} needle_blk={m['needle_block']}")
 
             for beam in args.beams:
-                selected = traverse_to_leaf(gate, doc["q_feat"], key_levels, beam)
+                selected = traverse_to_leaf(
+                    gate, doc["q_feat"], key_levels, beam, radix=args.radix)
                 met = leaf_metrics(
                     selected, doc["target"], doc["cmask"],
                     tuple(args.budgets), beam, m["needle_block"])

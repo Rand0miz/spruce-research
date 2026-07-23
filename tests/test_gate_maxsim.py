@@ -2,6 +2,7 @@
 import math
 
 import torch
+import selector.gate as gate_module
 
 from selector.gate import FlatGate
 
@@ -44,3 +45,31 @@ def test_gradient_flow():
     assert gate.Wq.grad is not None and gate.Wk.grad is not None
     assert torch.count_nonzero(gate.Wq.grad) > 0, "Wq.grad is all zero"
     assert torch.count_nonzero(gate.Wk.grad) > 0, "Wk.grad is all zero"
+
+
+def test_inference_skips_training_checkpoint(monkeypatch):
+    gate = FlatGate(L, d, proj_dim=d).eval()
+    q = torch.randn(L, G, qb, P, d)
+    k = torch.randn(L, G, kb, P, d)
+
+    def fail_checkpoint(*args, **kwargs):
+        raise AssertionError("inference should not invoke training checkpointing")
+
+    monkeypatch.setattr(gate_module.checkpoint, "checkpoint", fail_checkpoint)
+    with torch.no_grad():
+        output = gate(q, k)
+    assert output.shape == (L, G, qb, kb)
+
+
+def test_candidate_scores_match_flat_scores_at_gathered_ids():
+    gate = FlatGate(L, d, proj_dim=d).eval()
+    q = torch.randn(L, G, qb, P, d)
+    k = torch.randn(L, G, kb, P, d)
+    ids = torch.randint(0, kb, (L, G, qb, 2))
+
+    with torch.no_grad():
+        full = gate(q, k)
+        expected = full.gather(-1, ids)
+        actual = gate.score_candidates(q, k, ids)
+
+    torch.testing.assert_close(actual, expected, atol=1e-5, rtol=1e-5)

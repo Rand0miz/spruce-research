@@ -76,6 +76,43 @@ def _merge_node_prototypes(nodes):
     return out
 
 
+def _merge_level_prototypes(nodes, radix):
+    """Vectorized parent construction for every node group in one level."""
+    L, G, n, P, d = nodes.shape
+    parents = (n + radix - 1) // radix
+    padded_n = parents * radix
+    if padded_n != n:
+        nodes = torch.cat([
+            nodes,
+            nodes.new_zeros(L, G, padded_n - n, P, d),
+        ], dim=2)
+
+    grouped = nodes.view(L, G, parents, radix, P, d)
+    valid_children = (
+        torch.arange(padded_n, device=nodes.device).view(parents, radix) < n)
+    valid_float = valid_children[None, None, :, :, None].to(nodes.dtype)
+    counts = valid_children.sum(dim=1).clamp_min(1).to(nodes.dtype)
+    parent_mean = (
+        grouped[..., 0, :] * valid_float
+    ).sum(dim=3) / counts[None, None, :, None]
+
+    out = nodes.new_empty(L, G, parents, P, d)
+    out[..., 0, :] = parent_mean
+    if P == 1:
+        return out
+
+    candidates = grouped.reshape(L, G, parents, radix * P, d)
+    candidate_valid = valid_children[:, :, None].expand(
+        parents, radix, P).reshape(parents, radix * P)
+    dist = (candidates - parent_mean[..., None, :]).pow(2).sum(dim=-1)
+    dist = dist.masked_fill(
+        ~candidate_valid[None, None], float("-inf"))
+    idx = dist.topk(P - 1, dim=-1).indices
+    gather_idx = idx[..., None].expand(-1, -1, -1, -1, d)
+    out[..., 1:, :] = torch.gather(candidates, 3, gather_idx)
+    return out
+
+
 def build_key_tree(k_feat, radix=2):
     """Build key-node feature levels from leaf key features.
 
@@ -96,19 +133,13 @@ def build_key_tree(k_feat, radix=2):
     level = 0
     while current.shape[2] > 1:
         level += 1
-        parent_feats = []
-        parent_starts = []
-        parent_ends = []
         n = current.shape[2]
         prev = levels[-1]
-        for start in range(0, n, radix):
-            end = min(start + radix, n)
-            parent_feats.append(_merge_node_prototypes(current[:, :, start:end]))
-            parent_starts.append(prev.starts[start])
-            parent_ends.append(prev.ends[end - 1])
-        current = torch.stack(parent_feats, dim=2)           # [L, G, parent_nodes, P, d]
-        starts = torch.stack(parent_starts)
-        ends = torch.stack(parent_ends)
+        parent_count = (n + radix - 1) // radix
+        current = _merge_level_prototypes(current, radix)
+        parent_ids = torch.arange(parent_count, device=device)
+        starts = prev.starts[parent_ids * radix]
+        ends = prev.ends[((parent_ids + 1) * radix - 1).clamp_max(n - 1)]
         levels.append(KeyTreeLevel(level, current, starts, ends))
 
     return levels

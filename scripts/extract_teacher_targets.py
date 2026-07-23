@@ -1,4 +1,5 @@
 import argparse
+import gc
 import json
 import os
 import random
@@ -96,7 +97,7 @@ def save_heatmap(pooled_stack, n_blk, seq_len, depth, path):
     import matplotlib.pyplot as plt
     import numpy as np
 
-    agg = pooled_stack[0].sum(dim=(0, 1))       # [1,L,H,qb,kb] -> sum L,H -> [qb,kb]
+    agg = pooled_stack[0].float().sum(dim=(0, 1))  # [1,L,H,qb,kb] -> [qb,kb]
     grid = np.log1p(agg.detach().cpu().to(torch.float32).numpy())
     qb, kb = grid.shape
 
@@ -217,10 +218,17 @@ def main():
         dtag = depth_tag(depth)
         path = os.path.join(
             args.out, f"teacher_{case_id}_len{seq_len}_blk{args.block}_d{dtag}.pt")
-        torch.save({
-            "pooled": pooled_stack.to(store_dtype),      # [1, L, H, qb, kb]      TARGET
-            "pooledQ": pooledQ_stack.to(store_dtype),    # [1, L, G, qb, P, d]    selector input
-            "pooledK": pooledK_stack.to(store_dtype),    # [1, L, G, kb, P, d]    selector input
+        # Replace each large tensor with its storage dtype one at a time. Since
+        # get_pooled_targets already cleared the layerwise capture dictionaries,
+        # reassignment releases the FP32/model-dtype stack before converting the
+        # next tensor instead of retaining every source and converted copy.
+        pooled_stack = pooled_stack.to(store_dtype)
+        pooledQ_stack = pooledQ_stack.to(store_dtype)
+        pooledK_stack = pooledK_stack.to(store_dtype)
+        save_payload = {
+            "pooled": pooled_stack,      # [1, L, H, qb, kb]      TARGET
+            "pooledQ": pooledQ_stack,    # [1, L, G, qb, P, d]    selector input
+            "pooledK": pooledK_stack,    # [1, L, G, kb, P, d]    selector input
             "head_dim": pooledQ_stack.shape[-1],
             "num_kv_heads": pooledK_stack.shape[2],
             "seq_len": seq_len,
@@ -238,7 +246,8 @@ def main():
             "num_heads": pooled_stack.shape[2],
             "proto": pooledK_stack.shape[-2],
             "store_dtype": args.store_dtype,
-        }, path)
+        }
+        torch.save(save_payload, path)
         print(f"case={case_id}  len={seq_len:>6}  blocks={pooled_stack.shape[-1]:>4}  "
               f"depth={depth:.4f}  needle_block={n_blk:>4}  peak={peak_gb:.2f}GB  "
               f"saved={path}")
@@ -247,6 +256,16 @@ def main():
             png = path[:-3] + ".png"
             save_heatmap(pooled_stack, n_blk, seq_len, depth, png)
             print(f"          heatmap={png}")
+
+        # Do not let the completed target overlap the next forward. This is
+        # especially important because assignment to the next get_pooled_targets
+        # result happens only after that entire extraction has completed.
+        del save_payload
+        del pooled_stack, pooledQ_stack, pooledK_stack
+        del prompt, full
+        gc.collect()
+        if DEVICE == "cuda":
+            torch.cuda.empty_cache()
 
 
 if __name__ == "__main__":

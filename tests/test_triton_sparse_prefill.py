@@ -58,10 +58,41 @@ def test_triton_kernel_matches_pytorch_sparse_reference():
     if not torch.cuda.is_available():
         pytest.skip("CUDA is required")
     torch.manual_seed(0)
-    q = torch.randn(1, 2, 64, 64, device="cuda", dtype=torch.float16)
-    k = torch.randn(1, 1, 64, 64, device="cuda", dtype=torch.float16)
-    v = torch.randn(1, 1, 64, 64, device="cuda", dtype=torch.float16)
+    # Match Qwen's real projection layout: contiguous [B,T,H,D] storage
+    # viewed as non-contiguous [B,H,T,D]. The Triton path must not copy it.
+    q = torch.randn(1, 64, 2, 64, device="cuda", dtype=torch.float16).transpose(1, 2)
+    k = torch.randn(1, 64, 1, 64, device="cuda", dtype=torch.float16).transpose(1, 2)
+    v = torch.randn(1, 64, 1, 64, device="cuda", dtype=torch.float16).transpose(1, 2)
+    assert not q.is_contiguous()
     selected = torch.zeros((1, 1, 1, 1, 1), device="cuda", dtype=torch.int32)
+    module = _AttentionModule().cuda()
+    expected, _ = sparse_prefill_attention_forward(
+        module, q, k, v, None, selected_blocks=selected, block_size=64,
+        validate_selected_blocks_input=False,
+    )
+    actual, _ = triton_sparse_prefill_attention_forward(
+        module, q, k, v, None, selected_blocks=selected, block_size=64,
+    )
+    torch.testing.assert_close(actual, expected, atol=2e-2, rtol=2e-2)
+
+
+@pytest.mark.skipif(
+    os.environ.get("RUN_TRITON_TESTS") != "1",
+    reason="set RUN_TRITON_TESTS=1 on CUDA to compile and run Triton parity tests",
+)
+def test_triton_tiled_gqa_kernel_matches_reference_across_blocks():
+    if not torch.cuda.is_available():
+        pytest.skip("CUDA is required")
+    torch.manual_seed(4)
+    q = torch.randn(
+        1, 128, 4, 64, device="cuda", dtype=torch.float16).transpose(1, 2)
+    k = torch.randn(
+        1, 128, 2, 64, device="cuda", dtype=torch.float16).transpose(1, 2)
+    v = torch.randn(
+        1, 128, 2, 64, device="cuda", dtype=torch.float16).transpose(1, 2)
+    selected = torch.tensor(
+        [[[[[0, -1], [0, 1]], [[0, -1], [0, 1]]]]],
+        device="cuda", dtype=torch.int32)
     module = _AttentionModule().cuda()
     expected, _ = sparse_prefill_attention_forward(
         module, q, k, v, None, selected_blocks=selected, block_size=64,

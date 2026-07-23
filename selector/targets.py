@@ -18,6 +18,31 @@ q_feat/k_feat.
 import torch
 
 
+def load_selector_features(path, device="cpu"):
+    """Load only pooled Q/K features needed by live selector traversal.
+
+    The checkpoint is mapped to CPU first so dense teacher-mass tensors are
+    never copied to the selector GPU. Only q_feat/k_feat move to ``device``.
+    """
+    d = torch.load(path, map_location="cpu", weights_only=False)
+    if d.get("proto") is None or d["pooledK"].dim() != 6:
+        raise KeyError(
+            f"{path} lacks P-prototype selector features ('proto' key / 6-D pooledK). "
+            "Re-extract with scripts/extract_teacher_targets.py to regenerate it.")
+
+    q_feat = d["pooledQ"].float()[0].to(device)
+    k_feat = d["pooledK"].float()[0].to(device)
+    L, G, qb, _, head_dim = q_feat.shape
+    kb = k_feat.shape[2]
+    meta = {
+        "seq_len": int(d["seq_len"]), "block_size": int(d["block_size"]),
+        "needle_block": int(d.get("needle_block", -1)),
+        "num_layers": L, "num_groups": G, "qb": qb, "kb": kb,
+        "head_dim": head_dim, "proto": int(d["proto"]),
+    }
+    return {"q_feat": q_feat, "k_feat": k_feat, "meta": meta}
+
+
 def causal_block_mask(qb, kb, device=None):
     """Block-level causal mask: query-block q may attend key-block k iff k <= q.
     Key-block q itself is the (partially visible) diagonal and is included."""

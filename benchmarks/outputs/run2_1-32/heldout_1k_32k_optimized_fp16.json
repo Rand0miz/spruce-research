@@ -1,0 +1,3456 @@
+{
+  "model": "Qwen/Qwen2.5-Coder-1.5B-Instruct",
+  "gate": "/content/drive/MyDrive/SPRUCE_COLAB/selector_ckpt/flat_gate_lamt0.75_lamn0.25_lr5e4_e300.pt",
+  "selector": {
+    "mode": "live_candidate_only_tree_traversal",
+    "feature_source": "pooled_qk_loaded_from_teacher_target",
+    "feature_extraction_included": false,
+    "feature_file_loading_included": false,
+    "compute_dtype": "float16",
+    "beam": 16,
+    "radix": 2,
+    "k_selected": 18,
+    "local_window": 1
+  },
+  "repeats": 3,
+  "warmup_tokens": 64,
+  "cases": [
+    {
+      "case_id": "badge_elena_amber",
+      "seq_len": 14260,
+      "block_size": 64,
+      "needle_block": 103,
+      "teacher_target": "/content/SPRUCE/teacher_targets/1.5B_heldout_scaling_1k_32k/teacher_badge_elena_amber_len14260_blk64_d0.463071.pt",
+      "sparse": {
+        "exact": true,
+        "fuzzy": 1.0,
+        "answer": " Elena selected the amber badge for the audit. The compliance memo repeated ordinary review steps and noncritical status updates. The compliance memo repeated ordinary review steps and noncritical",
+        "needle": "elena selected the amber badge for the audit.",
+        "feature_load_seconds": 0.13017155000034109,
+        "tree_build_seconds": 0.006098986000324658,
+        "tree_traversal_seconds": 0.06807775199922617,
+        "route_pack_seconds": 0.002492846000677673,
+        "route_transfer_seconds": 0.0,
+        "selector_seconds": 0.07664790299986635,
+        "prefill_seconds": 1.1102859809998336,
+        "decode_seconds": 0.9195371649993831,
+        "seconds": 2.0313649959998656,
+        "live_prefill_seconds": 1.188113908001469,
+        "live_total_seconds": 2.107651073000852,
+        "needle_layer_group_hit_rate": 0.8571429252624512,
+        "needle_any_group_all_layers_rate": 0.9285714626312256,
+        "answer_repeat_match": true,
+        "timing_samples": [
+          {
+            "feature_load_seconds": 0.13383746100043936,
+            "tree_build_seconds": 0.2111218000000008,
+            "tree_traversal_seconds": 0.30353598600049736,
+            "route_pack_seconds": 0.020933988000251702,
+            "route_transfer_seconds": 0.0,
+            "selector_seconds": 0.5355917740007499,
+            "needle_layer_group_hit_rate": 0.8571429252624512,
+            "needle_any_group_all_layers_rate": 0.9285714626312256,
+            "seconds": 2.0374974549995386,
+            "prefill_seconds": 1.1102859809998336,
+            "decode_seconds": 0.927211473999705,
+            "live_prefill_seconds": 1.6458777550005834,
+            "live_total_seconds": 2.5730892290002885
+          },
+          {
+            "feature_load_seconds": 0.13017155000034109,
+            "tree_build_seconds": 0.006077304999962507,
+            "tree_traversal_seconds": 0.06807775199922617,
+            "route_pack_seconds": 0.002492846000677673,
+            "route_transfer_seconds": 0.0,
+            "selector_seconds": 0.07664790299986635,
+            "needle_layer_group_hit_rate": 0.8571429252624512,
+            "needle_any_group_all_layers_rate": 0.9285714626312256,
+            "seconds": 2.021625499000038,
+            "prefill_seconds": 1.1059247950006466,
+            "decode_seconds": 0.9157007039993914,
+            "live_prefill_seconds": 1.182572698000513,
+            "live_total_seconds": 2.0982734019999043
+          },
+          {
+            "feature_load_seconds": 0.11336009000024205,
+            "tree_build_seconds": 0.006098986000324658,
+            "tree_traversal_seconds": 0.06770340700040833,
+            "route_pack_seconds": 0.002483684000253561,
+            "route_transfer_seconds": 0.0,
+            "selector_seconds": 0.07628607700098655,
+            "needle_layer_group_hit_rate": 0.8571429252624512,
+            "needle_any_group_all_layers_rate": 0.9285714626312256,
+            "seconds": 2.0313649959998656,
+            "prefill_seconds": 1.1118278310004825,
+            "decode_seconds": 0.9195371649993831,
+            "live_prefill_seconds": 1.188113908001469,
+            "live_total_seconds": 2.107651073000852
+          }
+        ]
+      },
+      "dense": {
+        "exact": true,
+        "fuzzy": 1.0,
+        "answer": " Elena selected the amber badge for the audit. The compliance memo repeated ordinary review steps and noncritical status updates. The compliance memo repeated ordinary review steps and noncritical",
+        "needle": "elena selected the amber badge for the audit.",
+        "prefill_seconds": 1.4099464470000385,
+        "decode_seconds": 0.9207662930002698,
+        "seconds": 2.333292111999981,
+        "answer_repeat_match": true,
+        "timing_samples": [
+          {
+            "seconds": 2.3287973540000166,
+            "prefill_seconds": 1.4080310609997468,
+            "decode_seconds": 0.9207662930002698
+          },
+          {
+            "seconds": 2.333292111999981,
+            "prefill_seconds": 1.4145588969995515,
+            "decode_seconds": 0.9187332150004295
+          },
+          {
+            "seconds": 2.345660154000143,
+            "prefill_seconds": 1.4099464470000385,
+            "decode_seconds": 0.9357137070001045
+          }
+        ]
+      },
+      "answers_match": true,
+      "comparison": {
+        "kernel_prefill_speedup": 1.2698948479294991,
+        "live_prefill_speedup": 1.1867098242892509,
+        "live_total_speedup": 1.1070580618820665
+      }
+    },
+    {
+      "case_id": "badge_elena_amber",
+      "seq_len": 23763,
+      "block_size": 64,
+      "needle_block": 106,
+      "teacher_target": "/content/SPRUCE/teacher_targets/1.5B_heldout_scaling_1k_32k/teacher_badge_elena_amber_len23763_blk64_d0.286501.pt",
+      "sparse": {
+        "exact": true,
+        "fuzzy": 1.0,
+        "answer": " Elena selected the amber badge for the audit. The compliance memo repeated ordinary review steps and noncritical status updates. The compliance memo repeated ordinary review steps and noncritical",
+        "needle": "elena selected the amber badge for the audit.",
+        "feature_load_seconds": 0.22862389400052052,
+        "tree_build_seconds": 0.006909766999342537,
+        "tree_traversal_seconds": 0.14509453899972868,
+        "route_pack_seconds": 0.006041644999640994,
+        "route_transfer_seconds": 0.0,
+        "selector_seconds": 0.15785014999983105,
+        "prefill_seconds": 1.8776830370006792,
+        "decode_seconds": 0.9261401499998101,
+        "seconds": 2.812828709999849,
+        "live_prefill_seconds": 2.0355317080011446,
+        "live_total_seconds": 2.9709174649997294,
+        "needle_layer_group_hit_rate": 0.8392857313156128,
+        "needle_any_group_all_layers_rate": 0.9285714626312256,
+        "answer_repeat_match": true,
+        "timing_samples": [
+          {
+            "feature_load_seconds": 0.227489145000618,
+            "tree_build_seconds": 0.006909766999342537,
+            "tree_traversal_seconds": 0.14573144400037563,
+            "route_pack_seconds": 0.006041644999640994,
+            "route_transfer_seconds": 0.0,
+            "selector_seconds": 0.15868285599935916,
+            "needle_layer_group_hit_rate": 0.8392857313156128,
+            "needle_any_group_all_layers_rate": 0.9285714626312256,
+            "seconds": 2.812828709999849,
+            "prefill_seconds": 1.876314067999374,
+            "decode_seconds": 0.9365146420004749,
+            "live_prefill_seconds": 2.034996923998733,
+            "live_total_seconds": 2.971511565999208
+          },
+          {
+            "feature_load_seconds": 0.24681088499983161,
+            "tree_build_seconds": 0.006921406999936153,
+            "tree_traversal_seconds": 0.14485187900027086,
+            "route_pack_seconds": 0.006075385000258393,
+            "route_transfer_seconds": 0.0,
+            "selector_seconds": 0.1578486710004654,
+            "needle_layer_group_hit_rate": 0.8392857313156128,
+            "needle_any_group_all_layers_rate": 0.9285714626312256,
+            "seconds": 2.785931762000473,
+            "prefill_seconds": 1.8776830370006792,
+            "decode_seconds": 0.9082487249997939,
+            "live_prefill_seconds": 2.0355317080011446,
+            "live_total_seconds": 2.9437804330009385
+          },
+          {
+            "feature_load_seconds": 0.22862389400052052,
+            "tree_build_seconds": 0.006849825000244891,
+            "tree_traversal_seconds": 0.14509453899972868,
+            "route_pack_seconds": 0.005905785999857471,
+            "route_transfer_seconds": 0.0,
+            "selector_seconds": 0.15785014999983105,
+            "needle_layer_group_hit_rate": 0.8392857313156128,
+            "needle_any_group_all_layers_rate": 0.9285714626312256,
+            "seconds": 2.8130673149998984,
+            "prefill_seconds": 1.8869271650000883,
+            "decode_seconds": 0.9261401499998101,
+            "live_prefill_seconds": 2.0447773149999193,
+            "live_total_seconds": 2.9709174649997294
+          }
+        ]
+      },
+      "dense": {
+        "exact": true,
+        "fuzzy": 1.0,
+        "answer": " Elena selected the amber badge for the audit. The compliance memo repeated ordinary review steps and noncritical status updates. The compliance memo repeated ordinary review steps and noncritical",
+        "needle": "elena selected the amber badge for the audit.",
+        "prefill_seconds": 2.7491489389994967,
+        "decode_seconds": 0.9270329239998318,
+        "seconds": 3.6795416009999826,
+        "answer_repeat_match": true,
+        "timing_samples": [
+          {
+            "seconds": 3.658192422000866,
+            "prefill_seconds": 2.7349705440001344,
+            "decode_seconds": 0.9232218780007315
+          },
+          {
+            "seconds": 3.6795416009999826,
+            "prefill_seconds": 2.752508677000151,
+            "decode_seconds": 0.9270329239998318
+          },
+          {
+            "seconds": 3.6856801309995717,
+            "prefill_seconds": 2.7491489389994967,
+            "decode_seconds": 0.936531192000075
+          }
+        ]
+      },
+      "answers_match": true,
+      "comparison": {
+        "kernel_prefill_speedup": 1.4641176837763072,
+        "live_prefill_speedup": 1.350580257823206,
+        "live_total_speedup": 1.2385203036935655
+      }
+    },
+    {
+      "case_id": "badge_elena_amber",
+      "seq_len": 30419,
+      "block_size": 64,
+      "needle_block": 128,
+      "teacher_target": "/content/SPRUCE/teacher_targets/1.5B_heldout_scaling_1k_32k/teacher_badge_elena_amber_len30419_blk64_d0.271082.pt",
+      "sparse": {
+        "exact": true,
+        "fuzzy": 1.0,
+        "answer": " Elena selected the amber badge for the audit. The compliance memo repeated ordinary review steps and noncritical status updates. The compliance memo repeated ordinary review steps and noncritical",
+        "needle": "elena selected the amber badge for the audit.",
+        "feature_load_seconds": 0.3300494669992986,
+        "tree_build_seconds": 0.006989544000134629,
+        "tree_traversal_seconds": 0.1986618910004836,
+        "route_pack_seconds": 0.008931302999371837,
+        "route_transfer_seconds": 0.0,
+        "selector_seconds": 0.21458273799999006,
+        "prefill_seconds": 2.4406969710007616,
+        "decode_seconds": 0.9365956879992154,
+        "seconds": 3.384098536000238,
+        "live_prefill_seconds": 2.6552797090007516,
+        "live_total_seconds": 3.6036368939994645,
+        "needle_layer_group_hit_rate": 0.8571429252624512,
+        "needle_any_group_all_layers_rate": 0.9642857313156128,
+        "answer_repeat_match": true,
+        "timing_samples": [
+          {
+            "feature_load_seconds": 0.31705226200028847,
+            "tree_build_seconds": 0.006894582999848353,
+            "tree_traversal_seconds": 0.19850179999957618,
+            "route_pack_seconds": 0.008870745000422176,
+            "route_transfer_seconds": 0.0,
+            "selector_seconds": 0.2142671279998467,
+            "needle_layer_group_hit_rate": 0.8571429252624512,
+            "needle_any_group_all_layers_rate": 0.9642857313156128,
+            "seconds": 3.389369765999618,
+            "prefill_seconds": 2.430348385999423,
+            "decode_seconds": 0.9590213800001948,
+            "live_prefill_seconds": 2.6446155139992698,
+            "live_total_seconds": 3.6036368939994645
+          },
+          {
+            "feature_load_seconds": 0.3300494669992986,
+            "tree_build_seconds": 0.006989544000134629,
+            "tree_traversal_seconds": 0.1986618910004836,
+            "route_pack_seconds": 0.008931302999371837,
+            "route_transfer_seconds": 0.0,
+            "selector_seconds": 0.21458273799999006,
+            "needle_layer_group_hit_rate": 0.8571429252624512,
+            "needle_any_group_all_layers_rate": 0.9642857313156128,
+            "seconds": 3.377292658999977,
+            "prefill_seconds": 2.4406969710007616,
+            "decode_seconds": 0.9365956879992154,
+            "live_prefill_seconds": 2.6552797090007516,
+            "live_total_seconds": 3.591875396999967
+          },
+          {
+            "feature_load_seconds": 0.37345255099990027,
+            "tree_build_seconds": 0.008874264000041876,
+            "tree_traversal_seconds": 0.2029594059995361,
+            "route_pack_seconds": 0.008974919999673148,
+            "route_transfer_seconds": 0.0,
+            "selector_seconds": 0.22080858999925113,
+            "needle_layer_group_hit_rate": 0.8571429252624512,
+            "needle_any_group_all_layers_rate": 0.9642857313156128,
+            "seconds": 3.384098536000238,
+            "prefill_seconds": 2.4594786220004607,
+            "decode_seconds": 0.924619913999777,
+            "live_prefill_seconds": 2.680287211999712,
+            "live_total_seconds": 3.604907125999489
+          }
+        ]
+      },
+      "dense": {
+        "exact": true,
+        "fuzzy": 1.0,
+        "answer": " Elena selected the amber badge for the audit. The compliance memo repeated ordinary review steps and noncritical status updates. The compliance memo repeated ordinary review steps and noncritical",
+        "needle": "elena selected the amber badge for the audit.",
+        "prefill_seconds": 3.865952481000022,
+        "decode_seconds": 0.9318694849998792,
+        "seconds": 4.801759736999884,
+        "answer_repeat_match": true,
+        "timing_samples": [
+          {
+            "seconds": 4.79339800300022,
+            "prefill_seconds": 3.865952481000022,
+            "decode_seconds": 0.9274455220001983
+          },
+          {
+            "seconds": 4.801759736999884,
+            "prefill_seconds": 3.8698902520000047,
+            "decode_seconds": 0.9318694849998792
+          },
+          {
+            "seconds": 4.804709175000426,
+            "prefill_seconds": 3.8635816390005857,
+            "decode_seconds": 0.9411275359998399
+          }
+        ]
+      },
+      "answers_match": true,
+      "comparison": {
+        "kernel_prefill_speedup": 1.5839543076971419,
+        "live_prefill_speedup": 1.455949242520622,
+        "live_total_speedup": 1.3324760174909558
+      }
+    },
+    {
+      "case_id": "badge_elena_amber",
+      "seq_len": 7604,
+      "block_size": 64,
+      "needle_block": 71,
+      "teacher_target": "/content/SPRUCE/teacher_targets/1.5B_heldout_scaling_1k_32k/teacher_badge_elena_amber_len7604_blk64_d0.606284.pt",
+      "sparse": {
+        "exact": true,
+        "fuzzy": 1.0,
+        "answer": " Elena selected the amber badge for the audit. The compliance memo repeated ordinary review steps and noncritical status updates. The compliance memo repeated ordinary review steps and noncritical",
+        "needle": "elena selected the amber badge for the audit.",
+        "feature_load_seconds": 0.05635812000036822,
+        "tree_build_seconds": 0.005393781000748277,
+        "tree_traversal_seconds": 0.03782725099972595,
+        "route_pack_seconds": 0.0008405970002058893,
+        "route_transfer_seconds": 0.0,
+        "selector_seconds": 0.04404656699989573,
+        "prefill_seconds": 0.5793211559994234,
+        "decode_seconds": 0.9196631270006037,
+        "seconds": 1.4982056620001458,
+        "live_prefill_seconds": 0.6229265510000914,
+        "live_total_seconds": 1.542946042000949,
+        "needle_layer_group_hit_rate": 0.9285714626312256,
+        "needle_any_group_all_layers_rate": 0.9642857313156128,
+        "answer_repeat_match": true,
+        "timing_samples": [
+          {
+            "feature_load_seconds": 0.04703807500027324,
+            "tree_build_seconds": 0.00537696599985793,
+            "tree_traversal_seconds": 0.03782725099972595,
+            "route_pack_seconds": 0.0008423500003118534,
+            "route_transfer_seconds": 0.0,
+            "selector_seconds": 0.04404656699989573,
+            "needle_layer_group_hit_rate": 0.9285714626312256,
+            "needle_any_group_all_layers_rate": 0.9642857313156128,
+            "seconds": 1.4964207610000813,
+            "prefill_seconds": 0.5767576339994775,
+            "decode_seconds": 0.9196631270006037,
+            "live_prefill_seconds": 0.6208042009993733,
+            "live_total_seconds": 1.540467327999977
+          },
+          {
+            "feature_load_seconds": 0.05635812000036822,
+            "tree_build_seconds": 0.005393781000748277,
+            "tree_traversal_seconds": 0.038506001999849104,
+            "route_pack_seconds": 0.0008405970002058893,
+            "route_transfer_seconds": 0.0,
+            "selector_seconds": 0.04474038000080327,
+            "needle_layer_group_hit_rate": 0.9285714626312256,
+            "needle_any_group_all_layers_rate": 0.9642857313156128,
+            "seconds": 1.4982056620001458,
+            "prefill_seconds": 0.5793211559994234,
+            "decode_seconds": 0.9188845060007225,
+            "live_prefill_seconds": 0.6240615360002266,
+            "live_total_seconds": 1.542946042000949
+          },
+          {
+            "feature_load_seconds": 0.061980333000065,
+            "tree_build_seconds": 0.00557920000028389,
+            "tree_traversal_seconds": 0.03718489399943792,
+            "route_pack_seconds": 0.0007191780005086912,
+            "route_transfer_seconds": 0.0,
+            "selector_seconds": 0.0434832720002305,
+            "needle_layer_group_hit_rate": 0.9285714626312256,
+            "needle_any_group_all_layers_rate": 0.9642857313156128,
+            "seconds": 1.5130855629995494,
+            "prefill_seconds": 0.5794432789998609,
+            "decode_seconds": 0.9336422839996885,
+            "live_prefill_seconds": 0.6229265510000914,
+            "live_total_seconds": 1.55656883499978
+          }
+        ]
+      },
+      "dense": {
+        "exact": true,
+        "fuzzy": 1.0,
+        "answer": " Elena selected the amber badge for the audit. The compliance memo repeated ordinary review steps and noncritical status updates. The compliance memo repeated ordinary review steps and noncritical",
+        "needle": "elena selected the amber badge for the audit.",
+        "prefill_seconds": 0.638251661999675,
+        "decode_seconds": 0.9285676460003742,
+        "seconds": 1.5668193080000492,
+        "answer_repeat_match": true,
+        "timing_samples": [
+          {
+            "seconds": 1.6183714210001199,
+            "prefill_seconds": 0.6854061849999198,
+            "decode_seconds": 0.9329652360002001
+          },
+          {
+            "seconds": 1.5617312069998661,
+            "prefill_seconds": 0.6351398089991562,
+            "decode_seconds": 0.9265913980007099
+          },
+          {
+            "seconds": 1.5668193080000492,
+            "prefill_seconds": 0.638251661999675,
+            "decode_seconds": 0.9285676460003742
+          }
+        ]
+      },
+      "answers_match": true,
+      "comparison": {
+        "kernel_prefill_speedup": 1.1017233798385748,
+        "live_prefill_speedup": 1.0246017945052743,
+        "live_total_speedup": 1.0154725216237246
+      }
+    },
+    {
+      "case_id": "badge_elena_amber",
+      "seq_len": 948,
+      "block_size": 64,
+      "needle_block": 10,
+      "teacher_target": "/content/SPRUCE/teacher_targets/1.5B_heldout_scaling_1k_32k/teacher_badge_elena_amber_len948_blk64_d0.750598.pt",
+      "sparse": {
+        "exact": true,
+        "fuzzy": 1.0,
+        "answer": " Elena selected the amber badge for the audit. Elena selected the amber badge for the audit. Elena selected the amber badge for the audit. Elena selected the amber badge",
+        "needle": "elena selected the amber badge for the audit.",
+        "feature_load_seconds": 0.007714088999819069,
+        "tree_build_seconds": 0.0031572669995512115,
+        "tree_traversal_seconds": 0.021355079000386468,
+        "route_pack_seconds": 0.0006530840000777971,
+        "route_transfer_seconds": 0.0,
+        "selector_seconds": 0.025165430000015476,
+        "prefill_seconds": 0.059694907999983116,
+        "decode_seconds": 0.9205886330000794,
+        "seconds": 0.9802835410000625,
+        "live_prefill_seconds": 0.08486033799999859,
+        "live_total_seconds": 1.005448971000078,
+        "needle_layer_group_hit_rate": 1.0,
+        "needle_any_group_all_layers_rate": 1.0,
+        "answer_repeat_match": true,
+        "timing_samples": [
+          {
+            "feature_load_seconds": 0.007714088999819069,
+            "tree_build_seconds": 0.0034424249997755396,
+            "tree_traversal_seconds": 0.021761070000138716,
+            "route_pack_seconds": 0.0007924490000732476,
+            "route_transfer_seconds": 0.0,
+            "selector_seconds": 0.025995943999987503,
+            "needle_layer_group_hit_rate": 1.0,
+            "needle_any_group_all_layers_rate": 1.0,
+            "seconds": 1.3279662519998965,
+            "prefill_seconds": 0.3950274459994034,
+            "decode_seconds": 0.9329388060004931,
+            "live_prefill_seconds": 0.42102338999939093,
+            "live_total_seconds": 1.353962195999884
+          },
+          {
+            "feature_load_seconds": 0.007553422999990289,
+            "tree_build_seconds": 0.0031572669995512115,
+            "tree_traversal_seconds": 0.021355079000386468,
+            "route_pack_seconds": 0.0006530840000777971,
+            "route_transfer_seconds": 0.0,
+            "selector_seconds": 0.025165430000015476,
+            "needle_layer_group_hit_rate": 1.0,
+            "needle_any_group_all_layers_rate": 1.0,
+            "seconds": 0.9802835410000625,
+            "prefill_seconds": 0.059694907999983116,
+            "decode_seconds": 0.9205886330000794,
+            "live_prefill_seconds": 0.08486033799999859,
+            "live_total_seconds": 1.005448971000078
+          },
+          {
+            "feature_load_seconds": 0.008580636999795388,
+            "tree_build_seconds": 0.0031211959994834615,
+            "tree_traversal_seconds": 0.02122795900049823,
+            "route_pack_seconds": 0.0006458589996327646,
+            "route_transfer_seconds": 0.0,
+            "selector_seconds": 0.024995013999614457,
+            "needle_layer_group_hit_rate": 1.0,
+            "needle_any_group_all_layers_rate": 1.0,
+            "seconds": 0.9771164699996007,
+            "prefill_seconds": 0.05882184599977336,
+            "decode_seconds": 0.9182946239998273,
+            "live_prefill_seconds": 0.08381685999938782,
+            "live_total_seconds": 1.0021114839992151
+          }
+        ]
+      },
+      "dense": {
+        "exact": true,
+        "fuzzy": 1.0,
+        "answer": " Elena selected the amber badge for the audit. Elena selected the amber badge for the audit. Elena selected the amber badge for the audit. Elena selected the amber badge",
+        "needle": "elena selected the amber badge for the audit.",
+        "prefill_seconds": 0.05991330799952266,
+        "decode_seconds": 0.9217300450000039,
+        "seconds": 0.9817353059997913,
+        "answer_repeat_match": true,
+        "timing_samples": [
+          {
+            "seconds": 0.9836650689994713,
+            "prefill_seconds": 0.05969585799994093,
+            "decode_seconds": 0.9239692109995303
+          },
+          {
+            "seconds": 0.9775402949999261,
+            "prefill_seconds": 0.05991330799952266,
+            "decode_seconds": 0.9176269870004035
+          },
+          {
+            "seconds": 0.9817353059997913,
+            "prefill_seconds": 0.060005260999787424,
+            "decode_seconds": 0.9217300450000039
+          }
+        ]
+      },
+      "answers_match": true,
+      "comparison": {
+        "kernel_prefill_speedup": 1.0036586035033273,
+        "live_prefill_speedup": 0.7060225001640184,
+        "live_total_speedup": 0.97641484979919
+      }
+    },
+    {
+      "case_id": "birth_sara_1988",
+      "seq_len": 11256,
+      "block_size": 64,
+      "needle_block": 65,
+      "teacher_target": "/content/SPRUCE/teacher_targets/1.5B_heldout_scaling_1k_32k/teacher_birth_sara_1988_len11256_blk64_d0.375138.pt",
+      "sparse": {
+        "exact": true,
+        "fuzzy": 1.0,
+        "answer": " Sara was born in 1988. The portfolio review mentioned routine allocation changes and ordinary paperwork. The portfolio review mentioned routine allocation changes and ordinary paperwork.",
+        "needle": "sara was born in 1988.",
+        "feature_load_seconds": 0.08461052300026495,
+        "tree_build_seconds": 0.006173502999445191,
+        "tree_traversal_seconds": 0.05151443999966432,
+        "route_pack_seconds": 0.0017231459996764897,
+        "route_transfer_seconds": 0.0,
+        "selector_seconds": 0.05941490199893451,
+        "prefill_seconds": 0.8970161699999153,
+        "decode_seconds": 0.9217104409999592,
+        "seconds": 1.8169595670005947,
+        "live_prefill_seconds": 0.957816914000432,
+        "live_total_seconds": 1.87660574200072,
+        "needle_layer_group_hit_rate": 0.8750000596046448,
+        "needle_any_group_all_layers_rate": 0.9285714626312256,
+        "answer_repeat_match": true,
+        "timing_samples": [
+          {
+            "feature_load_seconds": 0.08461052300026495,
+            "tree_build_seconds": 0.006173502999445191,
+            "tree_traversal_seconds": 0.05151443999966432,
+            "route_pack_seconds": 0.0017269589998250012,
+            "route_transfer_seconds": 0.0,
+            "selector_seconds": 0.05941490199893451,
+            "needle_layer_group_hit_rate": 0.8750000596046448,
+            "needle_any_group_all_layers_rate": 0.9285714626312256,
+            "seconds": 1.8169595670005947,
+            "prefill_seconds": 0.8952491260006354,
+            "decode_seconds": 0.9217104409999592,
+            "live_prefill_seconds": 0.95466402799957,
+            "live_total_seconds": 1.8763744689995292
+          },
+          {
+            "feature_load_seconds": 0.08952757299994119,
+            "tree_build_seconds": 0.0070780599999125116,
+            "tree_traversal_seconds": 0.05200963100014633,
+            "route_pack_seconds": 0.001713053000457876,
+            "route_transfer_seconds": 0.0,
+            "selector_seconds": 0.060800744000516715,
+            "needle_layer_group_hit_rate": 0.8750000596046448,
+            "needle_any_group_all_layers_rate": 0.9285714626312256,
+            "seconds": 1.8158049980002033,
+            "prefill_seconds": 0.8970161699999153,
+            "decode_seconds": 0.918788828000288,
+            "live_prefill_seconds": 0.957816914000432,
+            "live_total_seconds": 1.87660574200072
+          },
+          {
+            "feature_load_seconds": 0.07968213399999513,
+            "tree_build_seconds": 0.006120336999629217,
+            "tree_traversal_seconds": 0.05017965600018215,
+            "route_pack_seconds": 0.0017231459996764897,
+            "route_transfer_seconds": 0.0,
+            "selector_seconds": 0.058023138999487855,
+            "needle_layer_group_hit_rate": 0.8750000596046448,
+            "needle_any_group_all_layers_rate": 0.9285714626312256,
+            "seconds": 1.8339663579999979,
+            "prefill_seconds": 0.900115143000221,
+            "decode_seconds": 0.9338512149997769,
+            "live_prefill_seconds": 0.9581382819997089,
+            "live_total_seconds": 1.8919894969994857
+          }
+        ]
+      },
+      "dense": {
+        "exact": false,
+        "fuzzy": 0.4,
+        "answer": " The birth year of Sara is 1988. The portfolio review mentioned routine allocation changes and ordinary paperwork. The portfolio review mentioned routine allocation changes and ordinary",
+        "needle": "sara was born in 1988.",
+        "prefill_seconds": 1.0454219189996365,
+        "decode_seconds": 0.9332325989998935,
+        "seconds": 1.9819696349995866,
+        "answer_repeat_match": true,
+        "timing_samples": [
+          {
+            "seconds": 1.9696002679993398,
+            "prefill_seconds": 1.0430966819994865,
+            "decode_seconds": 0.9265035859998534
+          },
+          {
+            "seconds": 1.9877881180000259,
+            "prefill_seconds": 1.0545555190001323,
+            "decode_seconds": 0.9332325989998935
+          },
+          {
+            "seconds": 1.9819696349995866,
+            "prefill_seconds": 1.0454219189996365,
+            "decode_seconds": 0.93654771599995
+          }
+        ]
+      },
+      "answers_match": false,
+      "comparison": {
+        "kernel_prefill_speedup": 1.1654437834713005,
+        "live_prefill_speedup": 1.0914632052521522,
+        "live_total_speedup": 1.0561459930771255
+      }
+    },
+    {
+      "case_id": "birth_sara_1988",
+      "seq_len": 15953,
+      "block_size": 64,
+      "needle_block": 180,
+      "teacher_target": "/content/SPRUCE/teacher_targets/1.5B_heldout_scaling_1k_32k/teacher_birth_sara_1988_len15953_blk64_d0.725503.pt",
+      "sparse": {
+        "exact": true,
+        "fuzzy": 1.0,
+        "answer": " Sara was born in 1988. The portfolio review mentioned routine allocation changes and ordinary paperwork. The portfolio review mentioned routine allocation changes and ordinary paperwork.",
+        "needle": "sara was born in 1988.",
+        "feature_load_seconds": 0.1427330559999973,
+        "tree_build_seconds": 0.006133732999842323,
+        "tree_traversal_seconds": 0.08087048200013669,
+        "route_pack_seconds": 0.003228542000215384,
+        "route_transfer_seconds": 0.0,
+        "selector_seconds": 0.09051873899989005,
+        "prefill_seconds": 1.3080309959996157,
+        "decode_seconds": 0.9279886530002841,
+        "seconds": 2.2383452130006845,
+        "live_prefill_seconds": 1.398623041999599,
+        "live_total_seconds": 2.3283100790004028,
+        "needle_layer_group_hit_rate": 0.8928571939468384,
+        "needle_any_group_all_layers_rate": 0.9285714626312256,
+        "answer_repeat_match": true,
+        "timing_samples": [
+          {
+            "feature_load_seconds": 0.15359842799989565,
+            "tree_build_seconds": 0.006061142999897129,
+            "tree_traversal_seconds": 0.08122905399977753,
+            "route_pack_seconds": 0.003228542000215384,
+            "route_transfer_seconds": 0.0,
+            "selector_seconds": 0.09051873899989005,
+            "needle_layer_group_hit_rate": 0.8928571939468384,
+            "needle_any_group_all_layers_rate": 0.9285714626312256,
+            "seconds": 2.2678865970001425,
+            "prefill_seconds": 1.304845302999638,
+            "decode_seconds": 0.9630412940005044,
+            "live_prefill_seconds": 1.3953640419995281,
+            "live_total_seconds": 2.3584053360000325
+          },
+          {
+            "feature_load_seconds": 0.1427330559999973,
+            "tree_build_seconds": 0.0062803390001135995,
+            "tree_traversal_seconds": 0.08087048200013669,
+            "route_pack_seconds": 0.0034412249997330946,
+            "route_transfer_seconds": 0.0,
+            "selector_seconds": 0.09059204599998338,
+            "needle_layer_group_hit_rate": 0.8928571939468384,
+            "needle_any_group_all_layers_rate": 0.9285714626312256,
+            "seconds": 2.2342569590000494,
+            "prefill_seconds": 1.3080309959996157,
+            "decode_seconds": 0.9262259630004337,
+            "live_prefill_seconds": 1.398623041999599,
+            "live_total_seconds": 2.3248490050000328
+          },
+          {
+            "feature_load_seconds": 0.12491883799975767,
+            "tree_build_seconds": 0.006133732999842323,
+            "tree_traversal_seconds": 0.08061279399953492,
+            "route_pack_seconds": 0.003218339000341075,
+            "route_transfer_seconds": 0.0,
+            "selector_seconds": 0.08996486599971831,
+            "needle_layer_group_hit_rate": 0.8928571939468384,
+            "needle_any_group_all_layers_rate": 0.9285714626312256,
+            "seconds": 2.2383452130006845,
+            "prefill_seconds": 1.3103565600004003,
+            "decode_seconds": 0.9279886530002841,
+            "live_prefill_seconds": 1.4003214260001187,
+            "live_total_seconds": 2.3283100790004028
+          }
+        ]
+      },
+      "dense": {
+        "exact": false,
+        "fuzzy": 0.4,
+        "answer": " The birth year of Sara is 1988. The portfolio review mentioned routine allocation changes and ordinary paperwork. The portfolio review mentioned routine allocation changes and ordinary",
+        "needle": "sara was born in 1988.",
+        "prefill_seconds": 1.588615800000298,
+        "decode_seconds": 0.9200761019992569,
+        "seconds": 2.5098657650005407,
+        "answer_repeat_match": true,
+        "timing_samples": [
+          {
+            "seconds": 2.5098657650005407,
+            "prefill_seconds": 1.5866987670005983,
+            "decode_seconds": 0.9231669979999424
+          },
+          {
+            "seconds": 2.5074643330008257,
+            "prefill_seconds": 1.588615800000298,
+            "decode_seconds": 0.9188485330005278
+          },
+          {
+            "seconds": 2.5161380759991516,
+            "prefill_seconds": 1.5960619739998947,
+            "decode_seconds": 0.9200761019992569
+          }
+        ]
+      },
+      "answers_match": false,
+      "comparison": {
+        "kernel_prefill_speedup": 1.2145092928675252,
+        "live_prefill_speedup": 1.1358427198003744,
+        "live_total_speedup": 1.077977451387439
+      }
+    },
+    {
+      "case_id": "birth_sara_1988",
+      "seq_len": 20650,
+      "block_size": 64,
+      "needle_block": 205,
+      "teacher_target": "/content/SPRUCE/teacher_targets/1.5B_heldout_scaling_1k_32k/teacher_birth_sara_1988_len20650_blk64_d0.639134.pt",
+      "sparse": {
+        "exact": true,
+        "fuzzy": 1.0,
+        "answer": " Sara was born in 1988. The portfolio review mentioned routine allocation changes and ordinary paperwork. The portfolio review mentioned routine allocation changes and ordinary paperwork.",
+        "needle": "sara was born in 1988.",
+        "feature_load_seconds": 0.17948815599993395,
+        "tree_build_seconds": 0.007239980000122159,
+        "tree_traversal_seconds": 0.12294527199992444,
+        "route_pack_seconds": 0.005130368000209273,
+        "route_transfer_seconds": 0.0,
+        "selector_seconds": 0.13520359599988296,
+        "prefill_seconds": 1.7160807290001685,
+        "decode_seconds": 0.9447198689995275,
+        "seconds": 2.6489037049996114,
+        "live_prefill_seconds": 1.8518832790005035,
+        "live_total_seconds": 2.784044496000206,
+        "needle_layer_group_hit_rate": 0.8035714626312256,
+        "needle_any_group_all_layers_rate": 0.8571429252624512,
+        "answer_repeat_match": true,
+        "timing_samples": [
+          {
+            "feature_load_seconds": 0.17942054700051813,
+            "tree_build_seconds": 0.007252772999891022,
+            "tree_traversal_seconds": 0.12275765000049432,
+            "route_pack_seconds": 0.005130368000209273,
+            "route_transfer_seconds": 0.0,
+            "selector_seconds": 0.13514079100059462,
+            "needle_layer_group_hit_rate": 0.8035714626312256,
+            "needle_any_group_all_layers_rate": 0.8571429252624512,
+            "seconds": 2.6489037049996114,
+            "prefill_seconds": 1.7041838360000838,
+            "decode_seconds": 0.9447198689995275,
+            "live_prefill_seconds": 1.8393246270006784,
+            "live_total_seconds": 2.784044496000206
+          },
+          {
+            "feature_load_seconds": 0.17948815599993395,
+            "tree_build_seconds": 0.007110962999831827,
+            "tree_traversal_seconds": 0.12294527199992444,
+            "route_pack_seconds": 0.005147361000126693,
+            "route_transfer_seconds": 0.0,
+            "selector_seconds": 0.13520359599988296,
+            "needle_layer_group_hit_rate": 0.8035714626312256,
+            "needle_any_group_all_layers_rate": 0.8571429252624512,
+            "seconds": 2.6802166729994497,
+            "prefill_seconds": 1.721768114999577,
+            "decode_seconds": 0.9584485579998727,
+            "live_prefill_seconds": 1.85697171099946,
+            "live_total_seconds": 2.8154202689993326
+          },
+          {
+            "feature_load_seconds": 0.186275769000531,
+            "tree_build_seconds": 0.007239980000122159,
+            "tree_traversal_seconds": 0.12361184300061723,
+            "route_pack_seconds": 0.004950726999595645,
+            "route_transfer_seconds": 0.0,
+            "selector_seconds": 0.13580255000033503,
+            "needle_layer_group_hit_rate": 0.8035714626312256,
+            "needle_any_group_all_layers_rate": 0.8571429252624512,
+            "seconds": 2.6347267150003972,
+            "prefill_seconds": 1.7160807290001685,
+            "decode_seconds": 0.9186459860002287,
+            "live_prefill_seconds": 1.8518832790005035,
+            "live_total_seconds": 2.7705292650007323
+          }
+        ]
+      },
+      "dense": {
+        "exact": true,
+        "fuzzy": 1.0,
+        "answer": " Sara was born in 1988. The portfolio review mentioned routine allocation changes and ordinary paperwork. The portfolio review mentioned routine allocation changes and ordinary paperwork.",
+        "needle": "sara was born in 1988.",
+        "prefill_seconds": 2.257983573999809,
+        "decode_seconds": 0.9363781550000567,
+        "seconds": 3.186444394999853,
+        "answer_repeat_match": true,
+        "timing_samples": [
+          {
+            "seconds": 3.184471978000147,
+            "prefill_seconds": 2.245932926999558,
+            "decode_seconds": 0.9385390510005891
+          },
+          {
+            "seconds": 3.1943617289998656,
+            "prefill_seconds": 2.257983573999809,
+            "decode_seconds": 0.9363781550000567
+          },
+          {
+            "seconds": 3.186444394999853,
+            "prefill_seconds": 2.2631342389995552,
+            "decode_seconds": 0.9233101560002979
+          }
+        ]
+      },
+      "answers_match": true,
+      "comparison": {
+        "kernel_prefill_speedup": 1.315779342919005,
+        "live_prefill_speedup": 1.2192904377961042,
+        "live_total_speedup": 1.144537883492081
+      }
+    },
+    {
+      "case_id": "birth_sara_1988",
+      "seq_len": 9386,
+      "block_size": 64,
+      "needle_block": 131,
+      "teacher_target": "/content/SPRUCE/teacher_targets/1.5B_heldout_scaling_1k_32k/teacher_birth_sara_1988_len9386_blk64_d0.900974.pt",
+      "sparse": {
+        "exact": true,
+        "fuzzy": 1.0,
+        "answer": " Sara was born in 1988. The portfolio review mentioned routine allocation changes and ordinary paperwork. The portfolio review mentioned routine allocation changes and ordinary paperwork.",
+        "needle": "sara was born in 1988.",
+        "feature_load_seconds": 0.06598894499984453,
+        "tree_build_seconds": 0.006213319999915257,
+        "tree_traversal_seconds": 0.04640699900028267,
+        "route_pack_seconds": 0.001321361999544024,
+        "route_transfer_seconds": 0.0,
+        "selector_seconds": 0.05395192799915094,
+        "prefill_seconds": 0.7480924419996882,
+        "decode_seconds": 0.9185830630003693,
+        "seconds": 1.666817927000011,
+        "live_prefill_seconds": 0.8018904719992861,
+        "live_total_seconds": 1.720769854999162,
+        "needle_layer_group_hit_rate": 0.910714328289032,
+        "needle_any_group_all_layers_rate": 0.9285714626312256,
+        "answer_repeat_match": true,
+        "timing_samples": [
+          {
+            "feature_load_seconds": 0.06546613699993031,
+            "tree_build_seconds": 0.006219509999937145,
+            "tree_traversal_seconds": 0.04736915000012232,
+            "route_pack_seconds": 0.001321361999544024,
+            "route_transfer_seconds": 0.0,
+            "selector_seconds": 0.05491002199960349,
+            "needle_layer_group_hit_rate": 0.910714328289032,
+            "needle_any_group_all_layers_rate": 0.9285714626312256,
+            "seconds": 1.6673989999999321,
+            "prefill_seconds": 0.7488159369995628,
+            "decode_seconds": 0.9185830630003693,
+            "live_prefill_seconds": 0.8037259589991663,
+            "live_total_seconds": 1.7223090219995356
+          },
+          {
+            "feature_load_seconds": 0.0673971710002661,
+            "tree_build_seconds": 0.00620552299915289,
+            "tree_traversal_seconds": 0.04640699900028267,
+            "route_pack_seconds": 0.0013394059997153818,
+            "route_transfer_seconds": 0.0,
+            "selector_seconds": 0.05395192799915094,
+            "needle_layer_group_hit_rate": 0.910714328289032,
+            "needle_any_group_all_layers_rate": 0.9285714626312256,
+            "seconds": 1.666817927000011,
+            "prefill_seconds": 0.7474941690006744,
+            "decode_seconds": 0.9193237579993365,
+            "live_prefill_seconds": 0.8014460969998254,
+            "live_total_seconds": 1.720769854999162
+          },
+          {
+            "feature_load_seconds": 0.06598894499984453,
+            "tree_build_seconds": 0.006213319999915257,
+            "tree_traversal_seconds": 0.04627574300047854,
+            "route_pack_seconds": 0.0013089669992041308,
+            "route_transfer_seconds": 0.0,
+            "selector_seconds": 0.05379802999959793,
+            "needle_layer_group_hit_rate": 0.910714328289032,
+            "needle_any_group_all_layers_rate": 0.9285714626312256,
+            "seconds": 1.6609864259999085,
+            "prefill_seconds": 0.7480924419996882,
+            "decode_seconds": 0.9128939840002204,
+            "live_prefill_seconds": 0.8018904719992861,
+            "live_total_seconds": 1.7147844559995065
+          }
+        ]
+      },
+      "dense": {
+        "exact": true,
+        "fuzzy": 1.0,
+        "answer": " Sara was born in 1988. The portfolio review mentioned routine allocation changes and ordinary paperwork. The portfolio review mentioned routine allocation changes and ordinary paperwork.",
+        "needle": "sara was born in 1988.",
+        "prefill_seconds": 0.839712101999794,
+        "decode_seconds": 0.9227237719996992,
+        "seconds": 1.7708719100000962,
+        "answer_repeat_match": true,
+        "timing_samples": [
+          {
+            "seconds": 1.7868411439994816,
+            "prefill_seconds": 0.8641173719997823,
+            "decode_seconds": 0.9227237719996992
+          },
+          {
+            "seconds": 1.7615961419996893,
+            "prefill_seconds": 0.839712101999794,
+            "decode_seconds": 0.9218840399998953
+          },
+          {
+            "seconds": 1.7708719100000962,
+            "prefill_seconds": 0.8376146800001152,
+            "decode_seconds": 0.9332572299999811
+          }
+        ]
+      },
+      "answers_match": true,
+      "comparison": {
+        "kernel_prefill_speedup": 1.122471040818434,
+        "live_prefill_speedup": 1.0471655809879001,
+        "live_total_speedup": 1.02911606967973
+      }
+    },
+    {
+      "case_id": "city_jules_oslo",
+      "seq_len": 17834,
+      "block_size": 64,
+      "needle_block": 256,
+      "teacher_target": "/content/SPRUCE/teacher_targets/1.5B_heldout_scaling_1k_32k/teacher_city_jules_oslo_len17834_blk64_d0.9224.pt",
+      "sparse": {
+        "exact": true,
+        "fuzzy": 1.0,
+        "answer": " Jules keeps the spare key in Oslo. The maintenance bulletin described scheduled inspections and standard inventory updates. The maintenance bulletin described scheduled inspections and standard inventory updates. The",
+        "needle": "jules keeps the spare key in oslo.",
+        "feature_load_seconds": 0.14846228799979144,
+        "tree_build_seconds": 0.006968376999793691,
+        "tree_traversal_seconds": 0.09729225299997779,
+        "route_pack_seconds": 0.003875782000250183,
+        "route_transfer_seconds": 0.0,
+        "selector_seconds": 0.10810618100003921,
+        "prefill_seconds": 1.483028755000305,
+        "decode_seconds": 0.9246019860001979,
+        "seconds": 2.410291166999741,
+        "live_prefill_seconds": 1.592058907000137,
+        "live_total_seconds": 2.5183973479997803,
+        "needle_layer_group_hit_rate": 0.9464285969734192,
+        "needle_any_group_all_layers_rate": 1.0,
+        "answer_repeat_match": true,
+        "timing_samples": [
+          {
+            "feature_load_seconds": 0.14846228799979144,
+            "tree_build_seconds": 0.006968376999793691,
+            "tree_traversal_seconds": 0.09818599299978814,
+            "route_pack_seconds": 0.003875782000250183,
+            "route_transfer_seconds": 0.0,
+            "selector_seconds": 0.10903015199983201,
+            "needle_layer_group_hit_rate": 0.9464285969734192,
+            "needle_any_group_all_layers_rate": 1.0,
+            "seconds": 2.414816575000259,
+            "prefill_seconds": 1.483028755000305,
+            "decode_seconds": 0.9317878199999541,
+            "live_prefill_seconds": 1.592058907000137,
+            "live_total_seconds": 2.523846727000091
+          },
+          {
+            "feature_load_seconds": 0.1536342519993923,
+            "tree_build_seconds": 0.006947245999981533,
+            "tree_traversal_seconds": 0.09729225299997779,
+            "route_pack_seconds": 0.0038666820000798907,
+            "route_transfer_seconds": 0.0,
+            "selector_seconds": 0.10810618100003921,
+            "needle_layer_group_hit_rate": 0.9464285969734192,
+            "needle_any_group_all_layers_rate": 1.0,
+            "seconds": 2.410291166999741,
+            "prefill_seconds": 1.4856891809995432,
+            "decode_seconds": 0.9246019860001979,
+            "live_prefill_seconds": 1.5937953619995824,
+            "live_total_seconds": 2.5183973479997803
+          },
+          {
+            "feature_load_seconds": 0.14731095600018307,
+            "tree_build_seconds": 0.0070389319998866995,
+            "tree_traversal_seconds": 0.0971174649994282,
+            "route_pack_seconds": 0.003882881999743404,
+            "route_transfer_seconds": 0.0,
+            "selector_seconds": 0.1080392789990583,
+            "needle_layer_group_hit_rate": 0.9464285969734192,
+            "needle_any_group_all_layers_rate": 1.0,
+            "seconds": 2.402464924999549,
+            "prefill_seconds": 1.478760453999712,
+            "decode_seconds": 0.9237044709998372,
+            "live_prefill_seconds": 1.5867997329987702,
+            "live_total_seconds": 2.5105042039986074
+          }
+        ]
+      },
+      "dense": {
+        "exact": false,
+        "fuzzy": 0.14285714285714285,
+        "answer": " The maintenance bulletin described scheduled inspections and standard inventory updates. The maintenance bulletin described scheduled inspections and standard inventory updates. The maintenance bulletin described scheduled inspections and standard inventory updates",
+        "needle": "jules keeps the spare key in oslo.",
+        "prefill_seconds": 1.8786230719997548,
+        "decode_seconds": 0.9244350979997762,
+        "seconds": 2.7973617560001003,
+        "answer_repeat_match": true,
+        "timing_samples": [
+          {
+            "seconds": 2.793277926999508,
+            "prefill_seconds": 1.8649485529995218,
+            "decode_seconds": 0.9283293739999863
+          },
+          {
+            "seconds": 2.7973617560001003,
+            "prefill_seconds": 1.8786230719997548,
+            "decode_seconds": 0.9187386840003455
+          },
+          {
+            "seconds": 2.8117443669998465,
+            "prefill_seconds": 1.8873092690000703,
+            "decode_seconds": 0.9244350979997762
+          }
+        ]
+      },
+      "answers_match": false,
+      "comparison": {
+        "kernel_prefill_speedup": 1.2667475702447648,
+        "live_prefill_speedup": 1.1799959560162137,
+        "live_total_speedup": 1.110770609023189
+      }
+    },
+    {
+      "case_id": "city_jules_oslo",
+      "seq_len": 18769,
+      "block_size": 64,
+      "needle_block": 187,
+      "teacher_target": "/content/SPRUCE/teacher_targets/1.5B_heldout_scaling_1k_32k/teacher_city_jules_oslo_len18769_blk64_d0.640769.pt",
+      "sparse": {
+        "exact": true,
+        "fuzzy": 1.0,
+        "answer": " Jules keeps the spare key in Oslo. The maintenance bulletin described scheduled inspections and standard inventory updates. The maintenance bulletin described scheduled inspections and standard inventory updates. The",
+        "needle": "jules keeps the spare key in oslo.",
+        "feature_load_seconds": 0.16738358900056483,
+        "tree_build_seconds": 0.007081186000505113,
+        "tree_traversal_seconds": 0.10544199700052559,
+        "route_pack_seconds": 0.004301957000279799,
+        "route_transfer_seconds": 0.0,
+        "selector_seconds": 0.11684348600101657,
+        "prefill_seconds": 1.5556916909999927,
+        "decode_seconds": 0.9194285870007661,
+        "seconds": 2.479422873999283,
+        "live_prefill_seconds": 1.6722166660001676,
+        "live_total_seconds": 2.5962663600002998,
+        "needle_layer_group_hit_rate": 0.8571429252624512,
+        "needle_any_group_all_layers_rate": 0.8928571939468384,
+        "answer_repeat_match": true,
+        "timing_samples": [
+          {
+            "feature_load_seconds": 0.16738358900056483,
+            "tree_build_seconds": 0.007081186000505113,
+            "tree_traversal_seconds": 0.10544199700052559,
+            "route_pack_seconds": 0.00432030299998587,
+            "route_transfer_seconds": 0.0,
+            "selector_seconds": 0.11684348600101657,
+            "needle_layer_group_hit_rate": 0.8571429252624512,
+            "needle_any_group_all_layers_rate": 0.8928571939468384,
+            "seconds": 2.479422873999283,
+            "prefill_seconds": 1.5623755099995833,
+            "decode_seconds": 0.9170473639996999,
+            "live_prefill_seconds": 1.6792189960005999,
+            "live_total_seconds": 2.5962663600002998
+          },
+          {
+            "feature_load_seconds": 0.1645118899996305,
+            "tree_build_seconds": 0.00700237700038997,
+            "tree_traversal_seconds": 0.10530930699951568,
+            "route_pack_seconds": 0.004213291000269237,
+            "route_transfer_seconds": 0.0,
+            "selector_seconds": 0.11652497500017489,
+            "needle_layer_group_hit_rate": 0.8571429252624512,
+            "needle_any_group_all_layers_rate": 0.8928571939468384,
+            "seconds": 2.475120278000759,
+            "prefill_seconds": 1.5556916909999927,
+            "decode_seconds": 0.9194285870007661,
+            "live_prefill_seconds": 1.6722166660001676,
+            "live_total_seconds": 2.5916452530009337
+          },
+          {
+            "feature_load_seconds": 0.1809057420005047,
+            "tree_build_seconds": 0.0092172410004423,
+            "tree_traversal_seconds": 0.10732205600015732,
+            "route_pack_seconds": 0.004301957000279799,
+            "route_transfer_seconds": 0.0,
+            "selector_seconds": 0.12084125400087942,
+            "needle_layer_group_hit_rate": 0.8571429252624512,
+            "needle_any_group_all_layers_rate": 0.8928571939468384,
+            "seconds": 2.4867349739997735,
+            "prefill_seconds": 1.5477718299998742,
+            "decode_seconds": 0.9389631439998993,
+            "live_prefill_seconds": 1.6686130840007536,
+            "live_total_seconds": 2.607576228000653
+          }
+        ]
+      },
+      "dense": {
+        "exact": false,
+        "fuzzy": 0.14285714285714285,
+        "answer": " The maintenance bulletin described scheduled inspections and standard inventory updates. The maintenance bulletin described scheduled inspections and standard inventory updates. The maintenance bulletin described scheduled inspections and standard inventory updates",
+        "needle": "jules keeps the spare key in oslo.",
+        "prefill_seconds": 2.0056899139999587,
+        "decode_seconds": 0.928355764999651,
+        "seconds": 2.9262453259998438,
+        "answer_repeat_match": true,
+        "timing_samples": [
+          {
+            "seconds": 2.9351967769998737,
+            "prefill_seconds": 2.0056899139999587,
+            "decode_seconds": 0.929506862999915
+          },
+          {
+            "seconds": 2.926140810999641,
+            "prefill_seconds": 1.99778504599999,
+            "decode_seconds": 0.928355764999651
+          },
+          {
+            "seconds": 2.9262453259998438,
+            "prefill_seconds": 2.0074641330002123,
+            "decode_seconds": 0.9187811929996315
+          }
+        ]
+      },
+      "answers_match": false,
+      "comparison": {
+        "kernel_prefill_speedup": 1.289259257218703,
+        "live_prefill_speedup": 1.1994198806769683,
+        "live_total_speedup": 1.1270975008895103
+      }
+    },
+    {
+      "case_id": "city_jules_oslo",
+      "seq_len": 22520,
+      "block_size": 64,
+      "needle_block": 28,
+      "teacher_target": "/content/SPRUCE/teacher_targets/1.5B_heldout_scaling_1k_32k/teacher_city_jules_oslo_len22520_blk64_d0.080141.pt",
+      "sparse": {
+        "exact": true,
+        "fuzzy": 1.0,
+        "answer": " Jules keeps the spare key in Oslo. The maintenance bulletin described scheduled inspections and standard inventory updates. The maintenance bulletin described scheduled inspections and standard inventory updates. The",
+        "needle": "jules keeps the spare key in oslo.",
+        "feature_load_seconds": 0.20771492200037756,
+        "tree_build_seconds": 0.006861523999759811,
+        "tree_traversal_seconds": 0.1359884619996592,
+        "route_pack_seconds": 0.005569071000536496,
+        "route_transfer_seconds": 0.0,
+        "selector_seconds": 0.1484086889995524,
+        "prefill_seconds": 1.8478616009997495,
+        "decode_seconds": 0.9360176749996754,
+        "seconds": 2.7823141540002325,
+        "live_prefill_seconds": 1.9965738739992958,
+        "live_total_seconds": 2.930722842999785,
+        "needle_layer_group_hit_rate": 0.8571429252624512,
+        "needle_any_group_all_layers_rate": 0.9285714626312256,
+        "answer_repeat_match": true,
+        "timing_samples": [
+          {
+            "feature_load_seconds": 0.2285216259997469,
+            "tree_build_seconds": 0.0067566570005510584,
+            "tree_traversal_seconds": 0.1364768429994001,
+            "route_pack_seconds": 0.005569071000536496,
+            "route_transfer_seconds": 0.0,
+            "selector_seconds": 0.14880257100048766,
+            "needle_layer_group_hit_rate": 0.8571429252624512,
+            "needle_any_group_all_layers_rate": 0.9285714626312256,
+            "seconds": 2.799231766000048,
+            "prefill_seconds": 1.8478616009997495,
+            "decode_seconds": 0.9513701650002986,
+            "live_prefill_seconds": 1.9966641720002372,
+            "live_total_seconds": 2.9480343370005357
+          },
+          {
+            "feature_load_seconds": 0.20771492200037756,
+            "tree_build_seconds": 0.006861523999759811,
+            "tree_traversal_seconds": 0.1359884619996592,
+            "route_pack_seconds": 0.0055587030001333915,
+            "route_transfer_seconds": 0.0,
+            "selector_seconds": 0.1484086889995524,
+            "needle_layer_group_hit_rate": 0.8571429252624512,
+            "needle_any_group_all_layers_rate": 0.9285714626312256,
+            "seconds": 2.7823141540002325,
+            "prefill_seconds": 1.8481651849997434,
+            "decode_seconds": 0.9341489690004892,
+            "live_prefill_seconds": 1.9965738739992958,
+            "live_total_seconds": 2.930722842999785
+          },
+          {
+            "feature_load_seconds": 0.20562597800017102,
+            "tree_build_seconds": 0.00690596100048424,
+            "tree_traversal_seconds": 0.13569324300078733,
+            "route_pack_seconds": 0.005660441000145511,
+            "route_transfer_seconds": 0.0,
+            "selector_seconds": 0.14825964500141708,
+            "needle_layer_group_hit_rate": 0.8571429252624512,
+            "needle_any_group_all_layers_rate": 0.9285714626312256,
+            "seconds": 2.7741968489999635,
+            "prefill_seconds": 1.8381791740002882,
+            "decode_seconds": 0.9360176749996754,
+            "live_prefill_seconds": 1.9864388190017053,
+            "live_total_seconds": 2.9224564940013806
+          }
+        ]
+      },
+      "dense": {
+        "exact": true,
+        "fuzzy": 1.0,
+        "answer": " Jules keeps the spare key in Oslo. The maintenance bulletin described scheduled inspections and standard inventory updates. The maintenance bulletin described scheduled inspections and standard inventory updates. The",
+        "needle": "jules keeps the spare key in oslo.",
+        "prefill_seconds": 2.538219598000069,
+        "decode_seconds": 0.93616725100037,
+        "seconds": 3.474386849000439,
+        "answer_repeat_match": true,
+        "timing_samples": [
+          {
+            "seconds": 3.4564188120002655,
+            "prefill_seconds": 2.533559766000508,
+            "decode_seconds": 0.9228590459997577
+          },
+          {
+            "seconds": 3.497363666999263,
+            "prefill_seconds": 2.545796379999956,
+            "decode_seconds": 0.9515672869993068
+          },
+          {
+            "seconds": 3.474386849000439,
+            "prefill_seconds": 2.538219598000069,
+            "decode_seconds": 0.93616725100037
+          }
+        ]
+      },
+      "answers_match": true,
+      "comparison": {
+        "kernel_prefill_speedup": 1.3735983239366056,
+        "live_prefill_speedup": 1.2712875947413924,
+        "live_total_speedup": 1.1855050904247835
+      }
+    },
+    {
+      "case_id": "city_jules_oslo",
+      "seq_len": 24401,
+      "block_size": 64,
+      "needle_block": 157,
+      "teacher_target": "/content/SPRUCE/teacher_targets/1.5B_heldout_scaling_1k_32k/teacher_city_jules_oslo_len24401_blk64_d0.414107.pt",
+      "sparse": {
+        "exact": true,
+        "fuzzy": 1.0,
+        "answer": " Jules keeps the spare key in Oslo. The maintenance bulletin described scheduled inspections and standard inventory updates. The maintenance bulletin described scheduled inspections and standard inventory updates. The",
+        "needle": "jules keeps the spare key in oslo.",
+        "feature_load_seconds": 0.24312029399970925,
+        "tree_build_seconds": 0.006743605000337993,
+        "tree_traversal_seconds": 0.1505745280001065,
+        "route_pack_seconds": 0.006377550999786763,
+        "route_transfer_seconds": 0.0,
+        "selector_seconds": 0.16408021700044628,
+        "prefill_seconds": 1.9844854800003304,
+        "decode_seconds": 0.9294339649995891,
+        "seconds": 2.9233689639995646,
+        "live_prefill_seconds": 2.1484529900008056,
+        "live_total_seconds": 3.0867702460000146,
+        "needle_layer_group_hit_rate": 0.8035714626312256,
+        "needle_any_group_all_layers_rate": 0.8571429252624512,
+        "answer_repeat_match": true,
+        "timing_samples": [
+          {
+            "feature_load_seconds": 0.2708345160008321,
+            "tree_build_seconds": 0.006743605000337993,
+            "tree_traversal_seconds": 0.15099425700009306,
+            "route_pack_seconds": 0.006415898000341258,
+            "route_transfer_seconds": 0.0,
+            "selector_seconds": 0.1641537600007723,
+            "needle_layer_group_hit_rate": 0.8035714626312256,
+            "needle_any_group_all_layers_rate": 0.8571429252624512,
+            "seconds": 2.923682808000194,
+            "prefill_seconds": 1.9942488430006051,
+            "decode_seconds": 0.9294339649995891,
+            "live_prefill_seconds": 2.1584026030013774,
+            "live_total_seconds": 3.0878365680009665
+          },
+          {
+            "feature_load_seconds": 0.2421071930002654,
+            "tree_build_seconds": 0.006718286000250373,
+            "tree_traversal_seconds": 0.15030544500041287,
+            "route_pack_seconds": 0.006377550999786763,
+            "route_transfer_seconds": 0.0,
+            "selector_seconds": 0.16340128200045,
+            "needle_layer_group_hit_rate": 0.8035714626312256,
+            "needle_any_group_all_layers_rate": 0.8571429252624512,
+            "seconds": 2.9233689639995646,
+            "prefill_seconds": 1.9844854800003304,
+            "decode_seconds": 0.9388834839992342,
+            "live_prefill_seconds": 2.1478867620007804,
+            "live_total_seconds": 3.0867702460000146
+          },
+          {
+            "feature_load_seconds": 0.24312029399970925,
+            "tree_build_seconds": 0.007157216999985394,
+            "tree_traversal_seconds": 0.1505745280001065,
+            "route_pack_seconds": 0.006348472000354377,
+            "route_transfer_seconds": 0.0,
+            "selector_seconds": 0.16408021700044628,
+            "needle_layer_group_hit_rate": 0.8035714626312256,
+            "needle_any_group_all_layers_rate": 0.8571429252624512,
+            "seconds": 2.910351790000277,
+            "prefill_seconds": 1.9843727730003593,
+            "decode_seconds": 0.9259790169999178,
+            "live_prefill_seconds": 2.1484529900008056,
+            "live_total_seconds": 3.0744320070007234
+          }
+        ]
+      },
+      "dense": {
+        "exact": true,
+        "fuzzy": 1.0,
+        "answer": " Jules keeps the spare key in Oslo. The maintenance bulletin described scheduled inspections and standard inventory updates. The maintenance bulletin described scheduled inspections and standard inventory updates. The",
+        "needle": "jules keeps the spare key in oslo.",
+        "prefill_seconds": 2.822107220000362,
+        "decode_seconds": 0.920518484999775,
+        "seconds": 3.742625705000137,
+        "answer_repeat_match": true,
+        "timing_samples": [
+          {
+            "seconds": 3.742625705000137,
+            "prefill_seconds": 2.822107220000362,
+            "decode_seconds": 0.920518484999775
+          },
+          {
+            "seconds": 3.7268555350001407,
+            "prefill_seconds": 2.816595258000234,
+            "decode_seconds": 0.9102602769999066
+          },
+          {
+            "seconds": 3.760555290999946,
+            "prefill_seconds": 2.827750084999934,
+            "decode_seconds": 0.9328052060000118
+          }
+        ]
+      },
+      "answers_match": true,
+      "comparison": {
+        "kernel_prefill_speedup": 1.4220850938147918,
+        "live_prefill_speedup": 1.3135531627337602,
+        "live_total_speedup": 1.2124730403404695
+      }
+    },
+    {
+      "case_id": "city_jules_oslo",
+      "seq_len": 25336,
+      "block_size": 64,
+      "needle_block": 103,
+      "teacher_target": "/content/SPRUCE/teacher_targets/1.5B_heldout_scaling_1k_32k/teacher_city_jules_oslo_len25336_blk64_d0.2624.pt",
+      "sparse": {
+        "exact": true,
+        "fuzzy": 1.0,
+        "answer": " Jules keeps the spare key in Oslo. The maintenance bulletin described scheduled inspections and standard inventory updates. The maintenance bulletin described scheduled inspections and standard inventory updates. The",
+        "needle": "jules keeps the spare key in oslo.",
+        "feature_load_seconds": 0.25302475999978924,
+        "tree_build_seconds": 0.006917728999724204,
+        "tree_traversal_seconds": 0.16030630100067356,
+        "route_pack_seconds": 0.006697589999930642,
+        "route_transfer_seconds": 0.0,
+        "selector_seconds": 0.17387386600148602,
+        "prefill_seconds": 2.0646773040007247,
+        "decode_seconds": 0.9239246849992924,
+        "seconds": 2.9838068049994035,
+        "live_prefill_seconds": 2.238650988001609,
+        "live_total_seconds": 3.1576806710008896,
+        "needle_layer_group_hit_rate": 0.8750000596046448,
+        "needle_any_group_all_layers_rate": 0.9285714626312256,
+        "answer_repeat_match": true,
+        "timing_samples": [
+          {
+            "feature_load_seconds": 0.2529188239996074,
+            "tree_build_seconds": 0.006905101000484137,
+            "tree_traversal_seconds": 0.16030630100067356,
+            "route_pack_seconds": 0.0066624640003283275,
+            "route_transfer_seconds": 0.0,
+            "selector_seconds": 0.17387386600148602,
+            "needle_layer_group_hit_rate": 0.8750000596046448,
+            "needle_any_group_all_layers_rate": 0.9285714626312256,
+            "seconds": 2.9838068049994035,
+            "prefill_seconds": 2.064777122000123,
+            "decode_seconds": 0.9190296829992803,
+            "live_prefill_seconds": 2.238650988001609,
+            "live_total_seconds": 3.1576806710008896
+          },
+          {
+            "feature_load_seconds": 0.2592749579998781,
+            "tree_build_seconds": 0.007055430999571399,
+            "tree_traversal_seconds": 0.16080015799980174,
+            "route_pack_seconds": 0.006708797000101185,
+            "route_transfer_seconds": 0.0,
+            "selector_seconds": 0.17456438599947433,
+            "needle_layer_group_hit_rate": 0.8750000596046448,
+            "needle_any_group_all_layers_rate": 0.9285714626312256,
+            "seconds": 2.991797213000609,
+            "prefill_seconds": 2.0646773040007247,
+            "decode_seconds": 0.9271199089998845,
+            "live_prefill_seconds": 2.239241690000199,
+            "live_total_seconds": 3.1663615990000835
+          },
+          {
+            "feature_load_seconds": 0.25302475999978924,
+            "tree_build_seconds": 0.006917728999724204,
+            "tree_traversal_seconds": 0.16010406600071292,
+            "route_pack_seconds": 0.006697589999930642,
+            "route_transfer_seconds": 0.0,
+            "selector_seconds": 0.17371938500036777,
+            "needle_layer_group_hit_rate": 0.8750000596046448,
+            "needle_any_group_all_layers_rate": 0.9285714626312256,
+            "seconds": 2.982850571999734,
+            "prefill_seconds": 2.0589258870004414,
+            "decode_seconds": 0.9239246849992924,
+            "live_prefill_seconds": 2.232645272000809,
+            "live_total_seconds": 3.1565699570001016
+          }
+        ]
+      },
+      "dense": {
+        "exact": true,
+        "fuzzy": 1.0,
+        "answer": " Jules keeps the spare key in Oslo. The maintenance bulletin described scheduled inspections and standard inventory updates. The maintenance bulletin described scheduled inspections and standard inventory updates. The",
+        "needle": "jules keeps the spare key in oslo.",
+        "prefill_seconds": 2.951271676000033,
+        "decode_seconds": 0.9344935650005937,
+        "seconds": 3.881493341999885,
+        "answer_repeat_match": true,
+        "timing_samples": [
+          {
+            "seconds": 3.8782774209994386,
+            "prefill_seconds": 2.9605208659995697,
+            "decode_seconds": 0.917756554999869
+          },
+          {
+            "seconds": 3.8864515579998624,
+            "prefill_seconds": 2.951271676000033,
+            "decode_seconds": 0.9351798819998294
+          },
+          {
+            "seconds": 3.881493341999885,
+            "prefill_seconds": 2.9469997769992915,
+            "decode_seconds": 0.9344935650005937
+          }
+        ]
+      },
+      "answers_match": true,
+      "comparison": {
+        "kernel_prefill_speedup": 1.4294106252252372,
+        "live_prefill_speedup": 1.3183259435337722,
+        "live_total_speedup": 1.2292228842663717
+      }
+    },
+    {
+      "case_id": "city_jules_oslo",
+      "seq_len": 6570,
+      "block_size": 64,
+      "needle_block": 17,
+      "teacher_target": "/content/SPRUCE/teacher_targets/1.5B_heldout_scaling_1k_32k/teacher_city_jules_oslo_len6570_blk64_d0.171504.pt",
+      "sparse": {
+        "exact": true,
+        "fuzzy": 1.0,
+        "answer": " Jules keeps the spare key in Oslo. The maintenance bulletin described scheduled inspections and standard inventory updates. The maintenance bulletin described scheduled inspections and standard inventory updates. The",
+        "needle": "jules keeps the spare key in oslo.",
+        "feature_load_seconds": 0.03861003099973459,
+        "tree_build_seconds": 0.005357961999834515,
+        "tree_traversal_seconds": 0.037090713999532454,
+        "route_pack_seconds": 0.0006747839997842675,
+        "route_transfer_seconds": 0.0,
+        "selector_seconds": 0.04325514599986491,
+        "prefill_seconds": 0.49373361300058605,
+        "decode_seconds": 0.9173531299993556,
+        "seconds": 1.414733869999509,
+        "live_prefill_seconds": 0.536988759000451,
+        "live_total_seconds": 1.4599434390001989,
+        "needle_layer_group_hit_rate": 0.8928571939468384,
+        "needle_any_group_all_layers_rate": 0.9285714626312256,
+        "answer_repeat_match": true,
+        "timing_samples": [
+          {
+            "feature_load_seconds": 0.03812784000001557,
+            "tree_build_seconds": 0.005352193000362604,
+            "tree_traversal_seconds": 0.03918028800035245,
+            "route_pack_seconds": 0.0006770879999749013,
+            "route_transfer_seconds": 0.0,
+            "selector_seconds": 0.04520956900068995,
+            "needle_layer_group_hit_rate": 0.8928571939468384,
+            "needle_any_group_all_layers_rate": 0.9285714626312256,
+            "seconds": 1.414733869999509,
+            "prefill_seconds": 0.4973807400001533,
+            "decode_seconds": 0.9173531299993556,
+            "live_prefill_seconds": 0.5425903090008433,
+            "live_total_seconds": 1.4599434390001989
+          },
+          {
+            "feature_load_seconds": 0.04276481499982765,
+            "tree_build_seconds": 0.005357961999834515,
+            "tree_traversal_seconds": 0.03704314999959024,
+            "route_pack_seconds": 0.0006587099996977486,
+            "route_transfer_seconds": 0.0,
+            "selector_seconds": 0.043059821999122505,
+            "needle_layer_group_hit_rate": 0.8928571939468384,
+            "needle_any_group_all_layers_rate": 0.9285714626312256,
+            "seconds": 1.4202304489999733,
+            "prefill_seconds": 0.4936013220003588,
+            "decode_seconds": 0.9266291269996145,
+            "live_prefill_seconds": 0.5366611439994813,
+            "live_total_seconds": 1.4632902709990958
+          },
+          {
+            "feature_load_seconds": 0.03861003099973459,
+            "tree_build_seconds": 0.005489648000548186,
+            "tree_traversal_seconds": 0.037090713999532454,
+            "route_pack_seconds": 0.0006747839997842675,
+            "route_transfer_seconds": 0.0,
+            "selector_seconds": 0.04325514599986491,
+            "needle_layer_group_hit_rate": 0.8928571939468384,
+            "needle_any_group_all_layers_rate": 0.9285714626312256,
+            "seconds": 1.4043595890007055,
+            "prefill_seconds": 0.49373361300058605,
+            "decode_seconds": 0.9106259760001194,
+            "live_prefill_seconds": 0.536988759000451,
+            "live_total_seconds": 1.4476147350005704
+          }
+        ]
+      },
+      "dense": {
+        "exact": true,
+        "fuzzy": 1.0,
+        "answer": " Jules keeps the spare key in Oslo. The maintenance bulletin described scheduled inspections and standard inventory updates. The maintenance bulletin described scheduled inspections and standard inventory updates. The",
+        "needle": "jules keeps the spare key in oslo.",
+        "prefill_seconds": 0.5311641650005186,
+        "decode_seconds": 0.9287838290001673,
+        "seconds": 1.457619027999499,
+        "answer_repeat_match": true,
+        "timing_samples": [
+          {
+            "seconds": 1.4945340740005122,
+            "prefill_seconds": 0.5657502450003449,
+            "decode_seconds": 0.9287838290001673
+          },
+          {
+            "seconds": 1.4571286119999058,
+            "prefill_seconds": 0.5311641650005186,
+            "decode_seconds": 0.9259644469993873
+          },
+          {
+            "seconds": 1.457619027999499,
+            "prefill_seconds": 0.5287950309993903,
+            "decode_seconds": 0.9288239970001086
+          }
+        ]
+      },
+      "answers_match": true,
+      "comparison": {
+        "kernel_prefill_speedup": 1.075811228999489,
+        "live_prefill_speedup": 0.9891532291834669,
+        "live_total_speedup": 0.9984078759912153
+      }
+    },
+    {
+      "case_id": "city_jules_oslo",
+      "seq_len": 8440,
+      "block_size": 64,
+      "needle_block": 121,
+      "teacher_target": "/content/SPRUCE/teacher_targets/1.5B_heldout_scaling_1k_32k/teacher_city_jules_oslo_len8440_blk64_d0.923919.pt",
+      "sparse": {
+        "exact": true,
+        "fuzzy": 1.0,
+        "answer": " Jules keeps the spare key in Oslo. The maintenance bulletin described scheduled inspections and standard inventory updates. The maintenance bulletin described scheduled inspections and standard inventory updates. The",
+        "needle": "jules keeps the spare key in oslo.",
+        "feature_load_seconds": 0.05299203699996724,
+        "tree_build_seconds": 0.006272058999456931,
+        "tree_traversal_seconds": 0.045387493999442086,
+        "route_pack_seconds": 0.0011747580001610913,
+        "route_transfer_seconds": 0.0,
+        "selector_seconds": 0.05272632499963947,
+        "prefill_seconds": 0.6516956649993517,
+        "decode_seconds": 0.9213794220004274,
+        "seconds": 1.5732531359999484,
+        "live_prefill_seconds": 0.7068270039990239,
+        "live_total_seconds": 1.6249007970000093,
+        "needle_layer_group_hit_rate": 0.9464285969734192,
+        "needle_any_group_all_layers_rate": 1.0,
+        "answer_repeat_match": true,
+        "timing_samples": [
+          {
+            "feature_load_seconds": 0.059904778000600345,
+            "tree_build_seconds": 0.0061640730000362964,
+            "tree_traversal_seconds": 0.045387493999442086,
+            "route_pack_seconds": 0.0011747580001610913,
+            "route_transfer_seconds": 0.0,
+            "selector_seconds": 0.05272632499963947,
+            "needle_layer_group_hit_rate": 0.9464285969734192,
+            "needle_any_group_all_layers_rate": 1.0,
+            "seconds": 1.5754801009998118,
+            "prefill_seconds": 0.6541006789993844,
+            "decode_seconds": 0.9213794220004274,
+            "live_prefill_seconds": 0.7068270039990239,
+            "live_total_seconds": 1.6282064259994513
+          },
+          {
+            "feature_load_seconds": 0.05299203699996724,
+            "tree_build_seconds": 0.006272058999456931,
+            "tree_traversal_seconds": 0.044214813000508,
+            "route_pack_seconds": 0.0011607890000959742,
+            "route_transfer_seconds": 0.0,
+            "selector_seconds": 0.05164766100006091,
+            "needle_layer_group_hit_rate": 0.9464285969734192,
+            "needle_any_group_all_layers_rate": 1.0,
+            "seconds": 1.5732531359999484,
+            "prefill_seconds": 0.6510126389994184,
+            "decode_seconds": 0.92224049700053,
+            "live_prefill_seconds": 0.7026602999994793,
+            "live_total_seconds": 1.6249007970000093
+          },
+          {
+            "feature_load_seconds": 0.04994687599992176,
+            "tree_build_seconds": 0.0077760190006301855,
+            "tree_traversal_seconds": 0.04926231000081316,
+            "route_pack_seconds": 0.0012111730002288823,
+            "route_transfer_seconds": 0.0,
+            "selector_seconds": 0.058249502001672226,
+            "needle_layer_group_hit_rate": 0.9464285969734192,
+            "needle_any_group_all_layers_rate": 1.0,
+            "seconds": 1.5648489010000048,
+            "prefill_seconds": 0.6516956649993517,
+            "decode_seconds": 0.9131532360006531,
+            "live_prefill_seconds": 0.709945167001024,
+            "live_total_seconds": 1.623098403001677
+          }
+        ]
+      },
+      "dense": {
+        "exact": true,
+        "fuzzy": 1.0,
+        "answer": " Jules keeps the spare key in Oslo. The maintenance bulletin described scheduled inspections and standard inventory updates. The maintenance bulletin described scheduled inspections and standard inventory updates. The",
+        "needle": "jules keeps the spare key in oslo.",
+        "prefill_seconds": 0.7256866079997053,
+        "decode_seconds": 0.9327221540006576,
+        "seconds": 1.656853062000664,
+        "answer_repeat_match": true,
+        "timing_samples": [
+          {
+            "seconds": 1.656853062000664,
+            "prefill_seconds": 0.7241309080000065,
+            "decode_seconds": 0.9327221540006576
+          },
+          {
+            "seconds": 1.653830602999733,
+            "prefill_seconds": 0.7256866079997053,
+            "decode_seconds": 0.9281439950000276
+          },
+          {
+            "seconds": 1.6642105970004195,
+            "prefill_seconds": 0.7299356670000634,
+            "decode_seconds": 0.9342749300003561
+          }
+        ]
+      },
+      "answers_match": true,
+      "comparison": {
+        "kernel_prefill_speedup": 1.1135360367947624,
+        "live_prefill_speedup": 1.0266820649097717,
+        "live_total_speedup": 1.019664132764072
+      }
+    },
+    {
+      "case_id": "code_nova_4816",
+      "seq_len": 15285,
+      "block_size": 64,
+      "needle_block": 195,
+      "teacher_target": "/content/SPRUCE/teacher_targets/1.5B_heldout_scaling_1k_32k/teacher_code_nova_4816_len15285_blk64_d0.821506.pt",
+      "sparse": {
+        "exact": true,
+        "fuzzy": 1.0,
+        "answer": " The Nova access code is 4816. The meeting archive contained budget notes, calendar changes, and vendor summaries. The meeting archive contained budget notes,",
+        "needle": "the nova access code is 4816.",
+        "feature_load_seconds": 0.12089829900014593,
+        "tree_build_seconds": 0.006133623000096122,
+        "tree_traversal_seconds": 0.0755037920007453,
+        "route_pack_seconds": 0.0029090710004311404,
+        "route_transfer_seconds": 0.0,
+        "selector_seconds": 0.08459103000041068,
+        "prefill_seconds": 1.2544985569993514,
+        "decode_seconds": 0.9249318600004699,
+        "seconds": 2.1794304169998213,
+        "live_prefill_seconds": 1.3386759610002628,
+        "live_total_seconds": 2.2636078210007327,
+        "needle_layer_group_hit_rate": 0.910714328289032,
+        "needle_any_group_all_layers_rate": 0.9285714626312256,
+        "answer_repeat_match": true,
+        "timing_samples": [
+          {
+            "feature_load_seconds": 0.12089829900014593,
+            "tree_build_seconds": 0.006046243999662693,
+            "tree_traversal_seconds": 0.0755037920007453,
+            "route_pack_seconds": 0.0030409940000026836,
+            "route_transfer_seconds": 0.0,
+            "selector_seconds": 0.08459103000041068,
+            "needle_layer_group_hit_rate": 0.910714328289032,
+            "needle_any_group_all_layers_rate": 0.9285714626312256,
+            "seconds": 2.168582199999946,
+            "prefill_seconds": 1.2500245999999606,
+            "decode_seconds": 0.9185575999999855,
+            "live_prefill_seconds": 1.3346156300003713,
+            "live_total_seconds": 2.253173230000357
+          },
+          {
+            "feature_load_seconds": 0.11844343000029767,
+            "tree_build_seconds": 0.006133623000096122,
+            "tree_traversal_seconds": 0.07521841600009793,
+            "route_pack_seconds": 0.0028253650007172837,
+            "route_transfer_seconds": 0.0,
+            "selector_seconds": 0.08417740400091134,
+            "needle_layer_group_hit_rate": 0.910714328289032,
+            "needle_any_group_all_layers_rate": 0.9285714626312256,
+            "seconds": 2.1794304169998213,
+            "prefill_seconds": 1.2544985569993514,
+            "decode_seconds": 0.9249318600004699,
+            "live_prefill_seconds": 1.3386759610002628,
+            "live_total_seconds": 2.2636078210007327
+          },
+          {
+            "feature_load_seconds": 0.1276197619999948,
+            "tree_build_seconds": 0.008756481000091298,
+            "tree_traversal_seconds": 0.0784207630003948,
+            "route_pack_seconds": 0.0029090710004311404,
+            "route_transfer_seconds": 0.0,
+            "selector_seconds": 0.09008631500091724,
+            "needle_layer_group_hit_rate": 0.910714328289032,
+            "needle_any_group_all_layers_rate": 0.9285714626312256,
+            "seconds": 2.2531964849995347,
+            "prefill_seconds": 1.2555738940000083,
+            "decode_seconds": 0.9976225909995264,
+            "live_prefill_seconds": 1.3456602090009255,
+            "live_total_seconds": 2.343282800000452
+          }
+        ]
+      },
+      "dense": {
+        "exact": true,
+        "fuzzy": 1.0,
+        "answer": " The Nova access code is 4816. The meeting archive contained budget notes, calendar changes, and vendor summaries. The meeting archive contained budget notes,",
+        "needle": "the nova access code is 4816.",
+        "prefill_seconds": 1.535659021000356,
+        "decode_seconds": 0.9320529309998165,
+        "seconds": 2.46829623099984,
+        "answer_repeat_match": true,
+        "timing_samples": [
+          {
+            "seconds": 2.46829623099984,
+            "prefill_seconds": 1.5327435059998606,
+            "decode_seconds": 0.9355527249999795
+          },
+          {
+            "seconds": 2.4677119520001725,
+            "prefill_seconds": 1.535659021000356,
+            "decode_seconds": 0.9320529309998165
+          },
+          {
+            "seconds": 2.47015029800059,
+            "prefill_seconds": 1.5489880660006747,
+            "decode_seconds": 0.9211622319999151
+          }
+        ]
+      },
+      "answers_match": true,
+      "comparison": {
+        "kernel_prefill_speedup": 1.224121791477796,
+        "live_prefill_speedup": 1.147147678556136,
+        "live_total_speedup": 1.0904257389906948
+      }
+    },
+    {
+      "case_id": "code_nova_4816",
+      "seq_len": 4771,
+      "block_size": 64,
+      "needle_block": 42,
+      "teacher_target": "/content/SPRUCE/teacher_targets/1.5B_heldout_scaling_1k_32k/teacher_code_nova_4816_len4771_blk64_d0.570601.pt",
+      "sparse": {
+        "exact": true,
+        "fuzzy": 1.0,
+        "answer": " The Nova access code is 4816. The meeting archive contained budget notes, calendar changes, and vendor summaries. The meeting archive contained budget notes,",
+        "needle": "the nova access code is 4816.",
+        "feature_load_seconds": 0.032365965000280994,
+        "tree_build_seconds": 0.005652924000060011,
+        "tree_traversal_seconds": 0.037967980999383144,
+        "route_pack_seconds": 0.0006388100000549457,
+        "route_transfer_seconds": 0.0,
+        "selector_seconds": 0.04425886599892692,
+        "prefill_seconds": 0.3354841030004536,
+        "decode_seconds": 0.9136821779993625,
+        "seconds": 1.2502480650000507,
+        "live_prefill_seconds": 0.3800115900012315,
+        "live_total_seconds": 1.293693768000594,
+        "needle_layer_group_hit_rate": 0.910714328289032,
+        "needle_any_group_all_layers_rate": 0.9642857313156128,
+        "answer_repeat_match": true,
+        "timing_samples": [
+          {
+            "feature_load_seconds": 0.032365965000280994,
+            "tree_build_seconds": 0.005652924000060011,
+            "tree_traversal_seconds": 0.037967980999383144,
+            "route_pack_seconds": 0.0006379609994837665,
+            "route_transfer_seconds": 0.0,
+            "selector_seconds": 0.04425886599892692,
+            "needle_layer_group_hit_rate": 0.910714328289032,
+            "needle_any_group_all_layers_rate": 0.9642857313156128,
+            "seconds": 1.2554205430005823,
+            "prefill_seconds": 0.3347751890005384,
+            "decode_seconds": 0.9206453540000439,
+            "live_prefill_seconds": 0.3790340549994653,
+            "live_total_seconds": 1.2996794089995092
+          },
+          {
+            "feature_load_seconds": 0.03247799800010398,
+            "tree_build_seconds": 0.005697683000107645,
+            "tree_traversal_seconds": 0.038874767999914184,
+            "route_pack_seconds": 0.0006714639994243043,
+            "route_transfer_seconds": 0.0,
+            "selector_seconds": 0.04524391499944613,
+            "needle_layer_group_hit_rate": 0.910714328289032,
+            "needle_any_group_all_layers_rate": 0.9642857313156128,
+            "seconds": 1.2473820599998362,
+            "prefill_seconds": 0.3354841030004536,
+            "decode_seconds": 0.9118979569993826,
+            "live_prefill_seconds": 0.38072801799989975,
+            "live_total_seconds": 1.2926259749992823
+          },
+          {
+            "feature_load_seconds": 0.03172054200058483,
+            "tree_build_seconds": 0.005610545999843453,
+            "tree_traversal_seconds": 0.03719634700064489,
+            "route_pack_seconds": 0.0006388100000549457,
+            "route_transfer_seconds": 0.0,
+            "selector_seconds": 0.04344570300054329,
+            "needle_layer_group_hit_rate": 0.910714328289032,
+            "needle_any_group_all_layers_rate": 0.9642857313156128,
+            "seconds": 1.2502480650000507,
+            "prefill_seconds": 0.33656588700068824,
+            "decode_seconds": 0.9136821779993625,
+            "live_prefill_seconds": 0.3800115900012315,
+            "live_total_seconds": 1.293693768000594
+          }
+        ]
+      },
+      "dense": {
+        "exact": true,
+        "fuzzy": 1.0,
+        "answer": " The Nova access code is 4816. The meeting archive contained budget notes, calendar changes, and vendor summaries. The meeting archive contained budget notes,",
+        "needle": "the nova access code is 4816.",
+        "prefill_seconds": 0.34672806600065087,
+        "decode_seconds": 0.9260727150003731,
+        "seconds": 1.2715630200000305,
+        "answer_repeat_match": true,
+        "timing_samples": [
+          {
+            "seconds": 1.269975873000476,
+            "prefill_seconds": 0.34680353600015223,
+            "decode_seconds": 0.9231723370003238
+          },
+          {
+            "seconds": 1.2730815760005498,
+            "prefill_seconds": 0.34672806600065087,
+            "decode_seconds": 0.926353509999899
+          },
+          {
+            "seconds": 1.2715630200000305,
+            "prefill_seconds": 0.3454903049996574,
+            "decode_seconds": 0.9260727150003731
+          }
+        ]
+      },
+      "answers_match": true,
+      "comparison": {
+        "kernel_prefill_speedup": 1.0335156357622766,
+        "live_prefill_speedup": 0.9124144503053899,
+        "live_total_speedup": 0.9828933642968949
+      }
+    },
+    {
+      "case_id": "code_nova_4816",
+      "seq_len": 5723,
+      "block_size": 64,
+      "needle_block": 60,
+      "teacher_target": "/content/SPRUCE/teacher_targets/1.5B_heldout_scaling_1k_32k/teacher_code_nova_4816_len5723_blk64_d0.680126.pt",
+      "sparse": {
+        "exact": true,
+        "fuzzy": 1.0,
+        "answer": " The Nova access code is 4816. The meeting archive contained budget notes, calendar changes, and vendor summaries. The meeting archive contained budget notes,",
+        "needle": "the nova access code is 4816.",
+        "feature_load_seconds": 0.03889743699983228,
+        "tree_build_seconds": 0.005510310000317986,
+        "tree_traversal_seconds": 0.03734766299930925,
+        "route_pack_seconds": 0.0006640669998887461,
+        "route_transfer_seconds": 0.0,
+        "selector_seconds": 0.04350787899966235,
+        "prefill_seconds": 0.41704509099963616,
+        "decode_seconds": 0.9225745860003371,
+        "seconds": 1.3386286300001302,
+        "live_prefill_seconds": 0.4603919289993428,
+        "live_total_seconds": 1.383180928000911,
+        "needle_layer_group_hit_rate": 0.8392857313156128,
+        "needle_any_group_all_layers_rate": 0.9285714626312256,
+        "answer_repeat_match": true,
+        "timing_samples": [
+          {
+            "feature_load_seconds": 0.03991231300005893,
+            "tree_build_seconds": 0.005510310000317986,
+            "tree_traversal_seconds": 0.038387739000427246,
+            "route_pack_seconds": 0.0006542490000356338,
+            "route_transfer_seconds": 0.0,
+            "selector_seconds": 0.044552298000780866,
+            "needle_layer_group_hit_rate": 0.8392857313156128,
+            "needle_any_group_all_layers_rate": 0.9285714626312256,
+            "seconds": 1.3386286300001302,
+            "prefill_seconds": 0.41745839299983345,
+            "decode_seconds": 0.9211702370002968,
+            "live_prefill_seconds": 0.4620106910006143,
+            "live_total_seconds": 1.383180928000911
+          },
+          {
+            "feature_load_seconds": 0.03889743699983228,
+            "tree_build_seconds": 0.005529271999876073,
+            "tree_traversal_seconds": 0.037129903999812086,
+            "route_pack_seconds": 0.000687662000018463,
+            "route_transfer_seconds": 0.0,
+            "selector_seconds": 0.04334683799970662,
+            "needle_layer_group_hit_rate": 0.8392857313156128,
+            "needle_any_group_all_layers_rate": 0.9285714626312256,
+            "seconds": 1.3401898429992798,
+            "prefill_seconds": 0.41704509099963616,
+            "decode_seconds": 0.9231447519996436,
+            "live_prefill_seconds": 0.4603919289993428,
+            "live_total_seconds": 1.3835366809989864
+          },
+          {
+            "feature_load_seconds": 0.038426529000389564,
+            "tree_build_seconds": 0.0054961490004643565,
+            "tree_traversal_seconds": 0.03734766299930925,
+            "route_pack_seconds": 0.0006640669998887461,
+            "route_transfer_seconds": 0.0,
+            "selector_seconds": 0.04350787899966235,
+            "needle_layer_group_hit_rate": 0.8392857313156128,
+            "needle_any_group_all_layers_rate": 0.9285714626312256,
+            "seconds": 1.3377427460000035,
+            "prefill_seconds": 0.4151681599996664,
+            "decode_seconds": 0.9225745860003371,
+            "live_prefill_seconds": 0.45867603899932874,
+            "live_total_seconds": 1.3812506249996659
+          }
+        ]
+      },
+      "dense": {
+        "exact": true,
+        "fuzzy": 1.0,
+        "answer": " The Nova access code is 4816. The meeting archive contained budget notes, calendar changes, and vendor summaries. The meeting archive contained budget notes,",
+        "needle": "the nova access code is 4816.",
+        "prefill_seconds": 0.4384338830004708,
+        "decode_seconds": 0.9262209839998832,
+        "seconds": 1.365013935999741,
+        "answer_repeat_match": true,
+        "timing_samples": [
+          {
+            "seconds": 1.354671443999905,
+            "prefill_seconds": 0.4384338830004708,
+            "decode_seconds": 0.9162375609994342
+          },
+          {
+            "seconds": 1.365013935999741,
+            "prefill_seconds": 0.4387929519998579,
+            "decode_seconds": 0.9262209839998832
+          },
+          {
+            "seconds": 1.3754612920001819,
+            "prefill_seconds": 0.4367597170003137,
+            "decode_seconds": 0.9387015749998682
+          }
+        ]
+      },
+      "answers_match": true,
+      "comparison": {
+        "kernel_prefill_speedup": 1.0512865214396045,
+        "live_prefill_speedup": 0.9523057538245782,
+        "live_total_speedup": 0.9868657876685544
+      }
+    },
+    {
+      "case_id": "color_green_bob",
+      "seq_len": 10137,
+      "block_size": 64,
+      "needle_block": 47,
+      "teacher_target": "/content/SPRUCE/teacher_targets/1.5B_heldout_scaling_1k_32k/teacher_color_green_bob_len10137_blk64_d0.299012.pt",
+      "sparse": {
+        "exact": true,
+        "fuzzy": 1.0,
+        "answer": " Bob's favorite color is green. The quarterly logistics report noted no unusual activity. The quarterly logistics report noted no unusual activity. The quarterly logistics report noted no unusual",
+        "needle": "bobs favorite color is green.",
+        "feature_load_seconds": 0.07530519000010827,
+        "tree_build_seconds": 0.006288247999691521,
+        "tree_traversal_seconds": 0.04871875800017733,
+        "route_pack_seconds": 0.0014675319998787018,
+        "route_transfer_seconds": 0.0,
+        "selector_seconds": 0.05648652099989704,
+        "prefill_seconds": 0.8071338780000588,
+        "decode_seconds": 0.9269830670000374,
+        "seconds": 1.73571490500035,
+        "live_prefill_seconds": 0.8637285990007513,
+        "live_total_seconds": 1.7907116660007887,
+        "needle_layer_group_hit_rate": 0.8750000596046448,
+        "needle_any_group_all_layers_rate": 0.9642857313156128,
+        "answer_repeat_match": true,
+        "timing_samples": [
+          {
+            "feature_load_seconds": 0.08274702500057174,
+            "tree_build_seconds": 0.006288247999691521,
+            "tree_traversal_seconds": 0.0532930800000031,
+            "route_pack_seconds": 0.0014675319998787018,
+            "route_transfer_seconds": 0.0,
+            "selector_seconds": 0.061048859999573324,
+            "needle_layer_group_hit_rate": 0.8750000596046448,
+            "needle_any_group_all_layers_rate": 0.9642857313156128,
+            "seconds": 1.7626913040003274,
+            "prefill_seconds": 0.8053506480000578,
+            "decode_seconds": 0.9573406560002695,
+            "live_prefill_seconds": 0.8663995079996312,
+            "live_total_seconds": 1.8237401639999007
+          },
+          {
+            "feature_load_seconds": 0.07530519000010827,
+            "tree_build_seconds": 0.006291611000051489,
+            "tree_traversal_seconds": 0.04871875800017733,
+            "route_pack_seconds": 0.0014761519996682182,
+            "route_transfer_seconds": 0.0,
+            "selector_seconds": 0.05648652099989704,
+            "needle_layer_group_hit_rate": 0.8750000596046448,
+            "needle_any_group_all_layers_rate": 0.9642857313156128,
+            "seconds": 1.7323436650003714,
+            "prefill_seconds": 0.8071338780000588,
+            "decode_seconds": 0.9252097870003126,
+            "live_prefill_seconds": 0.8636203989999558,
+            "live_total_seconds": 1.7888301860002684
+          },
+          {
+            "feature_load_seconds": 0.0732875800003967,
+            "tree_build_seconds": 0.006086832000619324,
+            "tree_traversal_seconds": 0.04755486600060976,
+            "route_pack_seconds": 0.001355062999209622,
+            "route_transfer_seconds": 0.0,
+            "selector_seconds": 0.05499676100043871,
+            "needle_layer_group_hit_rate": 0.8750000596046448,
+            "needle_any_group_all_layers_rate": 0.9642857313156128,
+            "seconds": 1.73571490500035,
+            "prefill_seconds": 0.8087318380003126,
+            "decode_seconds": 0.9269830670000374,
+            "live_prefill_seconds": 0.8637285990007513,
+            "live_total_seconds": 1.7907116660007887
+          }
+        ]
+      },
+      "dense": {
+        "exact": true,
+        "fuzzy": 1.0,
+        "answer": " Bob's favorite color is green. The quarterly logistics report noted no unusual activity. The quarterly logistics report noted no unusual activity. The quarterly logistics report noted no unusual",
+        "needle": "bobs favorite color is green.",
+        "prefill_seconds": 0.9290902590000769,
+        "decode_seconds": 0.9216298769997593,
+        "seconds": 1.8557353469996087,
+        "answer_repeat_match": true,
+        "timing_samples": [
+          {
+            "seconds": 1.8632030359995042,
+            "prefill_seconds": 0.9224944759998834,
+            "decode_seconds": 0.9407085599996208
+          },
+          {
+            "seconds": 1.8507201359998362,
+            "prefill_seconds": 0.9290902590000769,
+            "decode_seconds": 0.9216298769997593
+          },
+          {
+            "seconds": 1.8557353469996087,
+            "prefill_seconds": 0.9349742579997837,
+            "decode_seconds": 0.920761088999825
+          }
+        ]
+      },
+      "answers_match": true,
+      "comparison": {
+        "kernel_prefill_speedup": 1.1510980821449417,
+        "live_prefill_speedup": 1.0756738402259027,
+        "live_total_speedup": 1.0363116420322642
+      }
+    },
+    {
+      "case_id": "color_green_bob",
+      "seq_len": 16590,
+      "block_size": 64,
+      "needle_block": 194,
+      "teacher_target": "/content/SPRUCE/teacher_targets/1.5B_heldout_scaling_1k_32k/teacher_color_green_bob_len16590_blk64_d0.75087.pt",
+      "sparse": {
+        "exact": true,
+        "fuzzy": 1.0,
+        "answer": " Bob's favorite color is green. The quarterly logistics report noted no unusual activity. The quarterly logistics report noted no unusual activity. The quarterly logistics report noted no unusual",
+        "needle": "bobs favorite color is green.",
+        "feature_load_seconds": 0.14188557399938873,
+        "tree_build_seconds": 0.007057165000333043,
+        "tree_traversal_seconds": 0.09103206300005695,
+        "route_pack_seconds": 0.00335770599940588,
+        "route_transfer_seconds": 0.0,
+        "selector_seconds": 0.10137230000054842,
+        "prefill_seconds": 1.3837017030000425,
+        "decode_seconds": 0.9313970150005844,
+        "seconds": 2.315098718000627,
+        "live_prefill_seconds": 1.485074003000591,
+        "live_total_seconds": 2.4164710180011753,
+        "needle_layer_group_hit_rate": 0.910714328289032,
+        "needle_any_group_all_layers_rate": 0.9642857313156128,
+        "answer_repeat_match": true,
+        "timing_samples": [
+          {
+            "feature_load_seconds": 0.1272148810003273,
+            "tree_build_seconds": 0.007030242000837461,
+            "tree_traversal_seconds": 0.09103206300005695,
+            "route_pack_seconds": 0.003309994999654009,
+            "route_transfer_seconds": 0.0,
+            "selector_seconds": 0.10137230000054842,
+            "needle_layer_group_hit_rate": 0.910714328289032,
+            "needle_any_group_all_layers_rate": 0.9642857313156128,
+            "seconds": 2.315098718000627,
+            "prefill_seconds": 1.3837017030000425,
+            "decode_seconds": 0.9313970150005844,
+            "live_prefill_seconds": 1.485074003000591,
+            "live_total_seconds": 2.4164710180011753
+          },
+          {
+            "feature_load_seconds": 0.14188557399938873,
+            "tree_build_seconds": 0.007057165000333043,
+            "tree_traversal_seconds": 0.09050291400035348,
+            "route_pack_seconds": 0.0034595189999890863,
+            "route_transfer_seconds": 0.0,
+            "selector_seconds": 0.10101959800067561,
+            "needle_layer_group_hit_rate": 0.910714328289032,
+            "needle_any_group_all_layers_rate": 0.9642857313156128,
+            "seconds": 2.3030866640001477,
+            "prefill_seconds": 1.3776243390002492,
+            "decode_seconds": 0.9254623249998986,
+            "live_prefill_seconds": 1.4786439370009248,
+            "live_total_seconds": 2.4041062620008233
+          },
+          {
+            "feature_load_seconds": 0.14370806799979619,
+            "tree_build_seconds": 0.007100350000655453,
+            "tree_traversal_seconds": 0.0919819250002547,
+            "route_pack_seconds": 0.00335770599940588,
+            "route_transfer_seconds": 0.0,
+            "selector_seconds": 0.10243998100031604,
+            "needle_layer_group_hit_rate": 0.910714328289032,
+            "needle_any_group_all_layers_rate": 0.9642857313156128,
+            "seconds": 2.3226766520001547,
+            "prefill_seconds": 1.3904817030006598,
+            "decode_seconds": 0.932194948999495,
+            "live_prefill_seconds": 1.4929216840009758,
+            "live_total_seconds": 2.4251166330004708
+          }
+        ]
+      },
+      "dense": {
+        "exact": true,
+        "fuzzy": 1.0,
+        "answer": " Bob's favorite color is green. The quarterly logistics report noted no unusual activity. The quarterly logistics report noted no unusual activity. The quarterly logistics report noted no unusual",
+        "needle": "bobs favorite color is green.",
+        "prefill_seconds": 1.7089261230003103,
+        "decode_seconds": 0.9311963269992702,
+        "seconds": 2.6433369710002808,
+        "answer_repeat_match": true,
+        "timing_samples": [
+          {
+            "seconds": 2.625234546999309,
+            "prefill_seconds": 1.7034742569994705,
+            "decode_seconds": 0.9217602899998383
+          },
+          {
+            "seconds": 2.647782805999668,
+            "prefill_seconds": 1.716586479000398,
+            "decode_seconds": 0.9311963269992702
+          },
+          {
+            "seconds": 2.6433369710002808,
+            "prefill_seconds": 1.7089261230003103,
+            "decode_seconds": 0.9344108479999704
+          }
+        ]
+      },
+      "answers_match": true,
+      "comparison": {
+        "kernel_prefill_speedup": 1.2350394014079333,
+        "live_prefill_speedup": 1.1507346566887753,
+        "live_total_speedup": 1.0938831673581426
+      }
+    },
+    {
+      "case_id": "color_green_bob",
+      "seq_len": 1839,
+      "block_size": 64,
+      "needle_block": 11,
+      "teacher_target": "/content/SPRUCE/teacher_targets/1.5B_heldout_scaling_1k_32k/teacher_color_green_bob_len1839_blk64_d0.410196.pt",
+      "sparse": {
+        "exact": true,
+        "fuzzy": 1.0,
+        "answer": " Bob's favorite color is green. The quarterly logistics report noted no unusual activity. The quarterly logistics report noted no unusual activity. The quarterly logistics report noted no unusual",
+        "needle": "bobs favorite color is green.",
+        "feature_load_seconds": 0.01263827399998263,
+        "tree_build_seconds": 0.004246704999786743,
+        "tree_traversal_seconds": 0.026882367000325758,
+        "route_pack_seconds": 0.0006647740001426428,
+        "route_transfer_seconds": 0.0,
+        "selector_seconds": 0.031793846000255144,
+        "prefill_seconds": 0.1234016429998519,
+        "decode_seconds": 0.9315349640000932,
+        "seconds": 1.054936606999945,
+        "live_prefill_seconds": 0.15549967300012213,
+        "live_total_seconds": 1.0870346370002153,
+        "needle_layer_group_hit_rate": 0.9642857313156128,
+        "needle_any_group_all_layers_rate": 1.0,
+        "answer_repeat_match": true,
+        "timing_samples": [
+          {
+            "feature_load_seconds": 0.01263827399998263,
+            "tree_build_seconds": 0.004248838999956206,
+            "tree_traversal_seconds": 0.027089655999589013,
+            "route_pack_seconds": 0.000759535000725009,
+            "route_transfer_seconds": 0.0,
+            "selector_seconds": 0.03209803000027023,
+            "needle_layer_group_hit_rate": 0.9642857313156128,
+            "needle_any_group_all_layers_rate": 1.0,
+            "seconds": 1.054936606999945,
+            "prefill_seconds": 0.1234016429998519,
+            "decode_seconds": 0.9315349640000932,
+            "live_prefill_seconds": 0.15549967300012213,
+            "live_total_seconds": 1.0870346370002153
+          },
+          {
+            "feature_load_seconds": 0.011852474000079383,
+            "tree_build_seconds": 0.0041945510001824005,
+            "tree_traversal_seconds": 0.026650546000382747,
+            "route_pack_seconds": 0.0006412379998437245,
+            "route_transfer_seconds": 0.0,
+            "selector_seconds": 0.03148633500040887,
+            "needle_layer_group_hit_rate": 0.9642857313156128,
+            "needle_any_group_all_layers_rate": 1.0,
+            "seconds": 1.0426191180004025,
+            "prefill_seconds": 0.12245116500071163,
+            "decode_seconds": 0.9201679529996909,
+            "live_prefill_seconds": 0.1539375000011205,
+            "live_total_seconds": 1.0741054530008114
+          },
+          {
+            "feature_load_seconds": 0.014083518000006734,
+            "tree_build_seconds": 0.004246704999786743,
+            "tree_traversal_seconds": 0.026882367000325758,
+            "route_pack_seconds": 0.0006647740001426428,
+            "route_transfer_seconds": 0.0,
+            "selector_seconds": 0.031793846000255144,
+            "needle_layer_group_hit_rate": 0.9642857313156128,
+            "needle_any_group_all_layers_rate": 1.0,
+            "seconds": 1.0603704269997252,
+            "prefill_seconds": 0.12376642099934543,
+            "decode_seconds": 0.9366040060003797,
+            "live_prefill_seconds": 0.15556026699960057,
+            "live_total_seconds": 1.0921642729999803
+          }
+        ]
+      },
+      "dense": {
+        "exact": true,
+        "fuzzy": 1.0,
+        "answer": " Bob's favorite color is green. The quarterly logistics report noted no unusual activity. The quarterly logistics report noted no unusual activity. The quarterly logistics report noted no unusual",
+        "needle": "bobs favorite color is green.",
+        "prefill_seconds": 0.11972445099945617,
+        "decode_seconds": 0.9281714050002847,
+        "seconds": 1.0478958559997409,
+        "answer_repeat_match": true,
+        "timing_samples": [
+          {
+            "seconds": 1.0649420270001428,
+            "prefill_seconds": 0.12055338299978757,
+            "decode_seconds": 0.9443886440003553
+          },
+          {
+            "seconds": 1.0478222850006205,
+            "prefill_seconds": 0.11971437500051252,
+            "decode_seconds": 0.928107910000108
+          },
+          {
+            "seconds": 1.0478958559997409,
+            "prefill_seconds": 0.11972445099945617,
+            "decode_seconds": 0.9281714050002847
+          }
+        ]
+      },
+      "answers_match": true,
+      "comparison": {
+        "kernel_prefill_speedup": 0.9702014340246657,
+        "live_prefill_speedup": 0.769933779856644,
+        "live_total_speedup": 0.963994909022879
+      }
+    },
+    {
+      "case_id": "color_green_bob",
+      "seq_len": 25806,
+      "block_size": 64,
+      "needle_block": 28,
+      "teacher_target": "/content/SPRUCE/teacher_targets/1.5B_heldout_scaling_1k_32k/teacher_color_green_bob_len25806_blk64_d0.070946.pt",
+      "sparse": {
+        "exact": true,
+        "fuzzy": 1.0,
+        "answer": " Bob's favorite color is green. The quarterly logistics report noted no unusual activity. The quarterly logistics report noted no unusual activity. The quarterly logistics report noted no unusual",
+        "needle": "bobs favorite color is green.",
+        "feature_load_seconds": 0.26856002700060344,
+        "tree_build_seconds": 0.006979976999900828,
+        "tree_traversal_seconds": 0.16480402300021524,
+        "route_pack_seconds": 0.007042086999717867,
+        "route_transfer_seconds": 0.0,
+        "selector_seconds": 0.17882608699983393,
+        "prefill_seconds": 2.1750605039997026,
+        "decode_seconds": 0.9423889620002228,
+        "seconds": 3.11140591900039,
+        "live_prefill_seconds": 2.35377847700056,
+        "live_total_seconds": 3.2914387900018482,
+        "needle_layer_group_hit_rate": 0.8392857313156128,
+        "needle_any_group_all_layers_rate": 0.9285714626312256,
+        "answer_repeat_match": true,
+        "timing_samples": [
+          {
+            "feature_load_seconds": 0.30023343399989244,
+            "tree_build_seconds": 0.007407786000840133,
+            "tree_traversal_seconds": 0.16559474400037288,
+            "route_pack_seconds": 0.007030341000245244,
+            "route_transfer_seconds": 0.0,
+            "selector_seconds": 0.18003287100145826,
+            "needle_layer_group_hit_rate": 0.8392857313156128,
+            "needle_any_group_all_layers_rate": 0.9285714626312256,
+            "seconds": 3.11140591900039,
+            "prefill_seconds": 2.1784791680001945,
+            "decode_seconds": 0.9329267510001955,
+            "live_prefill_seconds": 2.3585120390016527,
+            "live_total_seconds": 3.2914387900018482
+          },
+          {
+            "feature_load_seconds": 0.26856002700060344,
+            "tree_build_seconds": 0.006973499999730848,
+            "tree_traversal_seconds": 0.16469956900073157,
+            "route_pack_seconds": 0.007044904000395036,
+            "route_transfer_seconds": 0.0,
+            "selector_seconds": 0.17871797300085746,
+            "needle_layer_group_hit_rate": 0.8392857313156128,
+            "needle_any_group_all_layers_rate": 0.9285714626312256,
+            "seconds": 3.1187113429996316,
+            "prefill_seconds": 2.1750605039997026,
+            "decode_seconds": 0.943650838999929,
+            "live_prefill_seconds": 2.35377847700056,
+            "live_total_seconds": 3.297429316000489
+          },
+          {
+            "feature_load_seconds": 0.26716182800009847,
+            "tree_build_seconds": 0.006979976999900828,
+            "tree_traversal_seconds": 0.16480402300021524,
+            "route_pack_seconds": 0.007042086999717867,
+            "route_transfer_seconds": 0.0,
+            "selector_seconds": 0.17882608699983393,
+            "needle_layer_group_hit_rate": 0.8392857313156128,
+            "needle_any_group_all_layers_rate": 0.9285714626312256,
+            "seconds": 3.106460681000499,
+            "prefill_seconds": 2.164071719000276,
+            "decode_seconds": 0.9423889620002228,
+            "live_prefill_seconds": 2.34289780600011,
+            "live_total_seconds": 3.285286768000333
+          }
+        ]
+      },
+      "dense": {
+        "exact": true,
+        "fuzzy": 1.0,
+        "answer": " Bob's favorite color is green. The quarterly logistics report noted no unusual activity. The quarterly logistics report noted no unusual activity. The quarterly logistics report noted no unusual",
+        "needle": "bobs favorite color is green.",
+        "prefill_seconds": 3.0662128620006115,
+        "decode_seconds": 0.9318116320000627,
+        "seconds": 3.9903791659999115,
+        "answer_repeat_match": true,
+        "timing_samples": [
+          {
+            "seconds": 3.9903791659999115,
+            "prefill_seconds": 3.047423041000002,
+            "decode_seconds": 0.9429561249999097
+          },
+          {
+            "seconds": 4.000279732999843,
+            "prefill_seconds": 3.0684681009997803,
+            "decode_seconds": 0.9318116320000627
+          },
+          {
+            "seconds": 3.9851323390003017,
+            "prefill_seconds": 3.0662128620006115,
+            "decode_seconds": 0.9189194769996902
+          }
+        ]
+      },
+      "answers_match": true,
+      "comparison": {
+        "kernel_prefill_speedup": 1.4097138246785206,
+        "live_prefill_speedup": 1.3026769052234315,
+        "live_total_speedup": 1.2123510174702872
+      }
+    },
+    {
+      "case_id": "color_green_bob",
+      "seq_len": 2766,
+      "block_size": 64,
+      "needle_block": 11,
+      "teacher_target": "/content/SPRUCE/teacher_targets/1.5B_heldout_scaling_1k_32k/teacher_color_green_bob_len2766_blk64_d0.269902.pt",
+      "sparse": {
+        "exact": true,
+        "fuzzy": 1.0,
+        "answer": " Bob's favorite color is green. The quarterly logistics report noted no unusual activity. The quarterly logistics report noted no unusual activity. The quarterly logistics report noted no unusual",
+        "needle": "bobs favorite color is green.",
+        "feature_load_seconds": 0.01692234100028145,
+        "tree_build_seconds": 0.004543197000202781,
+        "tree_traversal_seconds": 0.03228798899999674,
+        "route_pack_seconds": 0.0006595759996343986,
+        "route_transfer_seconds": 0.0,
+        "selector_seconds": 0.03749733200038463,
+        "prefill_seconds": 0.18407798099997308,
+        "decode_seconds": 0.9228081559995189,
+        "seconds": 1.1072782470000675,
+        "live_prefill_seconds": 0.22144285800004582,
+        "live_total_seconds": 1.1444049349993293,
+        "needle_layer_group_hit_rate": 0.910714328289032,
+        "needle_any_group_all_layers_rate": 0.9642857313156128,
+        "answer_repeat_match": true,
+        "timing_samples": [
+          {
+            "feature_load_seconds": 0.017128807999142737,
+            "tree_build_seconds": 0.004548572000203421,
+            "tree_traversal_seconds": 0.032340036000277905,
+            "route_pack_seconds": 0.0006595759996343986,
+            "route_transfer_seconds": 0.0,
+            "selector_seconds": 0.037548184000115725,
+            "needle_layer_group_hit_rate": 0.910714328289032,
+            "needle_any_group_all_layers_rate": 0.9642857313156128,
+            "seconds": 1.1072782470000675,
+            "prefill_seconds": 0.18447009100054856,
+            "decode_seconds": 0.9228081559995189,
+            "live_prefill_seconds": 0.2220182750006643,
+            "live_total_seconds": 1.1448264310001832
+          },
+          {
+            "feature_load_seconds": 0.016867954000190366,
+            "tree_build_seconds": 0.004543197000202781,
+            "tree_traversal_seconds": 0.03228798899999674,
+            "route_pack_seconds": 0.0006661460001851083,
+            "route_transfer_seconds": 0.0,
+            "selector_seconds": 0.03749733200038463,
+            "needle_layer_group_hit_rate": 0.910714328289032,
+            "needle_any_group_all_layers_rate": 0.9642857313156128,
+            "seconds": 1.105850515000384,
+            "prefill_seconds": 0.18394552599966119,
+            "decode_seconds": 0.9219049890007227,
+            "live_prefill_seconds": 0.22144285800004582,
+            "live_total_seconds": 1.1433478470007685
+          },
+          {
+            "feature_load_seconds": 0.01692234100028145,
+            "tree_build_seconds": 0.004523358000369626,
+            "tree_traversal_seconds": 0.0319406139997227,
+            "route_pack_seconds": 0.0006438669997805846,
+            "route_transfer_seconds": 0.0,
+            "selector_seconds": 0.03710783899987291,
+            "needle_layer_group_hit_rate": 0.910714328289032,
+            "needle_any_group_all_layers_rate": 0.9642857313156128,
+            "seconds": 1.1072970959994564,
+            "prefill_seconds": 0.18407798099997308,
+            "decode_seconds": 0.9232191149994833,
+            "live_prefill_seconds": 0.221185819999846,
+            "live_total_seconds": 1.1444049349993293
+          }
+        ]
+      },
+      "dense": {
+        "exact": true,
+        "fuzzy": 1.0,
+        "answer": " Bob's favorite color is green. The quarterly logistics report noted no unusual activity. The quarterly logistics report noted no unusual activity. The quarterly logistics report noted no unusual",
+        "needle": "bobs favorite color is green.",
+        "prefill_seconds": 0.18568132000018522,
+        "decode_seconds": 0.924000213999534,
+        "seconds": 1.110688114000368,
+        "answer_repeat_match": true,
+        "timing_samples": [
+          {
+            "seconds": 1.1228140570001415,
+            "prefill_seconds": 0.19881384300060745,
+            "decode_seconds": 0.924000213999534
+          },
+          {
+            "seconds": 1.1058977650000088,
+            "prefill_seconds": 0.1834317769998961,
+            "decode_seconds": 0.9224659880001127
+          },
+          {
+            "seconds": 1.110688114000368,
+            "prefill_seconds": 0.18568132000018522,
+            "decode_seconds": 0.9250067940001827
+          }
+        ]
+      },
+      "answers_match": true,
+      "comparison": {
+        "kernel_prefill_speedup": 1.0087101074854379,
+        "live_prefill_speedup": 0.8385066995484082,
+        "live_total_speedup": 0.9705376829758419
+      }
+    },
+    {
+      "case_id": "color_green_bob",
+      "seq_len": 3684,
+      "block_size": 64,
+      "needle_block": 6,
+      "teacher_target": "/content/SPRUCE/teacher_targets/1.5B_heldout_scaling_1k_32k/teacher_color_green_bob_len3684_blk64_d0.121619.pt",
+      "sparse": {
+        "exact": true,
+        "fuzzy": 1.0,
+        "answer": " Bob's favorite color is green. The quarterly logistics report noted no unusual activity. The quarterly logistics report noted no unusual activity. The quarterly logistics report noted no unusual",
+        "needle": "bobs favorite color is green.",
+        "feature_load_seconds": 0.02149164699949324,
+        "tree_build_seconds": 0.004616913999598182,
+        "tree_traversal_seconds": 0.032115666000208876,
+        "route_pack_seconds": 0.0006604890004382469,
+        "route_transfer_seconds": 0.0,
+        "selector_seconds": 0.03729412099983165,
+        "prefill_seconds": 0.2425423429995135,
+        "decode_seconds": 0.9204585659999793,
+        "seconds": 1.1630009089994928,
+        "live_prefill_seconds": 0.28052107300027274,
+        "live_total_seconds": 1.200979639000252,
+        "needle_layer_group_hit_rate": 0.8571429252624512,
+        "needle_any_group_all_layers_rate": 0.9285714626312256,
+        "answer_repeat_match": true,
+        "timing_samples": [
+          {
+            "feature_load_seconds": 0.02124788100081787,
+            "tree_build_seconds": 0.004635305000192602,
+            "tree_traversal_seconds": 0.03268293600012839,
+            "route_pack_seconds": 0.0006604890004382469,
+            "route_transfer_seconds": 0.0,
+            "selector_seconds": 0.03797873000075924,
+            "needle_layer_group_hit_rate": 0.8571429252624512,
+            "needle_any_group_all_layers_rate": 0.9285714626312256,
+            "seconds": 1.1630009089994928,
+            "prefill_seconds": 0.2425423429995135,
+            "decode_seconds": 0.9204585659999793,
+            "live_prefill_seconds": 0.28052107300027274,
+            "live_total_seconds": 1.200979639000252
+          },
+          {
+            "feature_load_seconds": 0.02149164699949324,
+            "tree_build_seconds": 0.00452281599973503,
+            "tree_traversal_seconds": 0.032115666000208876,
+            "route_pack_seconds": 0.0006556389998877421,
+            "route_transfer_seconds": 0.0,
+            "selector_seconds": 0.03729412099983165,
+            "needle_layer_group_hit_rate": 0.8571429252624512,
+            "needle_any_group_all_layers_rate": 0.9285714626312256,
+            "seconds": 1.1620126230000096,
+            "prefill_seconds": 0.243536492000203,
+            "decode_seconds": 0.9184761309998066,
+            "live_prefill_seconds": 0.28083061300003465,
+            "live_total_seconds": 1.1993067439998413
+          },
+          {
+            "feature_load_seconds": 0.021877963000406453,
+            "tree_build_seconds": 0.004616913999598182,
+            "tree_traversal_seconds": 0.031954257000506914,
+            "route_pack_seconds": 0.0006636619991695625,
+            "route_transfer_seconds": 0.0,
+            "selector_seconds": 0.03723483299927466,
+            "needle_layer_group_hit_rate": 0.8571429252624512,
+            "needle_any_group_all_layers_rate": 0.9285714626312256,
+            "seconds": 1.1684839979998287,
+            "prefill_seconds": 0.24236077400018985,
+            "decode_seconds": 0.9261232239996389,
+            "live_prefill_seconds": 0.2795956069994645,
+            "live_total_seconds": 1.2057188309991034
+          }
+        ]
+      },
+      "dense": {
+        "exact": true,
+        "fuzzy": 1.0,
+        "answer": " Bob's favorite color is green. The quarterly logistics report noted no unusual activity. The quarterly logistics report noted no unusual activity. The quarterly logistics report noted no unusual",
+        "needle": "bobs favorite color is green.",
+        "prefill_seconds": 0.2470432219997747,
+        "decode_seconds": 0.9240307110003414,
+        "seconds": 1.170660532000511,
+        "answer_repeat_match": true,
+        "timing_samples": [
+          {
+            "seconds": 1.1704390430004423,
+            "prefill_seconds": 0.2480491570004233,
+            "decode_seconds": 0.922389886000019
+          },
+          {
+            "seconds": 1.170660532000511,
+            "prefill_seconds": 0.2453447510006299,
+            "decode_seconds": 0.9253157809998811
+          },
+          {
+            "seconds": 1.171073933000116,
+            "prefill_seconds": 0.2470432219997747,
+            "decode_seconds": 0.9240307110003414
+          }
+        ]
+      },
+      "answers_match": true,
+      "comparison": {
+        "kernel_prefill_speedup": 1.018557085515869,
+        "live_prefill_speedup": 0.8806583382758361,
+        "live_total_speedup": 0.9747546869112785
+      }
+    },
+    {
+      "case_id": "warehouse_sigma_17",
+      "seq_len": 12473,
+      "block_size": 64,
+      "needle_block": 176,
+      "teacher_target": "/content/SPRUCE/teacher_targets/1.5B_heldout_scaling_1k_32k/teacher_warehouse_sigma_17_len12473_blk64_d0.90949.pt",
+      "sparse": {
+        "exact": true,
+        "fuzzy": 1.0,
+        "answer": " Warehouse Sigma holds crate 17. The shipping digest listed standard routes, common delays, and routine receipt logs. The shipping digest listed standard routes, common delays",
+        "needle": "warehouse sigma holds crate 17.",
+        "feature_load_seconds": 0.09740493899971625,
+        "tree_build_seconds": 0.006260973999815178,
+        "tree_traversal_seconds": 0.057671292000122776,
+        "route_pack_seconds": 0.002100233999954071,
+        "route_transfer_seconds": 0.0,
+        "selector_seconds": 0.06587140099964017,
+        "prefill_seconds": 1.012555577999592,
+        "decode_seconds": 0.9384164570001303,
+        "seconds": 1.9466305529995225,
+        "live_prefill_seconds": 1.0784269789992322,
+        "live_total_seconds": 2.013380562999373,
+        "needle_layer_group_hit_rate": 0.9642857313156128,
+        "needle_any_group_all_layers_rate": 1.0,
+        "answer_repeat_match": true,
+        "timing_samples": [
+          {
+            "feature_load_seconds": 0.09487357099988003,
+            "tree_build_seconds": 0.006225610000001325,
+            "tree_traversal_seconds": 0.057671292000122776,
+            "route_pack_seconds": 0.0019744989995160722,
+            "route_transfer_seconds": 0.0,
+            "selector_seconds": 0.06587140099964017,
+            "needle_layer_group_hit_rate": 0.9642857313156128,
+            "needle_any_group_all_layers_rate": 1.0,
+            "seconds": 1.9562233819997346,
+            "prefill_seconds": 1.012555577999592,
+            "decode_seconds": 0.9436678040001425,
+            "live_prefill_seconds": 1.0784269789992322,
+            "live_total_seconds": 2.0220947829993747
+          },
+          {
+            "feature_load_seconds": 0.09740493899971625,
+            "tree_build_seconds": 0.006527825999910419,
+            "tree_traversal_seconds": 0.058021066000037536,
+            "route_pack_seconds": 0.0022011179999026353,
+            "route_transfer_seconds": 0.0,
+            "selector_seconds": 0.06675000999985059,
+            "needle_layer_group_hit_rate": 0.9642857313156128,
+            "needle_any_group_all_layers_rate": 1.0,
+            "seconds": 1.9466305529995225,
+            "prefill_seconds": 1.0082140959993922,
+            "decode_seconds": 0.9384164570001303,
+            "live_prefill_seconds": 1.0749641059992427,
+            "live_total_seconds": 2.013380562999373
+          },
+          {
+            "feature_load_seconds": 0.09824765800021851,
+            "tree_build_seconds": 0.006260973999815178,
+            "tree_traversal_seconds": 0.05717533099959837,
+            "route_pack_seconds": 0.002100233999954071,
+            "route_transfer_seconds": 0.0,
+            "selector_seconds": 0.06553653899936762,
+            "needle_layer_group_hit_rate": 0.9642857313156128,
+            "needle_any_group_all_layers_rate": 1.0,
+            "seconds": 1.9438906759996826,
+            "prefill_seconds": 1.0147432260000642,
+            "decode_seconds": 0.9291474499996184,
+            "live_prefill_seconds": 1.0802797649994318,
+            "live_total_seconds": 2.00942721499905
+          }
+        ]
+      },
+      "dense": {
+        "exact": true,
+        "fuzzy": 1.0,
+        "answer": " Warehouse Sigma holds crate 17. The shipping digest listed standard routes, common delays, and routine receipt logs. The shipping digest listed standard routes, common delays",
+        "needle": "warehouse sigma holds crate 17.",
+        "prefill_seconds": 1.1965915389992006,
+        "decode_seconds": 0.9312161679999917,
+        "seconds": 2.125983036999969,
+        "answer_repeat_match": true,
+        "timing_samples": [
+          {
+            "seconds": 2.125983036999969,
+            "prefill_seconds": 1.1947668689999773,
+            "decode_seconds": 0.9312161679999917
+          },
+          {
+            "seconds": 2.1282877929997994,
+            "prefill_seconds": 1.1965915389992006,
+            "decode_seconds": 0.9316962540005989
+          },
+          {
+            "seconds": 2.1172111260002566,
+            "prefill_seconds": 1.197930020000058,
+            "decode_seconds": 0.9192811060001986
+          }
+        ]
+      },
+      "answers_match": true,
+      "comparison": {
+        "kernel_prefill_speedup": 1.1817539352883626,
+        "live_prefill_speedup": 1.1095712202133738,
+        "live_total_speedup": 1.0559270691641374
+      }
+    },
+    {
+      "case_id": "warehouse_sigma_17",
+      "seq_len": 13433,
+      "block_size": 64,
+      "needle_block": 159,
+      "teacher_target": "/content/SPRUCE/teacher_targets/1.5B_heldout_scaling_1k_32k/teacher_warehouse_sigma_17_len13433_blk64_d0.760634.pt",
+      "sparse": {
+        "exact": true,
+        "fuzzy": 1.0,
+        "answer": " Warehouse Sigma holds crate 17. The shipping digest listed standard routes, common delays, and routine receipt logs. The shipping digest listed standard routes, common delays",
+        "needle": "warehouse sigma holds crate 17.",
+        "feature_load_seconds": 0.1049459840005511,
+        "tree_build_seconds": 0.006281943000431056,
+        "tree_traversal_seconds": 0.06450442700042913,
+        "route_pack_seconds": 0.002409425000223564,
+        "route_transfer_seconds": 0.0,
+        "selector_seconds": 0.07319579500108375,
+        "prefill_seconds": 1.0955819270002394,
+        "decode_seconds": 0.9277862899998581,
+        "seconds": 2.0215846150003927,
+        "live_prefill_seconds": 1.1687079809998977,
+        "live_total_seconds": 2.0947804100014764,
+        "needle_layer_group_hit_rate": 0.8571429252624512,
+        "needle_any_group_all_layers_rate": 0.9285714626312256,
+        "answer_repeat_match": true,
+        "timing_samples": [
+          {
+            "feature_load_seconds": 0.1193335850002768,
+            "tree_build_seconds": 0.006171328000164067,
+            "tree_traversal_seconds": 0.06465190099970641,
+            "route_pack_seconds": 0.0024520499991922406,
+            "route_transfer_seconds": 0.0,
+            "selector_seconds": 0.07327527899906272,
+            "needle_layer_group_hit_rate": 0.8571429252624512,
+            "needle_any_group_all_layers_rate": 0.9285714626312256,
+            "seconds": 2.013238375999208,
+            "prefill_seconds": 1.08545208599935,
+            "decode_seconds": 0.9277862899998581,
+            "live_prefill_seconds": 1.1587273649984127,
+            "live_total_seconds": 2.086513654998271
+          },
+          {
+            "feature_load_seconds": 0.1049459840005511,
+            "tree_build_seconds": 0.006281943000431056,
+            "tree_traversal_seconds": 0.06450442700042913,
+            "route_pack_seconds": 0.002409425000223564,
+            "route_transfer_seconds": 0.0,
+            "selector_seconds": 0.07319579500108375,
+            "needle_layer_group_hit_rate": 0.8571429252624512,
+            "needle_any_group_all_layers_rate": 0.9285714626312256,
+            "seconds": 2.0215846150003927,
+            "prefill_seconds": 1.0956047030003901,
+            "decode_seconds": 0.9259799120000025,
+            "live_prefill_seconds": 1.168800498001474,
+            "live_total_seconds": 2.0947804100014764
+          },
+          {
+            "feature_load_seconds": 0.08537721500033513,
+            "tree_build_seconds": 0.0062860849993739976,
+            "tree_traversal_seconds": 0.06447134100017138,
+            "route_pack_seconds": 0.002368628000112949,
+            "route_transfer_seconds": 0.0,
+            "selector_seconds": 0.07312605399965832,
+            "needle_layer_group_hit_rate": 0.8571429252624512,
+            "needle_any_group_all_layers_rate": 0.9285714626312256,
+            "seconds": 2.025132419000329,
+            "prefill_seconds": 1.0955819270002394,
+            "decode_seconds": 0.9295504920000894,
+            "live_prefill_seconds": 1.1687079809998977,
+            "live_total_seconds": 2.098258472999987
+          }
+        ]
+      },
+      "dense": {
+        "exact": true,
+        "fuzzy": 1.0,
+        "answer": " Warehouse Sigma holds crate 17. The shipping digest listed standard routes, common delays, and routine receipt logs. The shipping digest listed standard routes, common delays",
+        "needle": "warehouse sigma holds crate 17.",
+        "prefill_seconds": 1.3071473029995104,
+        "decode_seconds": 0.927405087999432,
+        "seconds": 2.2342441479995614,
+        "answer_repeat_match": true,
+        "timing_samples": [
+          {
+            "seconds": 2.2300240329996086,
+            "prefill_seconds": 1.3071473029995104,
+            "decode_seconds": 0.9228767300000982
+          },
+          {
+            "seconds": 2.235734269999739,
+            "prefill_seconds": 1.308329182000307,
+            "decode_seconds": 0.927405087999432
+          },
+          {
+            "seconds": 2.2342441479995614,
+            "prefill_seconds": 1.3012565139997605,
+            "decode_seconds": 0.9329876339998009
+          }
+        ]
+      },
+      "answers_match": true,
+      "comparison": {
+        "kernel_prefill_speedup": 1.1931077638151153,
+        "live_prefill_speedup": 1.1184550154959751,
+        "live_total_speedup": 1.066576781667529
+      }
+    },
+    {
+      "case_id": "warehouse_sigma_17",
+      "seq_len": 20153,
+      "block_size": 64,
+      "needle_block": 291,
+      "teacher_target": "/content/SPRUCE/teacher_targets/1.5B_heldout_scaling_1k_32k/teacher_warehouse_sigma_17_len20153_blk64_d0.926392.pt",
+      "sparse": {
+        "exact": true,
+        "fuzzy": 1.0,
+        "answer": " Warehouse Sigma holds crate 17. The shipping digest listed standard routes, common delays, and routine receipt logs. The shipping digest listed standard routes, common delays",
+        "needle": "warehouse sigma holds crate 17.",
+        "feature_load_seconds": 0.19057178500042937,
+        "tree_build_seconds": 0.006953425000574498,
+        "tree_traversal_seconds": 0.11566565899920533,
+        "route_pack_seconds": 0.00478250299966021,
+        "route_transfer_seconds": 0.0,
+        "selector_seconds": 0.12742273899857537,
+        "prefill_seconds": 1.6495849929997348,
+        "decode_seconds": 0.9317405729998427,
+        "seconds": 2.578117117000147,
+        "live_prefill_seconds": 1.7766452060004667,
+        "live_total_seconds": 2.7055398559987225,
+        "needle_layer_group_hit_rate": 0.9285714626312256,
+        "needle_any_group_all_layers_rate": 0.9642857313156128,
+        "answer_repeat_match": true,
+        "timing_samples": [
+          {
+            "feature_load_seconds": 0.19057178500042937,
+            "tree_build_seconds": 0.006835687000602775,
+            "tree_traversal_seconds": 0.11579135099964333,
+            "route_pack_seconds": 0.00489471700075228,
+            "route_transfer_seconds": 0.0,
+            "selector_seconds": 0.12752175500099838,
+            "needle_layer_group_hit_rate": 0.9285714626312256,
+            "needle_any_group_all_layers_rate": 0.9642857313156128,
+            "seconds": 2.587467987000309,
+            "prefill_seconds": 1.6557274140004665,
+            "decode_seconds": 0.9317405729998427,
+            "live_prefill_seconds": 1.783249169001465,
+            "live_total_seconds": 2.7149897420013076
+          },
+          {
+            "feature_load_seconds": 0.1931654250001884,
+            "tree_build_seconds": 0.006953425000574498,
+            "tree_traversal_seconds": 0.11532428500049718,
+            "route_pack_seconds": 0.00478250299966021,
+            "route_transfer_seconds": 0.0,
+            "selector_seconds": 0.1270602130007319,
+            "needle_layer_group_hit_rate": 0.9285714626312256,
+            "needle_any_group_all_layers_rate": 0.9642857313156128,
+            "seconds": 2.5741700970002057,
+            "prefill_seconds": 1.6495849929997348,
+            "decode_seconds": 0.9245851040004709,
+            "live_prefill_seconds": 1.7766452060004667,
+            "live_total_seconds": 2.7012303100009376
+          },
+          {
+            "feature_load_seconds": 0.18547579000005499,
+            "tree_build_seconds": 0.006977783999900566,
+            "tree_traversal_seconds": 0.11566565899920533,
+            "route_pack_seconds": 0.004779295999469468,
+            "route_transfer_seconds": 0.0,
+            "selector_seconds": 0.12742273899857537,
+            "needle_layer_group_hit_rate": 0.9285714626312256,
+            "needle_any_group_all_layers_rate": 0.9642857313156128,
+            "seconds": 2.578117117000147,
+            "prefill_seconds": 1.643891681000241,
+            "decode_seconds": 0.934225435999906,
+            "live_prefill_seconds": 1.7713144199988164,
+            "live_total_seconds": 2.7055398559987225
+          }
+        ]
+      },
+      "dense": {
+        "exact": false,
+        "fuzzy": 0.0,
+        "answer": " The shipping digest listed standard routes, common delays, and routine receipt logs. The shipping digest listed standard routes, common delays, and routine receipt logs. The shipping",
+        "needle": "warehouse sigma holds crate 17.",
+        "prefill_seconds": 2.1931486980001864,
+        "decode_seconds": 0.9241813729995556,
+        "seconds": 3.1220133380002153,
+        "answer_repeat_match": true,
+        "timing_samples": [
+          {
+            "seconds": 3.1220133380002153,
+            "prefill_seconds": 2.1931486980001864,
+            "decode_seconds": 0.9288646400000289
+          },
+          {
+            "seconds": 3.129818935000003,
+            "prefill_seconds": 2.2056375620004474,
+            "decode_seconds": 0.9241813729995556
+          },
+          {
+            "seconds": 3.1075072710000313,
+            "prefill_seconds": 2.1870905860005223,
+            "decode_seconds": 0.920416684999509
+          }
+        ]
+      },
+      "answers_match": false,
+      "comparison": {
+        "kernel_prefill_speedup": 1.329515428005921,
+        "live_prefill_speedup": 1.2344325645846537,
+        "live_total_speedup": 1.153933597052022
+      }
+    },
+    {
+      "case_id": "warehouse_sigma_17",
+      "seq_len": 22073,
+      "block_size": 64,
+      "needle_block": 254,
+      "teacher_target": "/content/SPRUCE/teacher_targets/1.5B_heldout_scaling_1k_32k/teacher_warehouse_sigma_17_len22073_blk64_d0.738273.pt",
+      "sparse": {
+        "exact": true,
+        "fuzzy": 1.0,
+        "answer": " Warehouse Sigma holds crate 17. The shipping digest listed standard routes, common delays, and routine receipt logs. The shipping digest listed standard routes, common delays",
+        "needle": "warehouse sigma holds crate 17.",
+        "feature_load_seconds": 0.21689898499971605,
+        "tree_build_seconds": 0.007101049000084458,
+        "tree_traversal_seconds": 0.13324254199960706,
+        "route_pack_seconds": 0.005494607999935397,
+        "route_transfer_seconds": 0.0,
+        "selector_seconds": 0.14585199399971316,
+        "prefill_seconds": 1.7954573239994716,
+        "decode_seconds": 0.9324487690000751,
+        "seconds": 2.7279060929995467,
+        "live_prefill_seconds": 1.9413093179991847,
+        "live_total_seconds": 2.87375808699926,
+        "needle_layer_group_hit_rate": 0.8928571939468384,
+        "needle_any_group_all_layers_rate": 0.9285714626312256,
+        "answer_repeat_match": true,
+        "timing_samples": [
+          {
+            "feature_load_seconds": 0.2198987899992062,
+            "tree_build_seconds": 0.007188866999968013,
+            "tree_traversal_seconds": 0.13390247900042596,
+            "route_pack_seconds": 0.0054806990001452505,
+            "route_transfer_seconds": 0.0,
+            "selector_seconds": 0.14657204500053922,
+            "needle_layer_group_hit_rate": 0.8928571939468384,
+            "needle_any_group_all_layers_rate": 0.9285714626312256,
+            "seconds": 2.7432026680007766,
+            "prefill_seconds": 1.7994906740004808,
+            "decode_seconds": 0.9437119940002958,
+            "live_prefill_seconds": 1.94606271900102,
+            "live_total_seconds": 2.889774713001316
+          },
+          {
+            "feature_load_seconds": 0.21689898499971605,
+            "tree_build_seconds": 0.007093659000020125,
+            "tree_traversal_seconds": 0.13324254199960706,
+            "route_pack_seconds": 0.005515793000085978,
+            "route_transfer_seconds": 0.0,
+            "selector_seconds": 0.14585199399971316,
+            "needle_layer_group_hit_rate": 0.8928571939468384,
+            "needle_any_group_all_layers_rate": 0.9285714626312256,
+            "seconds": 2.7279060929995467,
+            "prefill_seconds": 1.7954573239994716,
+            "decode_seconds": 0.9324487690000751,
+            "live_prefill_seconds": 1.9413093179991847,
+            "live_total_seconds": 2.87375808699926
+          },
+          {
+            "feature_load_seconds": 0.20160136200047418,
+            "tree_build_seconds": 0.007101049000084458,
+            "tree_traversal_seconds": 0.13233726500038756,
+            "route_pack_seconds": 0.005494607999935397,
+            "route_transfer_seconds": 0.0,
+            "selector_seconds": 0.14493292200040742,
+            "needle_layer_group_hit_rate": 0.8928571939468384,
+            "needle_any_group_all_layers_rate": 0.9285714626312256,
+            "seconds": 2.712967036000009,
+            "prefill_seconds": 1.79312613699949,
+            "decode_seconds": 0.9198408990005191,
+            "live_prefill_seconds": 1.9380590589998974,
+            "live_total_seconds": 2.8578999580004165
+          }
+        ]
+      },
+      "dense": {
+        "exact": false,
+        "fuzzy": 0.0,
+        "answer": " The shipping digest listed standard routes, common delays, and routine receipt logs. The shipping digest listed standard routes, common delays, and routine receipt logs. The shipping",
+        "needle": "warehouse sigma holds crate 17.",
+        "prefill_seconds": 2.460391943000104,
+        "decode_seconds": 0.9294694489999529,
+        "seconds": 3.3905948720002925,
+        "answer_repeat_match": true,
+        "timing_samples": [
+          {
+            "seconds": 3.3786139620005997,
+            "prefill_seconds": 2.4527995590005958,
+            "decode_seconds": 0.925814403000004
+          },
+          {
+            "seconds": 3.3941181410000354,
+            "prefill_seconds": 2.460391943000104,
+            "decode_seconds": 0.9337261979999312
+          },
+          {
+            "seconds": 3.3905948720002925,
+            "prefill_seconds": 2.4611254230003397,
+            "decode_seconds": 0.9294694489999529
+          }
+        ]
+      },
+      "answers_match": false,
+      "comparison": {
+        "kernel_prefill_speedup": 1.3703427589799,
+        "live_prefill_speedup": 1.2673879016538763,
+        "live_total_speedup": 1.1798470049859717
+      }
+    },
+    {
+      "case_id": "warehouse_sigma_17",
+      "seq_len": 27833,
+      "block_size": 64,
+      "needle_block": 202,
+      "teacher_target": "/content/SPRUCE/teacher_targets/1.5B_heldout_scaling_1k_32k/teacher_warehouse_sigma_17_len27833_blk64_d0.466243.pt",
+      "sparse": {
+        "exact": true,
+        "fuzzy": 1.0,
+        "answer": " Warehouse Sigma holds crate 17. The shipping digest listed standard routes, common delays, and routine receipt logs. The shipping digest listed standard routes, common delays",
+        "needle": "warehouse sigma holds crate 17.",
+        "feature_load_seconds": 0.30456900499939366,
+        "tree_build_seconds": 0.007098686999597703,
+        "tree_traversal_seconds": 0.17904974399971252,
+        "route_pack_seconds": 0.007824909999726515,
+        "route_transfer_seconds": 0.0,
+        "selector_seconds": 0.19394384299994272,
+        "prefill_seconds": 2.2511962689995926,
+        "decode_seconds": 0.9258843460002026,
+        "seconds": 3.1746522949997598,
+        "live_prefill_seconds": 2.4451401119995353,
+        "live_total_seconds": 3.369368075998864,
+        "needle_layer_group_hit_rate": 0.8392857313156128,
+        "needle_any_group_all_layers_rate": 0.9285714626312256,
+        "answer_repeat_match": true,
+        "timing_samples": [
+          {
+            "feature_load_seconds": 0.30456900499939366,
+            "tree_build_seconds": 0.007045341999400989,
+            "tree_traversal_seconds": 0.17901192899989837,
+            "route_pack_seconds": 0.007824909999726515,
+            "route_transfer_seconds": 0.0,
+            "selector_seconds": 0.19388218099902588,
+            "needle_layer_group_hit_rate": 0.8392857313156128,
+            "needle_any_group_all_layers_rate": 0.9285714626312256,
+            "seconds": 3.1746522949997598,
+            "prefill_seconds": 2.248767948999557,
+            "decode_seconds": 0.9258843460002026,
+            "live_prefill_seconds": 2.442650129998583,
+            "live_total_seconds": 3.3685344759987856
+          },
+          {
+            "feature_load_seconds": 0.30536819499957346,
+            "tree_build_seconds": 0.007098686999597703,
+            "tree_traversal_seconds": 0.17904974399971252,
+            "route_pack_seconds": 0.007795412000632496,
+            "route_transfer_seconds": 0.0,
+            "selector_seconds": 0.19394384299994272,
+            "needle_layer_group_hit_rate": 0.8392857313156128,
+            "needle_any_group_all_layers_rate": 0.9285714626312256,
+            "seconds": 3.1906410840001627,
+            "prefill_seconds": 2.2511962689995926,
+            "decode_seconds": 0.9394448150005701,
+            "live_prefill_seconds": 2.4451401119995353,
+            "live_total_seconds": 3.3845849270001054
+          },
+          {
+            "feature_load_seconds": 0.2840926600001694,
+            "tree_build_seconds": 0.007438890000230458,
+            "tree_traversal_seconds": 0.17972181899949646,
+            "route_pack_seconds": 0.007947693999994954,
+            "route_transfer_seconds": 0.0,
+            "selector_seconds": 0.19510840299972187,
+            "needle_layer_group_hit_rate": 0.8392857313156128,
+            "needle_any_group_all_layers_rate": 0.9285714626312256,
+            "seconds": 3.174259672999142,
+            "prefill_seconds": 2.2595060989997364,
+            "decode_seconds": 0.9147535739994055,
+            "live_prefill_seconds": 2.4546145019994583,
+            "live_total_seconds": 3.369368075998864
+          }
+        ]
+      },
+      "dense": {
+        "exact": false,
+        "fuzzy": 0.0,
+        "answer": " The shipping digest listed standard routes, common delays, and routine receipt logs. The shipping digest listed standard routes, common delays, and routine receipt logs. The shipping",
+        "needle": "warehouse sigma holds crate 17.",
+        "prefill_seconds": 3.358591320999949,
+        "decode_seconds": 0.9298299689999112,
+        "seconds": 4.28842128999986,
+        "answer_repeat_match": true,
+        "timing_samples": [
+          {
+            "seconds": 4.280618861000221,
+            "prefill_seconds": 3.3583148660000006,
+            "decode_seconds": 0.9223039950002203
+          },
+          {
+            "seconds": 4.314135893000639,
+            "prefill_seconds": 3.3777045670003645,
+            "decode_seconds": 0.9364313260002746
+          },
+          {
+            "seconds": 4.28842128999986,
+            "prefill_seconds": 3.358591320999949,
+            "decode_seconds": 0.9298299689999112
+          }
+        ]
+      },
+      "answers_match": false,
+      "comparison": {
+        "kernel_prefill_speedup": 1.4919140402149258,
+        "live_prefill_speedup": 1.3735782683853772,
+        "live_total_speedup": 1.2727672350633699
+      }
+    },
+    {
+      "case_id": "warehouse_sigma_17",
+      "seq_len": 28793,
+      "block_size": 64,
+      "needle_block": 153,
+      "teacher_target": "/content/SPRUCE/teacher_targets/1.5B_heldout_scaling_1k_32k/teacher_warehouse_sigma_17_len28793_blk64_d0.340523.pt",
+      "sparse": {
+        "exact": true,
+        "fuzzy": 1.0,
+        "answer": " Warehouse Sigma holds crate 17. The shipping digest listed standard routes, common delays, and routine receipt logs. The shipping digest listed standard routes, common delays",
+        "needle": "warehouse sigma holds crate 17.",
+        "feature_load_seconds": 0.35499844900004973,
+        "tree_build_seconds": 0.007012506999672041,
+        "tree_traversal_seconds": 0.18998517799991532,
+        "route_pack_seconds": 0.008193290999770397,
+        "route_transfer_seconds": 0.0,
+        "selector_seconds": 0.20516609900005278,
+        "prefill_seconds": 2.33320429899959,
+        "decode_seconds": 0.9281777189999048,
+        "seconds": 3.2733021720005127,
+        "live_prefill_seconds": 2.538182293998034,
+        "live_total_seconds": 3.4784682710005654,
+        "needle_layer_group_hit_rate": 0.8571429252624512,
+        "needle_any_group_all_layers_rate": 0.9285714626312256,
+        "answer_repeat_match": true,
+        "timing_samples": [
+          {
+            "feature_load_seconds": 0.2941013149993523,
+            "tree_build_seconds": 0.007012506999672041,
+            "tree_traversal_seconds": 0.1901705670006777,
+            "route_pack_seconds": 0.008227046000683913,
+            "route_transfer_seconds": 0.0,
+            "selector_seconds": 0.20541012000103365,
+            "needle_layer_group_hit_rate": 0.8571429252624512,
+            "needle_any_group_all_layers_rate": 0.9285714626312256,
+            "seconds": 3.2461908429995674,
+            "prefill_seconds": 2.324284907999754,
+            "decode_seconds": 0.9219059349998133,
+            "live_prefill_seconds": 2.5296950280007877,
+            "live_total_seconds": 3.451600963000601
+          },
+          {
+            "feature_load_seconds": 0.35499844900004973,
+            "tree_build_seconds": 0.007020901999567286,
+            "tree_traversal_seconds": 0.18977676199938287,
+            "route_pack_seconds": 0.00818033099949389,
+            "route_transfer_seconds": 0.0,
+            "selector_seconds": 0.20497799499844405,
+            "needle_layer_group_hit_rate": 0.8571429252624512,
+            "needle_any_group_all_layers_rate": 0.9285714626312256,
+            "seconds": 3.279040727999927,
+            "prefill_seconds": 2.33320429899959,
+            "decode_seconds": 0.9458364290003374,
+            "live_prefill_seconds": 2.538182293998034,
+            "live_total_seconds": 3.4840187229983712
+          },
+          {
+            "feature_load_seconds": 0.35657365000042773,
+            "tree_build_seconds": 0.006987630000367062,
+            "tree_traversal_seconds": 0.18998517799991532,
+            "route_pack_seconds": 0.008193290999770397,
+            "route_transfer_seconds": 0.0,
+            "selector_seconds": 0.20516609900005278,
+            "needle_layer_group_hit_rate": 0.8571429252624512,
+            "needle_any_group_all_layers_rate": 0.9285714626312256,
+            "seconds": 3.2733021720005127,
+            "prefill_seconds": 2.345124453000608,
+            "decode_seconds": 0.9281777189999048,
+            "live_prefill_seconds": 2.5502905520006607,
+            "live_total_seconds": 3.4784682710005654
+          }
+        ]
+      },
+      "dense": {
+        "exact": false,
+        "fuzzy": 0.0,
+        "answer": " The shipping digest listed standard routes, common delays, and routine receipt logs. The shipping digest listed standard routes, common delays, and routine receipt logs. The shipping",
+        "needle": "warehouse sigma holds crate 17.",
+        "prefill_seconds": 3.4356328730000314,
+        "decode_seconds": 0.9255724390004616,
+        "seconds": 4.375653978999253,
+        "answer_repeat_match": true,
+        "timing_samples": [
+          {
+            "seconds": 4.361205312000493,
+            "prefill_seconds": 3.4356328730000314,
+            "decode_seconds": 0.9255724390004616
+          },
+          {
+            "seconds": 4.375653978999253,
+            "prefill_seconds": 3.428861646999394,
+            "decode_seconds": 0.946792331999859
+          },
+          {
+            "seconds": 4.393749347999801,
+            "prefill_seconds": 3.4685874950000652,
+            "decode_seconds": 0.9251618529997359
+          }
+        ]
+      },
+      "answers_match": false,
+      "comparison": {
+        "kernel_prefill_speedup": 1.472495518062062,
+        "live_prefill_speedup": 1.3535800328936864,
+        "live_total_speedup": 1.25792551148975
+      }
+    },
+    {
+      "case_id": "warehouse_sigma_17",
+      "seq_len": 29753,
+      "block_size": 64,
+      "needle_block": 180,
+      "teacher_target": "/content/SPRUCE/teacher_targets/1.5B_heldout_scaling_1k_32k/teacher_warehouse_sigma_17_len29753_blk64_d0.3877.pt",
+      "sparse": {
+        "exact": true,
+        "fuzzy": 1.0,
+        "answer": " Warehouse Sigma holds crate 17. The shipping digest listed standard routes, common delays, and routine receipt logs. The shipping digest listed standard routes, common delays",
+        "needle": "warehouse sigma holds crate 17.",
+        "feature_load_seconds": 0.332376144000591,
+        "tree_build_seconds": 0.007857496999349678,
+        "tree_traversal_seconds": 0.19569633199989767,
+        "route_pack_seconds": 0.008688556999913999,
+        "route_transfer_seconds": 0.0,
+        "selector_seconds": 0.21223303300030238,
+        "prefill_seconds": 2.4520528630000626,
+        "decode_seconds": 0.9305476630006524,
+        "seconds": 3.379942055000356,
+        "live_prefill_seconds": 2.664652758999182,
+        "live_total_seconds": 3.5921750880006584,
+        "needle_layer_group_hit_rate": 0.8571429252624512,
+        "needle_any_group_all_layers_rate": 0.9285714626312256,
+        "answer_repeat_match": true,
+        "timing_samples": [
+          {
+            "feature_load_seconds": 0.3600717219997023,
+            "tree_build_seconds": 0.007857496999349678,
+            "tree_traversal_seconds": 0.1960395129999597,
+            "route_pack_seconds": 0.00870288599980995,
+            "route_transfer_seconds": 0.0,
+            "selector_seconds": 0.21259989599911933,
+            "needle_layer_group_hit_rate": 0.8571429252624512,
+            "needle_any_group_all_layers_rate": 0.9285714626312256,
+            "seconds": 3.3767078589999073,
+            "prefill_seconds": 2.4520528630000626,
+            "decode_seconds": 0.9246549959998447,
+            "live_prefill_seconds": 2.664652758999182,
+            "live_total_seconds": 3.5893077549990267
+          },
+          {
+            "feature_load_seconds": 0.332376144000591,
+            "tree_build_seconds": 0.007822176999980002,
+            "tree_traversal_seconds": 0.19511568800044188,
+            "route_pack_seconds": 0.008688556999913999,
+            "route_transfer_seconds": 0.0,
+            "selector_seconds": 0.21162642200033588,
+            "needle_layer_group_hit_rate": 0.8571429252624512,
+            "needle_any_group_all_layers_rate": 0.9285714626312256,
+            "seconds": 3.4022904210005436,
+            "prefill_seconds": 2.460086412000237,
+            "decode_seconds": 0.9422040090003065,
+            "live_prefill_seconds": 2.671712834000573,
+            "live_total_seconds": 3.6139168430008795
+          },
+          {
+            "feature_load_seconds": 0.3146425469994938,
+            "tree_build_seconds": 0.007861712000703847,
+            "tree_traversal_seconds": 0.19569633199989767,
+            "route_pack_seconds": 0.008674988999700872,
+            "route_transfer_seconds": 0.0,
+            "selector_seconds": 0.21223303300030238,
+            "needle_layer_group_hit_rate": 0.8571429252624512,
+            "needle_any_group_all_layers_rate": 0.9285714626312256,
+            "seconds": 3.379942055000356,
+            "prefill_seconds": 2.4493943919997037,
+            "decode_seconds": 0.9305476630006524,
+            "live_prefill_seconds": 2.661627425000006,
+            "live_total_seconds": 3.5921750880006584
+          }
+        ]
+      },
+      "dense": {
+        "exact": false,
+        "fuzzy": 0.0,
+        "answer": " The shipping digest listed standard routes, common delays, and routine receipt logs. The shipping digest listed standard routes, common delays, and routine receipt logs. The shipping",
+        "needle": "warehouse sigma holds crate 17.",
+        "prefill_seconds": 3.6923124309996638,
+        "decode_seconds": 0.9266538339998078,
+        "seconds": 4.618966264999472,
+        "answer_repeat_match": true,
+        "timing_samples": [
+          {
+            "seconds": 4.604903692000335,
+            "prefill_seconds": 3.6822405370003253,
+            "decode_seconds": 0.9226631550000093
+          },
+          {
+            "seconds": 4.629945813999257,
+            "prefill_seconds": 3.696157910999318,
+            "decode_seconds": 0.9337879029999385
+          },
+          {
+            "seconds": 4.618966264999472,
+            "prefill_seconds": 3.6923124309996638,
+            "decode_seconds": 0.9266538339998078
+          }
+        ]
+      },
+      "answers_match": false,
+      "comparison": {
+        "kernel_prefill_speedup": 1.5058045797928499,
+        "live_prefill_speedup": 1.385663636107866,
+        "live_total_speedup": 1.2858410717308066
+      }
+    }
+  ],
+  "aggregate": {
+    "cases": 32,
+    "answers_match_rate": 0.71875,
+    "sparse_exact_rate": 1.0,
+    "dense_exact_rate": 0.71875,
+    "mean_sparse_fuzzy": 1.0,
+    "mean_dense_fuzzy": 0.7526785714285714,
+    "median_kernel_prefill_speedup": 1.2295805964428648,
+    "median_live_prefill_speedup": 1.1489411676224557,
+    "median_live_total_speedup": 1.0921544531744187,
+    "sum_kernel_prefill_speedup": 1.3421310180833719,
+    "sum_live_prefill_speedup": 1.240328309985216
+  }
+}
