@@ -14,7 +14,13 @@ except ImportError:
     triton = tl = None
 
 
-KERNEL_VARIANTS = ("single_head", "tiled_gqa")
+KERNEL_VARIANTS = (
+    "single_head",
+    "single_head_causal",
+    "single_head_prescale",
+    "single_head_qtile",
+    "tiled_gqa",
+)
 
 
 if triton is not None:
@@ -33,8 +39,10 @@ if triton is not None:
             svz, svh, svn, svd, siz, sih, sim, sik,
             soz, soh, som, sod, HQ, N,
             GROUP_SIZE: tl.constexpr, BM: tl.constexpr, BN: tl.constexpr,
-            D: tl.constexpr, MAX_K: tl.constexpr):
-        """Previously measured fast path: one query head per program."""
+            D: tl.constexpr, MAX_K: tl.constexpr,
+            CAUSAL_SPECIALIZE: tl.constexpr,
+            PRESCALE_Q: tl.constexpr):
+        """One-head control kernel plus isolated constexpr ablations."""
         query_block = tl.program_id(0)
         hz = tl.program_id(1)
         q_head, z = hz % HQ, hz // HQ
@@ -50,6 +58,9 @@ if triton is not None:
             Q + om[:, None] * sqm + od[None, :] * sqd,
             mask=om[:, None] < N,
         )
+        if PRESCALE_Q:
+            q = (q * (scale * 1.4426950408889634)).to(
+                q.type.element_ty)
         acc = tl.zeros([BM, D], tl.float32)
         l_i = tl.zeros([BM], tl.float32)
         m_i = tl.full([BM], float("-inf"), tl.float32)
@@ -58,14 +69,122 @@ if triton is not None:
             block_id = tl.load(Indices + slot * sik)
             if block_id >= 0:
                 start = block_id * BN
+                key_tokens = on + start
+                key_valid = key_tokens < N
+                if CAUSAL_SPECIALIZE:
+                    if block_id < query_block:
+                        token_mask = (
+                            (om[:, None] < N)
+                            & key_valid[None, :]
+                        )
+                    elif block_id == query_block:
+                        token_mask = (
+                            (om[:, None] < N)
+                            & key_valid[None, :]
+                            & (om[:, None] >= key_tokens[None, :])
+                        )
+                    else:
+                        token_mask = tl.full(
+                            (BM, BN), False, tl.int1)
+                else:
+                    token_mask = (
+                        key_valid[None, :]
+                        & (om[:, None] >= key_tokens[None, :])
+                    )
+                k = tl.load(
+                    K + key_tokens[None, :] * skn
+                    + od[:, None] * skd,
+                    mask=key_valid[None, :],
+                )
+                qk = tl.dot(q, k)
+                if not PRESCALE_Q:
+                    qk *= scale * 1.4426950408889634
+                qk = tl.where(token_mask, qk, float("-inf"))
+                m_new = tl.maximum(m_i, tl.max(qk, 1))
+                p = tl.exp2(qk - m_new[:, None])
+                alpha = tl.exp2(m_i - m_new)
+                l_i = l_i * alpha + tl.sum(p, 1)
+                acc *= alpha[:, None]
+                v = tl.load(
+                    V + key_tokens[:, None] * svn
+                    + od[None, :] * svd,
+                    mask=key_valid[:, None],
+                )
+                acc += tl.dot(p.to(v.type.element_ty), v)
+                m_i = m_new
+
+        tl.store(
+            Out + z * soz + q_head * soh
+            + om[:, None] * som + od[None, :] * sod,
+            (acc / l_i[:, None]).to(Out.type.element_ty),
+            mask=om[:, None] < N,
+        )
+
+
+    @triton.autotune(
+        configs=[
+            triton.Config(
+                {"QUERY_TILE": 16}, num_warps=4, num_stages=2),
+            triton.Config(
+                {"QUERY_TILE": 16}, num_warps=8, num_stages=2),
+            triton.Config(
+                {"QUERY_TILE": 32}, num_warps=4, num_stages=2),
+            triton.Config(
+                {"QUERY_TILE": 32}, num_warps=8, num_stages=2),
+            triton.Config(
+                {"QUERY_TILE": 64}, num_warps=4, num_stages=2),
+            triton.Config(
+                {"QUERY_TILE": 64}, num_warps=8, num_stages=2),
+            triton.Config(
+                {"QUERY_TILE": 64}, num_warps=4, num_stages=3),
+        ],
+        key=["D", "MAX_K", "GROUP_SIZE"],
+    )
+    @triton.jit
+    def _single_head_qtile_kernel(
+            Q, K, V, Indices, Out, scale,
+            sqz, sqh, sqm, sqd, skz, skh, skn, skd,
+            svz, svh, svn, svd, siz, sih, sim, sik,
+            soz, soh, som, sod, HQ, N,
+            GROUP_SIZE: tl.constexpr, BLOCK_SIZE: tl.constexpr,
+            BN: tl.constexpr, D: tl.constexpr, MAX_K: tl.constexpr,
+            QUERY_TILE: tl.constexpr):
+        """Query-tile-only ablation; still exactly one query head per program."""
+        query_tile = tl.program_id(0)
+        hz = tl.program_id(1)
+        q_head, z = hz % HQ, hz // HQ
+        kv_head = q_head // GROUP_SIZE
+        q_start = query_tile * QUERY_TILE
+        query_block = q_start // BLOCK_SIZE
+        Q += z * sqz + q_head * sqh
+        K += z * skz + kv_head * skh
+        V += z * svz + kv_head * svh
+        Indices += z * siz + kv_head * sih + query_block * sim
+        om = q_start + tl.arange(0, QUERY_TILE)
+        on = tl.arange(0, BN)
+        od = tl.arange(0, D)
+        q = tl.load(
+            Q + om[:, None] * sqm + od[None, :] * sqd,
+            mask=om[:, None] < N,
+        )
+        acc = tl.zeros([QUERY_TILE, D], tl.float32)
+        l_i = tl.zeros([QUERY_TILE], tl.float32)
+        m_i = tl.full([QUERY_TILE], float("-inf"), tl.float32)
+
+        for slot in range(0, MAX_K):
+            block_id = tl.load(Indices + slot * sik)
+            if block_id >= 0:
+                start = block_id * BN
+                key_tokens = on + start
+                key_valid = key_tokens < N
                 token_mask = (
-                    (on[None, :] + start < N)
-                    & (om[:, None] >= on[None, :] + start)
+                    key_valid[None, :]
+                    & (om[:, None] >= key_tokens[None, :])
                 )
                 k = tl.load(
-                    K + (on[None, :] + start) * skn
+                    K + key_tokens[None, :] * skn
                     + od[:, None] * skd,
-                    mask=on[None, :] + start < N,
+                    mask=key_valid[None, :],
                 )
                 qk = tl.dot(q, k) * (
                     scale * 1.4426950408889634)
@@ -76,9 +195,9 @@ if triton is not None:
                 l_i = l_i * alpha + tl.sum(p, 1)
                 acc *= alpha[:, None]
                 v = tl.load(
-                    V + (on[:, None] + start) * svn
+                    V + key_tokens[:, None] * svn
                     + od[None, :] * svd,
-                    mask=on[:, None] + start < N,
+                    mask=key_valid[:, None],
                 )
                 acc += tl.dot(p.to(v.type.element_ty), v)
                 m_i = m_new
@@ -255,12 +374,30 @@ def direct_index_sparse_triton(
     # The kernel indexes output logically as [B,Hq,T,D]. Pass the matching
     # logical strides while retaining Qwen's contiguous [B,T,Hq,D] storage.
     out_strides = (out.stride(0), out.stride(2), out.stride(1), out.stride(3))
-    if kernel_variant == "single_head":
+    if kernel_variant in (
+            "single_head", "single_head_causal",
+            "single_head_prescale"):
         _single_head_kernel[(qblocks, B * Hq)](
             q, k, v, indices, out, scale,
             *q.stride(), *k.stride(), *v.stride(),
             *indices.stride(), *out_strides, Hq, T,
             GROUP_SIZE=Hq // Hkv, BM=block_size,
+            BN=block_size, D=D, MAX_K=indices.shape[-1],
+            CAUSAL_SPECIALIZE=(
+                kernel_variant == "single_head_causal"),
+            PRESCALE_Q=(
+                kernel_variant == "single_head_prescale"),
+        )
+    elif kernel_variant == "single_head_qtile":
+        grid = lambda meta: (
+            triton.cdiv(T, meta["QUERY_TILE"]),
+            B * Hq,
+        )
+        _single_head_qtile_kernel[grid](
+            q, k, v, indices, out, scale,
+            *q.stride(), *k.stride(), *v.stride(),
+            *indices.stride(), *out_strides, Hq, T,
+            GROUP_SIZE=Hq // Hkv, BLOCK_SIZE=block_size,
             BN=block_size, D=D, MAX_K=indices.shape[-1],
         )
     else:
@@ -277,3 +414,35 @@ def direct_index_sparse_triton(
             BN=block_size, D=D, MAX_K=indices.shape[-1],
         )
     return out
+
+
+def _config_metadata(config):
+    if config is None:
+        return None
+    return {
+        "kwargs": dict(config.kwargs),
+        "num_warps": int(config.num_warps),
+        "num_stages": int(config.num_stages),
+        "num_ctas": int(config.num_ctas),
+    }
+
+
+def kernel_runtime_metadata(kernel_variant):
+    """Return the most recently selected autotune configuration."""
+    if kernel_variant not in KERNEL_VARIANTS:
+        raise ValueError(
+            f"kernel_variant must be one of {KERNEL_VARIANTS}, "
+            f"got {kernel_variant!r}")
+    if triton is None:
+        return {"variant": kernel_variant, "best_config": None}
+    if kernel_variant == "single_head_qtile":
+        kernel = _single_head_qtile_kernel
+    elif kernel_variant == "tiled_gqa":
+        kernel = _tiled_gqa_kernel
+    else:
+        kernel = _single_head_kernel
+    return {
+        "variant": kernel_variant,
+        "best_config": _config_metadata(
+            getattr(kernel, "best_config", None)),
+    }

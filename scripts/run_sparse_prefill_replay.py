@@ -19,6 +19,12 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 import torch
 
+from configs.long_context import (
+    QWEN_NATIVE_CONTEXT,
+    configure_tokenizer,
+    context_limit,
+    load_model_config,
+)
 from interfaces.validator import validate_selected_blocks
 from sparse.attention import SPARSE_PREFILL_ATTENTION, register_sparse_prefill_attention
 from sparse.plotting import save_sparse_replay_plot
@@ -33,10 +39,16 @@ def model_device(model) -> torch.device:
     return next(model.parameters()).device
 
 
-def run_once(model_name, implementation, inputs, selected, block_size, torch_dtype, load_offload_dir):
+def run_once(
+        model_name, implementation, inputs, selected, block_size, torch_dtype,
+        load_offload_dir, *, yarn_factor=1.0,
+        original_max_position_embeddings=QWEN_NATIVE_CONTEXT):
     from transformers import AutoModelForCausalLM
 
     os.makedirs(load_offload_dir, exist_ok=True)
+    config = load_model_config(
+        model_name, yarn_factor=yarn_factor,
+        original_max_position_embeddings=original_max_position_embeddings)
     model = AutoModelForCausalLM.from_pretrained(
         model_name,
         torch_dtype=torch_dtype,
@@ -48,6 +60,7 @@ def run_once(model_name, implementation, inputs, selected, block_size, torch_dty
         offload_state_dict=True,
         offload_folder=load_offload_dir,
         attn_implementation=implementation,
+        config=config,
     ).eval()
     device = model_device(model)
     inputs = {name: tensor.to(device) for name, tensor in inputs.items()}
@@ -109,6 +122,12 @@ def main():
     parser.add_argument("--reconstruct-only", action="store_true", help="verify prompt reconstruction, then exit before loading Qwen")
     parser.add_argument("--dtype", choices=("auto", "float16", "bfloat16"), default="auto")
     parser.add_argument(
+        "--yarn-factor", type=float, default=1.0,
+        help="static YaRN factor; use 4.0 for Qwen's 131072-token configuration")
+    parser.add_argument(
+        "--original-max-position-embeddings", type=int,
+        default=QWEN_NATIVE_CONTEXT)
+    parser.add_argument(
         "--save-logits",
         help="optional output .pt path for final-position (next-token) sparse logits",
     )
@@ -132,6 +151,9 @@ def main():
     if not teacher_target:
         raise SystemExit("pass --teacher-target: the selected-block artifact has no source target path")
     tokenizer = AutoTokenizer.from_pretrained(args.model)
+    configure_tokenizer(
+        tokenizer, yarn_factor=args.yarn_factor,
+        original_max_position_embeddings=args.original_max_position_embeddings)
     try:
         prompt, teacher_meta = reconstruct_teacher_prompt(
             tokenizer, teacher_target, bank_path=args.prompt_bank)
@@ -139,6 +161,18 @@ def main():
         raise SystemExit(f"could not reconstruct source prompt: {error}") from error
     encoded = tokenizer(prompt, return_tensors="pt")
     seq_len = int(encoded.input_ids.shape[1])
+    maximum_context = context_limit(
+        yarn_factor=args.yarn_factor,
+        original_max_position_embeddings=args.original_max_position_embeddings)
+    if seq_len > maximum_context:
+        raise SystemExit(
+            f"prompt length {seq_len} exceeds configured context "
+            f"{maximum_context}; use --yarn-factor 4.0 for 128K")
+    target_rope = teacher_meta.get("rope")
+    if (target_rope is not None
+            and float(target_rope.get("factor", 1.0))
+            != float(args.yarn_factor)):
+        raise SystemExit("teacher-target YaRN factor does not match --yarn-factor")
     if seq_len != int(meta["seq_len"]):
         raise SystemExit(
             f"token-length mismatch: reconstructed prompt tokenized to {seq_len}, but selected-block "
@@ -164,7 +198,8 @@ def main():
         sparse_implementation = SPARSE_PREFILL_ATTENTION
     sparse_logits = run_once(
         args.model, sparse_implementation, encoded, selected, block_size, dtype,
-        args.load_offload_dir,
+        args.load_offload_dir, yarn_factor=args.yarn_factor,
+        original_max_position_embeddings=args.original_max_position_embeddings,
     )
     print(
         f"sparse replay passed: backend={args.backend} case={teacher_meta['case_id']} "
@@ -185,6 +220,8 @@ def main():
     if args.compare_dense:
         dense_logits = run_once(
             args.model, args.dense_backend, encoded, selected, block_size, dtype, args.load_offload_dir,
+            yarn_factor=args.yarn_factor,
+            original_max_position_embeddings=args.original_max_position_embeddings,
         )
         diff = (sparse_logits - dense_logits).abs()
         print(

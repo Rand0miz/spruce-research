@@ -127,7 +127,10 @@ def reconstruct_teacher_prompt(tokenizer, teacher_target, bank_path=None):
                 f"teacher target {key} does not match prompt-bank case {target['case_id']!r}")
 
     question_tokens = len(tokenizer(case["question"])["input_ids"])
-    if "haystack_token_budget" in target:
+    if "filler_units" in target:
+        full = _prompt_from_unit_count(
+            case, float(target["depth"]), int(target["filler_units"]))
+    elif "haystack_token_budget" in target:
         prompt, _ = build_haystack(
             tokenizer, int(target["haystack_token_budget"]), case["needle"],
             float(target["depth"]), case["filler"],

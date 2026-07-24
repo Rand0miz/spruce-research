@@ -39,6 +39,8 @@ def load_selector_features(path, device="cpu"):
         "needle_block": int(d.get("needle_block", -1)),
         "num_layers": L, "num_groups": G, "qb": qb, "kb": kb,
         "head_dim": head_dim, "proto": int(d["proto"]),
+        "rope": d.get("rope"),
+        "features_only": bool(d.get("features_only", False)),
     }
     return {"q_feat": q_feat, "k_feat": k_feat, "meta": meta}
 
@@ -58,6 +60,10 @@ def load_teacher(path, device="cpu", eps=1e-9):
             f"{path} lacks P-prototype selector features ('proto' key / 6-D pooledK). "
             f"It predates multi-prototype extraction. Re-extract with "
             f"scripts/extract_teacher_targets.py to regenerate it.")
+    if d.get("pooled") is None:
+        raise ValueError(
+            f"{path} is a selector-feature-only artifact and has no dense "
+            "teacher mass; it can be used for traversal/128K replay but not training")
 
     pooled = d["pooled"].float()      # [1, L, H, qb, kb]  teacher mass
     q_feat = d["pooledQ"].float()[0]  # [L, G, qb, P, dd]  selector input (already grouped)

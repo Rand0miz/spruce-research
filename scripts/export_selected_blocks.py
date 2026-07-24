@@ -19,7 +19,7 @@ import torch
 
 from interfaces.validator import PAD_VALUE, validate_selected_blocks
 from scripts.eval_tree_traversal import load_gate, traverse_to_leaf_ids
-from selector.targets import load_teacher
+from selector.targets import load_selector_features
 from selector.tree import build_key_tree
 
 
@@ -177,7 +177,7 @@ def main():
           f"proj={cfg['proj_dim']}  beam={args.beam} K={k_selected}")
 
     for path in paths:
-        doc = load_teacher(path, device=args.device)
+        doc = load_selector_features(path, device=args.device)
         meta = doc["meta"]
         if meta["num_layers"] != cfg["num_layers"] or meta["head_dim"] != cfg["head_dim"]:
             raise SystemExit(f"{path} shape {meta} mismatches gate config {cfg}")
@@ -207,6 +207,7 @@ def main():
                 "num_groups": meta["num_groups"],
                 "query_blocks": meta["qb"],
                 "key_blocks": meta["kb"],
+                "rope": meta.get("rope"),
             },
         }, out_path)
         print(f"saved {out_path}  shape={tuple(selected_blocks.shape)}")

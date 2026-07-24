@@ -38,6 +38,24 @@ def test_loads_selector_features_without_teacher_mass(tmp_path):
     assert doc["k_feat"].shape == (L, G, kb, P, d)
 
 
+def test_feature_only_artifact_is_valid_for_traversal_not_training(tmp_path):
+    p = tmp_path / "features.pt"
+    torch.save({
+        "pooled": None,
+        "pooledQ": torch.rand(1, L, G, qb, P, d).half(),
+        "pooledK": torch.rand(1, L, G, kb, P, d).half(),
+        "seq_len": qb * 64, "block_size": 64, "needle_block": 1,
+        "proto": P, "features_only": True,
+        "rope": {"enabled": True, "factor": 4.0},
+    }, p)
+
+    features = load_selector_features(p)
+    assert features["meta"]["features_only"] is True
+    assert features["meta"]["rope"]["factor"] == 4.0
+    with pytest.raises(ValueError, match="feature-only"):
+        load_teacher(p)
+
+
 def test_rejects_old_format(tmp_path):
     p = tmp_path / "old.pt"
     torch.save({                                 # old 5-D pooledK, no proto key

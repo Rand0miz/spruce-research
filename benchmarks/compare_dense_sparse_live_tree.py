@@ -24,6 +24,12 @@ if ROOT not in sys.path:
 
 import torch
 
+from configs.long_context import (
+    QWEN_NATIVE_CONTEXT,
+    configure_tokenizer,
+    context_limit,
+    yarn_metadata,
+)
 from benchmarks.compare_dense_sparse import (
     _free_model,
     _generate,
@@ -31,12 +37,14 @@ from benchmarks.compare_dense_sparse import (
     _model_device,
     _set_attention_backend,
     _warmup,
+    runtime_metadata,
 )
 from eval.score import score_retrival
 from interfaces.validator import validate_selected_blocks
 from kernels.sparse_prefill import (
     KERNEL_VARIANTS,
     SPRUCE_TRITON_SPARSE_PREFILL,
+    kernel_runtime_metadata,
     register_triton_sparse_prefill_attention,
 )
 from scripts.eval_tree_traversal import load_gate, traverse_to_leaf_ids
@@ -83,9 +91,11 @@ def prepare_cases(paths, tokenizer, prompt_bank=None):
             "needle": target["needle"],
             "needle_block": int(target["needle_block"]),
             "seq_len": seq_len,
+            "requested_length": int(target.get("requested_length", seq_len)),
             "block_size": int(target["block_size"]),
             "num_layers": int(target["pooledK"].shape[1]),
             "num_groups": int(target["pooledK"].shape[2]),
+            "rope": target.get("rope"),
             "encoded": {name: value.cpu() for name, value in encoded.items()},
         })
         del target
@@ -95,13 +105,17 @@ def prepare_cases(paths, tokenizer, prompt_bank=None):
 @torch.no_grad()
 def live_route(gate, gate_config, target_path, *, beam, radix, k_selected,
                local_window, selector_device, model_device=None, validate=False,
-               selector_dtype="float32", selector_layer_chunk=4):
+               selector_dtype="float32", selector_layer_chunk=4,
+               features=None):
     """Build and traverse one tree now, returning compact selected blocks."""
     selector_device = torch.device(selector_device)
-    load_started = time.perf_counter()
-    features = load_selector_features(target_path, device=selector_device)
-    _sync(selector_device)
-    feature_load_seconds = time.perf_counter() - load_started
+    if features is None:
+        load_started = time.perf_counter()
+        features = load_selector_features(target_path, device=selector_device)
+        _sync(selector_device)
+        feature_load_seconds = time.perf_counter() - load_started
+    else:
+        feature_load_seconds = 0.0
     meta = features["meta"]
     if (meta["num_layers"] != gate_config["num_layers"]
             or meta["head_dim"] != gate_config["head_dim"]):
@@ -200,14 +214,23 @@ def _run_sparse_cases(
     results = {}
     for case_index, case in enumerate(cases):
         samples, answers = [], []
+        load_started = time.perf_counter()
+        features = load_selector_features(
+            case["target"], device=args.selector_device)
+        _sync(args.selector_device)
+        feature_load_seconds = time.perf_counter() - load_started
         for repeat in range(args.repeats):
+            if device.type == "cuda":
+                torch.cuda.reset_peak_memory_stats(device)
             selected, route_timing = live_route(
                 gate, gate_config, case["target"], beam=beam, radix=args.radix,
                 k_selected=k_selected, local_window=args.local_window,
                 selector_device=args.selector_device, model_device=device,
                 validate=(repeat == 0), selector_dtype=args.selector_dtype,
                 selector_layer_chunk=args.selector_layer_chunk,
+                features=features,
             )
+            route_timing["feature_load_seconds"] = feature_load_seconds
             _set_attention_backend(model, SPRUCE_TRITON_SPARSE_PREFILL)
             token_ids, model_timing = _generate(
                 model, case["encoded"], args.max_new_tokens,
@@ -221,10 +244,20 @@ def _run_sparse_cases(
             answer = tokenizer.decode(token_ids, skip_special_tokens=True)
             answers.append(answer)
             sample = {**route_timing, **model_timing}
+            if device.type == "cuda":
+                sample["peak_memory_allocated_gb"] = (
+                    torch.cuda.max_memory_allocated(device) / 1e9)
+                sample["peak_memory_reserved_gb"] = (
+                    torch.cuda.max_memory_reserved(device) / 1e9)
+            else:
+                sample["peak_memory_allocated_gb"] = 0.0
+                sample["peak_memory_reserved_gb"] = 0.0
             sample["live_prefill_seconds"] = sample["selector_seconds"] + sample["prefill_seconds"]
             sample["live_total_seconds"] = sample["selector_seconds"] + sample["seconds"]
             samples.append(sample)
             del selected
+        del features
+        gc.collect()
 
         timing_keys = (
             "feature_load_seconds", "tree_build_seconds", "tree_traversal_seconds",
@@ -232,6 +265,7 @@ def _run_sparse_cases(
             "prefill_seconds", "decode_seconds", "seconds", "live_prefill_seconds",
             "live_total_seconds", "needle_layer_group_hit_rate",
             "needle_any_group_all_layers_rate",
+            "peak_memory_allocated_gb", "peak_memory_reserved_gb",
         )
         results[case["case_key"]] = {
             **score_retrival(answers[0], case["needle"]),
@@ -249,18 +283,31 @@ def _run_sparse_cases(
 
 
 def _run_dense_cases(model, cases, args, tokenizer):
+    device = _model_device(model)
     results = {}
     for case_index, case in enumerate(cases):
         samples, answers = [], []
         for _ in range(args.repeats):
+            if device.type == "cuda":
+                torch.cuda.reset_peak_memory_stats(device)
             _set_attention_backend(model, "sdpa")
             token_ids, timing = _generate(
                 model, case["encoded"], args.max_new_tokens)
             answers.append(tokenizer.decode(token_ids, skip_special_tokens=True))
+            if device.type == "cuda":
+                timing["peak_memory_allocated_gb"] = (
+                    torch.cuda.max_memory_allocated(device) / 1e9)
+                timing["peak_memory_reserved_gb"] = (
+                    torch.cuda.max_memory_reserved(device) / 1e9)
+            else:
+                timing["peak_memory_allocated_gb"] = 0.0
+                timing["peak_memory_reserved_gb"] = 0.0
             samples.append(timing)
         results[case["case_key"]] = {
             **score_retrival(answers[0], case["needle"]),
-            **summarize_timings(samples, ("prefill_seconds", "decode_seconds", "seconds")),
+            **summarize_timings(samples, (
+                "prefill_seconds", "decode_seconds", "seconds",
+                "peak_memory_allocated_gb", "peak_memory_reserved_gb")),
             "answer_repeat_match": len(set(answer.strip() for answer in answers)) == 1,
             "timing_samples": samples,
         }
@@ -276,11 +323,47 @@ def aggregate_results(case_results):
     kernel_speedups = [case["comparison"]["kernel_prefill_speedup"] for case in case_results]
     live_speedups = [case["comparison"]["live_prefill_speedup"] for case in case_results]
     total_speedups = [case["comparison"]["live_total_speedup"] for case in case_results]
-    return {
+    sparse_only = sum(
+        bool(case["sparse"]["exact"]) and not bool(case["dense"]["exact"])
+        for case in case_results)
+    dense_only = sum(
+        bool(case["dense"]["exact"]) and not bool(case["sparse"]["exact"])
+        for case in case_results)
+    both_correct = sum(
+        bool(case["dense"]["exact"]) and bool(case["sparse"]["exact"])
+        for case in case_results)
+    neither_correct = len(case_results) - sparse_only - dense_only - both_correct
+    discordant = sparse_only + dense_only
+    if discordant:
+        smaller = min(sparse_only, dense_only)
+        mcnemar_p = min(
+            1.0,
+            2.0 * sum(
+                math.comb(discordant, index)
+                for index in range(smaller + 1))
+            / (2 ** discordant),
+        )
+    else:
+        mcnemar_p = 1.0
+    sparse_rate = (
+        sum(case["sparse"]["exact"] for case in case_results)
+        / len(case_results))
+    dense_rate = (
+        sum(case["dense"]["exact"] for case in case_results)
+        / len(case_results))
+    aggregate = {
         "cases": len(case_results),
         "answers_match_rate": sum(case["answers_match"] for case in case_results) / len(case_results),
-        "sparse_exact_rate": sum(case["sparse"]["exact"] for case in case_results) / len(case_results),
-        "dense_exact_rate": sum(case["dense"]["exact"] for case in case_results) / len(case_results),
+        "sparse_exact_rate": sparse_rate,
+        "dense_exact_rate": dense_rate,
+        "sparse_minus_dense_exact_rate": sparse_rate - dense_rate,
+        "paired_exact_counts": {
+            "sparse_only_correct": sparse_only,
+            "dense_only_correct": dense_only,
+            "both_correct": both_correct,
+            "neither_correct": neither_correct,
+            "exact_mcnemar_two_sided_p": mcnemar_p,
+        },
         "mean_sparse_fuzzy": statistics.mean(case["sparse"]["fuzzy"] for case in case_results),
         "mean_dense_fuzzy": statistics.mean(case["dense"]["fuzzy"] for case in case_results),
         "median_kernel_prefill_speedup": statistics.median(kernel_speedups),
@@ -293,6 +376,19 @@ def aggregate_results(case_results):
             sum(case["dense"]["prefill_seconds"] for case in case_results)
             / sum(case["sparse"]["live_prefill_seconds"] for case in case_results)),
     }
+    if all(
+            "peak_memory_allocated_gb" in case["sparse"]
+            and "peak_memory_allocated_gb" in case["dense"]
+            for case in case_results):
+        aggregate.update({
+            "max_sparse_peak_memory_allocated_gb": max(
+                case["sparse"]["peak_memory_allocated_gb"]
+                for case in case_results),
+            "max_dense_peak_memory_allocated_gb": max(
+                case["dense"]["peak_memory_allocated_gb"]
+                for case in case_results),
+        })
+    return aggregate
 
 
 def resolve_k_sweep(*, beam, local_window, k_selected=None, k_values=None):
@@ -324,6 +420,7 @@ def build_case_results(cases, sparse_results, dense_results):
         dense = dense_results[case["case_key"]]
         case_results.append({
             "case_id": case["case_id"], "seq_len": case["seq_len"],
+            "requested_length": case["requested_length"],
             "block_size": case["block_size"], "needle_block": case["needle_block"],
             "teacher_target": case["target"], "sparse": sparse, "dense": dense,
             "answers_match": sparse["answer"].strip() == dense["answer"].strip(),
@@ -381,8 +478,14 @@ def main():
         help="selector layers scored per batched candidate operation")
     parser.add_argument("--dtype", choices=("auto", "float16", "bfloat16"), default="auto")
     parser.add_argument(
+        "--yarn-factor", type=float, default=1.0,
+        help="static YaRN factor; use 4.0 for Qwen's 131072-token configuration")
+    parser.add_argument(
+        "--original-max-position-embeddings", type=int,
+        default=QWEN_NATIVE_CONTEXT)
+    parser.add_argument(
         "--kernel-variant", choices=KERNEL_VARIANTS, default="single_head",
-        help="single_head restores the measured run2 fast path; tiled_gqa is the run3 ablation")
+        help="single_head is the measured control; other choices are isolated kernel ablations")
     parser.add_argument("--out", required=True)
     parser.add_argument(
         "--plot", help="optional efficiency/accuracy PNG; also writes an adjacent CSV")
@@ -415,7 +518,27 @@ def main():
     from transformers import AutoTokenizer
 
     tokenizer = AutoTokenizer.from_pretrained(args.model)
+    configure_tokenizer(
+        tokenizer, yarn_factor=args.yarn_factor,
+        original_max_position_embeddings=args.original_max_position_embeddings)
     cases = prepare_cases(paths, tokenizer, prompt_bank=args.prompt_bank)
+    maximum_context = context_limit(
+        yarn_factor=args.yarn_factor,
+        original_max_position_embeddings=args.original_max_position_embeddings)
+    longest = max(case["seq_len"] for case in cases)
+    if longest > maximum_context:
+        raise SystemExit(
+            f"longest target {longest} exceeds configured context "
+            f"{maximum_context}; use --yarn-factor 4.0 for 128K")
+    mismatched_rope = [
+        case["target"] for case in cases
+        if case["rope"] is not None
+        and float(case["rope"].get("factor", 1.0)) != float(args.yarn_factor)
+    ]
+    if mismatched_rope:
+        raise SystemExit(
+            "target YaRN factor does not match --yarn-factor: "
+            f"{mismatched_rope[0]}")
     block_sizes = {case["block_size"] for case in cases}
     if block_sizes != {64}:
         raise SystemExit(f"Triton benchmark requires block_size=64, got {sorted(block_sizes)}")
@@ -425,8 +548,11 @@ def main():
 
     register_triton_sparse_prefill_attention()
     sparse_model = _load_model(
-        args.model, SPRUCE_TRITON_SPARSE_PREFILL, dtype, args.load_offload_dir)
+        args.model, SPRUCE_TRITON_SPARSE_PREFILL, dtype,
+        args.load_offload_dir, yarn_factor=args.yarn_factor,
+        original_max_position_embeddings=args.original_max_position_embeddings)
     sparse_results_by_k = {}
+    kernel_metadata_by_k = {}
     device = _model_device(sparse_model)
     for k_selected, effective_beam in k_sweep:
         if warmup_tokens:
@@ -447,12 +573,17 @@ def main():
         sparse_results_by_k[k_selected] = _run_sparse_cases(
             sparse_model, gate, gate_config, cases, args, tokenizer,
             beam=effective_beam, k_selected=k_selected)
+        kernel_metadata_by_k[k_selected] = kernel_runtime_metadata(
+            args.kernel_variant)
     sparse_model = _free_model(sparse_model)
     del gate
     gc.collect()
     torch.cuda.empty_cache()
 
-    dense_model = _load_model(args.model, "sdpa", dtype, args.load_offload_dir)
+    dense_model = _load_model(
+        args.model, "sdpa", dtype, args.load_offload_dir,
+        yarn_factor=args.yarn_factor,
+        original_max_position_embeddings=args.original_max_position_embeddings)
     if warmup_tokens:
         _warmup(dense_model, _warmup_inputs(cases[0]["encoded"], warmup_tokens))
     dense_results = _run_dense_cases(dense_model, cases, args, tokenizer)
@@ -464,10 +595,14 @@ def main():
             cases, sparse_results_by_k[k_selected], dense_results)
         sweep_reports.append({
             "model": args.model,
+            "runtime": runtime_metadata(),
             "gate": os.path.abspath(args.gate),
             "selector": selector_metadata(
                 args, beam=effective_beam, k_selected=k_selected),
-            "kernel": {"variant": args.kernel_variant},
+            "kernel": kernel_metadata_by_k[k_selected],
+            "rope": yarn_metadata(
+                yarn_factor=args.yarn_factor,
+                original_max_position_embeddings=args.original_max_position_embeddings),
             "repeats": args.repeats, "warmup_tokens": warmup_tokens,
             "cases": case_results,
             "aggregate": aggregate_results(case_results),
@@ -478,10 +613,14 @@ def main():
     else:
         report = {
             "model": args.model,
+            "runtime": runtime_metadata(),
             "gate": os.path.abspath(args.gate),
             "k_values": [item[0] for item in k_sweep],
             "repeats": args.repeats,
             "warmup_tokens": warmup_tokens,
+            "rope": yarn_metadata(
+                yarn_factor=args.yarn_factor,
+                original_max_position_embeddings=args.original_max_position_embeddings),
             "sweeps": sweep_reports,
         }
     os.makedirs(os.path.dirname(args.out) or ".", exist_ok=True)

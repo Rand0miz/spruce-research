@@ -21,6 +21,7 @@ _PROTO = 8              # prototypes per block (1 mean + 7 outliers), both Q and
 # bit-identical to processing all heads at once (heads are independent here).
 _HEAD_CHUNK = 2
 _REGISTERED = False
+_FEATURES_REGISTERED = False
 
 
 def _proto_pool_seq(x, block, P):
@@ -160,11 +161,39 @@ def _capture_attention(module, query, key, value, attention_mask,
     return attn_output, None
 
 
+def _capture_features(module, query, key, value, attention_mask,
+                      scaling=None, dropout=0.0, sliding_window=None, **kwargs):
+    """Capture selector Q/K prototypes without computing dense teacher mass."""
+    if scaling is None:
+        scaling = query.shape[-1] ** -0.5
+    n_rep = query.shape[1] // key.shape[1]
+    q_grouped = _group_avg_tokens(query, key.shape[1])
+    pooledQ = _proto_pool_seq(q_grouped, _BLOCK, _PROTO).cpu()
+    pooledK = _proto_pool_seq(key, _BLOCK, _PROTO).cpu()
+    _CAPTURE_QK[module.layer_idx] = (pooledQ, pooledK)
+
+    key_rep = _repeat_kv(key, n_rep)
+    value_rep = _repeat_kv(value, n_rep)
+    attn_output = F.scaled_dot_product_attention(
+        query, key_rep, value_rep,
+        attn_mask=None, dropout_p=dropout, scale=scaling, is_causal=True,
+    )
+    return attn_output.transpose(1, 2).contiguous(), None
+
+
 def _ensure_registered():
     global _REGISTERED
     if not _REGISTERED:
         ALL_ATTENTION_FUNCTIONS.register("chunked_capture", _capture_attention)
         _REGISTERED = True
+
+
+def _ensure_features_registered():
+    global _FEATURES_REGISTERED
+    if not _FEATURES_REGISTERED:
+        ALL_ATTENTION_FUNCTIONS.register(
+            "selector_feature_capture", _capture_features)
+        _FEATURES_REGISTERED = True
 
 
 def _stack_and_clear_captures(order):
@@ -234,3 +263,49 @@ def get_pooled_targets(model, tok, prompt, device="cuda", block_size=_BLOCK):
     pooled_stack, pooledQ_stack, pooledK_stack = _stack_and_clear_captures(order)
     del inputs
     return pooled_stack, pooledQ_stack, pooledK_stack, seq_len
+
+
+@torch.no_grad()
+def get_selector_features(model, tok, prompt, device="cuda", block_size=_BLOCK):
+    """Capture only O(n) selector Q/K prototypes for long-context evaluation.
+
+    Unlike ``get_pooled_targets``, this does not compute or save the quadratic
+    dense teacher block-mass tensor. It is for inference/length-generalization
+    evaluation, not selector training.
+    """
+    global _BLOCK
+    _BLOCK = block_size
+    _ensure_features_registered()
+    _CAPTURE.clear()
+    _CAPTURE_QK.clear()
+
+    previous = model.config._attn_implementation
+    model.config._attn_implementation = "selector_feature_capture"
+    for module in model.modules():
+        config = getattr(module, "config", None)
+        if config is not None:
+            config._attn_implementation = "selector_feature_capture"
+    try:
+        inputs = tok(prompt, return_tensors="pt").to(device)
+        backends = [SDPBackend.FLASH_ATTENTION, SDPBackend.EFFICIENT_ATTENTION]
+        with sdpa_kernel(backends):
+            model.model(**inputs, use_cache=False)
+    finally:
+        model.config._attn_implementation = previous
+        for module in model.modules():
+            config = getattr(module, "config", None)
+            if config is not None:
+                config._attn_implementation = previous
+
+    try:
+        order = sorted(_CAPTURE_QK)
+        pooledQ_stack = torch.stack(
+            [_CAPTURE_QK[index][0] for index in order], dim=1)
+        pooledK_stack = torch.stack(
+            [_CAPTURE_QK[index][1] for index in order], dim=1)
+    finally:
+        _CAPTURE.clear()
+        _CAPTURE_QK.clear()
+    seq_len = inputs["input_ids"].shape[1]
+    del inputs
+    return pooledQ_stack, pooledK_stack, seq_len

@@ -1,0 +1,57 @@
+-------------------------------------------------------  ------------  ------------  ------------  ------------  ------------  ------------  ------------  ------------  ------------  ------------  
+                                                   Name    Self CPU %      Self CPU   CPU total %     CPU total  CPU time avg     Self CUDA   Self CUDA %    CUDA total  CUDA time avg    # of Calls  
+-------------------------------------------------------  ------------  ------------  ------------  ------------  ------------  ------------  ------------  ------------  ------------  ------------  
+                                         spruce_prefill         0.00%       0.000us         0.00%       0.000us       0.000us        2.587s       115.91%        2.587s        2.587s             1  
+                                               aten::mm         0.15%       3.812ms         0.39%      10.043ms      88.873us        1.091s        48.88%        1.182s      10.462ms           113  
+void cutlass::Kernel2<cutlass_80_tensorop_bf16_s1681...         0.00%       0.000us         0.00%       0.000us       0.000us     813.830ms        36.47%     813.830ms       7.266ms           112  
+                                              aten::mul         0.12%       3.045ms         1.55%      40.058ms     156.478us     376.450ms        16.87%     400.587ms       1.565ms           256  
+void cutlass::Kernel2<cutlass_80_tensorop_bf16_s1681...         0.00%       0.000us         0.00%       0.000us       0.000us     338.348ms        15.16%     338.348ms      12.084ms            28  
+void at::native::vectorized_elementwise_kernel<4, at...         0.00%       0.000us         0.00%       0.000us       0.000us     195.902ms         8.78%     195.902ms       6.997ms            28  
+                                    Command Buffer Full         4.09%     105.804ms         4.09%     105.804ms       1.734ms     137.715ms         6.17%     137.715ms       2.258ms            61  
+                                            aten::copy_         0.05%       1.300ms         0.29%       7.555ms      43.417us     134.805ms         6.04%     141.908ms     815.561us           174  
+                                             aten::silu         0.01%     385.474us         0.11%       2.768ms      98.868us     128.822ms         5.77%     138.005ms       4.929ms            28  
+void at::native::vectorized_elementwise_kernel<4, at...         0.00%       0.000us         0.00%       0.000us       0.000us     128.822ms         5.77%     128.822ms       4.601ms            28  
+                              _single_head_qtile_kernel         0.00%       0.000us         0.00%       0.000us       0.000us     108.290ms         4.85%     108.290ms       3.868ms            28  
+                                              aten::add         0.08%       2.110ms         0.93%      24.127ms     141.925us     100.538ms         4.50%     102.005ms     600.027us           170  
+void at::native::elementwise_kernel<128, 4, at::nati...         0.00%       0.000us         0.00%       0.000us       0.000us      96.771ms         4.34%      96.771ms     572.610us           169  
+                                            aten::addmm         0.37%       9.549ms         0.54%      13.980ms     166.428us      94.365ms         4.23%     100.063ms       1.191ms            84  
+                                              aten::pow         0.04%     925.775us         0.17%       4.440ms      77.896us      92.261ms         4.13%      98.742ms       1.732ms            57  
+void at::native::vectorized_elementwise_kernel<4, at...         0.00%       0.000us         0.00%       0.000us       0.000us      92.261ms         4.13%      92.261ms       1.619ms            57  
+void at::native::elementwise_kernel<128, 2, at::nati...         0.00%       0.000us         0.00%       0.000us       0.000us      83.679ms         3.75%      83.679ms       1.468ms            57  
+void at::native::vectorized_elementwise_kernel<4, at...         0.00%       0.000us         0.00%       0.000us       0.000us      69.006ms         3.09%      69.006ms       1.170ms            59  
+void at::native::unrolled_elementwise_kernel<at::nat...         0.00%       0.000us         0.00%       0.000us       0.000us      65.795ms         2.95%      65.795ms       1.134ms            58  
+void at::native::vectorized_elementwise_kernel<4, at...         0.00%       0.000us         0.00%       0.000us       0.000us      63.108ms         2.83%      63.108ms       1.127ms            56  
+                                             aten::mean         0.04%       1.000ms         0.15%       3.963ms      69.521us      50.377ms         2.26%      53.919ms     945.952us            57  
+void at::native::reduce_kernel<512, 1, at::native::R...         0.00%       0.000us         0.00%       0.000us       0.000us      50.377ms         2.26%      50.377ms     883.805us            57  
+                                              aten::cat         0.05%       1.401ms         0.78%      20.210ms     178.847us      42.609ms         1.91%      44.498ms     393.790us           113  
+void at::native::(anonymous namespace)::CatArrayBatc...         0.00%       0.000us         0.00%       0.000us       0.000us      42.538ms         1.91%      42.538ms     379.804us           112  
+void at::native::elementwise_kernel<128, 4, at::nati...         0.00%       0.000us         0.00%       0.000us       0.000us      37.257ms         1.67%      37.257ms     665.298us            56  
+void cutlass::Kernel2<cutlass_80_tensorop_bf16_s1681...         0.00%       0.000us         0.00%       0.000us       0.000us      31.139ms         1.40%      31.139ms     556.051us            56  
+                                  Lazy Function Loading         0.02%     432.552us         0.02%     432.552us     108.138us      13.252ms         0.59%      13.252ms       3.313ms             4  
+                                              aten::neg         0.02%     637.445us         0.22%       5.600ms     100.008us      11.849ms         0.53%      11.877ms     212.096us            56  
+void at::native::elementwise_kernel<128, 4, at::nati...         0.00%       0.000us         0.00%       0.000us       0.000us      11.849ms         0.53%      11.849ms     211.597us            56  
+                                       cuLaunchKernelEx         0.02%     389.709us         0.12%       3.137ms     112.019us       2.260ms         0.10%       2.260ms      80.715us            28  
+std::enable_if<!(false), void>::type internal::gemvx...         0.00%       0.000us         0.00%       0.000us       0.000us       1.882ms         0.08%       1.882ms       1.882ms             1  
+                                           aten::gather         0.00%      40.944us         0.08%       2.152ms       2.152ms     311.263us         0.01%     622.526us     622.526us             1  
+                                Activity Buffer Request         0.08%       2.057ms         0.08%       2.057ms       2.057ms     311.263us         0.01%     311.263us     311.263us             1  
+void at::native::vectorized_gather_kernel<16, long>(...         0.00%       0.000us         0.00%       0.000us       0.000us     311.263us         0.01%     311.263us     311.263us             1  
+void at::native::vectorized_elementwise_kernel<4, at...         0.00%       0.000us         0.00%       0.000us       0.000us     170.147us         0.01%     170.147us       2.985us            57  
+                                            aten::rsqrt         0.02%     534.458us         0.21%       5.449ms      95.594us     161.123us         0.01%     172.643us       3.029us            57  
+void at::native::vectorized_elementwise_kernel<4, at...         0.00%       0.000us         0.00%       0.000us       0.000us     161.123us         0.01%     161.123us       2.827us            57  
+void at::native::vectorized_elementwise_kernel<4, at...         0.00%       0.000us         0.00%       0.000us       0.000us      97.632us         0.00%      97.632us      48.816us             2  
+void at::native::(anonymous namespace)::CatArrayBatc...         0.00%       0.000us         0.00%       0.000us       0.000us      70.719us         0.00%      70.719us      70.719us             1  
+                                              aten::cos         0.00%      15.197us         0.00%      24.237us      24.237us      42.656us         0.00%      42.656us      42.656us             1  
+void at::native::vectorized_elementwise_kernel<4, at...         0.00%       0.000us         0.00%       0.000us       0.000us      42.656us         0.00%      42.656us      42.656us             1  
+                                              aten::bmm         0.00%      73.619us         0.00%      90.937us      90.937us      35.776us         0.00%      35.776us      35.776us             1  
+void gemmk1_kernel<int, float, 256, 5, false, false,...         0.00%       0.000us         0.00%       0.000us       0.000us      35.776us         0.00%      35.776us      35.776us             1  
+                                              aten::sin         0.00%      10.056us         0.00%      17.955us      17.955us      23.680us         0.00%      23.680us      23.680us             1  
+void at::native::vectorized_elementwise_kernel<4, at...         0.00%       0.000us         0.00%       0.000us       0.000us      23.680us         0.00%      23.680us      23.680us             1  
+void at::native::unrolled_elementwise_kernel<at::nat...         0.00%       0.000us         0.00%       0.000us       0.000us       4.448us         0.00%       4.448us       4.448us             1  
+void at::native::vectorized_elementwise_kernel<2, at...         0.00%       0.000us         0.00%       0.000us       0.000us       3.808us         0.00%       3.808us       3.808us             1  
+                                           aten::arange         0.00%      36.948us         0.00%     125.671us      62.836us       3.264us         0.00%       6.528us       3.264us             2  
+void (anonymous namespace)::elementwise_kernel_with_...         0.00%       0.000us         0.00%       0.000us       0.000us       3.264us         0.00%       3.264us       3.264us             1  
+                                         spruce_prefill        14.68%     380.066ms        20.50%     530.936ms     530.936ms       0.000us         0.00%        2.277s        2.277s             1  
+-------------------------------------------------------  ------------  ------------  ------------  ------------  ------------  ------------  ------------  ------------  ------------  ------------  
+Self CPU time total: 2.589s
+Self CUDA time total: 2.232s
+

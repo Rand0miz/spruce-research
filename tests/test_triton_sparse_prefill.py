@@ -5,6 +5,7 @@ import torch
 
 from kernels.sparse_prefill import (
     KERNEL_VARIANTS,
+    kernel_runtime_metadata,
     selected_blocks_to_head_indices,
     selected_blocks_to_block_mask,
     triton_sparse_prefill_attention_forward,
@@ -77,6 +78,7 @@ def test_triton_kernel_matches_pytorch_sparse_reference(kernel_variant):
         kernel_variant=kernel_variant,
     )
     torch.testing.assert_close(actual, expected, atol=2e-2, rtol=2e-2)
+    assert kernel_runtime_metadata(kernel_variant)["best_config"] is not None
 
 
 @pytest.mark.skipif(

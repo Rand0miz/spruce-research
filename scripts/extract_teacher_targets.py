@@ -10,8 +10,15 @@ import torch
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from eval.haystack import build_haystack
-from teacher.chunked_extract import get_pooled_targets
+from eval.haystack import build_haystack_calibrated
+from configs.long_context import (
+    QWEN_NATIVE_CONTEXT,
+    configure_tokenizer,
+    context_limit,
+    load_model_config,
+    yarn_metadata,
+)
+from teacher.chunked_extract import get_pooled_targets, get_selector_features
 
 MODEL = "Qwen/Qwen2.5-Coder-1.5B-Instruct"
 DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
@@ -74,6 +81,40 @@ def select_cases(cases, run_all, rng):
     return list(cases) if run_all else [rng.choice(cases)]
 
 
+def build_jobs(args, cases, rng, maximum_context):
+    """Construct sampled, balanced-cycle, or exhaustive depth jobs."""
+    chosen_cases = select_cases(cases, args.all, rng)
+    mode = getattr(args, "depth_mode", "sample")
+    configured_depths = None
+    if mode != "sample":
+        if args.depth is not None:
+            configured_depths = [_check_depth(args.depth, "--depth")]
+        elif args.depths:
+            configured_depths = [
+                _check_depth(depth, "--depths") for depth in args.depths]
+        else:
+            raise ValueError(
+                f"--depth-mode {mode} requires --depth or --depths")
+
+    jobs = []
+    for target_len in args.lengths:
+        if target_len > maximum_context:
+            raise ValueError(
+                f"requested length {target_len} exceeds configured context "
+                f"{maximum_context}; use --yarn-factor 4.0 for 128K")
+        for case_index, case in enumerate(chosen_cases):
+            if mode == "grid":
+                depths = configured_depths
+            elif mode == "cycle":
+                depths = [
+                    configured_depths[case_index % len(configured_depths)]]
+            else:
+                depths = [choose_depth(args, rng)]
+            jobs.extend(
+                (target_len, case, float(depth)) for depth in depths)
+    return jobs
+
+
 def depth_tag(depth):
     return f"{depth:.6f}".rstrip("0").rstrip(".")
 
@@ -120,12 +161,28 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--lengths", type=int, nargs="+", default=[16384, 32768],
                     help="context lengths to extract; defaults to 16k and 32k")
+    ap.add_argument(
+        "--yarn-factor", type=float, default=1.0,
+        help="static YaRN factor; use 4.0 for Qwen's 131072-token configuration")
+    ap.add_argument(
+        "--original-max-position-embeddings", type=int,
+        default=QWEN_NATIVE_CONTEXT,
+        help="native context used to derive the YaRN limit; default: 32768")
+    ap.add_argument(
+        "--features-only", action="store_true",
+        help="save only O(n) selector Q/K prototypes, not quadratic dense "
+             "teacher mass; intended for 64K/128K traversal and replay")
     ap.add_argument("--block", type=int, default=64)
     ap.add_argument("--model", default=MODEL)
     ap.add_argument("--depth", type=float, default=None,
                     help="single fixed needle depth; overrides --depths and --depth-range")
     ap.add_argument("--depths", type=float, nargs="+", default=None,
                     help="candidate needle depths to randomly sample from; overrides --depth-range")
+    ap.add_argument(
+        "--depth-mode", choices=("sample", "cycle", "grid"),
+        default="sample",
+        help="sample one configured depth per job (default), cycle depths "
+             "evenly over cases, or run the full case×depth grid")
     ap.add_argument("--depth-range", type=float, nargs=2, default=[0.05, 0.95],
                     metavar=("MIN", "MAX"),
                     help="continuous random depth range used when --depth/--depths are omitted; default: 0.05 0.95")
@@ -141,6 +198,12 @@ def main():
                     help="use scripts/prompt_banks/heldout.json instead of train.json")
     ap.add_argument("--all", action="store_true",
                     help="run every scenario in the selected prompt bank; otherwise pick one randomly")
+    ap.add_argument(
+        "--skip-existing", action="store_true",
+        help="resume a large extraction by leaving existing target files unchanged")
+    ap.add_argument(
+        "--partition-by-length", action="store_true",
+        help="write each requested-length bucket into its own subdirectory")
     ap.add_argument("--offload", action="store_true",
                     help="stream fp16 weights from CPU RAM layer-by-layer so a bigger model "
                          "(3B/32k, 7B) fits 8GB VRAM. Targets are bit-identical to a full-GPU "
@@ -168,7 +231,19 @@ def main():
     from transformers import AutoModelForCausalLM, AutoTokenizer
 
     tok = AutoTokenizer.from_pretrained(args.model)
-    # fp16 weights; <=32768 native context -> no rope_scaling. sdpa is the restore target.
+    configure_tokenizer(
+        tok, yarn_factor=args.yarn_factor,
+        original_max_position_embeddings=args.original_max_position_embeddings)
+    model_config = load_model_config(
+        args.model, yarn_factor=args.yarn_factor,
+        original_max_position_embeddings=args.original_max_position_embeddings)
+    maximum_context = context_limit(
+        yarn_factor=args.yarn_factor,
+        original_max_position_embeddings=args.original_max_position_embeddings)
+    rope_config = yarn_metadata(
+        yarn_factor=args.yarn_factor,
+        original_max_position_embeddings=args.original_max_position_embeddings)
+
     if args.offload:
         # Stream weights: accelerate keeps ~gpu_budget GiB of layers resident and moves
         # the rest to CPU RAM, shuttling each to VRAM only for its forward. Peak VRAM =
@@ -180,49 +255,75 @@ def main():
         os.makedirs(offload_dir, exist_ok=True)
         model = AutoModelForCausalLM.from_pretrained(
             args.model, torch_dtype="auto", attn_implementation="sdpa",
+            config=model_config,
             device_map="auto",
             max_memory={0: f"{args.gpu_budget}GiB", "cpu": "48GiB"},
             offload_folder=offload_dir,
         ).eval()
     else:
         model = AutoModelForCausalLM.from_pretrained(
-            args.model, torch_dtype="auto", attn_implementation="sdpa"
+            args.model, torch_dtype="auto", attn_implementation="sdpa",
+            config=model_config,
         ).to(DEVICE).eval()
 
     store_dtype = getattr(torch, args.store_dtype)
-    jobs = []
-    for target_len in args.lengths:
-        assert target_len <= 32768, (
-            f"{target_len} > 32768 native max; needs YaRN rope_scaling (not set).")
-        for case in select_cases(cases, args.all, rng):
-            jobs.append((target_len, case, choose_depth(args, rng)))
+    try:
+        jobs = build_jobs(args, cases, rng, maximum_context)
+    except ValueError as error:
+        raise SystemExit(str(error)) from error
 
     print(f"prompt_bank={selected_bank} cases={len(cases)} jobs={len(jobs)} "
-          f"all={args.all} seed={args.seed}")
+          f"all={args.all} depth_mode={args.depth_mode} seed={args.seed}")
 
     for target_len, case, depth in jobs:
-        q_len = len(tok(case["question"])["input_ids"])
-        prompt, ndl = build_haystack(
-            tok, target_len - q_len, case["needle"], depth, case["filler"])
+        prompt, ndl, filler_units = build_haystack_calibrated(
+            tok, target_len, case["needle"], depth, case["filler"],
+            suffix=case["question"])
         full = prompt + case["question"]
+        calibrated_len = len(tok(full)["input_ids"])
+        if target_len - calibrated_len > args.block:
+            raise RuntimeError(
+                f"prompt calibration missed target {target_len} by "
+                f"{target_len - calibrated_len} tokens")
         n_blk = needle_block_index(tok, full, ndl, args.block)
+        case_id = _safe_id(case["id"])
+        dtag = depth_tag(depth)
+        target_dir = (
+            os.path.join(args.out, str(target_len))
+            if args.partition_by_length else args.out)
+        os.makedirs(target_dir, exist_ok=True)
+        path = os.path.join(
+            target_dir,
+            f"teacher_{case_id}_len{calibrated_len}_blk{args.block}_d{dtag}.pt")
+        if args.skip_existing and os.path.isfile(path):
+            print(f"skip existing {path}", flush=True)
+            del prompt, full
+            continue
 
         if DEVICE == "cuda":
             torch.cuda.reset_peak_memory_stats()
-        pooled_stack, pooledQ_stack, pooledK_stack, seq_len = get_pooled_targets(
-            model, tok, full, device=DEVICE, block_size=args.block)
+        if args.features_only:
+            pooledQ_stack, pooledK_stack, seq_len = get_selector_features(
+                model, tok, full, device=DEVICE, block_size=args.block)
+            pooled_stack = None
+        else:
+            pooled_stack, pooledQ_stack, pooledK_stack, seq_len = get_pooled_targets(
+                model, tok, full, device=DEVICE, block_size=args.block)
         peak_gb = torch.cuda.max_memory_allocated() / 1e9 if DEVICE == "cuda" else 0.0
-        assert seq_len <= 32768, f"seq_len {seq_len} exceeded native max after suffix."
+        if seq_len > maximum_context:
+            raise RuntimeError(
+                f"seq_len {seq_len} exceeded configured context {maximum_context}")
 
-        case_id = _safe_id(case["id"])
-        dtag = depth_tag(depth)
-        path = os.path.join(
-            args.out, f"teacher_{case_id}_len{seq_len}_blk{args.block}_d{dtag}.pt")
+        if seq_len != calibrated_len:
+            raise RuntimeError(
+                f"token count changed between calibration ({calibrated_len}) "
+                f"and extraction ({seq_len})")
         # Replace each large tensor with its storage dtype one at a time. Since
         # get_pooled_targets already cleared the layerwise capture dictionaries,
         # reassignment releases the FP32/model-dtype stack before converting the
         # next tensor instead of retaining every source and converted copy.
-        pooled_stack = pooled_stack.to(store_dtype)
+        if pooled_stack is not None:
+            pooled_stack = pooled_stack.to(store_dtype)
         pooledQ_stack = pooledQ_stack.to(store_dtype)
         pooledK_stack = pooledK_stack.to(store_dtype)
         save_payload = {
@@ -233,7 +334,9 @@ def main():
             "num_kv_heads": pooledK_stack.shape[2],
             "seq_len": seq_len,
             "requested_length": target_len,
-            "haystack_token_budget": target_len - q_len,
+            "haystack_token_budget": target_len,
+            "filler_units": filler_units,
+            "prompt_builder": "calibrated_units_v1",
             "block_size": args.block,
             "model": args.model,
             "prompt_bank": selected_bank,
@@ -242,17 +345,21 @@ def main():
             "question": case["question"],
             "depth": depth,
             "needle_block": n_blk,
-            "num_layers": pooled_stack.shape[1],
-            "num_heads": pooled_stack.shape[2],
+            "num_layers": pooledK_stack.shape[1],
+            "num_heads": int(model.config.num_attention_heads),
             "proto": pooledK_stack.shape[-2],
             "store_dtype": args.store_dtype,
+            "artifact_type": (
+                "selector_features" if args.features_only else "teacher_target"),
+            "features_only": bool(args.features_only),
+            "rope": rope_config,
         }
         torch.save(save_payload, path)
-        print(f"case={case_id}  len={seq_len:>6}  blocks={pooled_stack.shape[-1]:>4}  "
+        print(f"case={case_id}  len={seq_len:>6}  blocks={pooledK_stack.shape[3]:>4}  "
               f"depth={depth:.4f}  needle_block={n_blk:>4}  peak={peak_gb:.2f}GB  "
               f"saved={path}")
 
-        if not args.no_heatmap:
+        if not args.no_heatmap and pooled_stack is not None:
             png = path[:-3] + ".png"
             save_heatmap(pooled_stack, n_blk, seq_len, depth, png)
             print(f"          heatmap={png}")
@@ -261,7 +368,9 @@ def main():
         # especially important because assignment to the next get_pooled_targets
         # result happens only after that entire extraction has completed.
         del save_payload
-        del pooled_stack, pooledQ_stack, pooledK_stack
+        del pooledQ_stack, pooledK_stack
+        if pooled_stack is not None:
+            del pooled_stack
         del prompt, full
         gc.collect()
         if DEVICE == "cuda":

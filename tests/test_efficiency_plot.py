@@ -6,8 +6,8 @@ from benchmarks.plot_efficiency_accuracy import (
 )
 
 
-def _case(seq_len, dense, sparse, live, exact=True):
-    return {
+def _case(seq_len, dense, sparse, live, exact=True, requested_length=None):
+    case = {
         "seq_len": seq_len,
         "answers_match": True,
         "dense": {
@@ -25,6 +25,9 @@ def _case(seq_len, dense, sparse, live, exact=True):
             "route_pack_seconds": 0.01,
         },
     }
+    if requested_length is not None:
+        case["requested_length"] = requested_length
+    return case
 
 
 def test_scaling_series_groups_repeated_lengths():
@@ -52,3 +55,15 @@ def test_plot_writes_png_and_csv(tmp_path):
     assert plot_path == png
     assert png.stat().st_size > 0
     assert (tmp_path / "scaling.csv").stat().st_size > 0
+
+
+def test_scaling_series_groups_calibrated_lengths_by_requested_bucket():
+    report = {"cases": [
+        _case(63995, 2.0, 1.0, 1.5, requested_length=64000),
+        _case(63999, 4.0, 2.0, 3.0, requested_length=64000),
+    ]}
+    series = build_scaling_series(report)
+    assert len(series) == 1
+    assert series[0]["requested_length"] == 64000
+    assert series[0]["seq_len"] == 63997
+    assert series[0]["targets"] == 2

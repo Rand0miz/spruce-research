@@ -6,6 +6,7 @@ import torch
 from kernels.seerattention_direct_index_triton import (
     KERNEL_VARIANTS,
     direct_index_sparse_triton,
+    kernel_runtime_metadata,
 )
 
 

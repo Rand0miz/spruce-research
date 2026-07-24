@@ -14,25 +14,39 @@ def build_scaling_series(report):
     """Aggregate live-tree benchmark cases that share a sequence length."""
     grouped = {}
     for case in report["cases"]:
-        grouped.setdefault(int(case["seq_len"]), []).append(case)
+        bucket = int(case.get("requested_length", case["seq_len"]))
+        grouped.setdefault(bucket, []).append(case)
 
     series = []
-    for seq_len, cases in sorted(grouped.items()):
+    for requested_length, cases in sorted(grouped.items()):
         dense_prefill = _mean(cases, "dense", "prefill_seconds")
         sparse_prefill = _mean(cases, "sparse", "prefill_seconds")
         live_prefill = _mean(cases, "sparse", "live_prefill_seconds")
+        sparse_exact = statistics.mean(
+            float(case["sparse"]["exact"]) for case in cases)
+        dense_exact = statistics.mean(
+            float(case["dense"]["exact"]) for case in cases)
         series.append({
-            "seq_len": seq_len,
+            "requested_length": requested_length,
+            "seq_len": round(statistics.mean(
+                int(case["seq_len"]) for case in cases)),
             "targets": len(cases),
             "dense_prefill_seconds": dense_prefill,
             "sparse_kernel_prefill_seconds": sparse_prefill,
             "sparse_live_prefill_seconds": live_prefill,
             "kernel_prefill_speedup": dense_prefill / sparse_prefill,
             "live_prefill_speedup": dense_prefill / live_prefill,
-            "sparse_exact_rate": statistics.mean(
-                float(case["sparse"]["exact"]) for case in cases),
-            "dense_exact_rate": statistics.mean(
-                float(case["dense"]["exact"]) for case in cases),
+            "sparse_exact_rate": sparse_exact,
+            "dense_exact_rate": dense_exact,
+            "sparse_minus_dense_exact_rate": sparse_exact - dense_exact,
+            "sparse_only_correct": sum(
+                bool(case["sparse"]["exact"])
+                and not bool(case["dense"]["exact"])
+                for case in cases),
+            "dense_only_correct": sum(
+                bool(case["dense"]["exact"])
+                and not bool(case["sparse"]["exact"])
+                for case in cases),
             "sparse_fuzzy": _mean(cases, "sparse", "fuzzy"),
             "answers_match_rate": statistics.mean(
                 float(case["answers_match"]) for case in cases),
@@ -62,7 +76,7 @@ def save_efficiency_accuracy_plot(report, path, csv_path=None):
     series = build_scaling_series(report)
     if not series:
         raise ValueError("benchmark report contains no cases")
-    x = [row["seq_len"] / 1024 for row in series]
+    x = [row["requested_length"] / 1024 for row in series]
 
     fig, axes = plt.subplots(2, 2, figsize=(12, 8), constrained_layout=True)
     latency, speedup, accuracy, selector = axes.flatten()

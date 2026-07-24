@@ -33,3 +33,23 @@ def test_stack_failure_still_releases_capture_buffers():
         chunked._stack_and_clear_captures([0, 1, 2])
     assert chunked._CAPTURE == {}
     assert chunked._CAPTURE_QK == {}
+
+
+def test_feature_only_attention_captures_qk_without_teacher_mass():
+    class Module:
+        layer_idx = 0
+
+    chunked._CAPTURE.clear()
+    chunked._CAPTURE_QK.clear()
+    query = torch.randn(1, 2, 8, 4)
+    key = torch.randn(1, 1, 8, 4)
+    value = torch.randn(1, 1, 8, 4)
+    output, weights = chunked._capture_features(
+        Module(), query, key, value, None)
+
+    assert output.shape == (1, 8, 2, 4)
+    assert weights is None
+    assert chunked._CAPTURE == {}
+    pooled_q, pooled_k = chunked._CAPTURE_QK.pop(0)
+    assert pooled_q.shape == (1, 1, 1, chunked._PROTO, 4)
+    assert pooled_k.shape == (1, 1, 1, chunked._PROTO, 4)
