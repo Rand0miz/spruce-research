@@ -111,10 +111,23 @@ def _generate(model, inputs, max_new_tokens, *, prefill_kwargs=None, decode_back
             torch.cuda.synchronize()
         prefill_seconds = time.perf_counter() - started
         generated = []
+        eos_ids = getattr(model.generation_config, "eos_token_id", None)
+        if eos_ids is None:
+            eos_ids = getattr(model.config, "eos_token_id", None)
+        if eos_ids is None:
+            eos_ids = set()
+        elif isinstance(eos_ids, int):
+            eos_ids = {eos_ids}
+        else:
+            eos_ids = {int(token_id) for token_id in eos_ids}
         for step in range(max_new_tokens):
             next_token = next_logits[:, -1].argmax(dim=-1)
             generated.append(next_token)
-            if step + 1 == max_new_tokens:
+            reached_eos = (
+                bool(eos_ids)
+                and all(int(token_id) in eos_ids for token_id in next_token)
+            )
+            if reached_eos or step + 1 == max_new_tokens:
                 break
 
             # The initial pass was sparse only. Every following one-token

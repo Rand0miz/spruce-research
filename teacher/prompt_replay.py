@@ -114,6 +114,30 @@ def reconstruct_teacher_prompt(tokenizer, teacher_target, bank_path=None):
     if hasattr(tokenizer, "model_max_length"):
         tokenizer.model_max_length = max(int(tokenizer.model_max_length), int(target["seq_len"]) * 2)
 
+    if "prompt_text" in target:
+        full = target["prompt_text"]
+        if not isinstance(full, str) or not full:
+            raise ValueError("teacher target prompt_text must be a non-empty string")
+        if target["needle"] not in full:
+            raise ValueError("teacher target needle is absent from prompt_text")
+        if target.get("prompt_format") == "qwen_chat_v1":
+            user_prompt = target.get("user_prompt_text")
+            if (not isinstance(user_prompt, str)
+                    or not user_prompt.endswith(target["question"])
+                    or user_prompt not in full):
+                raise ValueError(
+                    "teacher target chat prompt does not preserve its exact "
+                    "user prompt and final question")
+        elif not full.endswith(target["question"]):
+            raise ValueError(
+                "teacher target prompt_text does not end with its question")
+        if not _matches_target(tokenizer, full, target):
+            actual_length = len(tokenizer(full)["input_ids"])
+            raise ValueError(
+                f"saved prompt_text has {actual_length} tokens or a different "
+                "needle block; use the extraction tokenizer")
+        return full, target
+
     bank_name = target["prompt_bank"]
     if bank_path is None:
         try:

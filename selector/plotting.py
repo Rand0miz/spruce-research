@@ -28,6 +28,23 @@ def pyplot_or_none():
         return None
 
 
+def _aligned_eval_series(eval_epochs, values):
+    """Collapse legacy per-document values into one mean per eval epoch."""
+    epochs = list(eval_epochs)
+    values = list(values)
+    if len(values) == len(epochs):
+        return epochs, values
+    if epochs and len(values) % len(epochs) == 0:
+        per_epoch = len(values) // len(epochs)
+        means = [
+            sum(values[start:start + per_epoch]) / per_epoch
+            for start in range(0, len(values), per_epoch)
+        ]
+        return epochs, means
+    count = min(len(epochs), len(values))
+    return epochs[-count:], values[-count:]
+
+
 def save_training_plot(history, path):
     plt = pyplot_or_none()
     if plt is None:
@@ -50,14 +67,18 @@ def save_training_plot(history, path):
     axes[0, 1].set(title="Retention Losses", xlabel="Epoch", ylabel="Loss")
     axes[0, 1].grid(alpha=0.25)
     for name, values in history.get("eval_recall8", {}).items():
-        axes[1, 0].plot(history.get("eval_epochs", []), values, marker="o", label=name)
+        x_values, y_values = _aligned_eval_series(
+            history.get("eval_epochs", []), values)
+        axes[1, 0].plot(x_values, y_values, marker="o", label=name)
     axes[1, 0].axhline(0.95, color="tab:red", linestyle="--", linewidth=1, label="0.95 bar")
     axes[1, 0].set(title="Recall@8 During Training", xlabel="Epoch", ylabel="Recall", ylim=(0, 1.02))
     axes[1, 0].grid(alpha=0.25)
     if history.get("eval_recall8"):
         axes[1, 0].legend(fontsize=8)
     for name, values in history.get("eval_needle8", {}).items():
-        axes[1, 1].plot(history.get("eval_epochs", []), values, marker="o", label=name)
+        x_values, y_values = _aligned_eval_series(
+            history.get("eval_epochs", []), values)
+        axes[1, 1].plot(x_values, y_values, marker="o", label=name)
     axes[1, 1].set(title="Needle Hit@8 During Training", xlabel="Epoch", ylabel="Hit rate", ylim=(0, 1.02))
     axes[1, 1].grid(alpha=0.25)
     if history.get("eval_needle8"):

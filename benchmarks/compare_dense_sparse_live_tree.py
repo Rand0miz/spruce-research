@@ -89,6 +89,7 @@ def prepare_cases(paths, tokenizer, prompt_bank=None):
             "case_key": f"{target['case_id']}|len{seq_len}|{os.path.basename(path)}",
             "case_id": target["case_id"],
             "needle": target["needle"],
+            "reference_answers": target.get("reference_answers"),
             "needle_block": int(target["needle_block"]),
             "seq_len": seq_len,
             "requested_length": int(target.get("requested_length", seq_len)),
@@ -268,7 +269,9 @@ def _run_sparse_cases(
             "peak_memory_allocated_gb", "peak_memory_reserved_gb",
         )
         results[case["case_key"]] = {
-            **score_retrival(answers[0], case["needle"]),
+            **score_retrival(
+                answers[0], case["needle"],
+                reference_answers=case.get("reference_answers")),
             **summarize_timings(samples, timing_keys),
             "answer_repeat_match": len(set(answer.strip() for answer in answers)) == 1,
             "timing_samples": samples,
@@ -304,7 +307,9 @@ def _run_dense_cases(model, cases, args, tokenizer):
                 timing["peak_memory_reserved_gb"] = 0.0
             samples.append(timing)
         results[case["case_key"]] = {
-            **score_retrival(answers[0], case["needle"]),
+            **score_retrival(
+                answers[0], case["needle"],
+                reference_answers=case.get("reference_answers")),
             **summarize_timings(samples, (
                 "prefill_seconds", "decode_seconds", "seconds",
                 "peak_memory_allocated_gb", "peak_memory_reserved_gb")),

@@ -1,0 +1,4016 @@
+{
+  "model": "Qwen/Qwen2.5-Coder-1.5B-Instruct",
+  "runtime": {
+    "platform": "Linux-6.6.122+-x86_64-with-glibc2.35",
+    "python": "3.12.13",
+    "torch": "2.11.0+cu128",
+    "cuda_runtime": "12.8",
+    "cuda_available": true,
+    "transformers": "5.13.1",
+    "triton": "3.6.0",
+    "gpu": {
+      "index": 0,
+      "name": "NVIDIA L4",
+      "total_memory_gb": 23.65915136,
+      "compute_capability": "8.9"
+    }
+  },
+  "gate": "/content/drive/MyDrive/SPRUCE_COLAB/selector_ckpt/flat_gate_lamt0.75_lamn0.25_lr5e4_e300.pt",
+  "selector": {
+    "mode": "live_candidate_only_tree_traversal",
+    "route_representation": "compact_leaf_ids",
+    "feature_source": "pooled_qk_loaded_from_teacher_target",
+    "feature_extraction_included": false,
+    "feature_file_loading_included": false,
+    "compute_dtype": "float16",
+    "layer_chunk": 4,
+    "beam": 8,
+    "radix": 2,
+    "k_selected": 10,
+    "local_window": 1
+  },
+  "kernel": {
+    "variant": "single_head",
+    "best_config": {
+      "kwargs": {},
+      "num_warps": 8,
+      "num_stages": 2,
+      "num_ctas": 1
+    }
+  },
+  "rope": {
+    "enabled": true,
+    "rope_type": "yarn",
+    "factor": 4.0,
+    "original_max_position_embeddings": 32768,
+    "max_position_embeddings": 131072,
+    "static": true
+  },
+  "repeats": 3,
+  "warmup_tokens": 64,
+  "cases": [
+    {
+      "case_id": "aquifer_lake_orison",
+      "seq_len": 63955,
+      "requested_length": 64000,
+      "block_size": 64,
+      "needle_block": 99,
+      "teacher_target": "/content/drive/MyDrive/SPRUCE_COLAB/run9_natural/targets/64000/teacher_aquifer_lake_orison_len63955_blk64_d0.1.pt",
+      "sparse": {
+        "exact": false,
+        "fuzzy": 0.5,
+        "answer": " Lake Voss's review of maintenance scheduling in the municipal workshop examined 67",
+        "needle": "after three seasons of sampling, the watershed committee designated lake orison as the reserve's primary groundwater source.",
+        "reference_answers": [
+          "Lake Orison"
+        ],
+        "feature_load_seconds": 0.38300422600013917,
+        "tree_build_seconds": 0.014390288999948098,
+        "tree_traversal_seconds": 0.2928769110003486,
+        "route_pack_seconds": 0.0030861740001455473,
+        "route_transfer_seconds": 0.0,
+        "selector_seconds": 0.3101118280001174,
+        "prefill_seconds": 5.077744081000219,
+        "decode_seconds": 0.5665779519999887,
+        "seconds": 5.644322033000208,
+        "live_prefill_seconds": 5.387855909000336,
+        "live_total_seconds": 5.954433861000325,
+        "needle_layer_group_hit_rate": 0.0535714328289032,
+        "needle_any_group_all_layers_rate": 0.1071428656578064,
+        "peak_memory_allocated_gb": 9.65504768,
+        "peak_memory_reserved_gb": 10.533994496,
+        "answer_repeat_match": true,
+        "timing_samples": [
+          {
+            "feature_load_seconds": 0.38300422600013917,
+            "tree_build_seconds": 0.1838183410000056,
+            "tree_traversal_seconds": 0.5371615179997207,
+            "route_pack_seconds": 0.049069095000049856,
+            "route_transfer_seconds": 0.0,
+            "selector_seconds": 0.7700489539997761,
+            "needle_layer_group_hit_rate": 0.0535714328289032,
+            "needle_any_group_all_layers_rate": 0.1071428656578064,
+            "seconds": 6.094606472000123,
+            "prefill_seconds": 5.515360103000148,
+            "decode_seconds": 0.579246368999975,
+            "peak_memory_allocated_gb": 9.65504768,
+            "peak_memory_reserved_gb": 10.533994496,
+            "live_prefill_seconds": 6.285409056999924,
+            "live_total_seconds": 6.864655425999899
+          },
+          {
+            "feature_load_seconds": 0.38300422600013917,
+            "tree_build_seconds": 0.01433857199981503,
+            "tree_traversal_seconds": 0.2886816930003988,
+            "route_pack_seconds": 0.0030861740001455473,
+            "route_transfer_seconds": 0.0,
+            "selector_seconds": 0.3061064390003594,
+            "needle_layer_group_hit_rate": 0.0535714328289032,
+            "needle_any_group_all_layers_rate": 0.1071428656578064,
+            "seconds": 5.613248186999954,
+            "prefill_seconds": 5.04960495000023,
+            "decode_seconds": 0.5636432369997237,
+            "peak_memory_allocated_gb": 9.65504768,
+            "peak_memory_reserved_gb": 10.533994496,
+            "live_prefill_seconds": 5.355711389000589,
+            "live_total_seconds": 5.919354626000313
+          },
+          {
+            "feature_load_seconds": 0.38300422600013917,
+            "tree_build_seconds": 0.014390288999948098,
+            "tree_traversal_seconds": 0.2928769110003486,
+            "route_pack_seconds": 0.002844627999820659,
+            "route_transfer_seconds": 0.0,
+            "selector_seconds": 0.3101118280001174,
+            "needle_layer_group_hit_rate": 0.0535714328289032,
+            "needle_any_group_all_layers_rate": 0.1071428656578064,
+            "seconds": 5.644322033000208,
+            "prefill_seconds": 5.077744081000219,
+            "decode_seconds": 0.5665779519999887,
+            "peak_memory_allocated_gb": 9.65504768,
+            "peak_memory_reserved_gb": 10.533994496,
+            "live_prefill_seconds": 5.387855909000336,
+            "live_total_seconds": 5.954433861000325
+          }
+        ]
+      },
+      "dense": {
+        "exact": true,
+        "fuzzy": 1.0,
+        "answer": " Lake Orison\nTo determine which lake the committee designated as the reserve's primary",
+        "needle": "after three seasons of sampling, the watershed committee designated lake orison as the reserve's primary groundwater source.",
+        "reference_answers": [
+          "Lake Orison"
+        ],
+        "prefill_seconds": 11.189218489000268,
+        "decode_seconds": 0.5633359919997929,
+        "seconds": 11.752554481000061,
+        "peak_memory_allocated_gb": 9.19418368,
+        "peak_memory_reserved_gb": 10.183770112,
+        "answer_repeat_match": true,
+        "timing_samples": [
+          {
+            "seconds": 11.757970120999744,
+            "prefill_seconds": 11.194059573999766,
+            "decode_seconds": 0.5639105469999777,
+            "peak_memory_allocated_gb": 9.19418368,
+            "peak_memory_reserved_gb": 10.183770112
+          },
+          {
+            "seconds": 11.752554481000061,
+            "prefill_seconds": 11.189218489000268,
+            "decode_seconds": 0.5633359919997929,
+            "peak_memory_allocated_gb": 9.19418368,
+            "peak_memory_reserved_gb": 10.183770112
+          },
+          {
+            "seconds": 11.730945574000089,
+            "prefill_seconds": 11.167772487000093,
+            "decode_seconds": 0.5631730869999956,
+            "peak_memory_allocated_gb": 9.19418368,
+            "peak_memory_reserved_gb": 10.183770112
+          }
+        ]
+      },
+      "answers_match": false,
+      "comparison": {
+        "kernel_prefill_speedup": 2.2035806276389187,
+        "live_prefill_speedup": 2.076747908255831,
+        "live_total_speedup": 1.9737484293806014
+      }
+    },
+    {
+      "case_id": "aquifer_lake_orison",
+      "seq_len": 63955,
+      "requested_length": 64000,
+      "block_size": 64,
+      "needle_block": 698,
+      "teacher_target": "/content/drive/MyDrive/SPRUCE_COLAB/run9_natural/targets/64000/teacher_aquifer_lake_orison_len63955_blk64_d0.7.pt",
+      "sparse": {
+        "exact": false,
+        "fuzzy": 0.5,
+        "answer": " Lake 1941 is the northern wetlands in 194",
+        "needle": "after three seasons of sampling, the watershed committee designated lake orison as the reserve's primary groundwater source.",
+        "reference_answers": [
+          "Lake Orison"
+        ],
+        "feature_load_seconds": 0.3849833059998673,
+        "tree_build_seconds": 0.01434227199979432,
+        "tree_traversal_seconds": 0.2963740120003422,
+        "route_pack_seconds": 0.0030210199997782183,
+        "route_transfer_seconds": 0.0,
+        "selector_seconds": 0.31373730399991473,
+        "prefill_seconds": 5.159100731000308,
+        "decode_seconds": 0.5657291839997924,
+        "seconds": 5.7248299150001,
+        "live_prefill_seconds": 5.472838035000223,
+        "live_total_seconds": 6.038567219000015,
+        "needle_layer_group_hit_rate": 0.0357142873108387,
+        "needle_any_group_all_layers_rate": 0.0714285746216774,
+        "peak_memory_allocated_gb": 9.655252992,
+        "peak_memory_reserved_gb": 10.533994496,
+        "answer_repeat_match": true,
+        "timing_samples": [
+          {
+            "feature_load_seconds": 0.3849833059998673,
+            "tree_build_seconds": 0.014523538000048575,
+            "tree_traversal_seconds": 0.280011358000138,
+            "route_pack_seconds": 0.0029494199998225668,
+            "route_transfer_seconds": 0.0,
+            "selector_seconds": 0.29748431600000913,
+            "needle_layer_group_hit_rate": 0.0357142873108387,
+            "needle_any_group_all_layers_rate": 0.0714285746216774,
+            "seconds": 5.687903765000101,
+            "prefill_seconds": 5.123126625000168,
+            "decode_seconds": 0.5647771399999328,
+            "peak_memory_allocated_gb": 9.655252992,
+            "peak_memory_reserved_gb": 10.533994496,
+            "live_prefill_seconds": 5.420610941000177,
+            "live_total_seconds": 5.98538808100011
+          },
+          {
+            "feature_load_seconds": 0.3849833059998673,
+            "tree_build_seconds": 0.01434227199979432,
+            "tree_traversal_seconds": 0.2963740120003422,
+            "route_pack_seconds": 0.0030210199997782183,
+            "route_transfer_seconds": 0.0,
+            "selector_seconds": 0.31373730399991473,
+            "needle_layer_group_hit_rate": 0.0357142873108387,
+            "needle_any_group_all_layers_rate": 0.0714285746216774,
+            "seconds": 5.7248299150001,
+            "prefill_seconds": 5.159100731000308,
+            "decode_seconds": 0.5657291839997924,
+            "peak_memory_allocated_gb": 9.655252992,
+            "peak_memory_reserved_gb": 10.533994496,
+            "live_prefill_seconds": 5.472838035000223,
+            "live_total_seconds": 6.038567219000015
+          },
+          {
+            "feature_load_seconds": 0.3849833059998673,
+            "tree_build_seconds": 0.014323246999992989,
+            "tree_traversal_seconds": 0.30050986300011573,
+            "route_pack_seconds": 0.003083521999997174,
+            "route_transfer_seconds": 0.0,
+            "selector_seconds": 0.3179166320001059,
+            "needle_layer_group_hit_rate": 0.0357142873108387,
+            "needle_any_group_all_layers_rate": 0.0714285746216774,
+            "seconds": 5.7576723610000045,
+            "prefill_seconds": 5.191666377999809,
+            "decode_seconds": 0.5660059830001956,
+            "peak_memory_allocated_gb": 9.655252992,
+            "peak_memory_reserved_gb": 10.533994496,
+            "live_prefill_seconds": 5.509583009999915,
+            "live_total_seconds": 6.07558899300011
+          }
+        ]
+      },
+      "dense": {
+        "exact": false,
+        "fuzzy": 0.5,
+        "answer": " Lake Merrow\nTo determine which lake the committee designated as the reserve's primary",
+        "needle": "after three seasons of sampling, the watershed committee designated lake orison as the reserve's primary groundwater source.",
+        "reference_answers": [
+          "Lake Orison"
+        ],
+        "prefill_seconds": 11.097585372999674,
+        "decode_seconds": 0.5636276710001766,
+        "seconds": 11.66135766699972,
+        "peak_memory_allocated_gb": 9.19418368,
+        "peak_memory_reserved_gb": 10.183770112,
+        "answer_repeat_match": true,
+        "timing_samples": [
+          {
+            "seconds": 11.692193697999755,
+            "prefill_seconds": 11.128566026999579,
+            "decode_seconds": 0.5636276710001766,
+            "peak_memory_allocated_gb": 9.19418368,
+            "peak_memory_reserved_gb": 10.183770112
+          },
+          {
+            "seconds": 11.644386922000194,
+            "prefill_seconds": 11.081622744000015,
+            "decode_seconds": 0.5627641780001795,
+            "peak_memory_allocated_gb": 9.19418368,
+            "peak_memory_reserved_gb": 10.183770112
+          },
+          {
+            "seconds": 11.66135766699972,
+            "prefill_seconds": 11.097585372999674,
+            "decode_seconds": 0.5637722940000458,
+            "peak_memory_allocated_gb": 9.19418368,
+            "peak_memory_reserved_gb": 10.183770112
+          }
+        ]
+      },
+      "answers_match": false,
+      "comparison": {
+        "kernel_prefill_speedup": 2.1510697215729575,
+        "live_prefill_speedup": 2.0277569520654053,
+        "live_total_speedup": 1.9311464531367488
+      }
+    },
+    {
+      "case_id": "aquifer_lake_orison",
+      "seq_len": 63955,
+      "requested_length": 64000,
+      "block_size": 64,
+      "needle_block": 898,
+      "teacher_target": "/content/drive/MyDrive/SPRUCE_COLAB/run9_natural/targets/64000/teacher_aquifer_lake_orison_len63955_blk64_d0.9.pt",
+      "sparse": {
+        "exact": false,
+        "fuzzy": 0.5,
+        "answer": " Lake\n\nIn 1997, Elias Voss's review of public",
+        "needle": "after three seasons of sampling, the watershed committee designated lake orison as the reserve's primary groundwater source.",
+        "reference_answers": [
+          "Lake Orison"
+        ],
+        "feature_load_seconds": 0.3950567100000626,
+        "tree_build_seconds": 0.014311717000055069,
+        "tree_traversal_seconds": 0.2965328770001179,
+        "route_pack_seconds": 0.002973331999783113,
+        "route_transfer_seconds": 0.0,
+        "selector_seconds": 0.31389504599974316,
+        "prefill_seconds": 5.142235932999938,
+        "decode_seconds": 0.5659050470003422,
+        "seconds": 5.70814098000028,
+        "live_prefill_seconds": 5.460785192000458,
+        "live_total_seconds": 6.0266902390008,
+        "needle_layer_group_hit_rate": 0.0892857164144516,
+        "needle_any_group_all_layers_rate": 0.1785714328289032,
+        "peak_memory_allocated_gb": 9.655252992,
+        "peak_memory_reserved_gb": 10.533994496,
+        "answer_repeat_match": true,
+        "timing_samples": [
+          {
+            "feature_load_seconds": 0.3950567100000626,
+            "tree_build_seconds": 0.014296226999704231,
+            "tree_traversal_seconds": 0.28364688000010574,
+            "route_pack_seconds": 0.0028498289998424298,
+            "route_transfer_seconds": 0.0,
+            "selector_seconds": 0.3007929359996524,
+            "needle_layer_group_hit_rate": 0.0892857164144516,
+            "needle_any_group_all_layers_rate": 0.1785714328289032,
+            "seconds": 5.771945435999896,
+            "prefill_seconds": 5.205212754000058,
+            "decode_seconds": 0.566732681999838,
+            "peak_memory_allocated_gb": 9.655252992,
+            "peak_memory_reserved_gb": 10.533994496,
+            "live_prefill_seconds": 5.506005689999711,
+            "live_total_seconds": 6.072738371999549
+          },
+          {
+            "feature_load_seconds": 0.3950567100000626,
+            "tree_build_seconds": 0.014311717000055069,
+            "tree_traversal_seconds": 0.3009623500001908,
+            "route_pack_seconds": 0.003275192000273819,
+            "route_transfer_seconds": 0.0,
+            "selector_seconds": 0.31854925900051967,
+            "needle_layer_group_hit_rate": 0.0892857164144516,
+            "needle_any_group_all_layers_rate": 0.1785714328289032,
+            "seconds": 5.70814098000028,
+            "prefill_seconds": 5.142235932999938,
+            "decode_seconds": 0.5659050470003422,
+            "peak_memory_allocated_gb": 9.655252992,
+            "peak_memory_reserved_gb": 10.533994496,
+            "live_prefill_seconds": 5.460785192000458,
+            "live_total_seconds": 6.0266902390008
+          },
+          {
+            "feature_load_seconds": 0.3950567100000626,
+            "tree_build_seconds": 0.01438883699984217,
+            "tree_traversal_seconds": 0.2965328770001179,
+            "route_pack_seconds": 0.002973331999783113,
+            "route_transfer_seconds": 0.0,
+            "selector_seconds": 0.31389504599974316,
+            "needle_layer_group_hit_rate": 0.0892857164144516,
+            "needle_any_group_all_layers_rate": 0.1785714328289032,
+            "seconds": 5.689402599999994,
+            "prefill_seconds": 5.124537578999934,
+            "decode_seconds": 0.5648650210000596,
+            "peak_memory_allocated_gb": 9.655252992,
+            "peak_memory_reserved_gb": 10.533994496,
+            "live_prefill_seconds": 5.4384326249996775,
+            "live_total_seconds": 6.003297645999737
+          }
+        ]
+      },
+      "dense": {
+        "exact": true,
+        "fuzzy": 1.0,
+        "answer": " Lake Orison\nTo determine which lake the committee designated as the reserve's primary",
+        "needle": "after three seasons of sampling, the watershed committee designated lake orison as the reserve's primary groundwater source.",
+        "reference_answers": [
+          "Lake Orison"
+        ],
+        "prefill_seconds": 11.104104993999954,
+        "decode_seconds": 0.5643315460001759,
+        "seconds": 11.668979530999877,
+        "peak_memory_allocated_gb": 9.19418368,
+        "peak_memory_reserved_gb": 10.183770112,
+        "answer_repeat_match": true,
+        "timing_samples": [
+          {
+            "seconds": 11.655429139999796,
+            "prefill_seconds": 11.091817369999717,
+            "decode_seconds": 0.5636117700000796,
+            "peak_memory_allocated_gb": 9.19418368,
+            "peak_memory_reserved_gb": 10.183770112
+          },
+          {
+            "seconds": 11.668979530999877,
+            "prefill_seconds": 11.104104993999954,
+            "decode_seconds": 0.5648745369999233,
+            "peak_memory_allocated_gb": 9.19418368,
+            "peak_memory_reserved_gb": 10.183770112
+          },
+          {
+            "seconds": 11.700590485000248,
+            "prefill_seconds": 11.136258939000072,
+            "decode_seconds": 0.5643315460001759,
+            "peak_memory_allocated_gb": 9.19418368,
+            "peak_memory_reserved_gb": 10.183770112
+          }
+        ]
+      },
+      "answers_match": false,
+      "comparison": {
+        "kernel_prefill_speedup": 2.1593923613539667,
+        "live_prefill_speedup": 2.033426440261088,
+        "live_total_speedup": 1.936216906501328
+      }
+    },
+    {
+      "case_id": "aquifer_lake_orison",
+      "seq_len": 63962,
+      "requested_length": 64000,
+      "block_size": 64,
+      "needle_block": 298,
+      "teacher_target": "/content/drive/MyDrive/SPRUCE_COLAB/run9_natural/targets/64000/teacher_aquifer_lake_orison_len63962_blk64_d0.3.pt",
+      "sparse": {
+        "exact": false,
+        "fuzzy": 0.5,
+        "answer": " Lake Voss's review of maintenance scheduling in the municipal workshop examined 73",
+        "needle": "after three seasons of sampling, the watershed committee designated lake orison as the reserve's primary groundwater source.",
+        "reference_answers": [
+          "Lake Orison"
+        ],
+        "feature_load_seconds": 0.3908079689999795,
+        "tree_build_seconds": 0.014293271000042296,
+        "tree_traversal_seconds": 0.29649013400012336,
+        "route_pack_seconds": 0.003071274999911111,
+        "route_transfer_seconds": 0.0,
+        "selector_seconds": 0.31385468000007677,
+        "prefill_seconds": 5.1344722199996795,
+        "decode_seconds": 0.5641849710000315,
+        "seconds": 5.699584640000012,
+        "live_prefill_seconds": 5.433953385999757,
+        "live_total_seconds": 5.99906580600009,
+        "needle_layer_group_hit_rate": 0.0357142873108387,
+        "needle_any_group_all_layers_rate": 0.0714285746216774,
+        "peak_memory_allocated_gb": 9.659593216,
+        "peak_memory_reserved_gb": 10.533994496,
+        "answer_repeat_match": true,
+        "timing_samples": [
+          {
+            "feature_load_seconds": 0.3908079689999795,
+            "tree_build_seconds": 0.014279341000019485,
+            "tree_traversal_seconds": 0.28246430800027156,
+            "route_pack_seconds": 0.002737516999786749,
+            "route_transfer_seconds": 0.0,
+            "selector_seconds": 0.2994811660000778,
+            "needle_layer_group_hit_rate": 0.0357142873108387,
+            "needle_any_group_all_layers_rate": 0.0714285746216774,
+            "seconds": 5.699584640000012,
+            "prefill_seconds": 5.1344722199996795,
+            "decode_seconds": 0.5651124200003323,
+            "peak_memory_allocated_gb": 9.659593216,
+            "peak_memory_reserved_gb": 10.533994496,
+            "live_prefill_seconds": 5.433953385999757,
+            "live_total_seconds": 5.99906580600009
+          },
+          {
+            "feature_load_seconds": 0.3908079689999795,
+            "tree_build_seconds": 0.014358485999764525,
+            "tree_traversal_seconds": 0.29738537799994447,
+            "route_pack_seconds": 0.0031479069998567866,
+            "route_transfer_seconds": 0.0,
+            "selector_seconds": 0.3148917709995658,
+            "needle_layer_group_hit_rate": 0.0357142873108387,
+            "needle_any_group_all_layers_rate": 0.0714285746216774,
+            "seconds": 5.706987868999931,
+            "prefill_seconds": 5.1428028979999,
+            "decode_seconds": 0.5641849710000315,
+            "peak_memory_allocated_gb": 9.659593216,
+            "peak_memory_reserved_gb": 10.533994496,
+            "live_prefill_seconds": 5.457694668999466,
+            "live_total_seconds": 6.021879639999497
+          },
+          {
+            "feature_load_seconds": 0.3908079689999795,
+            "tree_build_seconds": 0.014293271000042296,
+            "tree_traversal_seconds": 0.29649013400012336,
+            "route_pack_seconds": 0.003071274999911111,
+            "route_transfer_seconds": 0.0,
+            "selector_seconds": 0.31385468000007677,
+            "needle_layer_group_hit_rate": 0.0357142873108387,
+            "needle_any_group_all_layers_rate": 0.0714285746216774,
+            "seconds": 5.666010017999724,
+            "prefill_seconds": 5.101922627000022,
+            "decode_seconds": 0.5640873909997026,
+            "peak_memory_allocated_gb": 9.659593216,
+            "peak_memory_reserved_gb": 10.533994496,
+            "live_prefill_seconds": 5.4157773070000985,
+            "live_total_seconds": 5.979864697999801
+          }
+        ]
+      },
+      "dense": {
+        "exact": false,
+        "fuzzy": 0.5,
+        "answer": " Lake Merrow\nTo determine which lake the committee designated as the reserve's primary",
+        "needle": "after three seasons of sampling, the watershed committee designated lake orison as the reserve's primary groundwater source.",
+        "reference_answers": [
+          "Lake Orison"
+        ],
+        "prefill_seconds": 11.14909611999974,
+        "decode_seconds": 0.5645882920002805,
+        "seconds": 11.71368441200002,
+        "peak_memory_allocated_gb": 9.19950848,
+        "peak_memory_reserved_gb": 10.183770112,
+        "answer_repeat_match": true,
+        "timing_samples": [
+          {
+            "seconds": 11.696824435000053,
+            "prefill_seconds": 11.132430515000124,
+            "decode_seconds": 0.5643939199999295,
+            "peak_memory_allocated_gb": 9.19950848,
+            "peak_memory_reserved_gb": 10.183770112
+          },
+          {
+            "seconds": 11.71368441200002,
+            "prefill_seconds": 11.14909611999974,
+            "decode_seconds": 0.5645882920002805,
+            "peak_memory_allocated_gb": 9.19950848,
+            "peak_memory_reserved_gb": 10.183770112
+          },
+          {
+            "seconds": 11.717040204000114,
+            "prefill_seconds": 11.152238720000241,
+            "decode_seconds": 0.5648014839998723,
+            "peak_memory_allocated_gb": 9.19950848,
+            "peak_memory_reserved_gb": 10.183770112
+          }
+        ]
+      },
+      "answers_match": false,
+      "comparison": {
+        "kernel_prefill_speedup": 2.171420088041773,
+        "live_prefill_speedup": 2.051746735392448,
+        "live_total_speedup": 1.9525847508264265
+      }
+    },
+    {
+      "case_id": "aquifer_lake_orison",
+      "seq_len": 63999,
+      "requested_length": 64000,
+      "block_size": 64,
+      "needle_block": 499,
+      "teacher_target": "/content/drive/MyDrive/SPRUCE_COLAB/run9_natural/targets/64000/teacher_aquifer_lake_orison_len63999_blk64_d0.5.pt",
+      "sparse": {
+        "exact": false,
+        "fuzzy": 0.5,
+        "answer": " The lake name is the northern wetlands. While studying habitat migration, Marek",
+        "needle": "after three seasons of sampling, the watershed committee designated lake orison as the reserve's primary groundwater source.",
+        "reference_answers": [
+          "Lake Orison"
+        ],
+        "feature_load_seconds": 0.3887667760000113,
+        "tree_build_seconds": 0.014363570000114123,
+        "tree_traversal_seconds": 0.29276389200003905,
+        "route_pack_seconds": 0.003028227000413608,
+        "route_transfer_seconds": 0.0,
+        "selector_seconds": 0.3101374060006492,
+        "prefill_seconds": 5.065150356999766,
+        "decode_seconds": 0.5635723890000008,
+        "seconds": 5.629106902999865,
+        "live_prefill_seconds": 5.374641381000856,
+        "live_total_seconds": 5.938213770000857,
+        "needle_layer_group_hit_rate": 0.01785714365541935,
+        "needle_any_group_all_layers_rate": 0.0357142873108387,
+        "peak_memory_allocated_gb": 9.659943936,
+        "peak_memory_reserved_gb": 10.533994496,
+        "answer_repeat_match": true,
+        "timing_samples": [
+          {
+            "feature_load_seconds": 0.3887667760000113,
+            "tree_build_seconds": 0.014363570000114123,
+            "tree_traversal_seconds": 0.28180855400023574,
+            "route_pack_seconds": 0.0027858570001626504,
+            "route_transfer_seconds": 0.0,
+            "selector_seconds": 0.2989579810005125,
+            "needle_layer_group_hit_rate": 0.01785714365541935,
+            "needle_any_group_all_layers_rate": 0.0357142873108387,
+            "seconds": 5.629106902999865,
+            "prefill_seconds": 5.065150356999766,
+            "decode_seconds": 0.5639565460000995,
+            "peak_memory_allocated_gb": 9.659943936,
+            "peak_memory_reserved_gb": 10.533994496,
+            "live_prefill_seconds": 5.364108338000278,
+            "live_total_seconds": 5.928064884000378
+          },
+          {
+            "feature_load_seconds": 0.3887667760000113,
+            "tree_build_seconds": 0.01441204699995069,
+            "tree_traversal_seconds": 0.2935854970000946,
+            "route_pack_seconds": 0.0030548659997293726,
+            "route_transfer_seconds": 0.0,
+            "selector_seconds": 0.3110524099997747,
+            "needle_layer_group_hit_rate": 0.01785714365541935,
+            "needle_any_group_all_layers_rate": 0.0357142873108387,
+            "seconds": 5.633198508000078,
+            "prefill_seconds": 5.069912513999952,
+            "decode_seconds": 0.5632859940001254,
+            "peak_memory_allocated_gb": 9.659943936,
+            "peak_memory_reserved_gb": 10.533994496,
+            "live_prefill_seconds": 5.380964923999727,
+            "live_total_seconds": 5.944250917999852
+          },
+          {
+            "feature_load_seconds": 0.3887667760000113,
+            "tree_build_seconds": 0.01434528700019655,
+            "tree_traversal_seconds": 0.29276389200003905,
+            "route_pack_seconds": 0.003028227000413608,
+            "route_transfer_seconds": 0.0,
+            "selector_seconds": 0.3101374060006492,
+            "needle_layer_group_hit_rate": 0.01785714365541935,
+            "needle_any_group_all_layers_rate": 0.0357142873108387,
+            "seconds": 5.628076364000208,
+            "prefill_seconds": 5.064503975000207,
+            "decode_seconds": 0.5635723890000008,
+            "peak_memory_allocated_gb": 9.659943936,
+            "peak_memory_reserved_gb": 10.533994496,
+            "live_prefill_seconds": 5.374641381000856,
+            "live_total_seconds": 5.938213770000857
+          }
+        ]
+      },
+      "dense": {
+        "exact": false,
+        "fuzzy": 0.5,
+        "answer": " Lake Merrow\nTo determine which lake the committee designated as the reserve's primary",
+        "needle": "after three seasons of sampling, the watershed committee designated lake orison as the reserve's primary groundwater source.",
+        "reference_answers": [
+          "Lake Orison"
+        ],
+        "prefill_seconds": 11.146498392000012,
+        "decode_seconds": 0.5646600039999612,
+        "seconds": 11.7114279110001,
+        "peak_memory_allocated_gb": 9.19941376,
+        "peak_memory_reserved_gb": 10.183770112,
+        "answer_repeat_match": true,
+        "timing_samples": [
+          {
+            "seconds": 11.710286443999848,
+            "prefill_seconds": 11.145626439999887,
+            "decode_seconds": 0.5646600039999612,
+            "peak_memory_allocated_gb": 9.19941376,
+            "peak_memory_reserved_gb": 10.183770112
+          },
+          {
+            "seconds": 11.71439260599982,
+            "prefill_seconds": 11.149829410000166,
+            "decode_seconds": 0.5645631959996535,
+            "peak_memory_allocated_gb": 9.19941376,
+            "peak_memory_reserved_gb": 10.183770112
+          },
+          {
+            "seconds": 11.7114279110001,
+            "prefill_seconds": 11.146498392000012,
+            "decode_seconds": 0.5649295190000885,
+            "peak_memory_allocated_gb": 9.19941376,
+            "peak_memory_reserved_gb": 10.183770112
+          }
+        ]
+      },
+      "answers_match": false,
+      "comparison": {
+        "kernel_prefill_speedup": 2.2006253726695695,
+        "live_prefill_speedup": 2.07390551328735,
+        "live_total_speedup": 1.9722139290715381
+      }
+    },
+    {
+      "case_id": "atlas_checkpoint_path",
+      "seq_len": 63942,
+      "requested_length": 64000,
+      "block_size": 64,
+      "needle_block": 498,
+      "teacher_target": "/content/drive/MyDrive/SPRUCE_COLAB/run9_natural/targets/64000/teacher_atlas_checkpoint_path_len63942_blk64_d0.5.pt",
+      "sparse": {
+        "exact": false,
+        "fuzzy": 0.0,
+        "answer": " The 1985 account filed by Owen Becker as item 87",
+        "needle": "the atlas indexer writes its recoverable checkpoint to state/atlas.chk after each completed shard.",
+        "reference_answers": [
+          "state/atlas.chk"
+        ],
+        "feature_load_seconds": 0.38829846899989207,
+        "tree_build_seconds": 0.014328406999993604,
+        "tree_traversal_seconds": 0.2924501079996844,
+        "route_pack_seconds": 0.002966669999750593,
+        "route_transfer_seconds": 0.0,
+        "selector_seconds": 0.30973564299938516,
+        "prefill_seconds": 5.050878610000382,
+        "decode_seconds": 0.5632023820003269,
+        "seconds": 5.616000876000271,
+        "live_prefill_seconds": 5.360614252999767,
+        "live_total_seconds": 5.925736518999656,
+        "needle_layer_group_hit_rate": 0.01785714365541935,
+        "needle_any_group_all_layers_rate": 0.0357142873108387,
+        "peak_memory_allocated_gb": 9.65419776,
+        "peak_memory_reserved_gb": 10.533994496,
+        "answer_repeat_match": true,
+        "timing_samples": [
+          {
+            "feature_load_seconds": 0.38829846899989207,
+            "tree_build_seconds": 0.014345366000270587,
+            "tree_traversal_seconds": 0.2791290969998954,
+            "route_pack_seconds": 0.0027822520000881923,
+            "route_transfer_seconds": 0.0,
+            "selector_seconds": 0.2962567150002542,
+            "needle_layer_group_hit_rate": 0.01785714365541935,
+            "needle_any_group_all_layers_rate": 0.0357142873108387,
+            "seconds": 5.606292772000415,
+            "prefill_seconds": 5.0430903900000885,
+            "decode_seconds": 0.5632023820003269,
+            "peak_memory_allocated_gb": 9.65419776,
+            "peak_memory_reserved_gb": 10.533994496,
+            "live_prefill_seconds": 5.339347105000343,
+            "live_total_seconds": 5.90254948700067
+          },
+          {
+            "feature_load_seconds": 0.38829846899989207,
+            "tree_build_seconds": 0.014318864999950165,
+            "tree_traversal_seconds": 0.2924501079996844,
+            "route_pack_seconds": 0.002966669999750593,
+            "route_transfer_seconds": 0.0,
+            "selector_seconds": 0.30973564299938516,
+            "needle_layer_group_hit_rate": 0.01785714365541935,
+            "needle_any_group_all_layers_rate": 0.0357142873108387,
+            "seconds": 5.616000876000271,
+            "prefill_seconds": 5.050878610000382,
+            "decode_seconds": 0.5651222659998894,
+            "peak_memory_allocated_gb": 9.65419776,
+            "peak_memory_reserved_gb": 10.533994496,
+            "live_prefill_seconds": 5.360614252999767,
+            "live_total_seconds": 5.925736518999656
+          },
+          {
+            "feature_load_seconds": 0.38829846899989207,
+            "tree_build_seconds": 0.014328406999993604,
+            "tree_traversal_seconds": 0.2932277949998934,
+            "route_pack_seconds": 0.0030643709997093538,
+            "route_transfer_seconds": 0.0,
+            "selector_seconds": 0.31062057299959633,
+            "needle_layer_group_hit_rate": 0.01785714365541935,
+            "needle_any_group_all_layers_rate": 0.0357142873108387,
+            "seconds": 5.627470445999734,
+            "prefill_seconds": 5.064719725000032,
+            "decode_seconds": 0.562750720999702,
+            "peak_memory_allocated_gb": 9.65419776,
+            "peak_memory_reserved_gb": 10.533994496,
+            "live_prefill_seconds": 5.375340297999628,
+            "live_total_seconds": 5.93809101899933
+          }
+        ]
+      },
+      "dense": {
+        "exact": false,
+        "fuzzy": 0.3333333333333333,
+        "answer": " The answer is: logs/atlas.log The Atlas indexer writes its recoverable checkpoint",
+        "needle": "the atlas indexer writes its recoverable checkpoint to state/atlas.chk after each completed shard.",
+        "reference_answers": [
+          "state/atlas.chk"
+        ],
+        "prefill_seconds": 11.112259000999984,
+        "decode_seconds": 0.5630629739998767,
+        "seconds": 11.675639628999761,
+        "peak_memory_allocated_gb": 9.19305216,
+        "peak_memory_reserved_gb": 10.183770112,
+        "answer_repeat_match": true,
+        "timing_samples": [
+          {
+            "seconds": 11.675639628999761,
+            "prefill_seconds": 11.112259000999984,
+            "decode_seconds": 0.5633806279997771,
+            "peak_memory_allocated_gb": 9.19305216,
+            "peak_memory_reserved_gb": 10.183770112
+          },
+          {
+            "seconds": 11.671863759000189,
+            "prefill_seconds": 11.108989844000007,
+            "decode_seconds": 0.562873915000182,
+            "peak_memory_allocated_gb": 9.19305216,
+            "peak_memory_reserved_gb": 10.183770112
+          },
+          {
+            "seconds": 11.679906394999762,
+            "prefill_seconds": 11.116843420999885,
+            "decode_seconds": 0.5630629739998767,
+            "peak_memory_allocated_gb": 9.19305216,
+            "peak_memory_reserved_gb": 10.183770112
+          }
+        ]
+      },
+      "answers_match": false,
+      "comparison": {
+        "kernel_prefill_speedup": 2.200064554907041,
+        "live_prefill_speedup": 2.072945091093177,
+        "live_total_speedup": 1.9703271638157083
+      }
+    },
+    {
+      "case_id": "atlas_checkpoint_path",
+      "seq_len": 63942,
+      "requested_length": 64000,
+      "block_size": 64,
+      "needle_block": 698,
+      "teacher_target": "/content/drive/MyDrive/SPRUCE_COLAB/run9_natural/targets/64000/teacher_atlas_checkpoint_path_len63942_blk64_d0.7.pt",
+      "sparse": {
+        "exact": false,
+        "fuzzy": 0.0,
+        "answer": " The 1985 account filed by Owen Becker as item 87",
+        "needle": "the atlas indexer writes its recoverable checkpoint to state/atlas.chk after each completed shard.",
+        "reference_answers": [
+          "state/atlas.chk"
+        ],
+        "feature_load_seconds": 0.38880176800012123,
+        "tree_build_seconds": 0.014320285999929183,
+        "tree_traversal_seconds": 0.2927415479998672,
+        "route_pack_seconds": 0.0028061639995939913,
+        "route_transfer_seconds": 0.0,
+        "selector_seconds": 0.30986559899974964,
+        "prefill_seconds": 5.076187281999864,
+        "decode_seconds": 0.5642086320003727,
+        "seconds": 5.640395914000237,
+        "live_prefill_seconds": 5.3769027489997825,
+        "live_total_seconds": 5.941211439999734,
+        "needle_layer_group_hit_rate": 0.0357142873108387,
+        "needle_any_group_all_layers_rate": 0.0714285746216774,
+        "peak_memory_allocated_gb": 9.65419776,
+        "peak_memory_reserved_gb": 10.533994496,
+        "answer_repeat_match": true,
+        "timing_samples": [
+          {
+            "feature_load_seconds": 0.38880176800012123,
+            "tree_build_seconds": 0.014359028999933798,
+            "tree_traversal_seconds": 0.28035990500029584,
+            "route_pack_seconds": 0.002713813000355003,
+            "route_transfer_seconds": 0.0,
+            "selector_seconds": 0.29743274700058464,
+            "needle_layer_group_hit_rate": 0.0357142873108387,
+            "needle_any_group_all_layers_rate": 0.0714285746216774,
+            "seconds": 5.640395914000237,
+            "prefill_seconds": 5.076187281999864,
+            "decode_seconds": 0.5642086320003727,
+            "peak_memory_allocated_gb": 9.65419776,
+            "peak_memory_reserved_gb": 10.533994496,
+            "live_prefill_seconds": 5.373620029000449,
+            "live_total_seconds": 5.937828661000822
+          },
+          {
+            "feature_load_seconds": 0.38880176800012123,
+            "tree_build_seconds": 0.014320285999929183,
+            "tree_traversal_seconds": 0.2944085419999283,
+            "route_pack_seconds": 0.0031115719998524582,
+            "route_transfer_seconds": 0.0,
+            "selector_seconds": 0.3118403999997099,
+            "needle_layer_group_hit_rate": 0.0357142873108387,
+            "needle_any_group_all_layers_rate": 0.0714285746216774,
+            "seconds": 5.629371040000024,
+            "prefill_seconds": 5.065062349000073,
+            "decode_seconds": 0.5643086909999511,
+            "peak_memory_allocated_gb": 9.65419776,
+            "peak_memory_reserved_gb": 10.533994496,
+            "live_prefill_seconds": 5.3769027489997825,
+            "live_total_seconds": 5.941211439999734
+          },
+          {
+            "feature_load_seconds": 0.38880176800012123,
+            "tree_build_seconds": 0.014317887000288465,
+            "tree_traversal_seconds": 0.2927415479998672,
+            "route_pack_seconds": 0.0028061639995939913,
+            "route_transfer_seconds": 0.0,
+            "selector_seconds": 0.30986559899974964,
+            "needle_layer_group_hit_rate": 0.0357142873108387,
+            "needle_any_group_all_layers_rate": 0.0714285746216774,
+            "seconds": 5.647685788999752,
+            "prefill_seconds": 5.083619993999946,
+            "decode_seconds": 0.5640657949998058,
+            "peak_memory_allocated_gb": 9.65419776,
+            "peak_memory_reserved_gb": 10.533994496,
+            "live_prefill_seconds": 5.393485592999696,
+            "live_total_seconds": 5.9575513879995015
+          }
+        ]
+      },
+      "dense": {
+        "exact": true,
+        "fuzzy": 1.0,
+        "answer": " The answer is: state/atlas.chk The Atlas indexer writes its recoverable checkpoint",
+        "needle": "the atlas indexer writes its recoverable checkpoint to state/atlas.chk after each completed shard.",
+        "reference_answers": [
+          "state/atlas.chk"
+        ],
+        "prefill_seconds": 11.135804674000156,
+        "decode_seconds": 0.5637666479997279,
+        "seconds": 11.699571321999883,
+        "peak_memory_allocated_gb": 9.19305216,
+        "peak_memory_reserved_gb": 10.183770112,
+        "answer_repeat_match": true,
+        "timing_samples": [
+          {
+            "seconds": 11.674502247999953,
+            "prefill_seconds": 11.111833424999986,
+            "decode_seconds": 0.5626688229999672,
+            "peak_memory_allocated_gb": 9.19305216,
+            "peak_memory_reserved_gb": 10.183770112
+          },
+          {
+            "seconds": 11.714012666000144,
+            "prefill_seconds": 11.149397302000125,
+            "decode_seconds": 0.5646153640000193,
+            "peak_memory_allocated_gb": 9.19305216,
+            "peak_memory_reserved_gb": 10.183770112
+          },
+          {
+            "seconds": 11.699571321999883,
+            "prefill_seconds": 11.135804674000156,
+            "decode_seconds": 0.5637666479997279,
+            "peak_memory_allocated_gb": 9.19305216,
+            "peak_memory_reserved_gb": 10.183770112
+          }
+        ]
+      },
+      "answers_match": false,
+      "comparison": {
+        "kernel_prefill_speedup": 2.193734008492489,
+        "live_prefill_speedup": 2.0710444644124633,
+        "live_total_speedup": 1.969223186239675
+      }
+    },
+    {
+      "case_id": "atlas_checkpoint_path",
+      "seq_len": 63942,
+      "requested_length": 64000,
+      "block_size": 64,
+      "needle_block": 897,
+      "teacher_target": "/content/drive/MyDrive/SPRUCE_COLAB/run9_natural/targets/64000/teacher_atlas_checkpoint_path_len63942_blk64_d0.9.pt",
+      "sparse": {
+        "exact": false,
+        "fuzzy": 0.0,
+        "answer": " The 1985 account filed by Owen Becker as item 87",
+        "needle": "the atlas indexer writes its recoverable checkpoint to state/atlas.chk after each completed shard.",
+        "reference_answers": [
+          "state/atlas.chk"
+        ],
+        "feature_load_seconds": 0.39176075400018817,
+        "tree_build_seconds": 0.014372650000041176,
+        "tree_traversal_seconds": 0.2962035109999306,
+        "route_pack_seconds": 0.0029973999999128864,
+        "route_transfer_seconds": 0.0,
+        "selector_seconds": 0.31396712100013247,
+        "prefill_seconds": 5.101230493000003,
+        "decode_seconds": 0.5643359430000601,
+        "seconds": 5.6655302970002595,
+        "live_prefill_seconds": 5.4142838360003225,
+        "live_total_seconds": 5.979497418000392,
+        "needle_layer_group_hit_rate": 0.196428582072258,
+        "needle_any_group_all_layers_rate": 0.392857164144516,
+        "peak_memory_allocated_gb": 9.65419776,
+        "peak_memory_reserved_gb": 10.533994496,
+        "answer_repeat_match": true,
+        "timing_samples": [
+          {
+            "feature_load_seconds": 0.39176075400018817,
+            "tree_build_seconds": 0.014372650000041176,
+            "tree_traversal_seconds": 0.28092968999999357,
+            "route_pack_seconds": 0.002800154999931692,
+            "route_transfer_seconds": 0.0,
+            "selector_seconds": 0.29810249499996644,
+            "needle_layer_group_hit_rate": 0.196428582072258,
+            "needle_any_group_all_layers_rate": 0.392857164144516,
+            "seconds": 5.665238577999844,
+            "prefill_seconds": 5.101230493000003,
+            "decode_seconds": 0.5640080849998412,
+            "peak_memory_allocated_gb": 9.65419776,
+            "peak_memory_reserved_gb": 10.533994496,
+            "live_prefill_seconds": 5.399332987999969,
+            "live_total_seconds": 5.96334107299981
+          },
+          {
+            "feature_load_seconds": 0.39176075400018817,
+            "tree_build_seconds": 0.014423562000047241,
+            "tree_traversal_seconds": 0.2962035109999306,
+            "route_pack_seconds": 0.0033400480001546384,
+            "route_transfer_seconds": 0.0,
+            "selector_seconds": 0.31396712100013247,
+            "needle_layer_group_hit_rate": 0.196428582072258,
+            "needle_any_group_all_layers_rate": 0.392857164144516,
+            "seconds": 5.6655302970002595,
+            "prefill_seconds": 5.10031671500019,
+            "decode_seconds": 0.5652135820000694,
+            "peak_memory_allocated_gb": 9.65419776,
+            "peak_memory_reserved_gb": 10.533994496,
+            "live_prefill_seconds": 5.4142838360003225,
+            "live_total_seconds": 5.979497418000392
+          },
+          {
+            "feature_load_seconds": 0.39176075400018817,
+            "tree_build_seconds": 0.014293202999851928,
+            "tree_traversal_seconds": 0.2968389140000909,
+            "route_pack_seconds": 0.0029973999999128864,
+            "route_transfer_seconds": 0.0,
+            "selector_seconds": 0.3141295169998557,
+            "needle_layer_group_hit_rate": 0.196428582072258,
+            "needle_any_group_all_layers_rate": 0.392857164144516,
+            "seconds": 5.6801312310003595,
+            "prefill_seconds": 5.1157952880002995,
+            "decode_seconds": 0.5643359430000601,
+            "peak_memory_allocated_gb": 9.65419776,
+            "peak_memory_reserved_gb": 10.533994496,
+            "live_prefill_seconds": 5.429924805000155,
+            "live_total_seconds": 5.994260748000215
+          }
+        ]
+      },
+      "dense": {
+        "exact": false,
+        "fuzzy": 0.0,
+        "answer": " To answer this question, I'll follow these steps:\n1. Identify the relevant",
+        "needle": "the atlas indexer writes its recoverable checkpoint to state/atlas.chk after each completed shard.",
+        "reference_answers": [
+          "state/atlas.chk"
+        ],
+        "prefill_seconds": 11.13026104499977,
+        "decode_seconds": 0.5636750660000871,
+        "seconds": 11.694928724999954,
+        "peak_memory_allocated_gb": 9.19305216,
+        "peak_memory_reserved_gb": 10.183770112,
+        "answer_repeat_match": true,
+        "timing_samples": [
+          {
+            "seconds": 11.704297819999738,
+            "prefill_seconds": 11.140964862999681,
+            "decode_seconds": 0.5633329570000569,
+            "peak_memory_allocated_gb": 9.19305216,
+            "peak_memory_reserved_gb": 10.183770112
+          },
+          {
+            "seconds": 11.694928724999954,
+            "prefill_seconds": 11.13026104499977,
+            "decode_seconds": 0.5646676800001842,
+            "peak_memory_allocated_gb": 9.19305216,
+            "peak_memory_reserved_gb": 10.183770112
+          },
+          {
+            "seconds": 11.690008826999929,
+            "prefill_seconds": 11.126333760999842,
+            "decode_seconds": 0.5636750660000871,
+            "peak_memory_allocated_gb": 9.19305216,
+            "peak_memory_reserved_gb": 10.183770112
+          }
+        ]
+      },
+      "answers_match": false,
+      "comparison": {
+        "kernel_prefill_speedup": 2.1818776979932406,
+        "live_prefill_speedup": 2.0557217504913807,
+        "live_total_speedup": 1.955838075921582
+      }
+    },
+    {
+      "case_id": "atlas_checkpoint_path",
+      "seq_len": 63995,
+      "requested_length": 64000,
+      "block_size": 64,
+      "needle_block": 99,
+      "teacher_target": "/content/drive/MyDrive/SPRUCE_COLAB/run9_natural/targets/64000/teacher_atlas_checkpoint_path_len63995_blk64_d0.1.pt",
+      "sparse": {
+        "exact": false,
+        "fuzzy": 0.0,
+        "answer": " Reference 8503 summarizes Luc Moreau's 1985",
+        "needle": "the atlas indexer writes its recoverable checkpoint to state/atlas.chk after each completed shard.",
+        "reference_answers": [
+          "state/atlas.chk"
+        ],
+        "feature_load_seconds": 0.3900155830001495,
+        "tree_build_seconds": 0.014347210999858362,
+        "tree_traversal_seconds": 0.2963911609999741,
+        "route_pack_seconds": 0.003182220000326197,
+        "route_transfer_seconds": 0.0,
+        "selector_seconds": 0.31392059200015865,
+        "prefill_seconds": 5.110896240000329,
+        "decode_seconds": 0.5642446439997002,
+        "seconds": 5.6751408840000295,
+        "live_prefill_seconds": 5.42570093500035,
+        "live_total_seconds": 5.98994557900005,
+        "needle_layer_group_hit_rate": 0.0714285746216774,
+        "needle_any_group_all_layers_rate": 0.1428571492433548,
+        "peak_memory_allocated_gb": 9.659906048,
+        "peak_memory_reserved_gb": 10.533994496,
+        "answer_repeat_match": true,
+        "timing_samples": [
+          {
+            "feature_load_seconds": 0.3900155830001495,
+            "tree_build_seconds": 0.014376755000284902,
+            "tree_traversal_seconds": 0.2806688430000577,
+            "route_pack_seconds": 0.0028067530001862906,
+            "route_transfer_seconds": 0.0,
+            "selector_seconds": 0.29785235100052887,
+            "needle_layer_group_hit_rate": 0.0714285746216774,
+            "needle_any_group_all_layers_rate": 0.1428571492433548,
+            "seconds": 5.668848871999671,
+            "prefill_seconds": 5.105450063999797,
+            "decode_seconds": 0.5633988079998744,
+            "peak_memory_allocated_gb": 9.659906048,
+            "peak_memory_reserved_gb": 10.533994496,
+            "live_prefill_seconds": 5.403302415000326,
+            "live_total_seconds": 5.9667012230002
+          },
+          {
+            "feature_load_seconds": 0.3900155830001495,
+            "tree_build_seconds": 0.01429572899996856,
+            "tree_traversal_seconds": 0.2972163270001147,
+            "route_pack_seconds": 0.0032926389999374805,
+            "route_transfer_seconds": 0.0,
+            "selector_seconds": 0.31480469500002073,
+            "needle_layer_group_hit_rate": 0.0714285746216774,
+            "needle_any_group_all_layers_rate": 0.1428571492433548,
+            "seconds": 5.6751408840000295,
+            "prefill_seconds": 5.110896240000329,
+            "decode_seconds": 0.5642446439997002,
+            "peak_memory_allocated_gb": 9.659906048,
+            "peak_memory_reserved_gb": 10.533994496,
+            "live_prefill_seconds": 5.42570093500035,
+            "live_total_seconds": 5.98994557900005
+          },
+          {
+            "feature_load_seconds": 0.3900155830001495,
+            "tree_build_seconds": 0.014347210999858362,
+            "tree_traversal_seconds": 0.2963911609999741,
+            "route_pack_seconds": 0.003182220000326197,
+            "route_transfer_seconds": 0.0,
+            "selector_seconds": 0.31392059200015865,
+            "needle_layer_group_hit_rate": 0.0714285746216774,
+            "needle_any_group_all_layers_rate": 0.1428571492433548,
+            "seconds": 5.680365924999933,
+            "prefill_seconds": 5.115010525999878,
+            "decode_seconds": 0.5653553990000546,
+            "peak_memory_allocated_gb": 9.659906048,
+            "peak_memory_reserved_gb": 10.533994496,
+            "live_prefill_seconds": 5.428931118000037,
+            "live_total_seconds": 5.994286517000091
+          }
+        ]
+      },
+      "dense": {
+        "exact": false,
+        "fuzzy": 0.3333333333333333,
+        "answer": " The answer is: logs/atlas.log The Atlas indexer writes its recoverable checkpoint",
+        "needle": "the atlas indexer writes its recoverable checkpoint to state/atlas.chk after each completed shard.",
+        "reference_answers": [
+          "state/atlas.chk"
+        ],
+        "prefill_seconds": 11.132573935999972,
+        "decode_seconds": 0.5635532060000514,
+        "seconds": 11.69697065399987,
+        "peak_memory_allocated_gb": 9.199424,
+        "peak_memory_reserved_gb": 10.183770112,
+        "answer_repeat_match": true,
+        "timing_samples": [
+          {
+            "seconds": 11.69697065399987,
+            "prefill_seconds": 11.132573935999972,
+            "decode_seconds": 0.5643967179998981,
+            "peak_memory_allocated_gb": 9.199424,
+            "peak_memory_reserved_gb": 10.183770112
+          },
+          {
+            "seconds": 11.69351576300005,
+            "prefill_seconds": 11.129962556999999,
+            "decode_seconds": 0.5635532060000514,
+            "peak_memory_allocated_gb": 9.199424,
+            "peak_memory_reserved_gb": 10.183770112
+          },
+          {
+            "seconds": 11.69910212700006,
+            "prefill_seconds": 11.13627790999999,
+            "decode_seconds": 0.5628242170000703,
+            "peak_memory_allocated_gb": 9.199424,
+            "peak_memory_reserved_gb": 10.183770112
+          }
+        ]
+      },
+      "answers_match": false,
+      "comparison": {
+        "kernel_prefill_speedup": 2.178203863516363,
+        "live_prefill_speedup": 2.051822256583564,
+        "live_total_speedup": 1.9527674333149014
+      }
+    },
+    {
+      "case_id": "atlas_checkpoint_path",
+      "seq_len": 63995,
+      "requested_length": 64000,
+      "block_size": 64,
+      "needle_block": 299,
+      "teacher_target": "/content/drive/MyDrive/SPRUCE_COLAB/run9_natural/targets/64000/teacher_atlas_checkpoint_path_len63995_blk64_d0.3.pt",
+      "sparse": {
+        "exact": false,
+        "fuzzy": 0.0,
+        "answer": " The 1915 account filed by Owen Becker as item 22",
+        "needle": "the atlas indexer writes its recoverable checkpoint to state/atlas.chk after each completed shard.",
+        "reference_answers": [
+          "state/atlas.chk"
+        ],
+        "feature_load_seconds": 0.3881181319998177,
+        "tree_build_seconds": 0.014347278000059305,
+        "tree_traversal_seconds": 0.2949096030001783,
+        "route_pack_seconds": 0.0028910109999742417,
+        "route_transfer_seconds": 0.0,
+        "selector_seconds": 0.31217158000026757,
+        "prefill_seconds": 5.113207141999737,
+        "decode_seconds": 0.5644011620001947,
+        "seconds": 5.677608303999932,
+        "live_prefill_seconds": 5.426398913999947,
+        "live_total_seconds": 5.990800076000141,
+        "needle_layer_group_hit_rate": 0.0714285746216774,
+        "needle_any_group_all_layers_rate": 0.1428571492433548,
+        "peak_memory_allocated_gb": 9.659906048,
+        "peak_memory_reserved_gb": 10.533994496,
+        "answer_repeat_match": true,
+        "timing_samples": [
+          {
+            "feature_load_seconds": 0.3881181319998177,
+            "tree_build_seconds": 0.014328743000078248,
+            "tree_traversal_seconds": 0.28105335299960643,
+            "route_pack_seconds": 0.00274856899977749,
+            "route_transfer_seconds": 0.0,
+            "selector_seconds": 0.29813066499946217,
+            "needle_layer_group_hit_rate": 0.0714285746216774,
+            "needle_any_group_all_layers_rate": 0.1428571492433548,
+            "seconds": 5.665683285999876,
+            "prefill_seconds": 5.10179953099987,
+            "decode_seconds": 0.5638837550000062,
+            "peak_memory_allocated_gb": 9.659906048,
+            "peak_memory_reserved_gb": 10.533994496,
+            "live_prefill_seconds": 5.399930195999332,
+            "live_total_seconds": 5.963813950999338
+          },
+          {
+            "feature_load_seconds": 0.3881181319998177,
+            "tree_build_seconds": 0.014347278000059305,
+            "tree_traversal_seconds": 0.2958253810002134,
+            "route_pack_seconds": 0.003019112999936624,
+            "route_transfer_seconds": 0.0,
+            "selector_seconds": 0.3131917720002093,
+            "needle_layer_group_hit_rate": 0.0714285746216774,
+            "needle_any_group_all_layers_rate": 0.1428571492433548,
+            "seconds": 5.677608303999932,
+            "prefill_seconds": 5.113207141999737,
+            "decode_seconds": 0.5644011620001947,
+            "peak_memory_allocated_gb": 9.659906048,
+            "peak_memory_reserved_gb": 10.533994496,
+            "live_prefill_seconds": 5.426398913999947,
+            "live_total_seconds": 5.990800076000141
+          },
+          {
+            "feature_load_seconds": 0.3881181319998177,
+            "tree_build_seconds": 0.014370966000115004,
+            "tree_traversal_seconds": 0.2949096030001783,
+            "route_pack_seconds": 0.0028910109999742417,
+            "route_transfer_seconds": 0.0,
+            "selector_seconds": 0.31217158000026757,
+            "needle_layer_group_hit_rate": 0.0714285746216774,
+            "needle_any_group_all_layers_rate": 0.1428571492433548,
+            "seconds": 5.685622566000347,
+            "prefill_seconds": 5.121069821000219,
+            "decode_seconds": 0.5645527450001282,
+            "peak_memory_allocated_gb": 9.659906048,
+            "peak_memory_reserved_gb": 10.533994496,
+            "live_prefill_seconds": 5.433241401000487,
+            "live_total_seconds": 5.997794146000615
+          }
+        ]
+      },
+      "dense": {
+        "exact": false,
+        "fuzzy": 0.3333333333333333,
+        "answer": " The answer is: logs/atlas.log The Atlas indexer writes its recoverable checkpoint",
+        "needle": "the atlas indexer writes its recoverable checkpoint to state/atlas.chk after each completed shard.",
+        "reference_answers": [
+          "state/atlas.chk"
+        ],
+        "prefill_seconds": 11.127131086999725,
+        "decode_seconds": 0.5636527289998412,
+        "seconds": 11.69088745099998,
+        "peak_memory_allocated_gb": 9.199424,
+        "peak_memory_reserved_gb": 10.183770112,
+        "answer_repeat_match": true,
+        "timing_samples": [
+          {
+            "seconds": 11.687741856999764,
+            "prefill_seconds": 11.124158150999847,
+            "decode_seconds": 0.5635837059999176,
+            "peak_memory_allocated_gb": 9.199424,
+            "peak_memory_reserved_gb": 10.183770112
+          },
+          {
+            "seconds": 11.69088745099998,
+            "prefill_seconds": 11.127131086999725,
+            "decode_seconds": 0.5637563640002554,
+            "peak_memory_allocated_gb": 9.199424,
+            "peak_memory_reserved_gb": 10.183770112
+          },
+          {
+            "seconds": 11.698261487999844,
+            "prefill_seconds": 11.134608759000002,
+            "decode_seconds": 0.5636527289998412,
+            "peak_memory_allocated_gb": 9.199424,
+            "peak_memory_reserved_gb": 10.183770112
+          }
+        ]
+      },
+      "answers_match": false,
+      "comparison": {
+        "kernel_prefill_speedup": 2.1761549606707282,
+        "live_prefill_speedup": 2.0505553062625124,
+        "live_total_speedup": 1.9514734764451693
+      }
+    },
+    {
+      "case_id": "council_larkspur_method",
+      "seq_len": 63947,
+      "requested_length": 64000,
+      "block_size": 64,
+      "needle_block": 99,
+      "teacher_target": "/content/drive/MyDrive/SPRUCE_COLAB/run9_natural/targets/64000/teacher_council_larkspur_method_len63947_blk64_d0.1.pt",
+      "sparse": {
+        "exact": false,
+        "fuzzy": 0.3333333333333333,
+        "answer": " The 1901 account filed by Owen Becker as item 82",
+        "needle": "following the pilot review, the regional council adopted the larkspur method as its official procedure for rating wetland restoration proposals.",
+        "reference_answers": [
+          "Larkspur Method",
+          "the Larkspur Method"
+        ],
+        "feature_load_seconds": 0.38649648000000525,
+        "tree_build_seconds": 0.014332182000089233,
+        "tree_traversal_seconds": 0.29207907299996805,
+        "route_pack_seconds": 0.003088380999997753,
+        "route_transfer_seconds": 0.0,
+        "selector_seconds": 0.31057126400037305,
+        "prefill_seconds": 5.096508680999705,
+        "decode_seconds": 0.5642188689998875,
+        "seconds": 5.6606262029999925,
+        "live_prefill_seconds": 5.39514574299983,
+        "live_total_seconds": 5.959655459999794,
+        "needle_layer_group_hit_rate": 0.0714285746216774,
+        "needle_any_group_all_layers_rate": 0.1428571492433548,
+        "peak_memory_allocated_gb": 9.654603776,
+        "peak_memory_reserved_gb": 10.533994496,
+        "answer_repeat_match": true,
+        "timing_samples": [
+          {
+            "feature_load_seconds": 0.38649648000000525,
+            "tree_build_seconds": 0.014314134999949601,
+            "tree_traversal_seconds": 0.2804364399999031,
+            "route_pack_seconds": 0.0027841539999826637,
+            "route_transfer_seconds": 0.0,
+            "selector_seconds": 0.29753472899983535,
+            "needle_layer_group_hit_rate": 0.0714285746216774,
+            "needle_any_group_all_layers_rate": 0.1428571492433548,
+            "seconds": 5.662120730999959,
+            "prefill_seconds": 5.097611013999995,
+            "decode_seconds": 0.5645097169999644,
+            "peak_memory_allocated_gb": 9.654603776,
+            "peak_memory_reserved_gb": 10.533994496,
+            "live_prefill_seconds": 5.39514574299983,
+            "live_total_seconds": 5.959655459999794
+          },
+          {
+            "feature_load_seconds": 0.38649648000000525,
+            "tree_build_seconds": 0.014332182000089233,
+            "tree_traversal_seconds": 0.29207907299996805,
+            "route_pack_seconds": 0.0041600090003157675,
+            "route_transfer_seconds": 0.0,
+            "selector_seconds": 0.31057126400037305,
+            "needle_layer_group_hit_rate": 0.0714285746216774,
+            "needle_any_group_all_layers_rate": 0.1428571492433548,
+            "seconds": 5.64649532500016,
+            "prefill_seconds": 5.0822764560002724,
+            "decode_seconds": 0.5642188689998875,
+            "peak_memory_allocated_gb": 9.654603776,
+            "peak_memory_reserved_gb": 10.533994496,
+            "live_prefill_seconds": 5.3928477200006455,
+            "live_total_seconds": 5.957066589000533
+          },
+          {
+            "feature_load_seconds": 0.38649648000000525,
+            "tree_build_seconds": 0.014439651999964553,
+            "tree_traversal_seconds": 0.29685086100016633,
+            "route_pack_seconds": 0.003088380999997753,
+            "route_transfer_seconds": 0.0,
+            "selector_seconds": 0.31437889400012864,
+            "needle_layer_group_hit_rate": 0.0714285746216774,
+            "needle_any_group_all_layers_rate": 0.1428571492433548,
+            "seconds": 5.6606262029999925,
+            "prefill_seconds": 5.096508680999705,
+            "decode_seconds": 0.5641175220002879,
+            "peak_memory_allocated_gb": 9.654603776,
+            "peak_memory_reserved_gb": 10.533994496,
+            "live_prefill_seconds": 5.410887574999833,
+            "live_total_seconds": 5.975005097000121
+          }
+        ]
+      },
+      "dense": {
+        "exact": true,
+        "fuzzy": 1.0,
+        "answer": " The regional council adopted the Larkspur Method as its official procedure for rating",
+        "needle": "following the pilot review, the regional council adopted the larkspur method as its official procedure for rating wetland restoration proposals.",
+        "reference_answers": [
+          "Larkspur Method",
+          "the Larkspur Method"
+        ],
+        "prefill_seconds": 11.128614835999997,
+        "decode_seconds": 0.5633616170002824,
+        "seconds": 11.69197645300028,
+        "peak_memory_allocated_gb": 9.19348736,
+        "peak_memory_reserved_gb": 10.183770112,
+        "answer_repeat_match": true,
+        "timing_samples": [
+          {
+            "seconds": 11.67644324999992,
+            "prefill_seconds": 11.112963820000004,
+            "decode_seconds": 0.5634794299999157,
+            "peak_memory_allocated_gb": 9.19348736,
+            "peak_memory_reserved_gb": 10.183770112
+          },
+          {
+            "seconds": 11.693020000999695,
+            "prefill_seconds": 11.130098792999888,
+            "decode_seconds": 0.5629212079998069,
+            "peak_memory_allocated_gb": 9.19348736,
+            "peak_memory_reserved_gb": 10.183770112
+          },
+          {
+            "seconds": 11.69197645300028,
+            "prefill_seconds": 11.128614835999997,
+            "decode_seconds": 0.5633616170002824,
+            "peak_memory_allocated_gb": 9.19348736,
+            "peak_memory_reserved_gb": 10.183770112
+          }
+        ]
+      },
+      "answers_match": false,
+      "comparison": {
+        "kernel_prefill_speedup": 2.1835761562593996,
+        "live_prefill_speedup": 2.062708843489411,
+        "live_total_speedup": 1.9618544279069252
+      }
+    },
+    {
+      "case_id": "council_larkspur_method",
+      "seq_len": 63947,
+      "requested_length": 64000,
+      "block_size": 64,
+      "needle_block": 299,
+      "teacher_target": "/content/drive/MyDrive/SPRUCE_COLAB/run9_natural/targets/64000/teacher_council_larkspur_method_len63947_blk64_d0.3.pt",
+      "sparse": {
+        "exact": false,
+        "fuzzy": 0.0,
+        "answer": "**Question:** In 1957, Owen Becker's review of",
+        "needle": "following the pilot review, the regional council adopted the larkspur method as its official procedure for rating wetland restoration proposals.",
+        "reference_answers": [
+          "Larkspur Method",
+          "the Larkspur Method"
+        ],
+        "feature_load_seconds": 0.3868642990000808,
+        "tree_build_seconds": 0.014351455999985774,
+        "tree_traversal_seconds": 0.29225808999990477,
+        "route_pack_seconds": 0.0029077410003992554,
+        "route_transfer_seconds": 0.0,
+        "selector_seconds": 0.30952088300045943,
+        "prefill_seconds": 5.073854172999745,
+        "decode_seconds": 0.5636878570003319,
+        "seconds": 5.637946279999596,
+        "live_prefill_seconds": 5.384913655999753,
+        "live_total_seconds": 5.9490057629996045,
+        "needle_layer_group_hit_rate": 0.0535714328289032,
+        "needle_any_group_all_layers_rate": 0.1071428656578064,
+        "peak_memory_allocated_gb": 9.654603776,
+        "peak_memory_reserved_gb": 10.533994496,
+        "answer_repeat_match": true,
+        "timing_samples": [
+          {
+            "feature_load_seconds": 0.3868642990000808,
+            "tree_build_seconds": 0.014351455999985774,
+            "tree_traversal_seconds": 0.281134664000092,
+            "route_pack_seconds": 0.002874926999993477,
+            "route_transfer_seconds": 0.0,
+            "selector_seconds": 0.29836104700007127,
+            "needle_layer_group_hit_rate": 0.0535714328289032,
+            "needle_any_group_all_layers_rate": 0.1071428656578064,
+            "seconds": 5.636620448000031,
+            "prefill_seconds": 5.072932590999699,
+            "decode_seconds": 0.5636878570003319,
+            "peak_memory_allocated_gb": 9.654603776,
+            "peak_memory_reserved_gb": 10.533994496,
+            "live_prefill_seconds": 5.37129363799977,
+            "live_total_seconds": 5.934981495000102
+          },
+          {
+            "feature_load_seconds": 0.3868642990000808,
+            "tree_build_seconds": 0.014347717999953602,
+            "tree_traversal_seconds": 0.2936672420000832,
+            "route_pack_seconds": 0.0030445229999713774,
+            "route_transfer_seconds": 0.0,
+            "selector_seconds": 0.3110594830000082,
+            "needle_layer_group_hit_rate": 0.0535714328289032,
+            "needle_any_group_all_layers_rate": 0.1071428656578064,
+            "seconds": 5.637946279999596,
+            "prefill_seconds": 5.073854172999745,
+            "decode_seconds": 0.5640921069998512,
+            "peak_memory_allocated_gb": 9.654603776,
+            "peak_memory_reserved_gb": 10.533994496,
+            "live_prefill_seconds": 5.384913655999753,
+            "live_total_seconds": 5.9490057629996045
+          },
+          {
+            "feature_load_seconds": 0.3868642990000808,
+            "tree_build_seconds": 0.01435505200015541,
+            "tree_traversal_seconds": 0.29225808999990477,
+            "route_pack_seconds": 0.0029077410003992554,
+            "route_transfer_seconds": 0.0,
+            "selector_seconds": 0.30952088300045943,
+            "needle_layer_group_hit_rate": 0.0535714328289032,
+            "needle_any_group_all_layers_rate": 0.1071428656578064,
+            "seconds": 5.6538473130003695,
+            "prefill_seconds": 5.090261855000335,
+            "decode_seconds": 0.5635854580000341,
+            "peak_memory_allocated_gb": 9.654603776,
+            "peak_memory_reserved_gb": 10.533994496,
+            "live_prefill_seconds": 5.399782738000795,
+            "live_total_seconds": 5.963368196000829
+          }
+        ]
+      },
+      "dense": {
+        "exact": true,
+        "fuzzy": 1.0,
+        "answer": " The regional council adopted the Larkspur Method as its official procedure for rating",
+        "needle": "following the pilot review, the regional council adopted the larkspur method as its official procedure for rating wetland restoration proposals.",
+        "reference_answers": [
+          "Larkspur Method",
+          "the Larkspur Method"
+        ],
+        "prefill_seconds": 11.130117098000028,
+        "decode_seconds": 0.5653543180001179,
+        "seconds": 11.695471416000146,
+        "peak_memory_allocated_gb": 9.19348736,
+        "peak_memory_reserved_gb": 10.183770112,
+        "answer_repeat_match": true,
+        "timing_samples": [
+          {
+            "seconds": 11.69582709000042,
+            "prefill_seconds": 11.130389053000272,
+            "decode_seconds": 0.565438037000149,
+            "peak_memory_allocated_gb": 9.19348736,
+            "peak_memory_reserved_gb": 10.183770112
+          },
+          {
+            "seconds": 11.694289034000121,
+            "prefill_seconds": 11.129954370000178,
+            "decode_seconds": 0.5643346639999436,
+            "peak_memory_allocated_gb": 9.19348736,
+            "peak_memory_reserved_gb": 10.183770112
+          },
+          {
+            "seconds": 11.695471416000146,
+            "prefill_seconds": 11.130117098000028,
+            "decode_seconds": 0.5653543180001179,
+            "peak_memory_allocated_gb": 9.19348736,
+            "peak_memory_reserved_gb": 10.183770112
+          }
+        ]
+      },
+      "answers_match": false,
+      "comparison": {
+        "kernel_prefill_speedup": 2.1936217948928007,
+        "live_prefill_speedup": 2.0669072540465145,
+        "live_total_speedup": 1.9659539563301853
+      }
+    },
+    {
+      "case_id": "council_larkspur_method",
+      "seq_len": 63947,
+      "requested_length": 64000,
+      "block_size": 64,
+      "needle_block": 499,
+      "teacher_target": "/content/drive/MyDrive/SPRUCE_COLAB/run9_natural/targets/64000/teacher_council_larkspur_method_len63947_blk64_d0.5.pt",
+      "sparse": {
+        "exact": false,
+        "fuzzy": 0.3333333333333333,
+        "answer": " In 1957, Owen Becker's review of maintenance scheduling in the",
+        "needle": "following the pilot review, the regional council adopted the larkspur method as its official procedure for rating wetland restoration proposals.",
+        "reference_answers": [
+          "Larkspur Method",
+          "the Larkspur Method"
+        ],
+        "feature_load_seconds": 0.37091426899996804,
+        "tree_build_seconds": 0.014328893999845604,
+        "tree_traversal_seconds": 0.2937806760000967,
+        "route_pack_seconds": 0.0029829519999111653,
+        "route_transfer_seconds": 0.0,
+        "selector_seconds": 0.3110703890001787,
+        "prefill_seconds": 5.097313119999853,
+        "decode_seconds": 0.5639286069999798,
+        "seconds": 5.660541149999972,
+        "live_prefill_seconds": 5.407155492000584,
+        "live_total_seconds": 5.971084099000564,
+        "needle_layer_group_hit_rate": 0.0892857164144516,
+        "needle_any_group_all_layers_rate": 0.1785714328289032,
+        "peak_memory_allocated_gb": 9.654603776,
+        "peak_memory_reserved_gb": 10.533994496,
+        "answer_repeat_match": true,
+        "timing_samples": [
+          {
+            "feature_load_seconds": 0.37091426899996804,
+            "tree_build_seconds": 0.014353950999975496,
+            "tree_traversal_seconds": 0.28010407000010673,
+            "route_pack_seconds": 0.002774931000203651,
+            "route_transfer_seconds": 0.0,
+            "selector_seconds": 0.2972329520002859,
+            "needle_layer_group_hit_rate": 0.0892857164144516,
+            "needle_any_group_all_layers_rate": 0.1785714328289032,
+            "seconds": 5.660541149999972,
+            "prefill_seconds": 5.097313119999853,
+            "decode_seconds": 0.5632280300001185,
+            "peak_memory_allocated_gb": 9.654603776,
+            "peak_memory_reserved_gb": 10.533994496,
+            "live_prefill_seconds": 5.394546072000139,
+            "live_total_seconds": 5.957774102000258
+          },
+          {
+            "feature_load_seconds": 0.37091426899996804,
+            "tree_build_seconds": 0.014306761000170809,
+            "tree_traversal_seconds": 0.2937806760000967,
+            "route_pack_seconds": 0.0029829519999111653,
+            "route_transfer_seconds": 0.0,
+            "selector_seconds": 0.3110703890001787,
+            "needle_layer_group_hit_rate": 0.0892857164144516,
+            "needle_any_group_all_layers_rate": 0.1785714328289032,
+            "seconds": 5.660013710000385,
+            "prefill_seconds": 5.096085103000405,
+            "decode_seconds": 0.5639286069999798,
+            "peak_memory_allocated_gb": 9.654603776,
+            "peak_memory_reserved_gb": 10.533994496,
+            "live_prefill_seconds": 5.407155492000584,
+            "live_total_seconds": 5.971084099000564
+          },
+          {
+            "feature_load_seconds": 0.37091426899996804,
+            "tree_build_seconds": 0.014328893999845604,
+            "tree_traversal_seconds": 0.2945165240003007,
+            "route_pack_seconds": 0.003122955999970145,
+            "route_transfer_seconds": 0.0,
+            "selector_seconds": 0.31196837400011646,
+            "needle_layer_group_hit_rate": 0.0892857164144516,
+            "needle_any_group_all_layers_rate": 0.1785714328289032,
+            "seconds": 5.66568701999995,
+            "prefill_seconds": 5.101629818999754,
+            "decode_seconds": 0.5640572010001961,
+            "peak_memory_allocated_gb": 9.654603776,
+            "peak_memory_reserved_gb": 10.533994496,
+            "live_prefill_seconds": 5.413598192999871,
+            "live_total_seconds": 5.977655394000067
+          }
+        ]
+      },
+      "dense": {
+        "exact": true,
+        "fuzzy": 1.0,
+        "answer": " The regional council adopted the Larkspur Method as its official procedure for rating",
+        "needle": "following the pilot review, the regional council adopted the larkspur method as its official procedure for rating wetland restoration proposals.",
+        "reference_answers": [
+          "Larkspur Method",
+          "the Larkspur Method"
+        ],
+        "prefill_seconds": 11.123706370000036,
+        "decode_seconds": 0.5636587239996516,
+        "seconds": 11.687600653000118,
+        "peak_memory_allocated_gb": 9.19348736,
+        "peak_memory_reserved_gb": 10.183770112,
+        "answer_repeat_match": true,
+        "timing_samples": [
+          {
+            "seconds": 11.68984863500009,
+            "prefill_seconds": 11.126691573000244,
+            "decode_seconds": 0.5631570619998456,
+            "peak_memory_allocated_gb": 9.19348736,
+            "peak_memory_reserved_gb": 10.183770112
+          },
+          {
+            "seconds": 11.687600653000118,
+            "prefill_seconds": 11.123706370000036,
+            "decode_seconds": 0.5638942830000815,
+            "peak_memory_allocated_gb": 9.19348736,
+            "peak_memory_reserved_gb": 10.183770112
+          },
+          {
+            "seconds": 11.682298658000036,
+            "prefill_seconds": 11.118639934000385,
+            "decode_seconds": 0.5636587239996516,
+            "peak_memory_allocated_gb": 9.19348736,
+            "peak_memory_reserved_gb": 10.183770112
+          }
+        ]
+      },
+      "answers_match": false,
+      "comparison": {
+        "kernel_prefill_speedup": 2.1822686007565406,
+        "live_prefill_speedup": 2.057219620640944,
+        "live_total_speedup": 1.9573666120288578
+      }
+    },
+    {
+      "case_id": "council_larkspur_method",
+      "seq_len": 63947,
+      "requested_length": 64000,
+      "block_size": 64,
+      "needle_block": 698,
+      "teacher_target": "/content/drive/MyDrive/SPRUCE_COLAB/run9_natural/targets/64000/teacher_council_larkspur_method_len63947_blk64_d0.7.pt",
+      "sparse": {
+        "exact": false,
+        "fuzzy": 0.0,
+        "answer": " While studying restoration planning, Tomas Ibarra compared 792 entries from",
+        "needle": "following the pilot review, the regional council adopted the larkspur method as its official procedure for rating wetland restoration proposals.",
+        "reference_answers": [
+          "Larkspur Method",
+          "the Larkspur Method"
+        ],
+        "feature_load_seconds": 0.3749082429999362,
+        "tree_build_seconds": 0.014296797000042716,
+        "tree_traversal_seconds": 0.2936179340003946,
+        "route_pack_seconds": 0.0031436089998351235,
+        "route_transfer_seconds": 0.0,
+        "selector_seconds": 0.31124594200082356,
+        "prefill_seconds": 5.090568425000129,
+        "decode_seconds": 0.564481884000088,
+        "seconds": 5.654232503999992,
+        "live_prefill_seconds": 5.401191467999979,
+        "live_total_seconds": 5.965673352000067,
+        "needle_layer_group_hit_rate": 0.0714285746216774,
+        "needle_any_group_all_layers_rate": 0.1428571492433548,
+        "peak_memory_allocated_gb": 9.654603776,
+        "peak_memory_reserved_gb": 10.533994496,
+        "answer_repeat_match": true,
+        "timing_samples": [
+          {
+            "feature_load_seconds": 0.3749082429999362,
+            "tree_build_seconds": 0.014291932999640267,
+            "tree_traversal_seconds": 0.2803506249997554,
+            "route_pack_seconds": 0.0028133240002716775,
+            "route_transfer_seconds": 0.0,
+            "selector_seconds": 0.2974558819996673,
+            "needle_layer_group_hit_rate": 0.0714285746216774,
+            "needle_any_group_all_layers_rate": 0.1428571492433548,
+            "seconds": 5.654232503999992,
+            "prefill_seconds": 5.090568425000129,
+            "decode_seconds": 0.5636640789998637,
+            "peak_memory_allocated_gb": 9.654603776,
+            "peak_memory_reserved_gb": 10.533994496,
+            "live_prefill_seconds": 5.388024306999796,
+            "live_total_seconds": 5.95168838599966
+          },
+          {
+            "feature_load_seconds": 0.3749082429999362,
+            "tree_build_seconds": 0.014296797000042716,
+            "tree_traversal_seconds": 0.29471916900001816,
+            "route_pack_seconds": 0.0031436089998351235,
+            "route_transfer_seconds": 0.0,
+            "selector_seconds": 0.312159574999896,
+            "needle_layer_group_hit_rate": 0.0714285746216774,
+            "needle_any_group_all_layers_rate": 0.1428571492433548,
+            "seconds": 5.653513777000171,
+            "prefill_seconds": 5.089031893000083,
+            "decode_seconds": 0.564481884000088,
+            "peak_memory_allocated_gb": 9.654603776,
+            "peak_memory_reserved_gb": 10.533994496,
+            "live_prefill_seconds": 5.401191467999979,
+            "live_total_seconds": 5.965673352000067
+          },
+          {
+            "feature_load_seconds": 0.3749082429999362,
+            "tree_build_seconds": 0.014449425000293559,
+            "tree_traversal_seconds": 0.2936179340003946,
+            "route_pack_seconds": 0.0031785830001354043,
+            "route_transfer_seconds": 0.0,
+            "selector_seconds": 0.31124594200082356,
+            "needle_layer_group_hit_rate": 0.0714285746216774,
+            "needle_any_group_all_layers_rate": 0.1428571492433548,
+            "seconds": 5.672755224999946,
+            "prefill_seconds": 5.108149216999664,
+            "decode_seconds": 0.5646060080002826,
+            "peak_memory_allocated_gb": 9.654603776,
+            "peak_memory_reserved_gb": 10.533994496,
+            "live_prefill_seconds": 5.419395159000487,
+            "live_total_seconds": 5.98400116700077
+          }
+        ]
+      },
+      "dense": {
+        "exact": true,
+        "fuzzy": 1.0,
+        "answer": " The regional council adopted the Larkspur Method as its official procedure for rating",
+        "needle": "following the pilot review, the regional council adopted the larkspur method as its official procedure for rating wetland restoration proposals.",
+        "reference_answers": [
+          "Larkspur Method",
+          "the Larkspur Method"
+        ],
+        "prefill_seconds": 11.111880472999928,
+        "decode_seconds": 0.5633743819998926,
+        "seconds": 11.676516566999908,
+        "peak_memory_allocated_gb": 9.19348736,
+        "peak_memory_reserved_gb": 10.183770112,
+        "answer_repeat_match": true,
+        "timing_samples": [
+          {
+            "seconds": 11.673588550999739,
+            "prefill_seconds": 11.110309056999995,
+            "decode_seconds": 0.5632794939997439,
+            "peak_memory_allocated_gb": 9.19348736,
+            "peak_memory_reserved_gb": 10.183770112
+          },
+          {
+            "seconds": 11.676516566999908,
+            "prefill_seconds": 11.111880472999928,
+            "decode_seconds": 0.5646360939999795,
+            "peak_memory_allocated_gb": 9.19348736,
+            "peak_memory_reserved_gb": 10.183770112
+          },
+          {
+            "seconds": 11.693087897000169,
+            "prefill_seconds": 11.129713515000276,
+            "decode_seconds": 0.5633743819998926,
+            "peak_memory_allocated_gb": 9.19348736,
+            "peak_memory_reserved_gb": 10.183770112
+          }
+        ]
+      },
+      "answers_match": false,
+      "comparison": {
+        "kernel_prefill_speedup": 2.182836875039087,
+        "live_prefill_speedup": 2.0573017155258477,
+        "live_total_speedup": 1.9572839272343345
+      }
+    },
+    {
+      "case_id": "council_larkspur_method",
+      "seq_len": 63947,
+      "requested_length": 64000,
+      "block_size": 64,
+      "needle_block": 897,
+      "teacher_target": "/content/drive/MyDrive/SPRUCE_COLAB/run9_natural/targets/64000/teacher_council_larkspur_method_len63947_blk64_d0.9.pt",
+      "sparse": {
+        "exact": false,
+        "fuzzy": 0.3333333333333333,
+        "answer": " While studying maintenance scheduling, Tomas Ibarra compared 69 entries from the",
+        "needle": "following the pilot review, the regional council adopted the larkspur method as its official procedure for rating wetland restoration proposals.",
+        "reference_answers": [
+          "Larkspur Method",
+          "the Larkspur Method"
+        ],
+        "feature_load_seconds": 0.3709689699999217,
+        "tree_build_seconds": 0.014320322000003216,
+        "tree_traversal_seconds": 0.2956289049998304,
+        "route_pack_seconds": 0.0031635020000067016,
+        "route_transfer_seconds": 0.0,
+        "selector_seconds": 0.3132774029995744,
+        "prefill_seconds": 5.095273793999695,
+        "decode_seconds": 0.5638599909998447,
+        "seconds": 5.659841713999867,
+        "live_prefill_seconds": 5.4085511969992695,
+        "live_total_seconds": 5.973119116999442,
+        "needle_layer_group_hit_rate": 0.1785714328289032,
+        "needle_any_group_all_layers_rate": 0.3571428656578064,
+        "peak_memory_allocated_gb": 9.654603776,
+        "peak_memory_reserved_gb": 10.533994496,
+        "answer_repeat_match": true,
+        "timing_samples": [
+          {
+            "feature_load_seconds": 0.3709689699999217,
+            "tree_build_seconds": 0.014320322000003216,
+            "tree_traversal_seconds": 0.2817955810000967,
+            "route_pack_seconds": 0.002768664999621251,
+            "route_transfer_seconds": 0.0,
+            "selector_seconds": 0.2988845679997212,
+            "needle_layer_group_hit_rate": 0.1785714328289032,
+            "needle_any_group_all_layers_rate": 0.3571428656578064,
+            "seconds": 5.6563815320000685,
+            "prefill_seconds": 5.092521541000224,
+            "decode_seconds": 0.5638599909998447,
+            "peak_memory_allocated_gb": 9.654603776,
+            "peak_memory_reserved_gb": 10.533994496,
+            "live_prefill_seconds": 5.391406108999945,
+            "live_total_seconds": 5.95526609999979
+          },
+          {
+            "feature_load_seconds": 0.3709689699999217,
+            "tree_build_seconds": 0.014289242999893759,
+            "tree_traversal_seconds": 0.2968493240000498,
+            "route_pack_seconds": 0.0031635020000067016,
+            "route_transfer_seconds": 0.0,
+            "selector_seconds": 0.3143020689999503,
+            "needle_layer_group_hit_rate": 0.1785714328289032,
+            "needle_any_group_all_layers_rate": 0.3571428656578064,
+            "seconds": 5.6734795600000325,
+            "prefill_seconds": 5.109669666000173,
+            "decode_seconds": 0.5638098939998599,
+            "peak_memory_allocated_gb": 9.654603776,
+            "peak_memory_reserved_gb": 10.533994496,
+            "live_prefill_seconds": 5.423971735000123,
+            "live_total_seconds": 5.987781628999983
+          },
+          {
+            "feature_load_seconds": 0.3709689699999217,
+            "tree_build_seconds": 0.014366101999712555,
+            "tree_traversal_seconds": 0.2956289049998304,
+            "route_pack_seconds": 0.00328239600003144,
+            "route_transfer_seconds": 0.0,
+            "selector_seconds": 0.3132774029995744,
+            "needle_layer_group_hit_rate": 0.1785714328289032,
+            "needle_any_group_all_layers_rate": 0.3571428656578064,
+            "seconds": 5.659841713999867,
+            "prefill_seconds": 5.095273793999695,
+            "decode_seconds": 0.5645679200001723,
+            "peak_memory_allocated_gb": 9.654603776,
+            "peak_memory_reserved_gb": 10.533994496,
+            "live_prefill_seconds": 5.4085511969992695,
+            "live_total_seconds": 5.973119116999442
+          }
+        ]
+      },
+      "dense": {
+        "exact": true,
+        "fuzzy": 1.0,
+        "answer": " The regional council adopted the Larkspur Method as its official procedure for rating",
+        "needle": "following the pilot review, the regional council adopted the larkspur method as its official procedure for rating wetland restoration proposals.",
+        "reference_answers": [
+          "Larkspur Method",
+          "the Larkspur Method"
+        ],
+        "prefill_seconds": 11.130033720000029,
+        "decode_seconds": 0.5636702359997798,
+        "seconds": 11.693706636000115,
+        "peak_memory_allocated_gb": 9.19348736,
+        "peak_memory_reserved_gb": 10.183770112,
+        "answer_repeat_match": true,
+        "timing_samples": [
+          {
+            "seconds": 11.690941519999797,
+            "prefill_seconds": 11.127271284000017,
+            "decode_seconds": 0.5636702359997798,
+            "peak_memory_allocated_gb": 9.19348736,
+            "peak_memory_reserved_gb": 10.183770112
+          },
+          {
+            "seconds": 11.693706636000115,
+            "prefill_seconds": 11.130033720000029,
+            "decode_seconds": 0.5636729160000868,
+            "peak_memory_allocated_gb": 9.19348736,
+            "peak_memory_reserved_gb": 10.183770112
+          },
+          {
+            "seconds": 11.700669272000141,
+            "prefill_seconds": 11.137435194000318,
+            "decode_seconds": 0.5632340779998231,
+            "peak_memory_allocated_gb": 9.19348736,
+            "peak_memory_reserved_gb": 10.183770112
+          }
+        ]
+      },
+      "answers_match": false,
+      "comparison": {
+        "kernel_prefill_speedup": 2.184383836862113,
+        "live_prefill_speedup": 2.0578586232437086,
+        "live_total_speedup": 1.9577219886206412
+      }
+    },
+    {
+      "case_id": "gallery_reopened_april_1986",
+      "seq_len": 63954,
+      "requested_length": 64000,
+      "block_size": 64,
+      "needle_block": 99,
+      "teacher_target": "/content/drive/MyDrive/SPRUCE_COLAB/run9_natural/targets/64000/teacher_gallery_reopened_april_1986_len63954_blk64_d0.1.pt",
+      "sparse": {
+        "exact": false,
+        "fuzzy": 0.0,
+        "answer": " In 1907, Elias Voss's review of survey methodology in",
+        "needle": "the restoration history records that the eastern gallery reopened to the public on 17 april 1986.",
+        "reference_answers": [
+          "17 April 1986",
+          "April 17 1986",
+          "April 17, 1986"
+        ],
+        "feature_load_seconds": 0.3824219460002496,
+        "tree_build_seconds": 0.014317621999907715,
+        "tree_traversal_seconds": 0.29468222800005606,
+        "route_pack_seconds": 0.0029863280001336534,
+        "route_transfer_seconds": 0.0,
+        "selector_seconds": 0.3119575870000517,
+        "prefill_seconds": 5.10026229999994,
+        "decode_seconds": 0.5642388530000062,
+        "seconds": 5.664399979999871,
+        "live_prefill_seconds": 5.412219886999992,
+        "live_total_seconds": 5.976357566999923,
+        "needle_layer_group_hit_rate": 0.0357142873108387,
+        "needle_any_group_all_layers_rate": 0.0714285746216774,
+        "peak_memory_allocated_gb": 9.655171584,
+        "peak_memory_reserved_gb": 10.533994496,
+        "answer_repeat_match": true,
+        "timing_samples": [
+          {
+            "feature_load_seconds": 0.3824219460002496,
+            "tree_build_seconds": 0.014333748999888485,
+            "tree_traversal_seconds": 0.28091115300003366,
+            "route_pack_seconds": 0.002765876000012213,
+            "route_transfer_seconds": 0.0,
+            "selector_seconds": 0.29801077799993436,
+            "needle_layer_group_hit_rate": 0.0357142873108387,
+            "needle_any_group_all_layers_rate": 0.0714285746216774,
+            "seconds": 5.655259543999819,
+            "prefill_seconds": 5.091020690999812,
+            "decode_seconds": 0.5642388530000062,
+            "peak_memory_allocated_gb": 9.655171584,
+            "peak_memory_reserved_gb": 10.533994496,
+            "live_prefill_seconds": 5.389031468999747,
+            "live_total_seconds": 5.953270321999753
+          },
+          {
+            "feature_load_seconds": 0.3824219460002496,
+            "tree_build_seconds": 0.014289030999862007,
+            "tree_traversal_seconds": 0.29468222800005606,
+            "route_pack_seconds": 0.0029863280001336534,
+            "route_transfer_seconds": 0.0,
+            "selector_seconds": 0.3119575870000517,
+            "needle_layer_group_hit_rate": 0.0357142873108387,
+            "needle_any_group_all_layers_rate": 0.0714285746216774,
+            "seconds": 5.664399979999871,
+            "prefill_seconds": 5.10026229999994,
+            "decode_seconds": 0.5641376799999307,
+            "peak_memory_allocated_gb": 9.655171584,
+            "peak_memory_reserved_gb": 10.533994496,
+            "live_prefill_seconds": 5.412219886999992,
+            "live_total_seconds": 5.976357566999923
+          },
+          {
+            "feature_load_seconds": 0.3824219460002496,
+            "tree_build_seconds": 0.014317621999907715,
+            "tree_traversal_seconds": 0.2967161550000128,
+            "route_pack_seconds": 0.00316677199998594,
+            "route_transfer_seconds": 0.0,
+            "selector_seconds": 0.31420054899990646,
+            "needle_layer_group_hit_rate": 0.0357142873108387,
+            "needle_any_group_all_layers_rate": 0.0714285746216774,
+            "seconds": 5.678045305000069,
+            "prefill_seconds": 5.11366133599995,
+            "decode_seconds": 0.5643839690001187,
+            "peak_memory_allocated_gb": 9.655171584,
+            "peak_memory_reserved_gb": 10.533994496,
+            "live_prefill_seconds": 5.427861884999857,
+            "live_total_seconds": 5.992245853999975
+          }
+        ]
+      },
+      "dense": {
+        "exact": true,
+        "fuzzy": 1.0,
+        "answer": " 17 April 1986. 9 June 19",
+        "needle": "the restoration history records that the eastern gallery reopened to the public on 17 april 1986.",
+        "reference_answers": [
+          "17 April 1986",
+          "April 17 1986",
+          "April 17, 1986"
+        ],
+        "prefill_seconds": 11.124585171000035,
+        "decode_seconds": 0.5640721429999758,
+        "seconds": 11.688209281000127,
+        "peak_memory_allocated_gb": 9.19409664,
+        "peak_memory_reserved_gb": 10.183770112,
+        "answer_repeat_match": true,
+        "timing_samples": [
+          {
+            "seconds": 11.688209281000127,
+            "prefill_seconds": 11.124585171000035,
+            "decode_seconds": 0.5636241100000916,
+            "peak_memory_allocated_gb": 9.19409664,
+            "peak_memory_reserved_gb": 10.183770112
+          },
+          {
+            "seconds": 11.675309759999891,
+            "prefill_seconds": 11.110958822999692,
+            "decode_seconds": 0.5643509370001993,
+            "peak_memory_allocated_gb": 9.19409664,
+            "peak_memory_reserved_gb": 10.183770112
+          },
+          {
+            "seconds": 11.6899406739999,
+            "prefill_seconds": 11.125868530999924,
+            "decode_seconds": 0.5640721429999758,
+            "peak_memory_allocated_gb": 9.19409664,
+            "peak_memory_reserved_gb": 10.183770112
+          }
+        ]
+      },
+      "answers_match": false,
+      "comparison": {
+        "kernel_prefill_speedup": 2.1811790289687973,
+        "live_prefill_speedup": 2.0554569849833695,
+        "live_total_speedup": 1.955741293917844
+      }
+    },
+    {
+      "case_id": "gallery_reopened_april_1986",
+      "seq_len": 63954,
+      "requested_length": 64000,
+      "block_size": 64,
+      "needle_block": 698,
+      "teacher_target": "/content/drive/MyDrive/SPRUCE_COLAB/run9_natural/targets/64000/teacher_gallery_reopened_april_1986_len63954_blk64_d0.7.pt",
+      "sparse": {
+        "exact": false,
+        "fuzzy": 0.0,
+        "answer": " In 1991, Elias Voss's review of habitat migration in",
+        "needle": "the restoration history records that the eastern gallery reopened to the public on 17 april 1986.",
+        "reference_answers": [
+          "17 April 1986",
+          "April 17 1986",
+          "April 17, 1986"
+        ],
+        "feature_load_seconds": 0.38888275599992994,
+        "tree_build_seconds": 0.014320349000172428,
+        "tree_traversal_seconds": 0.2953541619999669,
+        "route_pack_seconds": 0.0031559429999106214,
+        "route_transfer_seconds": 0.0,
+        "selector_seconds": 0.31283045400004994,
+        "prefill_seconds": 5.105906616999619,
+        "decode_seconds": 0.5636702820002029,
+        "seconds": 5.669576898999821,
+        "live_prefill_seconds": 5.420331547999922,
+        "live_total_seconds": 5.985467885000162,
+        "needle_layer_group_hit_rate": 0.0,
+        "needle_any_group_all_layers_rate": 0.0,
+        "peak_memory_allocated_gb": 9.655171584,
+        "peak_memory_reserved_gb": 10.533994496,
+        "answer_repeat_match": true,
+        "timing_samples": [
+          {
+            "feature_load_seconds": 0.38888275599992994,
+            "tree_build_seconds": 0.014313367000340804,
+            "tree_traversal_seconds": 0.2812121450001541,
+            "route_pack_seconds": 0.002798630000143021,
+            "route_transfer_seconds": 0.0,
+            "selector_seconds": 0.29832414200063795,
+            "needle_layer_group_hit_rate": 0.0,
+            "needle_any_group_all_layers_rate": 0.0,
+            "seconds": 5.6567488790001335,
+            "prefill_seconds": 5.093166252000174,
+            "decode_seconds": 0.5635826269999598,
+            "peak_memory_allocated_gb": 9.655171584,
+            "peak_memory_reserved_gb": 10.533994496,
+            "live_prefill_seconds": 5.391490394000812,
+            "live_total_seconds": 5.955073021000771
+          },
+          {
+            "feature_load_seconds": 0.38888275599992994,
+            "tree_build_seconds": 0.014320349000172428,
+            "tree_traversal_seconds": 0.2953541619999669,
+            "route_pack_seconds": 0.0031559429999106214,
+            "route_transfer_seconds": 0.0,
+            "selector_seconds": 0.31283045400004994,
+            "needle_layer_group_hit_rate": 0.0,
+            "needle_any_group_all_layers_rate": 0.0,
+            "seconds": 5.672637431000112,
+            "prefill_seconds": 5.107501093999872,
+            "decode_seconds": 0.56513633700024,
+            "peak_memory_allocated_gb": 9.655171584,
+            "peak_memory_reserved_gb": 10.533994496,
+            "live_prefill_seconds": 5.420331547999922,
+            "live_total_seconds": 5.985467885000162
+          },
+          {
+            "feature_load_seconds": 0.38888275599992994,
+            "tree_build_seconds": 0.014430306000122073,
+            "tree_traversal_seconds": 0.29884823900010815,
+            "route_pack_seconds": 0.003425413000059052,
+            "route_transfer_seconds": 0.0,
+            "selector_seconds": 0.3167039580002893,
+            "needle_layer_group_hit_rate": 0.0,
+            "needle_any_group_all_layers_rate": 0.0,
+            "seconds": 5.669576898999821,
+            "prefill_seconds": 5.105906616999619,
+            "decode_seconds": 0.5636702820002029,
+            "peak_memory_allocated_gb": 9.655171584,
+            "peak_memory_reserved_gb": 10.533994496,
+            "live_prefill_seconds": 5.422610574999908,
+            "live_total_seconds": 5.986280857000111
+          }
+        ]
+      },
+      "dense": {
+        "exact": false,
+        "fuzzy": 0.6666666666666666,
+        "answer": " The eastern gallery reopened to the public on 17 April 198",
+        "needle": "the restoration history records that the eastern gallery reopened to the public on 17 april 1986.",
+        "reference_answers": [
+          "17 April 1986",
+          "April 17 1986",
+          "April 17, 1986"
+        ],
+        "prefill_seconds": 11.12393615200017,
+        "decode_seconds": 0.5647489759999189,
+        "seconds": 11.688551026999903,
+        "peak_memory_allocated_gb": 9.19409664,
+        "peak_memory_reserved_gb": 10.183770112,
+        "answer_repeat_match": true,
+        "timing_samples": [
+          {
+            "seconds": 11.682670207999763,
+            "prefill_seconds": 11.117921231999844,
+            "decode_seconds": 0.5647489759999189,
+            "peak_memory_allocated_gb": 9.19409664,
+            "peak_memory_reserved_gb": 10.183770112
+          },
+          {
+            "seconds": 11.688551026999903,
+            "prefill_seconds": 11.12393615200017,
+            "decode_seconds": 0.5646148749997337,
+            "peak_memory_allocated_gb": 9.19409664,
+            "peak_memory_reserved_gb": 10.183770112
+          },
+          {
+            "seconds": 11.695907120999891,
+            "prefill_seconds": 11.130953983999916,
+            "decode_seconds": 0.564953136999975,
+            "peak_memory_allocated_gb": 9.19409664,
+            "peak_memory_reserved_gb": 10.183770112
+          }
+        ]
+      },
+      "answers_match": false,
+      "comparison": {
+        "kernel_prefill_speedup": 2.178640736390303,
+        "live_prefill_speedup": 2.0522612045945516,
+        "live_total_speedup": 1.9528216091998274
+      }
+    },
+    {
+      "case_id": "gallery_reopened_april_1986",
+      "seq_len": 63954,
+      "requested_length": 64000,
+      "block_size": 64,
+      "needle_block": 898,
+      "teacher_target": "/content/drive/MyDrive/SPRUCE_COLAB/run9_natural/targets/64000/teacher_gallery_reopened_april_1986_len63954_blk64_d0.9.pt",
+      "sparse": {
+        "exact": false,
+        "fuzzy": 0.0,
+        "answer": " In 1977, Elias Voss's review of instrument calibration in",
+        "needle": "the restoration history records that the eastern gallery reopened to the public on 17 april 1986.",
+        "reference_answers": [
+          "17 April 1986",
+          "April 17 1986",
+          "April 17, 1986"
+        ],
+        "feature_load_seconds": 0.3946754549997422,
+        "tree_build_seconds": 0.014311137999811763,
+        "tree_traversal_seconds": 0.2949101819999669,
+        "route_pack_seconds": 0.0031519690001005074,
+        "route_transfer_seconds": 0.0,
+        "selector_seconds": 0.31237328899987915,
+        "prefill_seconds": 5.109953078000217,
+        "decode_seconds": 0.5646698670002479,
+        "seconds": 5.67539112600025,
+        "live_prefill_seconds": 5.425630048000585,
+        "live_total_seconds": 5.9910680960006175,
+        "needle_layer_group_hit_rate": 0.0892857164144516,
+        "needle_any_group_all_layers_rate": 0.1785714328289032,
+        "peak_memory_allocated_gb": 9.655171584,
+        "peak_memory_reserved_gb": 10.533994496,
+        "answer_repeat_match": true,
+        "timing_samples": [
+          {
+            "feature_load_seconds": 0.3946754549997422,
+            "tree_build_seconds": 0.014293920000000071,
+            "tree_traversal_seconds": 0.2798726850001003,
+            "route_pack_seconds": 0.0027990260000478884,
+            "route_transfer_seconds": 0.0,
+            "selector_seconds": 0.2969656310001483,
+            "needle_layer_group_hit_rate": 0.0892857164144516,
+            "needle_any_group_all_layers_rate": 0.1785714328289032,
+            "seconds": 5.672904959999869,
+            "prefill_seconds": 5.108235092999621,
+            "decode_seconds": 0.5646698670002479,
+            "peak_memory_allocated_gb": 9.655171584,
+            "peak_memory_reserved_gb": 10.533994496,
+            "live_prefill_seconds": 5.405200723999769,
+            "live_total_seconds": 5.969870591000017
+          },
+          {
+            "feature_load_seconds": 0.3946754549997422,
+            "tree_build_seconds": 0.014311137999811763,
+            "tree_traversal_seconds": 0.2949101819999669,
+            "route_pack_seconds": 0.0031519690001005074,
+            "route_transfer_seconds": 0.0,
+            "selector_seconds": 0.31237328899987915,
+            "needle_layer_group_hit_rate": 0.0892857164144516,
+            "needle_any_group_all_layers_rate": 0.1785714328289032,
+            "seconds": 5.685052762999931,
+            "prefill_seconds": 5.12102127099979,
+            "decode_seconds": 0.5640314920001401,
+            "peak_memory_allocated_gb": 9.655171584,
+            "peak_memory_reserved_gb": 10.533994496,
+            "live_prefill_seconds": 5.43339455999967,
+            "live_total_seconds": 5.99742605199981
+          },
+          {
+            "feature_load_seconds": 0.3946754549997422,
+            "tree_build_seconds": 0.014321738000035111,
+            "tree_traversal_seconds": 0.29810737400021026,
+            "route_pack_seconds": 0.0032478580001225055,
+            "route_transfer_seconds": 0.0,
+            "selector_seconds": 0.3156769700003679,
+            "needle_layer_group_hit_rate": 0.0892857164144516,
+            "needle_any_group_all_layers_rate": 0.1785714328289032,
+            "seconds": 5.67539112600025,
+            "prefill_seconds": 5.109953078000217,
+            "decode_seconds": 0.5654380480000327,
+            "peak_memory_allocated_gb": 9.655171584,
+            "peak_memory_reserved_gb": 10.533994496,
+            "live_prefill_seconds": 5.425630048000585,
+            "live_total_seconds": 5.9910680960006175
+          }
+        ]
+      },
+      "dense": {
+        "exact": false,
+        "fuzzy": 0.6666666666666666,
+        "answer": " The eastern gallery reopened to the public on 17 April 198",
+        "needle": "the restoration history records that the eastern gallery reopened to the public on 17 april 1986.",
+        "reference_answers": [
+          "17 April 1986",
+          "April 17 1986",
+          "April 17, 1986"
+        ],
+        "prefill_seconds": 11.134675112999957,
+        "decode_seconds": 0.5640559570001642,
+        "seconds": 11.698271002000183,
+        "peak_memory_allocated_gb": 9.19409664,
+        "peak_memory_reserved_gb": 10.183770112,
+        "answer_repeat_match": true,
+        "timing_samples": [
+          {
+            "seconds": 11.698271002000183,
+            "prefill_seconds": 11.134675112999957,
+            "decode_seconds": 0.5635958890002257,
+            "peak_memory_allocated_gb": 9.19409664,
+            "peak_memory_reserved_gb": 10.183770112
+          },
+          {
+            "seconds": 11.705886552000266,
+            "prefill_seconds": 11.141830595000101,
+            "decode_seconds": 0.5640559570001642,
+            "peak_memory_allocated_gb": 9.19409664,
+            "peak_memory_reserved_gb": 10.183770112
+          },
+          {
+            "seconds": 11.694589752999946,
+            "prefill_seconds": 11.130056130999947,
+            "decode_seconds": 0.564533621999999,
+            "peak_memory_allocated_gb": 9.19409664,
+            "peak_memory_reserved_gb": 10.183770112
+          }
+        ]
+      },
+      "answers_match": false,
+      "comparison": {
+        "kernel_prefill_speedup": 2.179017095271943,
+        "live_prefill_speedup": 2.052236332829812,
+        "live_total_speedup": 1.9526186006480968
+      }
+    },
+    {
+      "case_id": "gallery_reopened_april_1986",
+      "seq_len": 63962,
+      "requested_length": 64000,
+      "block_size": 64,
+      "needle_block": 298,
+      "teacher_target": "/content/drive/MyDrive/SPRUCE_COLAB/run9_natural/targets/64000/teacher_gallery_reopened_april_1986_len63962_blk64_d0.3.pt",
+      "sparse": {
+        "exact": false,
+        "fuzzy": 0.0,
+        "answer": " Question: In 1963, Elias Voss's review of habitat",
+        "needle": "the restoration history records that the eastern gallery reopened to the public on 17 april 1986.",
+        "reference_answers": [
+          "17 April 1986",
+          "April 17 1986",
+          "April 17, 1986"
+        ],
+        "feature_load_seconds": 0.385810180000135,
+        "tree_build_seconds": 0.014308592999896064,
+        "tree_traversal_seconds": 0.2931635120003193,
+        "route_pack_seconds": 0.002828469000178302,
+        "route_transfer_seconds": 0.0,
+        "selector_seconds": 0.3103382620006414,
+        "prefill_seconds": 5.102442029000031,
+        "decode_seconds": 0.5641632460001347,
+        "seconds": 5.666605275000165,
+        "live_prefill_seconds": 5.410680943000443,
+        "live_total_seconds": 5.974459087000469,
+        "needle_layer_group_hit_rate": 0.01785714365541935,
+        "needle_any_group_all_layers_rate": 0.0357142873108387,
+        "peak_memory_allocated_gb": 9.659593216,
+        "peak_memory_reserved_gb": 10.533994496,
+        "answer_repeat_match": true,
+        "timing_samples": [
+          {
+            "feature_load_seconds": 0.385810180000135,
+            "tree_build_seconds": 0.014308592999896064,
+            "tree_traversal_seconds": 0.2803325469999436,
+            "route_pack_seconds": 0.0028222779997122416,
+            "route_transfer_seconds": 0.0,
+            "selector_seconds": 0.2974634179995519,
+            "needle_layer_group_hit_rate": 0.01785714365541935,
+            "needle_any_group_all_layers_rate": 0.0357142873108387,
+            "seconds": 5.666605275000165,
+            "prefill_seconds": 5.102442029000031,
+            "decode_seconds": 0.5641632460001347,
+            "peak_memory_allocated_gb": 9.659593216,
+            "peak_memory_reserved_gb": 10.533994496,
+            "live_prefill_seconds": 5.399905446999583,
+            "live_total_seconds": 5.964068692999717
+          },
+          {
+            "feature_load_seconds": 0.385810180000135,
+            "tree_build_seconds": 0.014275375000124768,
+            "tree_traversal_seconds": 0.29585848499982603,
+            "route_pack_seconds": 0.002962868999929924,
+            "route_transfer_seconds": 0.0,
+            "selector_seconds": 0.3130967289998807,
+            "needle_layer_group_hit_rate": 0.01785714365541935,
+            "needle_any_group_all_layers_rate": 0.0357142873108387,
+            "seconds": 5.674421764000272,
+            "prefill_seconds": 5.109253863000049,
+            "decode_seconds": 0.5651679010002226,
+            "peak_memory_allocated_gb": 9.659593216,
+            "peak_memory_reserved_gb": 10.533994496,
+            "live_prefill_seconds": 5.42235059199993,
+            "live_total_seconds": 5.987518493000152
+          },
+          {
+            "feature_load_seconds": 0.385810180000135,
+            "tree_build_seconds": 0.01434628100014379,
+            "tree_traversal_seconds": 0.2931635120003193,
+            "route_pack_seconds": 0.002828469000178302,
+            "route_transfer_seconds": 0.0,
+            "selector_seconds": 0.3103382620006414,
+            "needle_layer_group_hit_rate": 0.01785714365541935,
+            "needle_any_group_all_layers_rate": 0.0357142873108387,
+            "seconds": 5.664120824999827,
+            "prefill_seconds": 5.100342680999802,
+            "decode_seconds": 0.5637781440000253,
+            "peak_memory_allocated_gb": 9.659593216,
+            "peak_memory_reserved_gb": 10.533994496,
+            "live_prefill_seconds": 5.410680943000443,
+            "live_total_seconds": 5.974459087000469
+          }
+        ]
+      },
+      "dense": {
+        "exact": false,
+        "fuzzy": 0.3333333333333333,
+        "answer": " The restoration history records that the eastern gallery reopened to the public on 17",
+        "needle": "the restoration history records that the eastern gallery reopened to the public on 17 april 1986.",
+        "reference_answers": [
+          "17 April 1986",
+          "April 17 1986",
+          "April 17, 1986"
+        ],
+        "prefill_seconds": 11.130157654999948,
+        "decode_seconds": 0.5651232569998683,
+        "seconds": 11.69525695099992,
+        "peak_memory_allocated_gb": 9.19950848,
+        "peak_memory_reserved_gb": 10.183770112,
+        "answer_repeat_match": true,
+        "timing_samples": [
+          {
+            "seconds": 11.69525695099992,
+            "prefill_seconds": 11.131720709000092,
+            "decode_seconds": 0.5635362419998273,
+            "peak_memory_allocated_gb": 9.19950848,
+            "peak_memory_reserved_gb": 10.183770112
+          },
+          {
+            "seconds": 11.695280911999816,
+            "prefill_seconds": 11.130157654999948,
+            "decode_seconds": 0.5651232569998683,
+            "peak_memory_allocated_gb": 9.19950848,
+            "peak_memory_reserved_gb": 10.183770112
+          },
+          {
+            "seconds": 11.683710411999982,
+            "prefill_seconds": 11.118469244999687,
+            "decode_seconds": 0.5652411670002948,
+            "peak_memory_allocated_gb": 9.19950848,
+            "peak_memory_reserved_gb": 10.183770112
+          }
+        ]
+      },
+      "answers_match": false,
+      "comparison": {
+        "kernel_prefill_speedup": 2.1813393649043027,
+        "live_prefill_speedup": 2.0570715169221976,
+        "live_total_speedup": 1.9575423951679665
+      }
+    },
+    {
+      "case_id": "gallery_reopened_april_1986",
+      "seq_len": 63998,
+      "requested_length": 64000,
+      "block_size": 64,
+      "needle_block": 499,
+      "teacher_target": "/content/drive/MyDrive/SPRUCE_COLAB/run9_natural/targets/64000/teacher_gallery_reopened_april_1986_len63998_blk64_d0.5.pt",
+      "sparse": {
+        "exact": false,
+        "fuzzy": 0.0,
+        "answer": " The 1977 account filed by Elias Voss as item 5",
+        "needle": "the restoration history records that the eastern gallery reopened to the public on 17 april 1986.",
+        "reference_answers": [
+          "17 April 1986",
+          "April 17 1986",
+          "April 17, 1986"
+        ],
+        "feature_load_seconds": 0.40518791499971485,
+        "tree_build_seconds": 0.01435620199981713,
+        "tree_traversal_seconds": 0.2934582119996776,
+        "route_pack_seconds": 0.0029954100000395556,
+        "route_transfer_seconds": 0.0,
+        "selector_seconds": 0.31086092399937115,
+        "prefill_seconds": 5.08866312400005,
+        "decode_seconds": 0.565225762999944,
+        "seconds": 5.654482811999969,
+        "live_prefill_seconds": 5.399524047999421,
+        "live_total_seconds": 5.96534373599934,
+        "needle_layer_group_hit_rate": 0.0714285746216774,
+        "needle_any_group_all_layers_rate": 0.1428571492433548,
+        "peak_memory_allocated_gb": 9.659934208,
+        "peak_memory_reserved_gb": 10.533994496,
+        "answer_repeat_match": true,
+        "timing_samples": [
+          {
+            "feature_load_seconds": 0.40518791499971485,
+            "tree_build_seconds": 0.014374804999988555,
+            "tree_traversal_seconds": 0.28013081400013107,
+            "route_pack_seconds": 0.0027487890001793858,
+            "route_transfer_seconds": 0.0,
+            "selector_seconds": 0.297254408000299,
+            "needle_layer_group_hit_rate": 0.0714285746216774,
+            "needle_any_group_all_layers_rate": 0.1428571492433548,
+            "seconds": 5.649638653999773,
+            "prefill_seconds": 5.084412890999829,
+            "decode_seconds": 0.565225762999944,
+            "peak_memory_allocated_gb": 9.659934208,
+            "peak_memory_reserved_gb": 10.533994496,
+            "live_prefill_seconds": 5.381667299000128,
+            "live_total_seconds": 5.946893062000072
+          },
+          {
+            "feature_load_seconds": 0.40518791499971485,
+            "tree_build_seconds": 0.014342363000196201,
+            "tree_traversal_seconds": 0.2945608340000945,
+            "route_pack_seconds": 0.0029954100000395556,
+            "route_transfer_seconds": 0.0,
+            "selector_seconds": 0.31189860700033023,
+            "needle_layer_group_hit_rate": 0.0714285746216774,
+            "needle_any_group_all_layers_rate": 0.1428571492433548,
+            "seconds": 5.658981065000262,
+            "prefill_seconds": 5.094560327000181,
+            "decode_seconds": 0.5644207380000807,
+            "peak_memory_allocated_gb": 9.659934208,
+            "peak_memory_reserved_gb": 10.533994496,
+            "live_prefill_seconds": 5.406458934000511,
+            "live_total_seconds": 5.970879672000592
+          },
+          {
+            "feature_load_seconds": 0.40518791499971485,
+            "tree_build_seconds": 0.01435620199981713,
+            "tree_traversal_seconds": 0.2934582119996776,
+            "route_pack_seconds": 0.0030465099998764344,
+            "route_transfer_seconds": 0.0,
+            "selector_seconds": 0.31086092399937115,
+            "needle_layer_group_hit_rate": 0.0714285746216774,
+            "needle_any_group_all_layers_rate": 0.1428571492433548,
+            "seconds": 5.654482811999969,
+            "prefill_seconds": 5.08866312400005,
+            "decode_seconds": 0.5658196879999196,
+            "peak_memory_allocated_gb": 9.659934208,
+            "peak_memory_reserved_gb": 10.533994496,
+            "live_prefill_seconds": 5.399524047999421,
+            "live_total_seconds": 5.96534373599934
+          }
+        ]
+      },
+      "dense": {
+        "exact": false,
+        "fuzzy": 0.6666666666666666,
+        "answer": " The eastern gallery reopened to the public on 17 April 198",
+        "needle": "the restoration history records that the eastern gallery reopened to the public on 17 april 1986.",
+        "reference_answers": [
+          "17 April 1986",
+          "April 17 1986",
+          "April 17, 1986"
+        ],
+        "prefill_seconds": 11.131642441000167,
+        "decode_seconds": 0.5647126149997348,
+        "seconds": 11.696355055999902,
+        "peak_memory_allocated_gb": 9.19941632,
+        "peak_memory_reserved_gb": 10.183770112,
+        "answer_repeat_match": true,
+        "timing_samples": [
+          {
+            "seconds": 11.683155906000138,
+            "prefill_seconds": 11.118654463999974,
+            "decode_seconds": 0.5645014420001644,
+            "peak_memory_allocated_gb": 9.19941632,
+            "peak_memory_reserved_gb": 10.183770112
+          },
+          {
+            "seconds": 11.696355055999902,
+            "prefill_seconds": 11.131642441000167,
+            "decode_seconds": 0.5647126149997348,
+            "peak_memory_allocated_gb": 9.19941632,
+            "peak_memory_reserved_gb": 10.183770112
+          },
+          {
+            "seconds": 11.711214635000033,
+            "prefill_seconds": 11.144868462999966,
+            "decode_seconds": 0.5663461720000669,
+            "peak_memory_allocated_gb": 9.19941632,
+            "peak_memory_reserved_gb": 10.183770112
+          }
+        ]
+      },
+      "answers_match": false,
+      "comparison": {
+        "kernel_prefill_speedup": 2.1875377028790046,
+        "live_prefill_speedup": 2.061596974482326,
+        "live_total_speedup": 1.9607177010463552
+      }
+    },
+    {
+      "case_id": "observatory_kepler_731",
+      "seq_len": 63939,
+      "requested_length": 64000,
+      "block_size": 64,
+      "needle_block": 697,
+      "teacher_target": "/content/drive/MyDrive/SPRUCE_COLAB/run9_natural/targets/64000/teacher_observatory_kepler_731_len63939_blk64_d0.7.pt",
+      "sparse": {
+        "exact": false,
+        "fuzzy": 0.0,
+        "answer": " Label: \"Newly Reconciled\"\n\nIn 1977,",
+        "needle": "in the consolidated sky survey, the observatory assigned the label kepler field 731 to the newly reconciled northern mosaic.",
+        "reference_answers": [
+          "Kepler Field 731"
+        ],
+        "feature_load_seconds": 0.3968034759996044,
+        "tree_build_seconds": 0.014354986999933317,
+        "tree_traversal_seconds": 0.29579633499997726,
+        "route_pack_seconds": 0.0030410419999498117,
+        "route_transfer_seconds": 0.0,
+        "selector_seconds": 0.313199184000041,
+        "prefill_seconds": 5.092485958999987,
+        "decode_seconds": 0.5642199029998665,
+        "seconds": 5.656523359999937,
+        "live_prefill_seconds": 5.403960841999833,
+        "live_total_seconds": 5.9681807449996995,
+        "needle_layer_group_hit_rate": 0.0714285746216774,
+        "needle_any_group_all_layers_rate": 0.1428571492433548,
+        "peak_memory_allocated_gb": 9.65395456,
+        "peak_memory_reserved_gb": 10.533994496,
+        "answer_repeat_match": true,
+        "timing_samples": [
+          {
+            "feature_load_seconds": 0.3968034759996044,
+            "tree_build_seconds": 0.014354986999933317,
+            "tree_traversal_seconds": 0.2812042959999417,
+            "route_pack_seconds": 0.002843622000000323,
+            "route_transfer_seconds": 0.0,
+            "selector_seconds": 0.2984029049998753,
+            "needle_layer_group_hit_rate": 0.0714285746216774,
+            "needle_any_group_all_layers_rate": 0.1428571492433548,
+            "seconds": 5.656523359999937,
+            "prefill_seconds": 5.092485958999987,
+            "decode_seconds": 0.5640374009999505,
+            "peak_memory_allocated_gb": 9.65395456,
+            "peak_memory_reserved_gb": 10.533994496,
+            "live_prefill_seconds": 5.390888863999862,
+            "live_total_seconds": 5.954926264999813
+          },
+          {
+            "feature_load_seconds": 0.3968034759996044,
+            "tree_build_seconds": 0.01430757399975846,
+            "tree_traversal_seconds": 0.29579633499997726,
+            "route_pack_seconds": 0.0030952750003052643,
+            "route_transfer_seconds": 0.0,
+            "selector_seconds": 0.313199184000041,
+            "needle_layer_group_hit_rate": 0.0714285746216774,
+            "needle_any_group_all_layers_rate": 0.1428571492433548,
+            "seconds": 5.6549815609996585,
+            "prefill_seconds": 5.090761657999792,
+            "decode_seconds": 0.5642199029998665,
+            "peak_memory_allocated_gb": 9.65395456,
+            "peak_memory_reserved_gb": 10.533994496,
+            "live_prefill_seconds": 5.403960841999833,
+            "live_total_seconds": 5.9681807449996995
+          },
+          {
+            "feature_load_seconds": 0.3968034759996044,
+            "tree_build_seconds": 0.014385795000180224,
+            "tree_traversal_seconds": 0.29580249499986166,
+            "route_pack_seconds": 0.0030410419999498117,
+            "route_transfer_seconds": 0.0,
+            "selector_seconds": 0.3132293319999917,
+            "needle_layer_group_hit_rate": 0.0714285746216774,
+            "needle_any_group_all_layers_rate": 0.1428571492433548,
+            "seconds": 5.659145788999922,
+            "prefill_seconds": 5.094625376999829,
+            "decode_seconds": 0.5645204120000926,
+            "peak_memory_allocated_gb": 9.65395456,
+            "peak_memory_reserved_gb": 10.533994496,
+            "live_prefill_seconds": 5.407854708999821,
+            "live_total_seconds": 5.972375120999914
+          }
+        ]
+      },
+      "dense": {
+        "exact": false,
+        "fuzzy": 0.6666666666666666,
+        "answer": " Kepler Field 713 identifies a southern calibration strip observed during the previous survey",
+        "needle": "in the consolidated sky survey, the observatory assigned the label kepler field 731 to the newly reconciled northern mosaic.",
+        "reference_answers": [
+          "Kepler Field 731"
+        ],
+        "prefill_seconds": 11.146287564999966,
+        "decode_seconds": 0.5649394649999522,
+        "seconds": 11.71074568799986,
+        "peak_memory_allocated_gb": 9.19279104,
+        "peak_memory_reserved_gb": 10.183770112,
+        "answer_repeat_match": true,
+        "timing_samples": [
+          {
+            "seconds": 11.69315126499987,
+            "prefill_seconds": 11.128211799999917,
+            "decode_seconds": 0.5649394649999522,
+            "peak_memory_allocated_gb": 9.19279104,
+            "peak_memory_reserved_gb": 10.183770112
+          },
+          {
+            "seconds": 11.714753916999598,
+            "prefill_seconds": 11.147447387999819,
+            "decode_seconds": 0.5673065289997794,
+            "peak_memory_allocated_gb": 9.19279104,
+            "peak_memory_reserved_gb": 10.183770112
+          },
+          {
+            "seconds": 11.71074568799986,
+            "prefill_seconds": 11.146287564999966,
+            "decode_seconds": 0.5644581229998948,
+            "peak_memory_allocated_gb": 9.19279104,
+            "peak_memory_reserved_gb": 10.183770112
+          }
+        ]
+      },
+      "answers_match": false,
+      "comparison": {
+        "kernel_prefill_speedup": 2.1887713888147404,
+        "live_prefill_speedup": 2.062614421327872,
+        "live_total_speedup": 1.9621968885261116
+      }
+    },
+    {
+      "case_id": "observatory_kepler_731",
+      "seq_len": 63939,
+      "requested_length": 64000,
+      "block_size": 64,
+      "needle_block": 897,
+      "teacher_target": "/content/drive/MyDrive/SPRUCE_COLAB/run9_natural/targets/64000/teacher_observatory_kepler_731_len63939_blk64_d0.9.pt",
+      "sparse": {
+        "exact": false,
+        "fuzzy": 0.0,
+        "answer": " The label is \"newly reconciled northern mosaic.\"\n\nIn 197",
+        "needle": "in the consolidated sky survey, the observatory assigned the label kepler field 731 to the newly reconciled northern mosaic.",
+        "reference_answers": [
+          "Kepler Field 731"
+        ],
+        "feature_load_seconds": 0.37911437200000364,
+        "tree_build_seconds": 0.014331075999962195,
+        "tree_traversal_seconds": 0.29483141299988347,
+        "route_pack_seconds": 0.002944737000234454,
+        "route_transfer_seconds": 0.0,
+        "selector_seconds": 0.31222250999962853,
+        "prefill_seconds": 5.100564894999934,
+        "decode_seconds": 0.564100789999884,
+        "seconds": 5.664665684999818,
+        "live_prefill_seconds": 5.412787404999563,
+        "live_total_seconds": 5.976888194999447,
+        "needle_layer_group_hit_rate": 0.25,
+        "needle_any_group_all_layers_rate": 0.3214285969734192,
+        "peak_memory_allocated_gb": 9.65395456,
+        "peak_memory_reserved_gb": 10.533994496,
+        "answer_repeat_match": true,
+        "timing_samples": [
+          {
+            "feature_load_seconds": 0.37911437200000364,
+            "tree_build_seconds": 0.014344869000069593,
+            "tree_traversal_seconds": 0.2807848429997648,
+            "route_pack_seconds": 0.002778936000140675,
+            "route_transfer_seconds": 0.0,
+            "selector_seconds": 0.2979086479999751,
+            "needle_layer_group_hit_rate": 0.25,
+            "needle_any_group_all_layers_rate": 0.3214285969734192,
+            "seconds": 5.651973106999776,
+            "prefill_seconds": 5.088476566999816,
+            "decode_seconds": 0.5634965399999601,
+            "peak_memory_allocated_gb": 9.65395456,
+            "peak_memory_reserved_gb": 10.533994496,
+            "live_prefill_seconds": 5.386385214999791,
+            "live_total_seconds": 5.949881754999751
+          },
+          {
+            "feature_load_seconds": 0.37911437200000364,
+            "tree_build_seconds": 0.014331075999962195,
+            "tree_traversal_seconds": 0.2950787989998389,
+            "route_pack_seconds": 0.002944737000234454,
+            "route_transfer_seconds": 0.0,
+            "selector_seconds": 0.31235461200003556,
+            "needle_layer_group_hit_rate": 0.25,
+            "needle_any_group_all_layers_rate": 0.3214285969734192,
+            "seconds": 5.6776839260001,
+            "prefill_seconds": 5.1132929870000225,
+            "decode_seconds": 0.5643909390000772,
+            "peak_memory_allocated_gb": 9.65395456,
+            "peak_memory_reserved_gb": 10.533994496,
+            "live_prefill_seconds": 5.425647599000058,
+            "live_total_seconds": 5.990038538000135
+          },
+          {
+            "feature_load_seconds": 0.37911437200000364,
+            "tree_build_seconds": 0.014314657999875635,
+            "tree_traversal_seconds": 0.29483141299988347,
+            "route_pack_seconds": 0.003076438999869424,
+            "route_transfer_seconds": 0.0,
+            "selector_seconds": 0.31222250999962853,
+            "needle_layer_group_hit_rate": 0.25,
+            "needle_any_group_all_layers_rate": 0.3214285969734192,
+            "seconds": 5.664665684999818,
+            "prefill_seconds": 5.100564894999934,
+            "decode_seconds": 0.564100789999884,
+            "peak_memory_allocated_gb": 9.65395456,
+            "peak_memory_reserved_gb": 10.533994496,
+            "live_prefill_seconds": 5.412787404999563,
+            "live_total_seconds": 5.976888194999447
+          }
+        ]
+      },
+      "dense": {
+        "exact": true,
+        "fuzzy": 1.0,
+        "answer": " Kepler Field 731\nTo determine the label assigned to the newly reconc",
+        "needle": "in the consolidated sky survey, the observatory assigned the label kepler field 731 to the newly reconciled northern mosaic.",
+        "reference_answers": [
+          "Kepler Field 731"
+        ],
+        "prefill_seconds": 11.128951196000344,
+        "decode_seconds": 0.5646830190003129,
+        "seconds": 11.694362579000426,
+        "peak_memory_allocated_gb": 9.19279104,
+        "peak_memory_reserved_gb": 10.183770112,
+        "answer_repeat_match": true,
+        "timing_samples": [
+          {
+            "seconds": 11.679666550000093,
+            "prefill_seconds": 11.11498353099978,
+            "decode_seconds": 0.5646830190003129,
+            "peak_memory_allocated_gb": 9.19279104,
+            "peak_memory_reserved_gb": 10.183770112
+          },
+          {
+            "seconds": 11.70993799200005,
+            "prefill_seconds": 11.145895175000078,
+            "decode_seconds": 0.5640428169999723,
+            "peak_memory_allocated_gb": 9.19279104,
+            "peak_memory_reserved_gb": 10.183770112
+          },
+          {
+            "seconds": 11.694362579000426,
+            "prefill_seconds": 11.128951196000344,
+            "decode_seconds": 0.5654113830000824,
+            "peak_memory_allocated_gb": 9.19279104,
+            "peak_memory_reserved_gb": 10.183770112
+          }
+        ]
+      },
+      "answers_match": false,
+      "comparison": {
+        "kernel_prefill_speedup": 2.1819056173385847,
+        "live_prefill_speedup": 2.0560480882217917,
+        "live_total_speedup": 1.9565971785760514
+      }
+    },
+    {
+      "case_id": "observatory_kepler_731",
+      "seq_len": 63998,
+      "requested_length": 64000,
+      "block_size": 64,
+      "needle_block": 299,
+      "teacher_target": "/content/drive/MyDrive/SPRUCE_COLAB/run9_natural/targets/64000/teacher_observatory_kepler_731_len63998_blk64_d0.3.pt",
+      "sparse": {
+        "exact": false,
+        "fuzzy": 0.0,
+        "answer": " Label: Northern Mosaic\n\nIn 2005, Marek Silva",
+        "needle": "in the consolidated sky survey, the observatory assigned the label kepler field 731 to the newly reconciled northern mosaic.",
+        "reference_answers": [
+          "Kepler Field 731"
+        ],
+        "feature_load_seconds": 0.3875466729996333,
+        "tree_build_seconds": 0.014348894000249857,
+        "tree_traversal_seconds": 0.29496867499983637,
+        "route_pack_seconds": 0.002998324999680335,
+        "route_transfer_seconds": 0.0,
+        "selector_seconds": 0.3124023249997663,
+        "prefill_seconds": 5.1023724120000225,
+        "decode_seconds": 0.564314184000068,
+        "seconds": 5.665907456000241,
+        "live_prefill_seconds": 5.40834340299989,
+        "live_total_seconds": 5.973527400999501,
+        "needle_layer_group_hit_rate": 0.01785714365541935,
+        "needle_any_group_all_layers_rate": 0.0357142873108387,
+        "peak_memory_allocated_gb": 9.659934208,
+        "peak_memory_reserved_gb": 10.533994496,
+        "answer_repeat_match": true,
+        "timing_samples": [
+          {
+            "feature_load_seconds": 0.3875466729996333,
+            "tree_build_seconds": 0.01432810000005702,
+            "tree_traversal_seconds": 0.2814413370001603,
+            "route_pack_seconds": 0.002840483999989374,
+            "route_transfer_seconds": 0.0,
+            "selector_seconds": 0.29860992100020667,
+            "needle_layer_group_hit_rate": 0.01785714365541935,
+            "needle_any_group_all_layers_rate": 0.0357142873108387,
+            "seconds": 5.665907456000241,
+            "prefill_seconds": 5.1023724120000225,
+            "decode_seconds": 0.5635350440002185,
+            "peak_memory_allocated_gb": 9.659934208,
+            "peak_memory_reserved_gb": 10.533994496,
+            "live_prefill_seconds": 5.400982333000229,
+            "live_total_seconds": 5.964517377000448
+          },
+          {
+            "feature_load_seconds": 0.3875466729996333,
+            "tree_build_seconds": 0.014348894000249857,
+            "tree_traversal_seconds": 0.29590912999992725,
+            "route_pack_seconds": 0.002998324999680335,
+            "route_transfer_seconds": 0.0,
+            "selector_seconds": 0.31325634899985744,
+            "needle_layer_group_hit_rate": 0.01785714365541935,
+            "needle_any_group_all_layers_rate": 0.0357142873108387,
+            "seconds": 5.6602710519996435,
+            "prefill_seconds": 5.095087054000032,
+            "decode_seconds": 0.5651839979996112,
+            "peak_memory_allocated_gb": 9.659934208,
+            "peak_memory_reserved_gb": 10.533994496,
+            "live_prefill_seconds": 5.40834340299989,
+            "live_total_seconds": 5.973527400999501
+          },
+          {
+            "feature_load_seconds": 0.3875466729996333,
+            "tree_build_seconds": 0.014373272999819164,
+            "tree_traversal_seconds": 0.29496867499983637,
+            "route_pack_seconds": 0.0030603770001107478,
+            "route_transfer_seconds": 0.0,
+            "selector_seconds": 0.3124023249997663,
+            "needle_layer_group_hit_rate": 0.01785714365541935,
+            "needle_any_group_all_layers_rate": 0.0357142873108387,
+            "seconds": 5.669286776999797,
+            "prefill_seconds": 5.104972592999729,
+            "decode_seconds": 0.564314184000068,
+            "peak_memory_allocated_gb": 9.659934208,
+            "peak_memory_reserved_gb": 10.533994496,
+            "live_prefill_seconds": 5.417374917999496,
+            "live_total_seconds": 5.981689101999564
+          }
+        ]
+      },
+      "dense": {
+        "exact": true,
+        "fuzzy": 1.0,
+        "answer": " Kepler Field 731\nTo determine the label assigned to the newly reconc",
+        "needle": "in the consolidated sky survey, the observatory assigned the label kepler field 731 to the newly reconciled northern mosaic.",
+        "reference_answers": [
+          "Kepler Field 731"
+        ],
+        "prefill_seconds": 11.139666671000214,
+        "decode_seconds": 0.5647841959998914,
+        "seconds": 11.703928495000127,
+        "peak_memory_allocated_gb": 9.19941632,
+        "peak_memory_reserved_gb": 10.183770112,
+        "answer_repeat_match": true,
+        "timing_samples": [
+          {
+            "seconds": 11.71423821899998,
+            "prefill_seconds": 11.149206930999753,
+            "decode_seconds": 0.5650312880002275,
+            "peak_memory_allocated_gb": 9.19941632,
+            "peak_memory_reserved_gb": 10.183770112
+          },
+          {
+            "seconds": 11.69186878399978,
+            "prefill_seconds": 11.127084587999889,
+            "decode_seconds": 0.5647841959998914,
+            "peak_memory_allocated_gb": 9.19941632,
+            "peak_memory_reserved_gb": 10.183770112
+          },
+          {
+            "seconds": 11.703928495000127,
+            "prefill_seconds": 11.139666671000214,
+            "decode_seconds": 0.5642618239999138,
+            "peak_memory_allocated_gb": 9.19941632,
+            "peak_memory_reserved_gb": 10.183770112
+          }
+        ]
+      },
+      "answers_match": false,
+      "comparison": {
+        "kernel_prefill_speedup": 2.183232773209845,
+        "live_prefill_speedup": 2.0597188160835507,
+        "live_total_speedup": 1.9592993736065907
+      }
+    },
+    {
+      "case_id": "observatory_kepler_731",
+      "seq_len": 63999,
+      "requested_length": 64000,
+      "block_size": 64,
+      "needle_block": 99,
+      "teacher_target": "/content/drive/MyDrive/SPRUCE_COLAB/run9_natural/targets/64000/teacher_observatory_kepler_731_len63999_blk64_d0.1.pt",
+      "sparse": {
+        "exact": false,
+        "fuzzy": 0.0,
+        "answer": " The label is \"newly reconciled\". Jonas Reed returned to the municipal workshop",
+        "needle": "in the consolidated sky survey, the observatory assigned the label kepler field 731 to the newly reconciled northern mosaic.",
+        "reference_answers": [
+          "Kepler Field 731"
+        ],
+        "feature_load_seconds": 0.42862907800008543,
+        "tree_build_seconds": 0.014353218999985984,
+        "tree_traversal_seconds": 0.29470178700012184,
+        "route_pack_seconds": 0.0029128390001460502,
+        "route_transfer_seconds": 0.0,
+        "selector_seconds": 0.3120459250003478,
+        "prefill_seconds": 5.1009261029998925,
+        "decode_seconds": 0.5637439370002539,
+        "seconds": 5.664670040000146,
+        "live_prefill_seconds": 5.413464596000267,
+        "live_total_seconds": 5.977208533000521,
+        "needle_layer_group_hit_rate": 0.0357142873108387,
+        "needle_any_group_all_layers_rate": 0.0714285746216774,
+        "peak_memory_allocated_gb": 9.659943936,
+        "peak_memory_reserved_gb": 10.533994496,
+        "answer_repeat_match": true,
+        "timing_samples": [
+          {
+            "feature_load_seconds": 0.42862907800008543,
+            "tree_build_seconds": 0.01451114499968753,
+            "tree_traversal_seconds": 0.28026800599991475,
+            "route_pack_seconds": 0.002899930000239692,
+            "route_transfer_seconds": 0.0,
+            "selector_seconds": 0.29767908099984197,
+            "needle_layer_group_hit_rate": 0.0357142873108387,
+            "needle_any_group_all_layers_rate": 0.0714285746216774,
+            "seconds": 5.655412690000048,
+            "prefill_seconds": 5.091404349000186,
+            "decode_seconds": 0.5640083409998624,
+            "peak_memory_allocated_gb": 9.659943936,
+            "peak_memory_reserved_gb": 10.533994496,
+            "live_prefill_seconds": 5.389083430000028,
+            "live_total_seconds": 5.95309177099989
+          },
+          {
+            "feature_load_seconds": 0.42862907800008543,
+            "tree_build_seconds": 0.014322080000056303,
+            "tree_traversal_seconds": 0.29470178700012184,
+            "route_pack_seconds": 0.003022058000169636,
+            "route_transfer_seconds": 0.0,
+            "selector_seconds": 0.3120459250003478,
+            "needle_layer_group_hit_rate": 0.0357142873108387,
+            "needle_any_group_all_layers_rate": 0.0714285746216774,
+            "seconds": 5.665723226999944,
+            "prefill_seconds": 5.102131290000216,
+            "decode_seconds": 0.5635919369997282,
+            "peak_memory_allocated_gb": 9.659943936,
+            "peak_memory_reserved_gb": 10.533994496,
+            "live_prefill_seconds": 5.414177215000564,
+            "live_total_seconds": 5.977769152000292
+          },
+          {
+            "feature_load_seconds": 0.42862907800008543,
+            "tree_build_seconds": 0.014353218999985984,
+            "tree_traversal_seconds": 0.2952724350002427,
+            "route_pack_seconds": 0.0029128390001460502,
+            "route_transfer_seconds": 0.0,
+            "selector_seconds": 0.31253849300037473,
+            "needle_layer_group_hit_rate": 0.0357142873108387,
+            "needle_any_group_all_layers_rate": 0.0714285746216774,
+            "seconds": 5.664670040000146,
+            "prefill_seconds": 5.1009261029998925,
+            "decode_seconds": 0.5637439370002539,
+            "peak_memory_allocated_gb": 9.659943936,
+            "peak_memory_reserved_gb": 10.533994496,
+            "live_prefill_seconds": 5.413464596000267,
+            "live_total_seconds": 5.977208533000521
+          }
+        ]
+      },
+      "dense": {
+        "exact": false,
+        "fuzzy": 0.0,
+        "answer": " To determine the label assigned to the newly reconciled northern mosaic, let's analyze",
+        "needle": "in the consolidated sky survey, the observatory assigned the label kepler field 731 to the newly reconciled northern mosaic.",
+        "reference_answers": [
+          "Kepler Field 731"
+        ],
+        "prefill_seconds": 11.126301445000081,
+        "decode_seconds": 0.56433985700005,
+        "seconds": 11.690613687000223,
+        "peak_memory_allocated_gb": 9.19941376,
+        "peak_memory_reserved_gb": 10.183770112,
+        "answer_repeat_match": true,
+        "timing_samples": [
+          {
+            "seconds": 11.688429205000375,
+            "prefill_seconds": 11.124089348000325,
+            "decode_seconds": 0.56433985700005,
+            "peak_memory_allocated_gb": 9.19941376,
+            "peak_memory_reserved_gb": 10.183770112
+          },
+          {
+            "seconds": 11.690613687000223,
+            "prefill_seconds": 11.126301445000081,
+            "decode_seconds": 0.5643122420001419,
+            "peak_memory_allocated_gb": 9.19941376,
+            "peak_memory_reserved_gb": 10.183770112
+          },
+          {
+            "seconds": 11.697577765000005,
+            "prefill_seconds": 11.132931175000067,
+            "decode_seconds": 0.5646465899999384,
+            "peak_memory_allocated_gb": 9.19941376,
+            "peak_memory_reserved_gb": 10.183770112
+          }
+        ]
+      },
+      "answers_match": false,
+      "comparison": {
+        "kernel_prefill_speedup": 2.181231647025159,
+        "live_prefill_speedup": 2.0553014151456237,
+        "live_total_speedup": 1.955865120391175
+      }
+    },
+    {
+      "case_id": "observatory_kepler_731",
+      "seq_len": 63999,
+      "requested_length": 64000,
+      "block_size": 64,
+      "needle_block": 499,
+      "teacher_target": "/content/drive/MyDrive/SPRUCE_COLAB/run9_natural/targets/64000/teacher_observatory_kepler_731_len63999_blk64_d0.5.pt",
+      "sparse": {
+        "exact": false,
+        "fuzzy": 0.0,
+        "answer": " The label is \"newly reconciled\". While studying restoration planning, Jonas Reed",
+        "needle": "in the consolidated sky survey, the observatory assigned the label kepler field 731 to the newly reconciled northern mosaic.",
+        "reference_answers": [
+          "Kepler Field 731"
+        ],
+        "feature_load_seconds": 0.38172103100032473,
+        "tree_build_seconds": 0.014329894999718817,
+        "tree_traversal_seconds": 0.2911599760000172,
+        "route_pack_seconds": 0.00294969000015044,
+        "route_transfer_seconds": 0.0,
+        "selector_seconds": 0.30843956099988645,
+        "prefill_seconds": 5.092108426000323,
+        "decode_seconds": 0.5644947050000155,
+        "seconds": 5.657101881000017,
+        "live_prefill_seconds": 5.39817716799962,
+        "live_total_seconds": 5.962299447999612,
+        "needle_layer_group_hit_rate": 0.0892857164144516,
+        "needle_any_group_all_layers_rate": 0.1785714328289032,
+        "peak_memory_allocated_gb": 9.659943936,
+        "peak_memory_reserved_gb": 10.533994496,
+        "answer_repeat_match": true,
+        "timing_samples": [
+          {
+            "feature_load_seconds": 0.38172103100032473,
+            "tree_build_seconds": 0.014344438000080117,
+            "tree_traversal_seconds": 0.2800945369999681,
+            "route_pack_seconds": 0.0027527180000106455,
+            "route_transfer_seconds": 0.0,
+            "selector_seconds": 0.2971916930000589,
+            "needle_layer_group_hit_rate": 0.0892857164144516,
+            "needle_any_group_all_layers_rate": 0.1785714328289032,
+            "seconds": 5.657101881000017,
+            "prefill_seconds": 5.092108426000323,
+            "decode_seconds": 0.5649934549996942,
+            "peak_memory_allocated_gb": 9.659943936,
+            "peak_memory_reserved_gb": 10.533994496,
+            "live_prefill_seconds": 5.3893001190003815,
+            "live_total_seconds": 5.954293574000076
+          },
+          {
+            "feature_load_seconds": 0.38172103100032473,
+            "tree_build_seconds": 0.014329894999718817,
+            "tree_traversal_seconds": 0.2911599760000172,
+            "route_pack_seconds": 0.00294969000015044,
+            "route_transfer_seconds": 0.0,
+            "selector_seconds": 0.30843956099988645,
+            "needle_layer_group_hit_rate": 0.0892857164144516,
+            "needle_any_group_all_layers_rate": 0.1785714328289032,
+            "seconds": 5.653859886999726,
+            "prefill_seconds": 5.0897376069997335,
+            "decode_seconds": 0.5641222799999923,
+            "peak_memory_allocated_gb": 9.659943936,
+            "peak_memory_reserved_gb": 10.533994496,
+            "live_prefill_seconds": 5.39817716799962,
+            "live_total_seconds": 5.962299447999612
+          },
+          {
+            "feature_load_seconds": 0.38172103100032473,
+            "tree_build_seconds": 0.014287096999851201,
+            "tree_traversal_seconds": 0.29487170900029014,
+            "route_pack_seconds": 0.0030104519996712042,
+            "route_transfer_seconds": 0.0,
+            "selector_seconds": 0.31216925799981254,
+            "needle_layer_group_hit_rate": 0.0892857164144516,
+            "needle_any_group_all_layers_rate": 0.1785714328289032,
+            "seconds": 5.663763680999637,
+            "prefill_seconds": 5.099268975999621,
+            "decode_seconds": 0.5644947050000155,
+            "peak_memory_allocated_gb": 9.659943936,
+            "peak_memory_reserved_gb": 10.533994496,
+            "live_prefill_seconds": 5.411438233999434,
+            "live_total_seconds": 5.975932938999449
+          }
+        ]
+      },
+      "dense": {
+        "exact": false,
+        "fuzzy": 0.6666666666666666,
+        "answer": " Kepler Field 713\nTo determine the label assigned to the newly reconc",
+        "needle": "in the consolidated sky survey, the observatory assigned the label kepler field 731 to the newly reconciled northern mosaic.",
+        "reference_answers": [
+          "Kepler Field 731"
+        ],
+        "prefill_seconds": 11.135129651999705,
+        "decode_seconds": 0.5655952279998928,
+        "seconds": 11.700724879999598,
+        "peak_memory_allocated_gb": 9.19941376,
+        "peak_memory_reserved_gb": 10.183770112,
+        "answer_repeat_match": true,
+        "timing_samples": [
+          {
+            "seconds": 11.689877503999924,
+            "prefill_seconds": 11.124938282999665,
+            "decode_seconds": 0.5649392210002588,
+            "peak_memory_allocated_gb": 9.19941376,
+            "peak_memory_reserved_gb": 10.183770112
+          },
+          {
+            "seconds": 11.708790534999935,
+            "prefill_seconds": 11.14264901300021,
+            "decode_seconds": 0.5661415219997252,
+            "peak_memory_allocated_gb": 9.19941376,
+            "peak_memory_reserved_gb": 10.183770112
+          },
+          {
+            "seconds": 11.700724879999598,
+            "prefill_seconds": 11.135129651999705,
+            "decode_seconds": 0.5655952279998928,
+            "peak_memory_allocated_gb": 9.19941376,
+            "peak_memory_reserved_gb": 10.183770112
+          }
+        ]
+      },
+      "answers_match": false,
+      "comparison": {
+        "kernel_prefill_speedup": 2.186742449383775,
+        "live_prefill_speedup": 2.0627573540951425,
+        "live_total_speedup": 1.9624517322633404
+      }
+    },
+    {
+      "case_id": "turbine_alloy_k47",
+      "seq_len": 63955,
+      "requested_length": 64000,
+      "block_size": 64,
+      "needle_block": 99,
+      "teacher_target": "/content/drive/MyDrive/SPRUCE_COLAB/run9_natural/targets/64000/teacher_turbine_alloy_k47_len63955_blk64_d0.1.pt",
+      "sparse": {
+        "exact": false,
+        "fuzzy": 0.0,
+        "answer": " Priya Nordin returned to the upland farms in 1910",
+        "needle": "final calibration records specify alloy k-47 for the turbine's replacement bearing sleeve.",
+        "reference_answers": [
+          "K-47",
+          "K47"
+        ],
+        "feature_load_seconds": 0.3813992039999903,
+        "tree_build_seconds": 0.014335647999814682,
+        "tree_traversal_seconds": 0.2949236940003175,
+        "route_pack_seconds": 0.003144913000141969,
+        "route_transfer_seconds": 0.0,
+        "selector_seconds": 0.3123848010004622,
+        "prefill_seconds": 5.090992735000327,
+        "decode_seconds": 0.5640312470000026,
+        "seconds": 5.65479243100026,
+        "live_prefill_seconds": 5.400946104000468,
+        "live_total_seconds": 5.964977351000471,
+        "needle_layer_group_hit_rate": 0.01785714365541935,
+        "needle_any_group_all_layers_rate": 0.0357142873108387,
+        "peak_memory_allocated_gb": 9.655252992,
+        "peak_memory_reserved_gb": 10.533994496,
+        "answer_repeat_match": true,
+        "timing_samples": [
+          {
+            "feature_load_seconds": 0.3813992039999903,
+            "tree_build_seconds": 0.01439140899992708,
+            "tree_traversal_seconds": 0.2811255879996679,
+            "route_pack_seconds": 0.002870277000056376,
+            "route_transfer_seconds": 0.0,
+            "selector_seconds": 0.29838727399965137,
+            "needle_layer_group_hit_rate": 0.01785714365541935,
+            "needle_any_group_all_layers_rate": 0.0357142873108387,
+            "seconds": 5.65479243100026,
+            "prefill_seconds": 5.090992735000327,
+            "decode_seconds": 0.5637996959999327,
+            "peak_memory_allocated_gb": 9.655252992,
+            "peak_memory_reserved_gb": 10.533994496,
+            "live_prefill_seconds": 5.389380008999979,
+            "live_total_seconds": 5.953179704999911
+          },
+          {
+            "feature_load_seconds": 0.3813992039999903,
+            "tree_build_seconds": 0.014316194000002724,
+            "tree_traversal_seconds": 0.2949236940003175,
+            "route_pack_seconds": 0.003144913000141969,
+            "route_transfer_seconds": 0.0,
+            "selector_seconds": 0.3123848010004622,
+            "needle_layer_group_hit_rate": 0.01785714365541935,
+            "needle_any_group_all_layers_rate": 0.0357142873108387,
+            "seconds": 5.6525925500000085,
+            "prefill_seconds": 5.088561303000006,
+            "decode_seconds": 0.5640312470000026,
+            "peak_memory_allocated_gb": 9.655252992,
+            "peak_memory_reserved_gb": 10.533994496,
+            "live_prefill_seconds": 5.400946104000468,
+            "live_total_seconds": 5.964977351000471
+          },
+          {
+            "feature_load_seconds": 0.3813992039999903,
+            "tree_build_seconds": 0.014335647999814682,
+            "tree_traversal_seconds": 0.295876428000156,
+            "route_pack_seconds": 0.0031543939999210124,
+            "route_transfer_seconds": 0.0,
+            "selector_seconds": 0.3133664699998917,
+            "needle_layer_group_hit_rate": 0.01785714365541935,
+            "needle_any_group_all_layers_rate": 0.0357142873108387,
+            "seconds": 5.66359299800024,
+            "prefill_seconds": 5.098806715000137,
+            "decode_seconds": 0.5647862830001031,
+            "peak_memory_allocated_gb": 9.655252992,
+            "peak_memory_reserved_gb": 10.533994496,
+            "live_prefill_seconds": 5.412173185000029,
+            "live_total_seconds": 5.976959468000132
+          }
+        ]
+      },
+      "dense": {
+        "exact": false,
+        "fuzzy": 0.0,
+        "answer": " To answer this question, I need to look at the information provided in the text",
+        "needle": "final calibration records specify alloy k-47 for the turbine's replacement bearing sleeve.",
+        "reference_answers": [
+          "K-47",
+          "K47"
+        ],
+        "prefill_seconds": 11.12937104699995,
+        "decode_seconds": 0.5646050479999758,
+        "seconds": 11.694909944000301,
+        "peak_memory_allocated_gb": 9.19418368,
+        "peak_memory_reserved_gb": 10.183770112,
+        "answer_repeat_match": true,
+        "timing_samples": [
+          {
+            "seconds": 11.692599608000364,
+            "prefill_seconds": 11.127994560000388,
+            "decode_seconds": 0.5646050479999758,
+            "peak_memory_allocated_gb": 9.19418368,
+            "peak_memory_reserved_gb": 10.183770112
+          },
+          {
+            "seconds": 11.694909944000301,
+            "prefill_seconds": 11.13098032400012,
+            "decode_seconds": 0.5639296200001809,
+            "peak_memory_allocated_gb": 9.19418368,
+            "peak_memory_reserved_gb": 10.183770112
+          },
+          {
+            "seconds": 11.695489889999862,
+            "prefill_seconds": 11.12937104699995,
+            "decode_seconds": 0.5661188429999129,
+            "peak_memory_allocated_gb": 9.19418368,
+            "peak_memory_reserved_gb": 10.183770112
+          }
+        ]
+      },
+      "answers_match": false,
+      "comparison": {
+        "kernel_prefill_speedup": 2.186090537997838,
+        "live_prefill_speedup": 2.060633606166973,
+        "live_total_speedup": 1.9605958674828468
+      }
+    },
+    {
+      "case_id": "turbine_alloy_k47",
+      "seq_len": 63955,
+      "requested_length": 64000,
+      "block_size": 64,
+      "needle_block": 299,
+      "teacher_target": "/content/drive/MyDrive/SPRUCE_COLAB/run9_natural/targets/64000/teacher_turbine_alloy_k47_len63955_blk64_d0.3.pt",
+      "sparse": {
+        "exact": false,
+        "fuzzy": 0.0,
+        "answer": " After checking 492 entries in file 6406, the",
+        "needle": "final calibration records specify alloy k-47 for the turbine's replacement bearing sleeve.",
+        "reference_answers": [
+          "K-47",
+          "K47"
+        ],
+        "feature_load_seconds": 0.42428890899964244,
+        "tree_build_seconds": 0.014337862000047608,
+        "tree_traversal_seconds": 0.2947264970002834,
+        "route_pack_seconds": 0.002968205000343005,
+        "route_transfer_seconds": 0.0,
+        "selector_seconds": 0.31203256400067403,
+        "prefill_seconds": 5.09462905700002,
+        "decode_seconds": 0.5645993180000914,
+        "seconds": 5.65975840100009,
+        "live_prefill_seconds": 5.401775283000006,
+        "live_total_seconds": 5.966374601000098,
+        "needle_layer_group_hit_rate": 0.0535714328289032,
+        "needle_any_group_all_layers_rate": 0.1071428656578064,
+        "peak_memory_allocated_gb": 9.655252992,
+        "peak_memory_reserved_gb": 10.533994496,
+        "answer_repeat_match": true,
+        "timing_samples": [
+          {
+            "feature_load_seconds": 0.42428890899964244,
+            "tree_build_seconds": 0.014300927000022057,
+            "tree_traversal_seconds": 0.2809508920004191,
+            "route_pack_seconds": 0.0028138689999650524,
+            "route_transfer_seconds": 0.0,
+            "selector_seconds": 0.2980656880004062,
+            "needle_layer_group_hit_rate": 0.0535714328289032,
+            "needle_any_group_all_layers_rate": 0.1071428656578064,
+            "seconds": 5.65975840100009,
+            "prefill_seconds": 5.09462905700002,
+            "decode_seconds": 0.56512934400007,
+            "peak_memory_allocated_gb": 9.655252992,
+            "peak_memory_reserved_gb": 10.533994496,
+            "live_prefill_seconds": 5.392694745000426,
+            "live_total_seconds": 5.957824089000496
+          },
+          {
+            "feature_load_seconds": 0.42428890899964244,
+            "tree_build_seconds": 0.014389206000032573,
+            "tree_traversal_seconds": 0.2950108770000952,
+            "route_pack_seconds": 0.003247164000185876,
+            "route_transfer_seconds": 0.0,
+            "selector_seconds": 0.31264724700031366,
+            "needle_layer_group_hit_rate": 0.0535714328289032,
+            "needle_any_group_all_layers_rate": 0.1071428656578064,
+            "seconds": 5.653727353999784,
+            "prefill_seconds": 5.089128035999693,
+            "decode_seconds": 0.5645993180000914,
+            "peak_memory_allocated_gb": 9.655252992,
+            "peak_memory_reserved_gb": 10.533994496,
+            "live_prefill_seconds": 5.401775283000006,
+            "live_total_seconds": 5.966374601000098
+          },
+          {
+            "feature_load_seconds": 0.42428890899964244,
+            "tree_build_seconds": 0.014337862000047608,
+            "tree_traversal_seconds": 0.2947264970002834,
+            "route_pack_seconds": 0.002968205000343005,
+            "route_transfer_seconds": 0.0,
+            "selector_seconds": 0.31203256400067403,
+            "needle_layer_group_hit_rate": 0.0535714328289032,
+            "needle_any_group_all_layers_rate": 0.1071428656578064,
+            "seconds": 5.670594364999943,
+            "prefill_seconds": 5.106665900999815,
+            "decode_seconds": 0.5639284640001279,
+            "peak_memory_allocated_gb": 9.655252992,
+            "peak_memory_reserved_gb": 10.533994496,
+            "live_prefill_seconds": 5.418698465000489,
+            "live_total_seconds": 5.982626929000617
+          }
+        ]
+      },
+      "dense": {
+        "exact": false,
+        "fuzzy": 0.0,
+        "answer": " To answer this question, I'll follow these steps:\n1. Scan the text",
+        "needle": "final calibration records specify alloy k-47 for the turbine's replacement bearing sleeve.",
+        "reference_answers": [
+          "K-47",
+          "K47"
+        ],
+        "prefill_seconds": 11.132684039000196,
+        "decode_seconds": 0.5644273080001767,
+        "seconds": 11.697517724000136,
+        "peak_memory_allocated_gb": 9.19418368,
+        "peak_memory_reserved_gb": 10.183770112,
+        "answer_repeat_match": true,
+        "timing_samples": [
+          {
+            "seconds": 11.709407424000347,
+            "prefill_seconds": 11.14498011600017,
+            "decode_seconds": 0.5644273080001767,
+            "peak_memory_allocated_gb": 9.19418368,
+            "peak_memory_reserved_gb": 10.183770112
+          },
+          {
+            "seconds": 11.697517724000136,
+            "prefill_seconds": 11.132684039000196,
+            "decode_seconds": 0.5648336849999396,
+            "peak_memory_allocated_gb": 9.19418368,
+            "peak_memory_reserved_gb": 10.183770112
+          },
+          {
+            "seconds": 11.690608991999852,
+            "prefill_seconds": 11.127033286999904,
+            "decode_seconds": 0.5635757049999484,
+            "peak_memory_allocated_gb": 9.19418368,
+            "peak_memory_reserved_gb": 10.183770112
+          }
+        ]
+      },
+      "answers_match": false,
+      "comparison": {
+        "kernel_prefill_speedup": 2.1851804938975663,
+        "live_prefill_speedup": 2.060930611837187,
+        "live_total_speedup": 1.9605738000492579
+      }
+    },
+    {
+      "case_id": "turbine_alloy_k47",
+      "seq_len": 63955,
+      "requested_length": 64000,
+      "block_size": 64,
+      "needle_block": 499,
+      "teacher_target": "/content/drive/MyDrive/SPRUCE_COLAB/run9_natural/targets/64000/teacher_turbine_alloy_k47_len63955_blk64_d0.5.pt",
+      "sparse": {
+        "exact": false,
+        "fuzzy": 0.0,
+        "answer": " The 1910 account filed by Mei Laurent as item 76",
+        "needle": "final calibration records specify alloy k-47 for the turbine's replacement bearing sleeve.",
+        "reference_answers": [
+          "K-47",
+          "K47"
+        ],
+        "feature_load_seconds": 0.39516262100005406,
+        "tree_build_seconds": 0.014325065999855724,
+        "tree_traversal_seconds": 0.2931314139996175,
+        "route_pack_seconds": 0.003087243000209128,
+        "route_transfer_seconds": 0.0,
+        "selector_seconds": 0.31054372299968236,
+        "prefill_seconds": 5.110065990000294,
+        "decode_seconds": 0.5648407589997078,
+        "seconds": 5.67526858400015,
+        "live_prefill_seconds": 5.420609712999976,
+        "live_total_seconds": 5.985812306999833,
+        "needle_layer_group_hit_rate": 0.1428571492433548,
+        "needle_any_group_all_layers_rate": 0.25,
+        "peak_memory_allocated_gb": 9.655252992,
+        "peak_memory_reserved_gb": 10.533994496,
+        "answer_repeat_match": true,
+        "timing_samples": [
+          {
+            "feature_load_seconds": 0.39516262100005406,
+            "tree_build_seconds": 0.014277407999998104,
+            "tree_traversal_seconds": 0.2814107819999663,
+            "route_pack_seconds": 0.002753640000264568,
+            "route_transfer_seconds": 0.0,
+            "selector_seconds": 0.29844183000022895,
+            "needle_layer_group_hit_rate": 0.1428571492433548,
+            "needle_any_group_all_layers_rate": 0.25,
+            "seconds": 5.660385225999562,
+            "prefill_seconds": 5.095792763999725,
+            "decode_seconds": 0.5645924619998368,
+            "peak_memory_allocated_gb": 9.655252992,
+            "peak_memory_reserved_gb": 10.533994496,
+            "live_prefill_seconds": 5.394234593999954,
+            "live_total_seconds": 5.958827055999791
+          },
+          {
+            "feature_load_seconds": 0.39516262100005406,
+            "tree_build_seconds": 0.014325065999855724,
+            "tree_traversal_seconds": 0.2931314139996175,
+            "route_pack_seconds": 0.003087243000209128,
+            "route_transfer_seconds": 0.0,
+            "selector_seconds": 0.31054372299968236,
+            "needle_layer_group_hit_rate": 0.1428571492433548,
+            "needle_any_group_all_layers_rate": 0.25,
+            "seconds": 5.67526858400015,
+            "prefill_seconds": 5.110065990000294,
+            "decode_seconds": 0.5652025939998566,
+            "peak_memory_allocated_gb": 9.655252992,
+            "peak_memory_reserved_gb": 10.533994496,
+            "live_prefill_seconds": 5.420609712999976,
+            "live_total_seconds": 5.985812306999833
+          },
+          {
+            "feature_load_seconds": 0.39516262100005406,
+            "tree_build_seconds": 0.014334128999962559,
+            "tree_traversal_seconds": 0.2948743559995819,
+            "route_pack_seconds": 0.003167043000303238,
+            "route_transfer_seconds": 0.0,
+            "selector_seconds": 0.3123755279998477,
+            "needle_layer_group_hit_rate": 0.1428571492433548,
+            "needle_any_group_all_layers_rate": 0.25,
+            "seconds": 5.6768343219996495,
+            "prefill_seconds": 5.111993562999942,
+            "decode_seconds": 0.5648407589997078,
+            "peak_memory_allocated_gb": 9.655252992,
+            "peak_memory_reserved_gb": 10.533994496,
+            "live_prefill_seconds": 5.4243690909997895,
+            "live_total_seconds": 5.989209849999497
+          }
+        ]
+      },
+      "dense": {
+        "exact": false,
+        "fuzzy": 0.0,
+        "answer": " To solve this problem, I'll follow these steps:\n1. Scan the text",
+        "needle": "final calibration records specify alloy k-47 for the turbine's replacement bearing sleeve.",
+        "reference_answers": [
+          "K-47",
+          "K47"
+        ],
+        "prefill_seconds": 11.129821722000088,
+        "decode_seconds": 0.5635717330001171,
+        "seconds": 11.69398905800017,
+        "peak_memory_allocated_gb": 9.19418368,
+        "peak_memory_reserved_gb": 10.183770112,
+        "answer_repeat_match": true,
+        "timing_samples": [
+          {
+            "seconds": 11.695618171000206,
+            "prefill_seconds": 11.132046438000089,
+            "decode_seconds": 0.5635717330001171,
+            "peak_memory_allocated_gb": 9.19418368,
+            "peak_memory_reserved_gb": 10.183770112
+          },
+          {
+            "seconds": 11.69398905800017,
+            "prefill_seconds": 11.129821722000088,
+            "decode_seconds": 0.5641673360000823,
+            "peak_memory_allocated_gb": 9.19418368,
+            "peak_memory_reserved_gb": 10.183770112
+          },
+          {
+            "seconds": 11.680989387999944,
+            "prefill_seconds": 11.117716798999936,
+            "decode_seconds": 0.5632725890000074,
+            "peak_memory_allocated_gb": 9.19418368,
+            "peak_memory_reserved_gb": 10.183770112
+          }
+        ]
+      },
+      "answers_match": false,
+      "comparison": {
+        "kernel_prefill_speedup": 2.1780191770086024,
+        "live_prefill_speedup": 2.053241666764533,
+        "live_total_speedup": 1.9536177311014535
+      }
+    },
+    {
+      "case_id": "turbine_alloy_k47",
+      "seq_len": 63955,
+      "requested_length": 64000,
+      "block_size": 64,
+      "needle_block": 698,
+      "teacher_target": "/content/drive/MyDrive/SPRUCE_COLAB/run9_natural/targets/64000/teacher_turbine_alloy_k47_len63955_blk64_d0.7.pt",
+      "sparse": {
+        "exact": false,
+        "fuzzy": 0.0,
+        "answer": " After checking 78 entries in file 7868, the team",
+        "needle": "final calibration records specify alloy k-47 for the turbine's replacement bearing sleeve.",
+        "reference_answers": [
+          "K-47",
+          "K47"
+        ],
+        "feature_load_seconds": 0.3861162080002032,
+        "tree_build_seconds": 0.01429376299984142,
+        "tree_traversal_seconds": 0.29423269100016114,
+        "route_pack_seconds": 0.0029914840001765697,
+        "route_transfer_seconds": 0.0,
+        "selector_seconds": 0.31157383800064054,
+        "prefill_seconds": 5.1112782780001,
+        "decode_seconds": 0.5646335020001061,
+        "seconds": 5.676228787000127,
+        "live_prefill_seconds": 5.425822373999381,
+        "live_total_seconds": 5.9907728829994085,
+        "needle_layer_group_hit_rate": 0.0,
+        "needle_any_group_all_layers_rate": 0.0,
+        "peak_memory_allocated_gb": 9.655252992,
+        "peak_memory_reserved_gb": 10.533994496,
+        "answer_repeat_match": true,
+        "timing_samples": [
+          {
+            "feature_load_seconds": 0.3861162080002032,
+            "tree_build_seconds": 0.01428714099984063,
+            "tree_traversal_seconds": 0.28169682999987344,
+            "route_pack_seconds": 0.002832883999872138,
+            "route_transfer_seconds": 0.0,
+            "selector_seconds": 0.2988168549995862,
+            "needle_layer_group_hit_rate": 0.0,
+            "needle_any_group_all_layers_rate": 0.0,
+            "seconds": 5.663531981000233,
+            "prefill_seconds": 5.098898479000127,
+            "decode_seconds": 0.5646335020001061,
+            "peak_memory_allocated_gb": 9.655252992,
+            "peak_memory_reserved_gb": 10.533994496,
+            "live_prefill_seconds": 5.397715333999713,
+            "live_total_seconds": 5.962348835999819
+          },
+          {
+            "feature_load_seconds": 0.3861162080002032,
+            "tree_build_seconds": 0.014349663000302826,
+            "tree_traversal_seconds": 0.29423269100016114,
+            "route_pack_seconds": 0.0029914840001765697,
+            "route_transfer_seconds": 0.0,
+            "selector_seconds": 0.31157383800064054,
+            "needle_layer_group_hit_rate": 0.0,
+            "needle_any_group_all_layers_rate": 0.0,
+            "seconds": 5.687069546999737,
+            "prefill_seconds": 5.123144797999885,
+            "decode_seconds": 0.5639247489998525,
+            "peak_memory_allocated_gb": 9.655252992,
+            "peak_memory_reserved_gb": 10.533994496,
+            "live_prefill_seconds": 5.434718636000525,
+            "live_total_seconds": 5.998643385000378
+          },
+          {
+            "feature_load_seconds": 0.3861162080002032,
+            "tree_build_seconds": 0.01429376299984142,
+            "tree_traversal_seconds": 0.29710721599985845,
+            "route_pack_seconds": 0.0031431169995812525,
+            "route_transfer_seconds": 0.0,
+            "selector_seconds": 0.3145440959992811,
+            "needle_layer_group_hit_rate": 0.0,
+            "needle_any_group_all_layers_rate": 0.0,
+            "seconds": 5.676228787000127,
+            "prefill_seconds": 5.1112782780001,
+            "decode_seconds": 0.5649505090000275,
+            "peak_memory_allocated_gb": 9.655252992,
+            "peak_memory_reserved_gb": 10.533994496,
+            "live_prefill_seconds": 5.425822373999381,
+            "live_total_seconds": 5.9907728829994085
+          }
+        ]
+      },
+      "dense": {
+        "exact": false,
+        "fuzzy": 0.0,
+        "answer": " To solve this problem, we need to identify the alloy code used for the turbine",
+        "needle": "final calibration records specify alloy k-47 for the turbine's replacement bearing sleeve.",
+        "reference_answers": [
+          "K-47",
+          "K47"
+        ],
+        "prefill_seconds": 11.120328689999951,
+        "decode_seconds": 0.5649135339999702,
+        "seconds": 11.684139535999748,
+        "peak_memory_allocated_gb": 9.19418368,
+        "peak_memory_reserved_gb": 10.183770112,
+        "answer_repeat_match": true,
+        "timing_samples": [
+          {
+            "seconds": 11.684139535999748,
+            "prefill_seconds": 11.120328689999951,
+            "decode_seconds": 0.5638108459997966,
+            "peak_memory_allocated_gb": 9.19418368,
+            "peak_memory_reserved_gb": 10.183770112
+          },
+          {
+            "seconds": 11.682117783000194,
+            "prefill_seconds": 11.117204249000224,
+            "decode_seconds": 0.5649135339999702,
+            "peak_memory_allocated_gb": 9.19418368,
+            "peak_memory_reserved_gb": 10.183770112
+          },
+          {
+            "seconds": 11.69175942999982,
+            "prefill_seconds": 11.126502001000063,
+            "decode_seconds": 0.5652574289997574,
+            "peak_memory_allocated_gb": 9.19418368,
+            "peak_memory_reserved_gb": 10.183770112
+          }
+        ]
+      },
+      "answers_match": false,
+      "comparison": {
+        "kernel_prefill_speedup": 2.1756453249403247,
+        "live_prefill_speedup": 2.0495194872741735,
+        "live_total_speedup": 1.9503559497568257
+      }
+    },
+    {
+      "case_id": "turbine_alloy_k47",
+      "seq_len": 63955,
+      "requested_length": 64000,
+      "block_size": 64,
+      "needle_block": 898,
+      "teacher_target": "/content/drive/MyDrive/SPRUCE_COLAB/run9_natural/targets/64000/teacher_turbine_alloy_k47_len63955_blk64_d0.9.pt",
+      "sparse": {
+        "exact": false,
+        "fuzzy": 0.0,
+        "answer": " Reviewers asked that future surveys preserve the same measurement method. An audit of ",
+        "needle": "final calibration records specify alloy k-47 for the turbine's replacement bearing sleeve.",
+        "reference_answers": [
+          "K-47",
+          "K47"
+        ],
+        "feature_load_seconds": 0.38434203800034084,
+        "tree_build_seconds": 0.01435856500029331,
+        "tree_traversal_seconds": 0.2956079890000183,
+        "route_pack_seconds": 0.003196101999947132,
+        "route_transfer_seconds": 0.0,
+        "selector_seconds": 0.31311041800017847,
+        "prefill_seconds": 5.120268386999669,
+        "decode_seconds": 0.565290756000195,
+        "seconds": 5.685802861999946,
+        "live_prefill_seconds": 5.432265505999567,
+        "live_total_seconds": 5.997556261999762,
+        "needle_layer_group_hit_rate": 0.01785714365541935,
+        "needle_any_group_all_layers_rate": 0.0357142873108387,
+        "peak_memory_allocated_gb": 9.655252992,
+        "peak_memory_reserved_gb": 10.533994496,
+        "answer_repeat_match": true,
+        "timing_samples": [
+          {
+            "feature_load_seconds": 0.38434203800034084,
+            "tree_build_seconds": 0.01435856500029331,
+            "tree_traversal_seconds": 0.28045094899971446,
+            "route_pack_seconds": 0.002805122999689047,
+            "route_transfer_seconds": 0.0,
+            "selector_seconds": 0.2976146369996968,
+            "needle_layer_group_hit_rate": 0.01785714365541935,
+            "needle_any_group_all_layers_rate": 0.0357142873108387,
+            "seconds": 5.685802861999946,
+            "prefill_seconds": 5.120268386999669,
+            "decode_seconds": 0.5655344750002769,
+            "peak_memory_allocated_gb": 9.655252992,
+            "peak_memory_reserved_gb": 10.533994496,
+            "live_prefill_seconds": 5.417883023999366,
+            "live_total_seconds": 5.983417498999643
+          },
+          {
+            "feature_load_seconds": 0.38434203800034084,
+            "tree_build_seconds": 0.014505748999908974,
+            "tree_traversal_seconds": 0.295736069999748,
+            "route_pack_seconds": 0.0033814789999269124,
+            "route_transfer_seconds": 0.0,
+            "selector_seconds": 0.3136232979995839,
+            "needle_layer_group_hit_rate": 0.01785714365541935,
+            "needle_any_group_all_layers_rate": 0.0357142873108387,
+            "seconds": 5.683932964000178,
+            "prefill_seconds": 5.118642207999983,
+            "decode_seconds": 0.565290756000195,
+            "peak_memory_allocated_gb": 9.655252992,
+            "peak_memory_reserved_gb": 10.533994496,
+            "live_prefill_seconds": 5.432265505999567,
+            "live_total_seconds": 5.997556261999762
+          },
+          {
+            "feature_load_seconds": 0.38434203800034084,
+            "tree_build_seconds": 0.01430632700021306,
+            "tree_traversal_seconds": 0.2956079890000183,
+            "route_pack_seconds": 0.003196101999947132,
+            "route_transfer_seconds": 0.0,
+            "selector_seconds": 0.31311041800017847,
+            "needle_layer_group_hit_rate": 0.01785714365541935,
+            "needle_any_group_all_layers_rate": 0.0357142873108387,
+            "seconds": 5.689039352999771,
+            "prefill_seconds": 5.125075623000157,
+            "decode_seconds": 0.5639637299996139,
+            "peak_memory_allocated_gb": 9.655252992,
+            "peak_memory_reserved_gb": 10.533994496,
+            "live_prefill_seconds": 5.4381860410003355,
+            "live_total_seconds": 6.002149770999949
+          }
+        ]
+      },
+      "dense": {
+        "exact": false,
+        "fuzzy": 0.0,
+        "answer": " To solve this problem, we need to identify the alloy code used for the turbine",
+        "needle": "final calibration records specify alloy k-47 for the turbine's replacement bearing sleeve.",
+        "reference_answers": [
+          "K-47",
+          "K47"
+        ],
+        "prefill_seconds": 11.110857612000018,
+        "decode_seconds": 0.5651308950000384,
+        "seconds": 11.67678068899977,
+        "peak_memory_allocated_gb": 9.19418368,
+        "peak_memory_reserved_gb": 10.183770112,
+        "answer_repeat_match": true,
+        "timing_samples": [
+          {
+            "seconds": 11.672636994000186,
+            "prefill_seconds": 11.107506099000148,
+            "decode_seconds": 0.5651308950000384,
+            "peak_memory_allocated_gb": 9.19418368,
+            "peak_memory_reserved_gb": 10.183770112
+          },
+          {
+            "seconds": 11.691813115000059,
+            "prefill_seconds": 11.12732691600013,
+            "decode_seconds": 0.5644861989999299,
+            "peak_memory_allocated_gb": 9.19418368,
+            "peak_memory_reserved_gb": 10.183770112
+          },
+          {
+            "seconds": 11.67678068899977,
+            "prefill_seconds": 11.110857612000018,
+            "decode_seconds": 0.5659230769997521,
+            "peak_memory_allocated_gb": 9.19418368,
+            "peak_memory_reserved_gb": 10.183770112
+          }
+        ]
+      },
+      "answers_match": false,
+      "comparison": {
+        "kernel_prefill_speedup": 2.1699756286624385,
+        "live_prefill_speedup": 2.045345095840554,
+        "live_total_speedup": 1.9469230764842191
+      }
+    }
+  ],
+  "aggregate": {
+    "cases": 30,
+    "answers_match_rate": 0.0,
+    "sparse_exact_rate": 0.0,
+    "dense_exact_rate": 0.36666666666666664,
+    "sparse_minus_dense_exact_rate": -0.36666666666666664,
+    "paired_exact_counts": {
+      "sparse_only_correct": 0,
+      "dense_only_correct": 11,
+      "both_correct": 0,
+      "neither_correct": 19,
+      "exact_mcnemar_two_sided_p": 0.0009765625
+    },
+    "mean_sparse_fuzzy": 0.11666666666666667,
+    "mean_dense_fuzzy": 0.5722222222222222,
+    "median_kernel_prefill_speedup": 2.1820871090475626,
+    "median_live_prefill_speedup": 2.0571455687815705,
+    "median_live_total_speedup": 1.9573252696315961,
+    "sum_kernel_prefill_speedup": 2.1822014804797276,
+    "sum_live_prefill_speedup": 2.057038467228221,
+    "max_sparse_peak_memory_allocated_gb": 9.659943936,
+    "max_dense_peak_memory_allocated_gb": 9.19950848
+  }
+}

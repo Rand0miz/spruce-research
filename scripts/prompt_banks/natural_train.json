@@ -1,0 +1,162 @@
+{
+  "description": "Natural-prose candidate cases used only for dense screening and selector training. Keep separate from natural_heldout.json.",
+  "format": "natural_prose_v1",
+  "cases": [
+    {
+      "id": "reserve_cedar_spring",
+      "builder": "natural_prose_v1",
+      "evidence": "The hydrology panel identified Cedar Spring as the preserve's dependable dry-season water source. Its recommendation followed two years of flow measurements and replaced an older emergency plan.",
+      "needle": "The hydrology panel identified Cedar Spring as the preserve's dependable dry-season water source.",
+      "question": "\n\nQuestion: What did the panel identify as the preserve's dependable dry-season water source? Answer with only its name.",
+      "answers": ["Cedar Spring"],
+      "distractors": [
+        "Willow Pond supplies the visitor center during summer but is not classified as a dry-season source.",
+        "The emergency plan once listed North Well as a temporary backup.",
+        "Juniper Creek is monitored for habitat quality rather than water supply."
+      ]
+    },
+    {
+      "id": "reading_room_september_1992",
+      "builder": "natural_prose_v1",
+      "evidence": "According to the library history, the central reading room reopened on 12 September 1992. The renovation added fire protection while preserving the original oak tables.",
+      "needle": "According to the library history, the central reading room reopened on 12 September 1992.",
+      "question": "\n\nQuestion: On what date did the central reading room reopen? Answer with only the date.",
+      "answers": ["12 September 1992", "September 12 1992", "September 12, 1992"],
+      "distractors": [
+        "The map room closed on 8 September 1991 for an unrelated ventilation project.",
+        "A ceremony planned for 3 August 1992 was postponed before the reading room opened.",
+        "The children's wing reopened on 19 October 1993."
+      ]
+    },
+    {
+      "id": "planning_alder_framework",
+      "builder": "natural_prose_v1",
+      "evidence": "The county planning board selected the Alder Framework for evaluating hillside conservation grants. Reviewers favored its separate scores for erosion risk and community access.",
+      "needle": "The county planning board selected the Alder Framework for evaluating hillside conservation grants.",
+      "question": "\n\nQuestion: Which framework did the planning board select for evaluating hillside conservation grants? Answer with only its name.",
+      "answers": ["Alder Framework", "the Alder Framework"],
+      "distractors": [
+        "The Birch Schedule governs inspection dates but does not evaluate grant proposals.",
+        "Consultants tested the Rowan Matrix and rejected its combined risk score.",
+        "The state office applies the Elm Standard to coastal projects."
+      ]
+    },
+    {
+      "id": "compressor_alloy_t19",
+      "builder": "natural_prose_v1",
+      "evidence": "The maintenance specification requires alloy T-19 for the compressor's inner seal ring. Bench testing showed that the earlier P-6 ring expanded beyond tolerance.",
+      "needle": "The maintenance specification requires alloy T-19 for the compressor's inner seal ring.",
+      "question": "\n\nQuestion: Which alloy is required for the compressor's inner seal ring? Answer with only the alloy code.",
+      "answers": ["T-19", "T19"],
+      "distractors": [
+        "Alloy P-6 appeared in the prototype seal and failed expansion testing.",
+        "The compressor housing uses alloy C-22 rather than the seal material.",
+        "Fasteners listed on the same order use alloy T-14."
+      ]
+    },
+    {
+      "id": "meridian_checkpoint_path",
+      "builder": "natural_prose_v1",
+      "evidence": "The Meridian parser saves its restart marker in var/meridian.state whenever a source bundle finishes. On launch, the recovery routine checks that file before opening the next bundle.",
+      "needle": "The Meridian parser saves its restart marker in var/meridian.state whenever a source bundle finishes.",
+      "question": "\n\nQuestion: Where does the Meridian parser save its restart marker? Answer with only the path.",
+      "answers": ["var/meridian.state"],
+      "distractors": [
+        "Parser warnings are appended to logs/meridian.txt and cannot restart a job.",
+        "The legacy Delta loader uses var/delta.offset for a different format.",
+        "Temporary source fragments remain in cache/meridian until validation."
+      ]
+    },
+    {
+      "id": "survey_meridian_sector_442",
+      "builder": "natural_prose_v1",
+      "evidence": "The revised survey catalog names the reconciled western mosaic Meridian Sector 442. Earlier field notebooks divided the same sky region among two provisional entries.",
+      "needle": "The revised survey catalog names the reconciled western mosaic Meridian Sector 442.",
+      "question": "\n\nQuestion: What name does the revised catalog give the reconciled western mosaic? Answer with only the name.",
+      "answers": ["Meridian Sector 442"],
+      "distractors": [
+        "Meridian Sector 424 is an eastern calibration field.",
+        "Western Mosaic B was a provisional notebook label that the catalog retired.",
+        "Meridian Sector 449 borders the mosaic but remains a separate entry."
+      ]
+    },
+    {
+      "id": "ferry_calypso_pier_7",
+      "builder": "natural_prose_v1",
+      "evidence": "The summer harbor schedule assigns the Calypso ferry to pier 7 for all passenger departures. Freight vessels continue to use the adjacent service pier.",
+      "needle": "The summer harbor schedule assigns the Calypso ferry to pier 7 for all passenger departures.",
+      "question": "\n\nQuestion: Which pier is assigned to the Calypso ferry? Answer with only the pier number.",
+      "answers": ["pier 7", "7"],
+      "distractors": [
+        "The freight vessel Mariner loads at pier 6.",
+        "A winter draft proposed pier 9 for Calypso but was not adopted.",
+        "Pier 4 remains reserved for harbor maintenance boats."
+      ]
+    },
+    {
+      "id": "orchard_trial_variety_solace",
+      "builder": "natural_prose_v1",
+      "evidence": "The orchard trial selected the Solace pear for expanded planting in the upper terraces. It produced stable yields after two unusually cold springs.",
+      "needle": "The orchard trial selected the Solace pear for expanded planting in the upper terraces.",
+      "question": "\n\nQuestion: Which pear variety did the orchard trial select for expanded planting? Answer with only the variety.",
+      "answers": ["Solace pear", "Solace"],
+      "distractors": [
+        "The Marlow pear performed well in the lower field but was not expanded.",
+        "An early proposal recommended the Haven pear before winter damage was measured.",
+        "The orchard retained a small row of Crest pears for comparison."
+      ]
+    },
+    {
+      "id": "clinic_cobalt_room_214",
+      "builder": "natural_prose_v1",
+      "evidence": "The facilities directory places the Cobalt imaging unit in room 214. Patients reach it through the north corridor beyond the main laboratory.",
+      "needle": "The facilities directory places the Cobalt imaging unit in room 214.",
+      "question": "\n\nQuestion: Which room contains the Cobalt imaging unit? Answer with only the room number.",
+      "answers": ["room 214", "214"],
+      "distractors": [
+        "Room 241 contains the older Amber scanner.",
+        "A draft directory incorrectly placed Cobalt in room 204.",
+        "Room 114 is used for equipment intake rather than imaging."
+      ]
+    },
+    {
+      "id": "archive_box_finch",
+      "builder": "natural_prose_v1",
+      "evidence": "The accession ledger stores the expedition photographs in the Finch archive box. The box also contains the photographer's route notes and exposure index.",
+      "needle": "The accession ledger stores the expedition photographs in the Finch archive box.",
+      "question": "\n\nQuestion: Which archive box contains the expedition photographs? Answer with only the box name.",
+      "answers": ["Finch archive box", "Finch"],
+      "distractors": [
+        "The Heron box contains shipping receipts from the same expedition.",
+        "A temporary inventory sheet mistakenly referenced the Lark box.",
+        "The route maps are filed separately in the Kestrel cabinet."
+      ]
+    },
+    {
+      "id": "beacon_frequency_88_4",
+      "builder": "natural_prose_v1",
+      "evidence": "The coastal operations manual sets the Northwatch beacon to 88.4 megahertz during emergency drills. Operators verify the channel before each transmission test.",
+      "needle": "The coastal operations manual sets the Northwatch beacon to 88.4 megahertz during emergency drills.",
+      "question": "\n\nQuestion: What frequency does the manual specify for the Northwatch beacon? Answer with only the frequency.",
+      "answers": ["88.4 megahertz", "88.4 MHz", "88.4"],
+      "distractors": [
+        "The Southwatch beacon transmits routine notices at 87.9 megahertz.",
+        "An obsolete handbook listed 88.1 megahertz for Northwatch.",
+        "Portable harbor radios use 91.2 megahertz during maintenance."
+      ]
+    },
+    {
+      "id": "greenhouse_controller_maple",
+      "builder": "natural_prose_v1",
+      "evidence": "The greenhouse report identifies Maple as the controller responsible for the eastern irrigation loop. Its replacement battery was installed after the winter inspection.",
+      "needle": "The greenhouse report identifies Maple as the controller responsible for the eastern irrigation loop.",
+      "question": "\n\nQuestion: Which controller is responsible for the eastern irrigation loop? Answer with only its name.",
+      "answers": ["Maple"],
+      "distractors": [
+        "Cedar controls ventilation in the western greenhouse.",
+        "A preliminary wiring plan assigned the eastern loop to Aspen.",
+        "Birch monitors temperature but does not operate irrigation."
+      ]
+    }
+  ]
+}

@@ -4,6 +4,7 @@ from benchmarks.plot_efficiency_accuracy import (
     build_scaling_series,
     save_efficiency_accuracy_plot,
 )
+from selector.plotting import _aligned_eval_series
 
 
 def _case(seq_len, dense, sparse, live, exact=True, requested_length=None):
@@ -67,3 +68,10 @@ def test_scaling_series_groups_calibrated_lengths_by_requested_bucket():
     assert series[0]["requested_length"] == 64000
     assert series[0]["seq_len"] == 63997
     assert series[0]["targets"] == 2
+
+
+def test_training_plot_collapses_legacy_per_document_epoch_values():
+    epochs, values = _aligned_eval_series(
+        [1, 25], [0.2, 0.4, 0.6, 0.8])
+    assert epochs == [1, 25]
+    assert values == pytest.approx([0.3, 0.7])

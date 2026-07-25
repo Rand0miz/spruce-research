@@ -1,0 +1,84 @@
+{
+  "description": "Held-out diverse-prose retrieval cases. These are never selector-training inputs.",
+  "format": "natural_prose_v1",
+  "cases": [
+    {
+      "id": "aquifer_lake_orison",
+      "builder": "natural_prose_v1",
+      "evidence": "After three seasons of sampling, the watershed committee designated Lake Orison as the reserve's primary groundwater source. The decision followed chemical analysis at twelve wells and replaced an older provisional map.",
+      "needle": "After three seasons of sampling, the watershed committee designated Lake Orison as the reserve's primary groundwater source.",
+      "question": "\n\nQuestion: Which lake did the committee designate as the reserve's primary groundwater source? Answer with only the lake name.",
+      "answers": ["Lake Orison"],
+      "distractors": [
+        "Lake Merrow supplies irrigation water to the western farms, according to a separate agricultural survey completed in 1994.",
+        "A preliminary map labeled Lake Calden as an emergency surface-water intake, but the designation was never adopted.",
+        "The recreation authority monitors Lake Vesta for boating access and does not classify it as a groundwater source."
+      ]
+    },
+    {
+      "id": "gallery_reopened_april_1986",
+      "builder": "natural_prose_v1",
+      "evidence": "The restoration history records that the eastern gallery reopened to the public on 17 April 1986. Conservators had spent eleven months repairing its roof and stabilizing the painted ceiling.",
+      "needle": "The restoration history records that the eastern gallery reopened to the public on 17 April 1986.",
+      "question": "\n\nQuestion: On what date did the eastern gallery reopen to the public? Answer with only the date.",
+      "answers": ["17 April 1986", "April 17 1986", "April 17, 1986"],
+      "distractors": [
+        "The western gallery closed for electrical work on 9 June 1984 and resumed normal hours later that summer.",
+        "A planning memorandum dated 21 March 1986 discussed the eastern gallery but did not announce its reopening.",
+        "The sculpture court reopened on 4 September 1987 after a separate drainage project."
+      ]
+    },
+    {
+      "id": "council_larkspur_method",
+      "builder": "natural_prose_v1",
+      "evidence": "Following the pilot review, the regional council adopted the Larkspur Method as its official procedure for rating wetland restoration proposals. The method combines a field score with an independent archival review.",
+      "needle": "Following the pilot review, the regional council adopted the Larkspur Method as its official procedure for rating wetland restoration proposals.",
+      "question": "\n\nQuestion: What procedure did the regional council adopt for rating wetland restoration proposals? Answer with only its name.",
+      "answers": ["Larkspur Method", "the Larkspur Method"],
+      "distractors": [
+        "The Juniper Index remains the standard for estimating annual maintenance costs, a task unrelated to proposal ratings.",
+        "Several advisers tested the Hawthorn Protocol during the pilot but rejected it because its categories overlapped.",
+        "The national office uses the Reed Matrix for coastal permits, while regional restoration proposals follow a different procedure."
+      ]
+    },
+    {
+      "id": "turbine_alloy_k47",
+      "builder": "natural_prose_v1",
+      "evidence": "Final calibration records specify alloy K-47 for the turbine's replacement bearing sleeve. Engineers selected it after the M-12 sample showed unacceptable deformation during the heat cycle.",
+      "needle": "Final calibration records specify alloy K-47 for the turbine's replacement bearing sleeve.",
+      "question": "\n\nQuestion: Which alloy was specified for the turbine's replacement bearing sleeve? Answer with only the alloy code.",
+      "answers": ["K-47", "K47"],
+      "distractors": [
+        "Alloy M-12 was used in the early test sleeve and failed the high-temperature deformation limit.",
+        "The turbine casing uses alloy R-8, which is not part of the bearing assembly.",
+        "A procurement table lists alloy K-41 for spare fasteners ordered during the same maintenance period."
+      ]
+    },
+    {
+      "id": "atlas_checkpoint_path",
+      "builder": "natural_prose_v1",
+      "evidence": "The Atlas indexer writes its recoverable checkpoint to state/atlas.chk after each completed shard. Startup code reads the same file before deciding whether an interrupted indexing pass can resume.",
+      "needle": "The Atlas indexer writes its recoverable checkpoint to state/atlas.chk after each completed shard.",
+      "question": "\n\nQuestion: Where does the Atlas indexer write its recoverable checkpoint? Answer with only the path.",
+      "answers": ["state/atlas.chk"],
+      "distractors": [
+        "Diagnostic traces from the Atlas indexer are written to logs/atlas.log and are not used for recovery.",
+        "The older Orion importer stores progress in state/orion.cursor, a format Atlas does not read.",
+        "Temporary shard data appears under cache/atlas/tmp until a shard has been committed."
+      ]
+    },
+    {
+      "id": "observatory_kepler_731",
+      "builder": "natural_prose_v1",
+      "evidence": "In the consolidated sky survey, the observatory assigned the label Kepler Field 731 to the newly reconciled northern mosaic. Earlier notebooks used three informal names for overlapping portions of the same field.",
+      "needle": "In the consolidated sky survey, the observatory assigned the label Kepler Field 731 to the newly reconciled northern mosaic.",
+      "question": "\n\nQuestion: What label did the observatory assign to the newly reconciled northern mosaic? Answer with only the label.",
+      "answers": ["Kepler Field 731"],
+      "distractors": [
+        "Kepler Field 713 identifies a southern calibration strip observed during the previous survey.",
+        "The provisional label Northern Mosaic C appeared in notebooks but was retired before consolidation.",
+        "Kepler Field 739 refers to a neighboring region whose boundary remains under review."
+      ]
+    }
+  ]
+}

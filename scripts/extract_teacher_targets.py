@@ -11,6 +11,7 @@ import torch
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from eval.haystack import build_haystack_calibrated
+from eval.natural_context import build_natural_prompt_calibrated
 from configs.long_context import (
     QWEN_NATIVE_CONTEXT,
     configure_tokenizer,
@@ -25,6 +26,7 @@ DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DEFAULT_TRAIN_BANK = os.path.join(ROOT, "scripts", "prompt_banks", "train.json")
 DEFAULT_HELDOUT_BANK = os.path.join(ROOT, "scripts", "prompt_banks", "heldout.json")
+VERIFIED_MANIFEST_KIND = "spruce_dense_screen_manifest_v1"
 
 
 def _safe_id(s):
@@ -39,15 +41,87 @@ def load_prompt_bank(path):
     cases = data["cases"] if isinstance(data, dict) else data
     if not isinstance(cases, list) or not cases:
         raise ValueError(f"{path} must contain a non-empty 'cases' list")
-    required = {"id", "needle", "filler", "question"}
     for i, case in enumerate(cases):
+        builder = case.get("builder", "calibrated_units_v1")
+        required = (
+            {"id", "needle", "evidence", "question", "answers"}
+            if builder == "natural_prose_v1"
+            else {"id", "needle", "filler", "question"}
+        )
         missing = required - set(case)
         if missing:
             raise ValueError(f"{path} case {i} missing keys: {sorted(missing)}")
         for key in required:
-            if not isinstance(case[key], str) or not case[key]:
+            if key == "answers":
+                if (not isinstance(case[key], list) or not case[key]
+                        or any(
+                            not isinstance(answer, str) or not answer
+                            for answer in case[key])):
+                    raise ValueError(
+                        f"{path} case {i} key 'answers' must be a non-empty "
+                        "list of non-empty strings")
+            elif not isinstance(case[key], str) or not case[key]:
                 raise ValueError(f"{path} case {i} key {key!r} must be a non-empty string")
+        if builder not in {"calibrated_units_v1", "natural_prose_v1"}:
+            raise ValueError(
+                f"{path} case {i} has unknown builder {builder!r}")
+        if (builder == "natural_prose_v1"
+                and case["needle"] not in case["evidence"]):
+            raise ValueError(
+                f"{path} case {i} needle must occur inside evidence")
     return cases
+
+
+def load_verified_manifest(path):
+    """Load dense-correct exact prompts produced by the screening script."""
+    with open(path, "r", encoding="utf-8") as handle:
+        data = json.load(handle)
+    if data.get("kind") != VERIFIED_MANIFEST_KIND:
+        raise ValueError(
+            f"{path} is not a {VERIFIED_MANIFEST_KIND} manifest")
+    records = [
+        record for record in data.get("candidates", [])
+        if record.get("status") == "completed" and record.get("accepted")
+    ]
+    if not records:
+        raise ValueError(f"{path} contains no accepted prompts")
+    required = {
+        "id", "prompt_text", "needle", "question", "answers", "depth",
+        "requested_length", "seq_len", "block_size", "model", "rope",
+    }
+    for index, record in enumerate(records):
+        missing = required - set(record)
+        if missing:
+            raise ValueError(
+                f"{path} accepted record {index} is missing "
+                f"{sorted(missing)}")
+        if record["needle"] not in record["prompt_text"]:
+            raise ValueError(
+                f"{path} accepted record {index} does not contain its needle")
+        if record.get("prompt_format") == "qwen_chat_v1":
+            user_prompt = record.get("user_prompt_text")
+            if (not isinstance(user_prompt, str)
+                    or not user_prompt.endswith(record["question"])
+                    or user_prompt not in record["prompt_text"]):
+                raise ValueError(
+                    f"{path} accepted chat record {index} does not preserve "
+                    "its exact user prompt and final question")
+        elif not record["prompt_text"].endswith(record["question"]):
+            raise ValueError(
+                f"{path} accepted record {index} does not end with its question")
+    return records
+
+
+def build_verified_jobs(records, maximum_context):
+    jobs = []
+    for record in records:
+        requested_length = int(record["requested_length"])
+        if requested_length > maximum_context:
+            raise ValueError(
+                f"verified prompt {record['id']} requests {requested_length} "
+                f"tokens but configured context is {maximum_context}")
+        jobs.append((requested_length, record, float(record["depth"])))
+    return jobs
 
 
 def _check_depth(depth, name="depth"):
@@ -196,6 +270,20 @@ def main():
                     help="skip writing the per-length pooled-mass heatmap PNG")
     ap.add_argument("--heldout", action="store_true",
                     help="use scripts/prompt_banks/heldout.json instead of train.json")
+    ap.add_argument(
+        "--prompt-bank",
+        help=(
+            "explicit prompt-bank JSON; overrides --heldout and supports "
+            "natural_prose_v1 held-out cases"
+        ),
+    )
+    ap.add_argument(
+        "--verified-manifest",
+        help=(
+            "dense-screening manifest; extract only accepted exact prompts "
+            "and bypass prompt regeneration"
+        ),
+    )
     ap.add_argument("--all", action="store_true",
                     help="run every scenario in the selected prompt bank; otherwise pick one randomly")
     ap.add_argument(
@@ -222,9 +310,26 @@ def main():
             "--force-reinstall --no-deps), or pass --allow-cpu to override.")
 
     rng = random.Random(args.seed)
-    bank_path = DEFAULT_HELDOUT_BANK if args.heldout else DEFAULT_TRAIN_BANK
-    cases = load_prompt_bank(bank_path)
-    selected_bank = "heldout" if args.heldout else "train"
+    if args.verified_manifest and (args.prompt_bank or args.heldout):
+        raise SystemExit(
+            "--verified-manifest cannot be combined with --prompt-bank or "
+            "--heldout")
+    if args.verified_manifest:
+        bank_path = args.verified_manifest
+        cases = load_verified_manifest(bank_path)
+        selected_bank = os.path.splitext(os.path.basename(bank_path))[0]
+    else:
+        bank_path = (
+            args.prompt_bank
+            if args.prompt_bank
+            else (DEFAULT_HELDOUT_BANK if args.heldout else DEFAULT_TRAIN_BANK)
+        )
+        cases = load_prompt_bank(bank_path)
+        selected_bank = (
+            os.path.splitext(os.path.basename(bank_path))[0]
+            if args.prompt_bank
+            else ("heldout" if args.heldout else "train")
+        )
 
     os.makedirs(args.out, exist_ok=True)
 
@@ -268,7 +373,11 @@ def main():
 
     store_dtype = getattr(torch, args.store_dtype)
     try:
-        jobs = build_jobs(args, cases, rng, maximum_context)
+        jobs = (
+            build_verified_jobs(cases, maximum_context)
+            if args.verified_manifest
+            else build_jobs(args, cases, rng, maximum_context)
+        )
     except ValueError as error:
         raise SystemExit(str(error)) from error
 
@@ -276,16 +385,55 @@ def main():
           f"all={args.all} depth_mode={args.depth_mode} seed={args.seed}")
 
     for target_len, case, depth in jobs:
-        prompt, ndl, filler_units = build_haystack_calibrated(
-            tok, target_len, case["needle"], depth, case["filler"],
-            suffix=case["question"])
-        full = prompt + case["question"]
+        prompt_builder = case.get("builder", "calibrated_units_v1")
+        if prompt_builder == "verified_prompt_v1":
+            full = case["prompt_text"]
+            ndl = case["needle"]
+            prompt = full
+            filler_units = None
+            natural_units = case.get("natural_units")
+            if case["model"] != args.model:
+                raise RuntimeError(
+                    f"verified prompt {case['id']} was screened with "
+                    f"{case['model']}, not {args.model}")
+            screened_factor = float(case["rope"].get("factor", 1.0))
+            if screened_factor != float(args.yarn_factor):
+                raise RuntimeError(
+                    f"verified prompt {case['id']} used YaRN factor "
+                    f"{screened_factor}, not {args.yarn_factor}")
+            if int(case["block_size"]) != int(args.block):
+                raise RuntimeError(
+                    f"verified prompt {case['id']} used block size "
+                    f"{case['block_size']}, not {args.block}")
+        elif prompt_builder == "natural_prose_v1":
+            full, ndl, natural_units = build_natural_prompt_calibrated(
+                tok, target_len, case, depth,
+                seed=0 if args.seed is None else args.seed,
+            )
+            prompt = full
+            filler_units = None
+        else:
+            prompt, ndl, filler_units = build_haystack_calibrated(
+                tok, target_len, case["needle"], depth, case["filler"],
+                suffix=case["question"])
+            full = prompt + case["question"]
+            natural_units = None
         calibrated_len = len(tok(full)["input_ids"])
+        if (prompt_builder == "verified_prompt_v1"
+                and calibrated_len != int(case["seq_len"])):
+            raise RuntimeError(
+                f"verified prompt {case['id']} reconstructed to "
+                f"{calibrated_len} tokens, expected {case['seq_len']}")
         if target_len - calibrated_len > args.block:
             raise RuntimeError(
                 f"prompt calibration missed target {target_len} by "
                 f"{target_len - calibrated_len} tokens")
         n_blk = needle_block_index(tok, full, ndl, args.block)
+        if (prompt_builder == "verified_prompt_v1"
+                and n_blk != int(case["needle_block"])):
+            raise RuntimeError(
+                f"verified prompt {case['id']} evidence moved from block "
+                f"{case['needle_block']} to {n_blk}")
         case_id = _safe_id(case["id"])
         dtag = depth_tag(depth)
         target_dir = (
@@ -335,8 +483,7 @@ def main():
             "seq_len": seq_len,
             "requested_length": target_len,
             "haystack_token_budget": target_len,
-            "filler_units": filler_units,
-            "prompt_builder": "calibrated_units_v1",
+            "prompt_builder": prompt_builder,
             "block_size": args.block,
             "model": args.model,
             "prompt_bank": selected_bank,
@@ -354,6 +501,33 @@ def main():
             "features_only": bool(args.features_only),
             "rope": rope_config,
         }
+        if filler_units is not None:
+            save_payload["filler_units"] = filler_units
+        if natural_units is not None:
+            # Storing the exact diverse prompt avoids coupling replay to future
+            # prose-generator revisions. The text is small compared with Q/K.
+            save_payload.update({
+                "prompt_text": full,
+                "natural_units": natural_units,
+                "reference_answers": list(case["answers"]),
+            })
+        if prompt_builder == "verified_prompt_v1":
+            save_payload.update({
+                "prompt_text": full,
+                "prompt_format": case.get("prompt_format", "raw_text_v1"),
+                "reference_answers": list(case["answers"]),
+                "dense_screen": {
+                    "accepted": True,
+                    "dense_answer": case.get("dense_answer"),
+                    "dense_exact": case.get("dense_exact"),
+                    "dense_fuzzy": case.get("dense_fuzzy"),
+                    "source_case_id": case.get("source_case_id"),
+                    "candidate_id": case["id"],
+                    "manifest": os.path.abspath(args.verified_manifest),
+                },
+            })
+            if case.get("user_prompt_text") is not None:
+                save_payload["user_prompt_text"] = case["user_prompt_text"]
         torch.save(save_payload, path)
         print(f"case={case_id}  len={seq_len:>6}  blocks={pooledK_stack.shape[3]:>4}  "
               f"depth={depth:.4f}  needle_block={n_blk:>4}  peak={peak_gb:.2f}GB  "

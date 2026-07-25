@@ -36,11 +36,17 @@ def load_selector_features(path, device="cpu"):
     kb = k_feat.shape[2]
     meta = {
         "seq_len": int(d["seq_len"]), "block_size": int(d["block_size"]),
+        "requested_length": int(d.get("requested_length", d["seq_len"])),
         "needle_block": int(d.get("needle_block", -1)),
         "num_layers": L, "num_groups": G, "qb": qb, "kb": kb,
         "head_dim": head_dim, "proto": int(d["proto"]),
         "rope": d.get("rope"),
         "features_only": bool(d.get("features_only", False)),
+        "prompt_format": d.get("prompt_format"),
+        "dense_screen_accepted": bool(
+            d.get("dense_screen", {}).get("accepted", False)),
+        "case_id": d.get("case_id"),
+        "depth": d.get("depth"),
     }
     return {"q_feat": q_feat, "k_feat": k_feat, "meta": meta}
 
@@ -86,9 +92,15 @@ def load_teacher(path, device="cpu", eps=1e-9):
 
     meta = {
         "seq_len": int(d["seq_len"]), "block_size": int(d["block_size"]),
+        "requested_length": int(d.get("requested_length", d["seq_len"])),
         "needle_block": int(d.get("needle_block", -1)),
         "num_layers": L, "num_groups": G, "qb": qb, "kb": kb,
         "head_dim": q_feat.shape[-1], "proto": int(d["proto"]),
+        "prompt_format": d.get("prompt_format"),
+        "dense_screen_accepted": bool(
+            d.get("dense_screen", {}).get("accepted", False)),
+        "case_id": d.get("case_id"),
+        "depth": d.get("depth"),
     }
     return {"q_feat": q_feat, "k_feat": k_feat, "target": target,
             "cmask": cmask, "row_mass": row.squeeze(-1), "meta": meta}

@@ -71,6 +71,8 @@ def save_resume_checkpoint(path, gate, opt, config, args, epoch, paths, history)
             "budgets": list(args.budgets),
             "out": args.out,
             "seed": args.seed,
+            "init_gate": args.init_gate,
+            "shuffle_targets": args.shuffle_targets,
         },
         "targets": list(paths),
         "history": history,
@@ -138,6 +140,12 @@ def main():
     ap.add_argument("--eval-every", type=int, default=25)
     ap.add_argument("--budgets", type=int, nargs="+", default=[1, 2, 4, 8, 16])
     ap.add_argument("--device", default="cuda" if torch.cuda.is_available() else "cpu")
+    ap.add_argument(
+        "--init-gate",
+        help="initialize weights from a gate checkpoint; cannot combine with --resume")
+    ap.add_argument(
+        "--shuffle-targets", action=argparse.BooleanOptionalAction, default=True,
+        help="shuffle document order every epoch (default: enabled)")
     ap.add_argument("--out", default=os.path.join(
         os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
         "selector_ckpt", "flat_gate.pt"))
@@ -157,6 +165,8 @@ def main():
                     help="metric history JSON path; default is --out with .history.json suffix")
     args = ap.parse_args()
 
+    if args.resume and args.init_gate:
+        raise SystemExit("--resume and --init-gate cannot be combined")
     if args.seed is not None:
         torch.manual_seed(args.seed)
         if torch.cuda.is_available():
@@ -180,6 +190,14 @@ def main():
 
     config = gate_config(L, d, args.proj_dim)
     gate = FlatGate(L, d, args.proj_dim).to(args.device)
+    if args.init_gate:
+        initial = torch.load(args.init_gate, map_location=args.device)
+        if initial.get("config") != config:
+            raise SystemExit(
+                f"initial gate config {initial.get('config')} does not "
+                f"match requested config {config}")
+        gate.load_state_dict(initial["state_dict"])
+        print(f"initialized gate weights from {args.init_gate}")
     opt = torch.optim.Adam(gate.parameters(), lr=args.lr)
     print(f"gate params: {sum(p.numel() for p in gate.parameters())}  device={args.device}")
 
@@ -188,10 +206,13 @@ def main():
     model_name = os.path.splitext(os.path.basename(args.out))[0]
     plot_path = args.plot or os.path.join(graph_dir, f"{model_name}.png")
     history_path = args.history or os.path.join(graph_dir, f"{model_name}.json")
-    history = load_json(history_path, {
+    empty_history = {
         "epochs": [], "kl": [], "topk": [], "needle": [], "eval_epochs": [],
         "eval_recall8": {}, "eval_needle8": {},
-    })
+    }
+    # A fresh run must not inherit a partial history left by a prior crash.
+    # Resume checkpoints carry their own matching history below.
+    history = load_json(history_path, empty_history) if args.resume else empty_history
     history.setdefault("needle", [])
     start_epoch = 1
     if args.resume:
@@ -215,7 +236,12 @@ def main():
         tot, nrows = 0.0, 0
         topk_tot, topk_rows = 0.0, 0
         needle_tot, needle_groups = 0.0, 0
-        for doc in docs:
+        document_order = (
+            torch.randperm(len(docs)).tolist()
+            if args.shuffle_targets else range(len(docs))
+        )
+        for document_index in document_order:
+            doc = docs[document_index]
             scores = gate(doc["q_feat"], doc["k_feat"])
             kl, nv = kl_loss(scores, doc["target"], doc["cmask"])
             loss = kl
@@ -225,6 +251,15 @@ def main():
                 loss = loss + args.lambda_topk * tk
                 topk_tot += tk.item() * tnv
                 topk_rows += tnv
+            if args.lambda_needle:
+                needle_k = args.needle_topk or args.topk
+                nl, nng = needle_topk_loss(
+                    scores, doc["target"], doc["cmask"],
+                    doc["meta"]["needle_block"], k=needle_k,
+                )
+                loss = loss + args.lambda_needle * nl
+                needle_tot += nl.item() * nng
+                needle_groups += nng
             opt.zero_grad()
             loss.backward()
             opt.step()
@@ -254,6 +289,7 @@ def main():
             if args.lambda_needle:
                 line.append(f"needle={needle_avg:.4f}")
             history["eval_epochs"].append(epoch)
+            buckets = {}
             with torch.no_grad():
                 for doc in docs:
                     sc = gate(doc["q_feat"], doc["k_feat"])
@@ -261,15 +297,43 @@ def main():
                                          tuple(args.budgets), doc["meta"]["needle_block"])
                     r8 = met.get("recall@8", float("nan"))
                     nh = met.get("needle_hit@8", None)
-                    tag = f"len{doc['meta']['seq_len']}"
-                    history["eval_recall8"].setdefault(tag, []).append(r8)
-                    history["eval_needle8"].setdefault(tag, []).append(nh)
-                    line.append(f"{tag} r@8={r8:.3f}" +
-                                (f" ndl@8={nh:.2f}" if nh is not None else ""))
+                    requested = doc["meta"].get(
+                        "requested_length", doc["meta"]["seq_len"])
+                    tag = f"len{requested}"
+                    bucket = buckets.setdefault(
+                        tag, {"recall": [], "needle": []})
+                    bucket["recall"].append(r8)
+                    if nh is not None:
+                        bucket["needle"].append(nh)
+            for tag in sorted(buckets):
+                recall_values = buckets[tag]["recall"]
+                needle_values = buckets[tag]["needle"]
+                mean_recall = sum(recall_values) / len(recall_values)
+                mean_needle = (
+                    sum(needle_values) / len(needle_values)
+                    if needle_values else None
+                )
+                history["eval_recall8"].setdefault(
+                    tag, []).append(mean_recall)
+                history["eval_needle8"].setdefault(
+                    tag, []).append(mean_needle)
+                line.append(
+                    f"{tag} n={len(recall_values)} r@8={mean_recall:.3f}"
+                    + (
+                        f" ndl@8={mean_needle:.2f}"
+                        if mean_needle is not None else ""
+                    )
+                )
             emit("  ".join(line), progress)
             write_json(history_path, history)
-            if not save_training_plot(history, plot_path):
-                emit("matplotlib not installed; skipped training graph", progress)
+            try:
+                if not save_training_plot(history, plot_path):
+                    emit(
+                        "matplotlib not installed; skipped training graph",
+                        progress,
+                    )
+            except ValueError as error:
+                emit(f"skipped malformed training graph: {error}", progress)
 
         if args.save_every and (
                 epoch % args.save_every == 0 or epoch == 1 or epoch == args.epochs):

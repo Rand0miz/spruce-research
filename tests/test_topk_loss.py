@@ -1,7 +1,7 @@
 """Tests for top-k membership loss."""
 import torch
 
-from selector.loss import topk_membership_loss, topk_set_loss
+from selector.loss import needle_topk_loss, topk_membership_loss, topk_set_loss
 
 
 def test_topk_loss_prefers_teacher_topk():
@@ -25,3 +25,18 @@ def test_legacy_wrapper_still_works():
     loss, positives = topk_set_loss(scores, target, cmask, topk=1)
     assert positives == 1
     assert loss.isfinite()
+
+
+def test_needle_loss_prefers_needle_above_topk_threshold():
+    target = torch.tensor([[[[0.05, 0.10, 0.80, 0.05]]]])
+    cmask = torch.ones(1, 4, dtype=torch.bool)
+    bad = torch.tensor([[[[3.0, 2.0, -1.0, 1.0]]]])
+    good = torch.tensor([[[[1.0, 0.0, 4.0, -1.0]]]])
+
+    bad_loss, bad_groups = needle_topk_loss(
+        bad, target, cmask, needle_block=2, k=1)
+    good_loss, good_groups = needle_topk_loss(
+        good, target, cmask, needle_block=2, k=1)
+
+    assert bad_groups == good_groups == 1
+    assert good_loss.item() < bad_loss.item()
