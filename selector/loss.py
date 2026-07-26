@@ -103,16 +103,23 @@ def topk_boundary_loss(scores, target, cmask, k=8, margin=0.0,
 
 
 def needle_topk_loss(scores, target, cmask, needle_block, k=8,
-                     margin=0.0, row_valid_thresh=0.5):
+                     margin=0.0, row_valid_thresh=0.5,
+                     require_teacher_topk=True):
     """Encourage the reader row to retain a known needle in its top-k blocks.
 
-    Only the final query block (the question/reader row) is supervised. A group
-    participates only when the teacher itself puts ``needle_block`` in its top-k.
-    The softplus term compares the needle score with the k-th best other causal
-    block, a differentiable surrogate for student top-k membership.
+    Only the final query block (the question/reader row) is supervised. With
+    ``require_teacher_topk`` (legacy default) a group participates only when
+    the teacher itself puts ``needle_block`` in its top-k; block-pooled teacher
+    mass provably misses the evidence on natural cases (LOG 2026-07-26), so
+    ``require_teacher_topk=False`` supervises every valid reader row instead —
+    the needle block is ground truth from prompt construction, not from the
+    teacher. The softplus term compares the needle score with the k-th best
+    other causal block, a differentiable surrogate for student top-k
+    membership.
 
-    Returns ``(loss, eligible_layer_groups)``. Invalid needle metadata or a
-    teacher that never selects the needle produces a zero, gradient-safe loss.
+    Returns ``(loss, eligible_layer_groups)``. Invalid needle metadata (or, in
+    teacher mode, a teacher that never selects the needle) produces a zero,
+    gradient-safe loss.
     """
     _, _, qb, kb = scores.shape
     if needle_block is None or not 0 <= int(needle_block) < kb:
@@ -131,10 +138,13 @@ def needle_topk_loss(scores, target, cmask, needle_block, k=8,
 
     reader_scores = scores[:, :, qb - 1, :]
     reader_target = target[:, :, qb - 1, :]
-    teacher_top = reader_target.topk(min(int(k), kb), dim=-1).indices
-    teacher_keeps_needle = (teacher_top == needle_block).any(dim=-1)
     valid = reader_target.sum(dim=-1) > row_valid_thresh
-    eligible = teacher_keeps_needle & valid
+    if require_teacher_topk:
+        teacher_top = reader_target.topk(min(int(k), kb), dim=-1).indices
+        teacher_keeps_needle = (teacher_top == needle_block).any(dim=-1)
+        eligible = teacher_keeps_needle & valid
+    else:
+        eligible = valid
     n = int(eligible.sum())
     if n == 0:
         return scores.sum() * 0.0, 0
@@ -149,7 +159,8 @@ def needle_topk_loss(scores, target, cmask, needle_block, k=8,
 
 
 def needle_union_topk_loss(scores, target, cmask, needle_block, k=8,
-                           margin=0.0, row_valid_thresh=0.5):
+                           margin=0.0, row_valid_thresh=0.5,
+                           require_teacher_topk=True):
     """Keep evidence in at least one KV group per teacher-eligible layer.
 
     ``selected_blocks`` routes independently per KV group, while retrieval only
@@ -176,10 +187,15 @@ def needle_union_topk_loss(scores, target, cmask, needle_block, k=8,
 
     reader_scores = scores[:, :, qb - 1, :]
     reader_target = target[:, :, qb - 1, :]
-    teacher_top = reader_target.topk(min(int(k), kb), dim=-1).indices
-    teacher_keeps_needle = (teacher_top == needle_block).any(dim=-1)
     valid = reader_target.sum(dim=-1) > row_valid_thresh
-    eligible_groups = teacher_keeps_needle & valid
+    if require_teacher_topk:
+        teacher_top = reader_target.topk(min(int(k), kb), dim=-1).indices
+        teacher_keeps_needle = (teacher_top == needle_block).any(dim=-1)
+        eligible_groups = teacher_keeps_needle & valid
+    else:
+        # Evidence location is ground truth from prompt construction; do not
+        # let a teacher blind spot (LOG 2026-07-26) silence the loss.
+        eligible_groups = valid
     eligible_layers = eligible_groups.any(dim=1)
     n = int(eligible_layers.sum())
     if n == 0:

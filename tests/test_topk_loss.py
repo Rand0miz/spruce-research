@@ -117,3 +117,40 @@ def test_recursive_target_glob(tmp_path):
     assert expand_target_paths([str(tmp_path / "**" / "*.pt")]) == [
         str(target.resolve())
     ]
+
+
+def _needle_hidden_case():
+    # Teacher puts ZERO mass on the needle everywhere: the exact Gallery-d0.5
+    # label failure (LOG 2026-07-26). L=1, G=2, qb=4, kb=4, needle=1.
+    torch.manual_seed(0)
+    L, G, qb, kb = 1, 2, 4, 4
+    scores = torch.randn(L, G, qb, kb, requires_grad=True)
+    target = torch.zeros(L, G, qb, kb)
+    cmask = torch.arange(kb)[None, :] <= torch.arange(qb)[:, None]
+    for q in range(qb):
+        target[:, :, q, 0] = 1.0          # all mass on block 0, never block 1
+    return scores, target, cmask
+
+
+def test_needle_loss_teacher_gate_fires_zero_when_teacher_drops_needle():
+    scores, target, cmask = _needle_hidden_case()
+    loss, n = needle_topk_loss(scores, target, cmask, needle_block=1, k=1)
+    assert n == 0 and float(loss) == 0.0
+
+
+def test_needle_loss_always_mode_trains_through_teacher_blindspot():
+    scores, target, cmask = _needle_hidden_case()
+    loss, n = needle_topk_loss(
+        scores, target, cmask, needle_block=1, k=1, require_teacher_topk=False)
+    assert n == 2                          # both valid groups now eligible
+    assert float(loss) > 0.0
+    loss.backward()
+    assert scores.grad is not None and scores.grad.abs().sum() > 0
+
+
+def test_needle_union_loss_always_mode_eligible_layers():
+    scores, target, cmask = _needle_hidden_case()
+    loss, n = needle_union_topk_loss(
+        scores, target, cmask, needle_block=1, k=1, require_teacher_topk=False)
+    assert n == 1                          # one layer, eligible via any valid group
+    assert float(loss) > 0.0

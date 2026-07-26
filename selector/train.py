@@ -118,6 +118,7 @@ def training_recipe(args):
         "needle_topk": args.needle_topk,
         "needle_margin": args.needle_margin,
         "needle_objective": args.needle_objective,
+        "needle_eligibility": args.needle_eligibility,
         "tree_supervision": args.tree_supervision,
         "tree_radix": args.tree_radix,
         "tree_beam": args.tree_beam,
@@ -171,6 +172,7 @@ def validate_resume_recipe(saved_args, expected):
         "topk_margin": 0.0,
         "needle_margin": 0.0,
         "needle_objective": "group",
+        "needle_eligibility": "teacher",
         "tree_supervision": False,
         "tree_radix": 2,
         "tree_beam": 8,
@@ -349,7 +351,9 @@ def train_document(gate, optimizer, doc, args):
                 target_level.starts, target_level.ends)
             needle, needle_units = needle_loss_fn(
                 scores, target_level.target, target_level.cmask,
-                needle_node, k=needle_k, margin=args.needle_margin)
+                needle_node, k=needle_k, margin=args.needle_margin,
+                require_teacher_topk=(
+                    getattr(args, "needle_eligibility", "teacher") == "teacher"))
             level_loss = (
                 level_loss
                 + args.lambda_needle * needle / needle_levels
@@ -402,6 +406,12 @@ def main():
     ap.add_argument(
         "--needle-objective", choices=("group", "union"), default="group",
         help="per-group legacy loss or any-group-per-layer retrieval objective")
+    ap.add_argument(
+        "--needle-eligibility", choices=("teacher", "always"), default="teacher",
+        help="teacher: needle losses fire only where the teacher's top-k keeps "
+             "the evidence (legacy); always: the known evidence block is a "
+             "hard positive for every valid reader row, even where block-pooled "
+             "teacher mass misses it (LOG 2026-07-26)")
     ap.add_argument(
         "--tree-supervision", action=argparse.BooleanOptionalAction,
         default=False,

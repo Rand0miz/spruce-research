@@ -86,3 +86,18 @@ def test_legacy_flat_resume_gets_safe_new_objective_defaults():
             "tree_beam": 8,
         },
     )
+
+
+def test_needle_eligibility_mismatch_refuses_resume():
+    saved = {"lr": 5e-4, "needle_eligibility": "teacher"}
+    expected = {"lr": 5e-4, "needle_eligibility": "always"}
+    with pytest.raises(SystemExit, match="needle_eligibility"):
+        validate_resume_recipe(saved, expected)
+
+
+def test_legacy_checkpoint_defaults_needle_eligibility_to_teacher():
+    # Checkpoints predating the flag must resume cleanly in teacher mode and
+    # refuse a silent switch to always mode.
+    validate_resume_recipe({"lr": 5e-4}, {"lr": 5e-4, "needle_eligibility": "teacher"})
+    with pytest.raises(SystemExit, match="needle_eligibility"):
+        validate_resume_recipe({"lr": 5e-4}, {"lr": 5e-4, "needle_eligibility": "always"})
