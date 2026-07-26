@@ -38,6 +38,42 @@ Rules (from CLAUDE.md):
 
 <!-- Newest first. Paste eval_gate.py / eval_tree_traversal.py output into Number, distill to one line in Conclusion. -->
 
+## 2026-07-25 — Cross-runtime CUDA RNG resume fix
+**Question:** Can a mixed-gate resume checkpoint restore its RNG state after Colab starts a fresh CUDA runtime?
+**Config:** User-reported resume of the 160-natural/40-replay selector run from its Drive checkpoint. `torch.load(..., map_location="cuda")` moved the saved CUDA RNG byte tensors to the GPU before `torch.cuda.set_rng_state_all` was called.
+**Number:** Resume stopped before the next epoch with `TypeError: RNG state must be a torch.ByteTensor`. After normalizing each saved CUDA RNG state through `detach().cpu().to(torch.uint8)`, the focused resume/loss suite passed 6/6 and the full local suite passed 98 tests with 11 skipped.
+**Conclusion:** The checkpoint is valid; only the loader was wrong. Patch `selector/train.py` in the active runtime and rerun the same `--resume` command. Fresh source archives now include the fix.
+
+## 2026-07-25 — Compact 40-target legacy replay pool
+**Question:** Can mixed natural training retain a strict 160:40 natural-to-old epoch ratio without loading all 120 legacy targets?
+**Config:** Selected one full teacher target from each of 40 distinct old training cases; deterministic seed 20260725; balanced across native context scale and evidence position. Packaged without modifying the original 120-target directory.
+**Number:** Replay pool contains exactly 40 files from 40 semantic cases: 20 approximately 16K and 20 approximately 32K; evidence-depth bins are 13 shallow (`d<0.33`), 14 middle, and 13 deep (`d>=0.67`). Archive size is 4,190,289,374 bytes; SHA-256 `CE3C6FB913EF054397A2D8AB96AD8E6FB902C3623D5B0DE026CE67E5BB3DE3A9`.
+**Conclusion:** Train with all 160 natural targets plus this fixed 40-target replay directory and `--natural-fraction 0.8`. The grouped sampler then uses every file exactly once per epoch, avoiding both excess eager-load memory and changing replay composition across epochs.
+
+## 2026-07-25 — Diversity-first 160-target source bank
+**Question:** Can the natural training source be expanded enough that an exact 160-target teacher set does not rely on repeated seed variants of twelve semantic facts?
+**Config:** Expanded `scripts/prompt_banks/natural_train.json` from 12 to 60 held-out-disjoint semantic cases. The 48 additions span 48 labeled document genres and vary answers across names, dates, times, paths, codes, versions, measurements, ranges, percentages, counts, classifications, procedures, and locations; every case includes three close distractors. Added global `--max-per-case` enforcement to the balanced screened-manifest selector using an exact capacity allocation across length/depth strata. No dense screening or teacher extraction was run locally.
+**Number:** Bank validation: 60/60 unique case IDs, zero overlap with the six-case natural held-out bank, 60/60 needles contained in their evidence, and at least three distractors per case. Full local suite: 97 passed, 11 skipped. Rebuilt `spruce_colab_train_source.zip` contains 82 source/test files, including the 60-case bank and capped selector.
+**Conclusion:** Screen one variant of all 60 cases at 16K/32K and three depths (360 candidates), then select exactly 160 with `--max-per-case 3`. This makes semantic diversity a hard dataset constraint rather than an incidental effect of selection order.
+
+## 2026-07-25 — 160-target extraction exposes semantic-duplication problem
+**Question:** Does scaling the existing 12-case natural bank to 160 targets by increasing prose seeds create the intended practical-data diversity?
+**Config:** User-reported in-progress Colab extraction from the four-variant screened/selected manifest; native 16K/32K; multiple depths; Qwen2.5-Coder-1.5B-Instruct; full FP16 teacher targets. Each seed changes deterministic surrounding prose, but case evidence, question, answer, and near-miss distractors remain fixed.
+**Number:** The extraction log shows repeated source cases such as `archive_box_finch`, `beacon_frequency_88_4`, and `clinic_cobalt_room_214` across seeds 20260725–20260727, lengths, and depths. Reported peak VRAM is 4.19GB at 16K and 5.28GB at 32K.
+**Conclusion:** These are distinct documents but semantic duplicates, so completing 160 from only 12 cases is poor use of extraction budget and risks learning case/question templates. Stop treating seed variants as new semantic examples. Expand the natural training bank substantially, use one or at most two variants per case, then screen and extract a diversity-first set; retain already extracted files only as a small augmentation subset.
+
+## 2026-07-25 — Exact 160-target screened natural-set builder
+**Question:** Can an oversized dense-screening run be reduced to exactly 160 accepted natural prompts without concentrating selection in one length, depth, or semantic case?
+**Config:** Added `scripts/select_screened_prompts.py`. It filters completed dense-accepted records, allocates an exact count evenly across requested-length/evidence-depth strata subject to available capacity, round-robins source cases within each stratum, and writes an accepted-only verified manifest consumable by full teacher extraction. Selection is deterministic by seed and rejects duplicate IDs or insufficient accepted supply. No screening or extraction was run locally.
+**Number:** Focused screening/selection tests: 10 passed. Full local suite: 95 passed, 11 skipped; compile, CLI-help, and whitespace checks passed.
+**Conclusion:** Screen an oversized four-variant 16K/32K natural candidate pool, select exactly 160 accepted prompts, then extract only that manifest into a clean target directory. The resulting directory has exactly 160 jobs if extraction completes without unrelated pre-existing files.
+
+## 2026-07-25 — Natural-majority balanced replay sampler
+**Question:** Can mixed selector training prioritize practical natural documents without discarding the old repeated-needle distribution entirely?
+**Config:** Added grouped trainer inputs `--natural-targets` and `--replay-targets` plus `--natural-fraction`. Each epoch uses every natural target exactly once, samples only enough old targets to reach the requested fraction, and deterministically shuffles the combined order. Sampling cycles without replacement before repeating when necessary. Recursive globs now support arbitrary directory layouts produced by teacher-target ZIPs. Existing ungrouped `--targets` remains backward compatible. No gate training was run locally.
+**Number:** At the recommended 0.8 fraction, eight natural documents produce two replay draws and ten updates per epoch. Focused grouped-sampling/evaluator/target suite: 12 passed. Full local suite: 92 passed, 11 skipped; compile, CLI-help, and whitespace checks passed.
+**Conclusion:** The next gate can train on an 80/20 natural/replay curriculum independent of raw file counts, initialized from the original gate. This tests whether natural held-out gains can be retained while using old data only as regression regularization.
+
 ## 2026-07-25 — First mixed natural gate: natural gain, legacy regression
 **Question:** Does the first mixed original-plus-natural gate improve diverse-prose routing without losing the original repeated-needle behavior?
 **Config:** Laptop structural evaluation; original `flat_gate_lamt0.75_lamn0.25_lr5e4_e300.pt` versus `natural_gate_lamt075_lamn025_k10_lr5e4_e300.pt`; live radix-2 tree; natural eval K10/beam8/local1 on dense-accepted chat-formatted held-out 16K/32K targets; legacy eval on six held-out repeated-needle targets at beams 8 and 16. One copied Atlas natural target was accidentally included twice, giving 25 rows/24 unique targets; this has negligible effect but must be deduplicated before the final report. Selector timings are laptop diagnostics and not paper numbers.

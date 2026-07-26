@@ -1,5 +1,5 @@
 {
-  "description": "Natural-prose candidate cases used only for dense screening and selector training. Keep separate from natural_heldout.json.",
+  "description": "Sixty semantically distinct natural-prose cases for dense screening and selector training, spanning records, reports, manuals, schedules, scientific notes, software operations, and public documents. Keep separate from natural_heldout.json.",
   "format": "natural_prose_v1",
   "cases": [
     {
@@ -156,6 +156,678 @@
         "Cedar controls ventilation in the western greenhouse.",
         "A preliminary wiring plan assigned the eastern loop to Aspen.",
         "Birch monitors temperature but does not operate irrigation."
+      ]
+    },
+    {
+      "id": "museum_linden_donation_1974",
+      "builder": "natural_prose_v1",
+      "genre": "museum accession record",
+      "evidence": "The museum accession record dates the Linden textile donation to 1974. The donor's correspondence arrived the following winter and was cataloged separately.",
+      "needle": "The museum accession record dates the Linden textile donation to 1974.",
+      "question": "\n\nQuestion: In what year was the Linden textile donation made? Answer with only the year.",
+      "answers": ["1974"],
+      "distractors": [
+        "A conservation report from 1976 describes repairs to the Linden textiles.",
+        "The museum acquired the Rowan ceramics in 1971.",
+        "A draft catalog mistakenly assigned the donation to 1975."
+      ]
+    },
+    {
+      "id": "transit_aurora_platform_3",
+      "builder": "natural_prose_v1",
+      "genre": "transit service bulletin",
+      "evidence": "The weekend service bulletin directs the Aurora express to platform 3. Local trains remain on the two outer platforms during the track inspection.",
+      "needle": "The weekend service bulletin directs the Aurora express to platform 3.",
+      "question": "\n\nQuestion: Which platform should passengers use for the Aurora express? Answer with only the platform number.",
+      "answers": ["platform 3", "3"],
+      "distractors": [
+        "The Borealis local departs from platform 2.",
+        "An earlier draft assigned the Aurora express to platform 5.",
+        "Platform 1 is closed for signal maintenance."
+      ]
+    },
+    {
+      "id": "reef_sampling_depth_42_meters",
+      "builder": "natural_prose_v1",
+      "genre": "marine field report",
+      "evidence": "The reef survey collected the primary coral sample at a depth of 42 meters. Divers logged water temperature before sealing the specimen container.",
+      "needle": "The reef survey collected the primary coral sample at a depth of 42 meters.",
+      "question": "\n\nQuestion: At what depth was the primary coral sample collected? Answer with only the depth.",
+      "answers": ["42 meters", "42 m", "42"],
+      "distractors": [
+        "A sediment core was taken at 24 meters on the previous dive.",
+        "The expedition plan proposed a 45-meter station that was later canceled.",
+        "The calibration sensor was tested at 12 meters."
+      ]
+    },
+    {
+      "id": "municipal_vote_17_to_4",
+      "builder": "natural_prose_v1",
+      "genre": "city council minutes",
+      "evidence": "The council minutes record that the riverwalk amendment passed by a vote of 17 to 4. Two members were absent when the roll was called.",
+      "needle": "The council minutes record that the riverwalk amendment passed by a vote of 17 to 4.",
+      "question": "\n\nQuestion: What was the recorded vote on the riverwalk amendment? Answer with only the vote tally.",
+      "answers": ["17 to 4", "17-4"],
+      "distractors": [
+        "The lighting ordinance passed 14 to 7 later in the meeting.",
+        "A committee recommendation had supported the amendment 4 to 1.",
+        "The draft minutes incorrectly reported a 16-to-5 tally."
+      ]
+    },
+    {
+      "id": "firmware_orchid_3_8_2",
+      "builder": "natural_prose_v1",
+      "genre": "software release note",
+      "evidence": "The deployment note approves firmware version 3.8.2 for the Orchid controllers. This release corrects a restart fault found during overnight testing.",
+      "needle": "The deployment note approves firmware version 3.8.2 for the Orchid controllers.",
+      "question": "\n\nQuestion: Which firmware version is approved for the Orchid controllers? Answer with only the version.",
+      "answers": ["3.8.2"],
+      "distractors": [
+        "Version 3.8.1 remains installed on the retired Cedar controllers.",
+        "A beta checklist refers to version 3.9.0 but does not approve it.",
+        "The monitoring dashboard itself runs software version 2.8.2."
+      ]
+    },
+    {
+      "id": "treaty_signatory_mara_velen",
+      "builder": "natural_prose_v1",
+      "genre": "diplomatic register",
+      "evidence": "The diplomatic register lists Mara Velen as the coastal republic's signatory to the Ardent Accord. Her deputy witnessed the ceremony but did not sign the instrument.",
+      "needle": "The diplomatic register lists Mara Velen as the coastal republic's signatory to the Ardent Accord.",
+      "question": "\n\nQuestion: Who signed the Ardent Accord for the coastal republic? Answer with only the person's name.",
+      "answers": ["Mara Velen"],
+      "distractors": [
+        "Tomas Velen chaired an earlier trade conference.",
+        "Deputy Lia Maren witnessed the accord without signing it.",
+        "A newspaper preview incorrectly named Mara Selen as the delegate."
+      ]
+    },
+    {
+      "id": "bakery_proofing_27_minutes",
+      "builder": "natural_prose_v1",
+      "genre": "production recipe",
+      "evidence": "The production recipe gives the rye rolls a final proofing time of 27 minutes. The oven must already be at temperature before the trays leave the cabinet.",
+      "needle": "The production recipe gives the rye rolls a final proofing time of 27 minutes.",
+      "question": "\n\nQuestion: How long is the final proofing time for the rye rolls? Answer with only the duration.",
+      "answers": ["27 minutes", "27 min", "27"],
+      "distractors": [
+        "The wheat loaves receive a 32-minute final proof.",
+        "An experimental batch was held for 24 minutes and rejected.",
+        "The rye dough rests for 40 minutes before it is divided."
+      ]
+    },
+    {
+      "id": "weather_station_altitude_1860",
+      "builder": "natural_prose_v1",
+      "genre": "meteorological station inventory",
+      "evidence": "The station inventory places the Mount Kestrel weather station at an altitude of 1,860 meters. Its wind mast stands twelve meters above the instrument deck.",
+      "needle": "The station inventory places the Mount Kestrel weather station at an altitude of 1,860 meters.",
+      "question": "\n\nQuestion: What altitude is listed for the Mount Kestrel weather station? Answer with only the altitude.",
+      "answers": ["1,860 meters", "1860 meters", "1,860 m", "1860 m", "1860"],
+      "distractors": [
+        "The Valley Kestrel gauge is located at 860 meters.",
+        "A preliminary map labeled the station at 1,680 meters.",
+        "The nearby radio relay occupies the 1,920-meter ridge."
+      ]
+    },
+    {
+      "id": "library_translation_harbor_lantern",
+      "builder": "natural_prose_v1",
+      "genre": "library catalog note",
+      "evidence": "The library catalog gives Harbor Lantern as the English title of the recovered novella. The original edition was published under a regional dialect title.",
+      "needle": "The library catalog gives Harbor Lantern as the English title of the recovered novella.",
+      "question": "\n\nQuestion: What English title does the catalog give the recovered novella? Answer with only the title.",
+      "answers": ["Harbor Lantern"],
+      "distractors": [
+        "Harbor Light is a different novel by the same publisher.",
+        "A bookseller's list shortened the title to Lantern.",
+        "The translator's essay is titled Lamps of the Coast."
+      ]
+    },
+    {
+      "id": "laboratory_buffer_ph_6_8",
+      "builder": "natural_prose_v1",
+      "genre": "laboratory protocol",
+      "evidence": "The assay protocol specifies a buffer pH of 6.8 for the second wash. Technicians measure it again after the solution reaches room temperature.",
+      "needle": "The assay protocol specifies a buffer pH of 6.8 for the second wash.",
+      "question": "\n\nQuestion: What buffer pH is specified for the second wash? Answer with only the pH value.",
+      "answers": ["6.8", "pH 6.8"],
+      "distractors": [
+        "The first wash uses a buffer adjusted to pH 7.2.",
+        "An obsolete protocol specified pH 6.5 for the second wash.",
+        "The storage solution is maintained at pH 7.8."
+      ]
+    },
+    {
+      "id": "shipping_container_zx_418",
+      "builder": "natural_prose_v1",
+      "genre": "freight manifest",
+      "evidence": "The freight manifest assigns the replacement turbine blades to container ZX-418. Customs seals were applied after the final weight inspection.",
+      "needle": "The freight manifest assigns the replacement turbine blades to container ZX-418.",
+      "question": "\n\nQuestion: Which container holds the replacement turbine blades? Answer with only the container code.",
+      "answers": ["ZX-418"],
+      "distractors": [
+        "Container ZX-481 carries mounting brackets.",
+        "The preliminary manifest placed the blades in ZK-418.",
+        "Container RX-418 was empty after unloading."
+      ]
+    },
+    {
+      "id": "audit_invoice_7319",
+      "builder": "natural_prose_v1",
+      "genre": "financial audit memorandum",
+      "evidence": "The audit memorandum traces the unmatched freight charge to invoice 7319. The supporting receipt was filed after the quarterly ledger closed.",
+      "needle": "The audit memorandum traces the unmatched freight charge to invoice 7319.",
+      "question": "\n\nQuestion: Which invoice caused the unmatched freight charge? Answer with only the invoice number.",
+      "answers": ["invoice 7319", "7319"],
+      "distractors": [
+        "Invoice 7391 covers a separate equipment rental.",
+        "A review note initially cited invoice 7316 in error.",
+        "Receipt 7319-B documents packaging rather than freight."
+      ]
+    },
+    {
+      "id": "theater_costume_sable",
+      "builder": "natural_prose_v1",
+      "genre": "theater wardrobe ledger",
+      "evidence": "The wardrobe ledger assigns the Sable coat to the actor playing the magistrate. Its silver buttons were replaced before the final rehearsal.",
+      "needle": "The wardrobe ledger assigns the Sable coat to the actor playing the magistrate.",
+      "question": "\n\nQuestion: Which coat is assigned to the actor playing the magistrate? Answer with only the coat name.",
+      "answers": ["Sable coat", "Sable"],
+      "distractors": [
+        "The actor playing the captain wears the Slate coat.",
+        "An early costume sketch labeled the magistrate's coat Onyx.",
+        "The Sable cloak belongs to the chorus wardrobe."
+      ]
+    },
+    {
+      "id": "reservoir_gate_tuesday_0600",
+      "builder": "natural_prose_v1",
+      "genre": "water operations schedule",
+      "evidence": "The reservoir schedule orders Gate C opened Tuesday at 06:00. Operators must confirm the downstream gauge reading before beginning the release.",
+      "needle": "The reservoir schedule orders Gate C opened Tuesday at 06:00.",
+      "question": "\n\nQuestion: When is Gate C scheduled to open? Answer with only the day and time.",
+      "answers": ["Tuesday at 06:00", "Tuesday 06:00", "Tuesday at 6:00"],
+      "distractors": [
+        "Gate B opens Monday at 06:00 for a smaller release.",
+        "A draft schedule placed Gate C on Tuesday at 08:00.",
+        "The inspection crew arrives Wednesday at 06:00."
+      ]
+    },
+    {
+      "id": "archaeology_layer_iv",
+      "builder": "natural_prose_v1",
+      "genre": "archaeological field journal",
+      "evidence": "The excavation journal records the bronze clasp in stratigraphic Layer IV. It was found beside a burned timber line near the eastern wall.",
+      "needle": "The excavation journal records the bronze clasp in stratigraphic Layer IV.",
+      "question": "\n\nQuestion: In which layer was the bronze clasp found? Answer with only the layer.",
+      "answers": ["Layer IV", "IV"],
+      "distractors": [
+        "A pottery fragment was recovered from Layer VI.",
+        "The initial field sketch mislabeled the clasp as Layer III.",
+        "Layer V contained iron nails but no bronze clasp."
+      ]
+    },
+    {
+      "id": "manuscript_language_old_sorian",
+      "builder": "natural_prose_v1",
+      "genre": "manuscript examination",
+      "evidence": "The paleography report identifies the marginal prayer as written in Old Sorian. Its letter forms differ from the later court dialect used in the main text.",
+      "needle": "The paleography report identifies the marginal prayer as written in Old Sorian.",
+      "question": "\n\nQuestion: In what language is the marginal prayer written? Answer with only the language.",
+      "answers": ["Old Sorian"],
+      "distractors": [
+        "The manuscript's main text is written in Court Sorian.",
+        "An early catalog described the prayer as Old Serian.",
+        "A Latin ownership note appears on the final leaf."
+      ]
+    },
+    {
+      "id": "network_service_port_7443",
+      "builder": "natural_prose_v1",
+      "genre": "network operations runbook",
+      "evidence": "The operations runbook exposes the internal Cedar service on port 7443. The public proxy terminates encryption before forwarding requests to that port.",
+      "needle": "The operations runbook exposes the internal Cedar service on port 7443.",
+      "question": "\n\nQuestion: Which port does the Cedar service use internally? Answer with only the port number.",
+      "answers": ["7443", "port 7443"],
+      "distractors": [
+        "The public proxy accepts connections on port 443.",
+        "A deprecated staging service used port 7433.",
+        "The Cedar metrics endpoint listens on port 9104."
+      ]
+    },
+    {
+      "id": "wildfire_evacuation_zone_echo",
+      "builder": "natural_prose_v1",
+      "genre": "emergency management bulletin",
+      "evidence": "The emergency bulletin places the Pine Hollow residences in evacuation Zone Echo. Residents should follow the marked western road if an order is issued.",
+      "needle": "The emergency bulletin places the Pine Hollow residences in evacuation Zone Echo.",
+      "question": "\n\nQuestion: Which evacuation zone includes the Pine Hollow residences? Answer with only the zone.",
+      "answers": ["Zone Echo", "Echo"],
+      "distractors": [
+        "Zone Delta covers the campground north of Pine Hollow.",
+        "A preliminary map incorrectly shaded the residences as Zone Foxtrot.",
+        "The western road crosses Zone Charlie near the highway."
+      ]
+    },
+    {
+      "id": "nutrition_sodium_limit_18_grams",
+      "builder": "natural_prose_v1",
+      "genre": "institutional nutrition standard",
+      "evidence": "The kitchen standard limits sodium to 1.8 grams per full daily menu. Recipe substitutions must be reviewed against that total rather than per serving.",
+      "needle": "The kitchen standard limits sodium to 1.8 grams per full daily menu.",
+      "question": "\n\nQuestion: What sodium limit applies to a full daily menu? Answer with only the limit.",
+      "answers": ["1.8 grams", "1.8 g", "1.8"],
+      "distractors": [
+        "The previous standard allowed 2.1 grams per daily menu.",
+        "One soup recipe contains 0.8 grams per batch.",
+        "The potassium guideline is 3.5 grams and is measured separately."
+      ]
+    },
+    {
+      "id": "school_mascot_red_kite",
+      "builder": "natural_prose_v1",
+      "genre": "school board history",
+      "evidence": "The school board history names the red kite as Westmere Academy's official mascot. Students selected it during the centennial campaign.",
+      "needle": "The school board history names the red kite as Westmere Academy's official mascot.",
+      "question": "\n\nQuestion: What is Westmere Academy's official mascot? Answer with only the mascot.",
+      "answers": ["red kite", "the red kite"],
+      "distractors": [
+        "Eastmere College uses a golden hawk as its mascot.",
+        "A student petition proposed the river otter but did not win.",
+        "The academy seal includes an oak tree that is not the mascot."
+      ]
+    },
+    {
+      "id": "rail_inspection_october_14",
+      "builder": "natural_prose_v1",
+      "genre": "rail maintenance calendar",
+      "evidence": "The maintenance calendar schedules the Alder Viaduct inspection for October 14. Freight traffic will use the lower bypass until the inspection is complete.",
+      "needle": "The maintenance calendar schedules the Alder Viaduct inspection for October 14.",
+      "question": "\n\nQuestion: On what date is the Alder Viaduct inspection scheduled? Answer with only the date.",
+      "answers": ["October 14", "Oct 14", "October 14th"],
+      "distractors": [
+        "The Birch Tunnel inspection is scheduled for October 11.",
+        "A superseded calendar listed the viaduct inspection on October 16.",
+        "The lower bypass reopens for local traffic on October 15."
+      ]
+    },
+    {
+      "id": "telescope_filter_h_alpha",
+      "builder": "natural_prose_v1",
+      "genre": "observatory night plan",
+      "evidence": "The observing plan assigns the H-alpha filter to the first exposure of the Crescent Nebula. A broadband image follows after the guide camera is recalibrated.",
+      "needle": "The observing plan assigns the H-alpha filter to the first exposure of the Crescent Nebula.",
+      "question": "\n\nQuestion: Which filter is assigned to the first Crescent Nebula exposure? Answer with only the filter name.",
+      "answers": ["H-alpha", "H alpha"],
+      "distractors": [
+        "The O-III filter is reserved for the second target.",
+        "An earlier plan assigned a broadband L filter to the first exposure.",
+        "The guide camera uses a clear filter during calibration."
+      ]
+    },
+    {
+      "id": "pharmacy_storage_2_to_8_c",
+      "builder": "natural_prose_v1",
+      "genre": "pharmacy storage instruction",
+      "evidence": "The pharmacy instruction requires the Vireo reagent to be stored between 2 and 8 degrees Celsius. Opened vials remain subject to the same range.",
+      "needle": "The pharmacy instruction requires the Vireo reagent to be stored between 2 and 8 degrees Celsius.",
+      "question": "\n\nQuestion: What storage temperature range is required for the Vireo reagent? Answer with only the range.",
+      "answers": ["2 to 8 degrees Celsius", "2-8 degrees Celsius", "2-8 C", "2 to 8 C"],
+      "distractors": [
+        "The Lumen reagent is frozen below minus 10 degrees Celsius.",
+        "A shipping label allows 8 to 12 degrees for no more than one hour.",
+        "The refrigerator alarm is set to trigger at 9 degrees Celsius."
+      ]
+    },
+    {
+      "id": "mining_supervisor_inez_park",
+      "builder": "natural_prose_v1",
+      "genre": "mining shift roster",
+      "evidence": "The overnight shift roster names Inez Park as supervisor of the North Drift crew. She receives the ventilation report at the start of each shift.",
+      "needle": "The overnight shift roster names Inez Park as supervisor of the North Drift crew.",
+      "question": "\n\nQuestion: Who supervises the North Drift crew overnight? Answer with only the person's name.",
+      "answers": ["Inez Park"],
+      "distractors": [
+        "Omar Pike supervises the South Drift crew.",
+        "A provisional roster listed Ines Park before the spelling was corrected.",
+        "Ventilation engineer Mara Quinn advises both crews but supervises neither."
+      ]
+    },
+    {
+      "id": "bridge_load_limit_28_tonnes",
+      "builder": "natural_prose_v1",
+      "genre": "civil engineering inspection",
+      "evidence": "The bridge inspection sets a temporary gross load limit of 28 tonnes for the East Span. The restriction remains until the bearing plates are replaced.",
+      "needle": "The bridge inspection sets a temporary gross load limit of 28 tonnes for the East Span.",
+      "question": "\n\nQuestion: What temporary gross load limit applies to the East Span? Answer with only the limit.",
+      "answers": ["28 tonnes", "28 tons", "28"],
+      "distractors": [
+        "The West Span retains its 36-tonne limit.",
+        "A draft notice proposed a 25-tonne restriction.",
+        "Replacement bearing plates are rated for 40 tonnes."
+      ]
+    },
+    {
+      "id": "election_turnout_61_4_percent",
+      "builder": "natural_prose_v1",
+      "genre": "election certification report",
+      "evidence": "The certified election report gives voter turnout in Lark County as 61.4 percent. The figure includes accepted provisional ballots.",
+      "needle": "The certified election report gives voter turnout in Lark County as 61.4 percent.",
+      "question": "\n\nQuestion: What voter turnout does the certified report give for Lark County? Answer with only the percentage.",
+      "answers": ["61.4 percent", "61.4%"],
+      "distractors": [
+        "Neighboring Heron County reported 64.1 percent turnout.",
+        "An election-night estimate placed Lark County at 60.8 percent.",
+        "Provisional ballots represented 1.4 percent of votes cast."
+      ]
+    },
+    {
+      "id": "lake_species_silver_dace",
+      "builder": "natural_prose_v1",
+      "genre": "ecological survey",
+      "evidence": "The shoreline survey confirms the silver dace as the fish nesting among Lake Vesper's reed beds. The observation was verified during three morning transects.",
+      "needle": "The shoreline survey confirms the silver dace as the fish nesting among Lake Vesper's reed beds.",
+      "question": "\n\nQuestion: Which fish was confirmed nesting among Lake Vesper's reed beds? Answer with only the species.",
+      "answers": ["silver dace", "the silver dace"],
+      "distractors": [
+        "Golden dace were observed in the upstream river.",
+        "A preliminary note misidentified the nesting fish as silver chub.",
+        "Reed minnows occupied the southern inlet but did not nest in the surveyed beds."
+      ]
+    },
+    {
+      "id": "court_archive_shelf_b12",
+      "builder": "natural_prose_v1",
+      "genre": "court archive index",
+      "evidence": "The archive index stores the sealed Harrow deposition on shelf B12. Access requires signatures from both the registrar and the records officer.",
+      "needle": "The archive index stores the sealed Harrow deposition on shelf B12.",
+      "question": "\n\nQuestion: Where is the sealed Harrow deposition stored? Answer with only the shelf code.",
+      "answers": ["B12", "shelf B12"],
+      "distractors": [
+        "Shelf B21 contains the unsealed hearing exhibits.",
+        "A transfer request proposed moving the deposition to C12.",
+        "The Harrow docket book is kept on shelf A12."
+      ]
+    },
+    {
+      "id": "backup_sunday_0230",
+      "builder": "natural_prose_v1",
+      "genre": "IT backup policy",
+      "evidence": "The backup policy schedules the complete ledger snapshot for Sunday at 02:30 UTC. Incremental copies run every six hours between full snapshots.",
+      "needle": "The backup policy schedules the complete ledger snapshot for Sunday at 02:30 UTC.",
+      "question": "\n\nQuestion: When does the complete ledger snapshot run? Answer with only the day and time.",
+      "answers": ["Sunday at 02:30 UTC", "Sunday 02:30 UTC", "Sunday at 2:30 UTC"],
+      "distractors": [
+        "An incremental copy runs Saturday at 20:30 UTC.",
+        "The retired policy scheduled the full snapshot for Sunday at 03:00 UTC.",
+        "Database maintenance begins Monday at 02:30 UTC."
+      ]
+    },
+    {
+      "id": "vineyard_trial_row_47",
+      "builder": "natural_prose_v1",
+      "genre": "agricultural trial notebook",
+      "evidence": "The vineyard notebook places the drought-resistant rootstock trial in row 47. Soil probes were installed at both ends of that row.",
+      "needle": "The vineyard notebook places the drought-resistant rootstock trial in row 47.",
+      "question": "\n\nQuestion: Which row contains the drought-resistant rootstock trial? Answer with only the row number.",
+      "answers": ["row 47", "47"],
+      "distractors": [
+        "Row 44 contains the mildew-resistance trial.",
+        "A planning map originally assigned the rootstock trial to row 49.",
+        "Soil probe 47-B was later moved to row 46."
+      ]
+    },
+    {
+      "id": "satellite_orbit_640_km",
+      "builder": "natural_prose_v1",
+      "genre": "spacecraft mission brief",
+      "evidence": "The mission brief places the Cormorant satellite in a circular orbit 640 kilometers above Earth. Its first imaging pass begins after the third ground contact.",
+      "needle": "The mission brief places the Cormorant satellite in a circular orbit 640 kilometers above Earth.",
+      "question": "\n\nQuestion: What orbital altitude is planned for the Cormorant satellite? Answer with only the altitude.",
+      "answers": ["640 kilometers", "640 km", "640"],
+      "distractors": [
+        "The older Tern satellite operates at 460 kilometers.",
+        "A feasibility study considered a 600-kilometer orbit.",
+        "Cormorant's deployment rocket separates at 180 kilometers."
+      ]
+    },
+    {
+      "id": "clinical_trial_cohort_c",
+      "builder": "natural_prose_v1",
+      "genre": "clinical trial allocation note",
+      "evidence": "The allocation note assigns participants receiving the reduced evening dose to Cohort C. Their morning dose remains unchanged during the observation period.",
+      "needle": "The allocation note assigns participants receiving the reduced evening dose to Cohort C.",
+      "question": "\n\nQuestion: Which cohort receives the reduced evening dose? Answer with only the cohort.",
+      "answers": ["Cohort C", "C"],
+      "distractors": [
+        "Cohort B receives a reduced morning dose.",
+        "An early protocol draft assigned the evening reduction to Cohort D.",
+        "Cohort A continues the standard schedule."
+      ]
+    },
+    {
+      "id": "aviation_runway_16_left",
+      "builder": "natural_prose_v1",
+      "genre": "airport operations notice",
+      "evidence": "The operations notice assigns inbound medical flights to runway 16 Left during the resurfacing period. Ground crews will stage beside the northern taxiway.",
+      "needle": "The operations notice assigns inbound medical flights to runway 16 Left during the resurfacing period.",
+      "question": "\n\nQuestion: Which runway is assigned to inbound medical flights? Answer with only the runway.",
+      "answers": ["runway 16 Left", "16 Left", "16L"],
+      "distractors": [
+        "Cargo departures continue to use runway 16 Right.",
+        "A preliminary notice assigned medical flights to runway 14 Left.",
+        "Runway 6 Left is closed for lighting repairs."
+      ]
+    },
+    {
+      "id": "music_tempo_72_bpm",
+      "builder": "natural_prose_v1",
+      "genre": "orchestral rehearsal annotation",
+      "evidence": "The conductor's annotation sets the opening procession at 72 beats per minute. The tempo increases only after the second brass entrance.",
+      "needle": "The conductor's annotation sets the opening procession at 72 beats per minute.",
+      "question": "\n\nQuestion: What tempo is specified for the opening procession? Answer with only the tempo.",
+      "answers": ["72 beats per minute", "72 bpm", "72"],
+      "distractors": [
+        "The central dance begins at 96 beats per minute.",
+        "An earlier score marking gave the procession as 76 bpm.",
+        "The second brass entrance occurs at measure 72."
+      ]
+    },
+    {
+      "id": "geology_sample_basalt",
+      "builder": "natural_prose_v1",
+      "genre": "geological core log",
+      "evidence": "The core log identifies the dark band at 318 meters as olivine basalt. Thin sections show small crystals aligned along the cooling margin.",
+      "needle": "The core log identifies the dark band at 318 meters as olivine basalt.",
+      "question": "\n\nQuestion: What rock type forms the dark band at 318 meters? Answer with only the rock type.",
+      "answers": ["olivine basalt", "basalt"],
+      "distractors": [
+        "A pale band at 281 meters consists of rhyolite.",
+        "The field description initially called the dark band plain gabbro.",
+        "Olivine sandstone occurs in a separate surface sample."
+      ]
+    },
+    {
+      "id": "customs_tariff_9403_20",
+      "builder": "natural_prose_v1",
+      "genre": "customs classification ruling",
+      "evidence": "The customs ruling classifies the modular steel shelving under tariff code 9403.20. Wooden display cabinets remain in a different category.",
+      "needle": "The customs ruling classifies the modular steel shelving under tariff code 9403.20.",
+      "question": "\n\nQuestion: Which tariff code applies to the modular steel shelving? Answer with only the code.",
+      "answers": ["9403.20"],
+      "distractors": [
+        "Tariff code 9403.60 applies to certain wooden furniture.",
+        "The importer's draft declaration used code 9403.10.",
+        "Fasteners for the shelving are listed under code 7318.20."
+      ]
+    },
+    {
+      "id": "conference_room_juniper",
+      "builder": "natural_prose_v1",
+      "genre": "conference agenda",
+      "evidence": "The conference agenda places the accessibility workshop in the Juniper Room. Registration staff will direct attendees there after the morning keynote.",
+      "needle": "The conference agenda places the accessibility workshop in the Juniper Room.",
+      "question": "\n\nQuestion: Which room hosts the accessibility workshop? Answer with only the room name.",
+      "answers": ["Juniper Room", "Juniper"],
+      "distractors": [
+        "The Cedar Room hosts the security workshop.",
+        "A draft agenda placed accessibility in the Jupiter Room.",
+        "The morning keynote takes place in the Grand Hall."
+      ]
+    },
+    {
+      "id": "water_treatment_ozone",
+      "builder": "natural_prose_v1",
+      "genre": "water treatment process sheet",
+      "evidence": "The process sheet specifies ozone as the final disinfection method for the North Basin line. Residual levels are checked before water enters the storage tanks.",
+      "needle": "The process sheet specifies ozone as the final disinfection method for the North Basin line.",
+      "question": "\n\nQuestion: Which final disinfection method is used for the North Basin line? Answer with only the method.",
+      "answers": ["ozone"],
+      "distractors": [
+        "The South Basin line still uses ultraviolet disinfection.",
+        "A design proposal considered chlorine dioxide but was not adopted.",
+        "Activated carbon is used earlier for odor control."
+      ]
+    },
+    {
+      "id": "census_population_18472",
+      "builder": "natural_prose_v1",
+      "genre": "regional census table",
+      "evidence": "The final census table records Bellweather Township's resident population as 18,472. Seasonal workers are tabulated separately from residents.",
+      "needle": "The final census table records Bellweather Township's resident population as 18,472.",
+      "question": "\n\nQuestion: What resident population is recorded for Bellweather Township? Answer with only the number.",
+      "answers": ["18,472", "18472"],
+      "distractors": [
+        "Neighboring Fairweather Township has 17,842 residents.",
+        "A preliminary estimate listed Bellweather at 18,247.",
+        "The township counted 1,472 seasonal workers."
+      ]
+    },
+    {
+      "id": "emergency_route_west_stair",
+      "builder": "natural_prose_v1",
+      "genre": "building evacuation plan",
+      "evidence": "The evacuation plan directs laboratory occupants to the west stair during a fire alarm. The central lift automatically returns to the ground floor.",
+      "needle": "The evacuation plan directs laboratory occupants to the west stair during a fire alarm.",
+      "question": "\n\nQuestion: Which route should laboratory occupants use during a fire alarm? Answer with only the route.",
+      "answers": ["west stair", "the west stair"],
+      "distractors": [
+        "Office occupants on the east wing use the east stair.",
+        "An obsolete wall card directed laboratories to the central stair.",
+        "The west lift is reserved for maintenance and is not an evacuation route."
+      ]
+    },
+    {
+      "id": "poetry_collection_author_nila_arden",
+      "builder": "natural_prose_v1",
+      "genre": "literary bibliography",
+      "evidence": "The bibliography attributes the poetry collection Winter Compass to Nila Arden. The volume was issued anonymously in its first printing.",
+      "needle": "The bibliography attributes the poetry collection Winter Compass to Nila Arden.",
+      "question": "\n\nQuestion: Who wrote Winter Compass? Answer with only the author's name.",
+      "answers": ["Nila Arden"],
+      "distractors": [
+        "Mila Arden edited a later anthology with a similar title.",
+        "An early bookseller catalog attributed the collection to Nila Ardent.",
+        "Poet Soren Vale wrote the introduction to the second printing."
+      ]
+    },
+    {
+      "id": "bus_depot_bay_12",
+      "builder": "natural_prose_v1",
+      "genre": "intercity bus dispatch sheet",
+      "evidence": "The dispatch sheet assigns the overnight Halcyon service to bay 12. Boarding closes ten minutes before its scheduled departure.",
+      "needle": "The dispatch sheet assigns the overnight Halcyon service to bay 12.",
+      "question": "\n\nQuestion: Which bay is assigned to the overnight Halcyon service? Answer with only the bay number.",
+      "answers": ["bay 12", "12"],
+      "distractors": [
+        "The daytime Halcyon local boards at bay 10.",
+        "A superseded dispatch sheet listed bay 21.",
+        "The overnight Meridian service uses bay 11."
+      ]
+    },
+    {
+      "id": "telescope_proposal_omega_17",
+      "builder": "natural_prose_v1",
+      "genre": "scientific allocation decision",
+      "evidence": "The allocation committee approved observing proposal Omega-17 for the winter telescope cycle. Its requested polarimetry sequence received four clear nights.",
+      "needle": "The allocation committee approved observing proposal Omega-17 for the winter telescope cycle.",
+      "question": "\n\nQuestion: Which proposal was approved for the winter telescope cycle? Answer with only the proposal code.",
+      "answers": ["Omega-17"],
+      "distractors": [
+        "Proposal Omega-71 was deferred to the spring cycle.",
+        "The technical review referred to the submission as Omicron-17 in error.",
+        "Proposal Vega-17 received time on a different telescope."
+      ]
+    },
+    {
+      "id": "forest_plot_6_5_hectares",
+      "builder": "natural_prose_v1",
+      "genre": "forest management survey",
+      "evidence": "The forestry survey measures the Bracken experimental plot at 6.5 hectares. Boundary markers were reset after the northern trail was rerouted.",
+      "needle": "The forestry survey measures the Bracken experimental plot at 6.5 hectares.",
+      "question": "\n\nQuestion: What area does the survey give for the Bracken experimental plot? Answer with only the area.",
+      "answers": ["6.5 hectares", "6.5 ha", "6.5"],
+      "distractors": [
+        "The neighboring Fern plot covers 5.6 hectares.",
+        "An old map estimated Bracken at 6.8 hectares.",
+        "The rerouted trail occupies 0.5 hectares of the wider management unit."
+      ]
+    },
+    {
+      "id": "committee_quorum_7",
+      "builder": "natural_prose_v1",
+      "genre": "organizational bylaws",
+      "evidence": "The revised bylaws set the archives committee's quorum at seven voting members. Remote attendance counts if identity is verified before the meeting.",
+      "needle": "The revised bylaws set the archives committee's quorum at seven voting members.",
+      "question": "\n\nQuestion: How many voting members make a quorum for the archives committee? Answer with only the number.",
+      "answers": ["seven", "7"],
+      "distractors": [
+        "The finance committee requires nine voting members.",
+        "A rejected amendment proposed reducing the archives quorum to five.",
+        "The archives committee currently has seventeen voting members."
+      ]
+    },
+    {
+      "id": "species_status_vulnerable",
+      "builder": "natural_prose_v1",
+      "genre": "conservation assessment",
+      "evidence": "The regional assessment classifies the marsh glider as Vulnerable. Habitat fragmentation, rather than direct harvesting, drives the classification.",
+      "needle": "The regional assessment classifies the marsh glider as Vulnerable.",
+      "question": "\n\nQuestion: What conservation status is assigned to the marsh glider? Answer with only the status.",
+      "answers": ["Vulnerable"],
+      "distractors": [
+        "The river glider is classified as Near Threatened.",
+        "A draft assessment proposed Endangered for the marsh glider.",
+        "The national list records Data Deficient for a different subspecies."
+      ]
+    },
+    {
+      "id": "machine_torque_34_nm",
+      "builder": "natural_prose_v1",
+      "genre": "mechanical service manual",
+      "evidence": "The service manual sets the impeller retaining nut to 34 newton-meters. Mechanics apply the value after lubricating the specified thread section.",
+      "needle": "The service manual sets the impeller retaining nut to 34 newton-meters.",
+      "question": "\n\nQuestion: What torque is specified for the impeller retaining nut? Answer with only the torque.",
+      "answers": ["34 newton-meters", "34 Nm", "34 N-m", "34"],
+      "distractors": [
+        "The housing bolts are tightened to 43 newton-meters.",
+        "An older manual listed 30 newton-meters for the retaining nut.",
+        "The thread section is lubricated with service compound number 34."
+      ]
+    },
+    {
+      "id": "radio_call_sign_kestrel_nine",
+      "builder": "natural_prose_v1",
+      "genre": "search and rescue communications plan",
+      "evidence": "The rescue communications plan assigns the ridge team the call sign Kestrel Nine. Teams repeat their call signs at the start of every location report.",
+      "needle": "The rescue communications plan assigns the ridge team the call sign Kestrel Nine.",
+      "question": "\n\nQuestion: What call sign is assigned to the ridge team? Answer with only the call sign.",
+      "answers": ["Kestrel Nine", "Kestrel 9"],
+      "distractors": [
+        "The valley team uses the call sign Kestrel Five.",
+        "A draft plan assigned the ridge team Falcon Nine.",
+        "Rescue helicopter Nine uses the call sign Heron Air."
       ]
     }
   ]

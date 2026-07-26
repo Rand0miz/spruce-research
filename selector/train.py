@@ -36,6 +36,52 @@ def gate_config(num_layers, head_dim, proj_dim):
             "proj_dim": proj_dim or head_dim}
 
 
+def expand_target_paths(patterns):
+    paths = []
+    for pattern in patterns or ():
+        matches = (
+            sorted(glob.glob(pattern, recursive=True))
+            if any(character in pattern for character in "*?[")
+            else [pattern]
+        )
+        paths.extend(matches)
+    return list(dict.fromkeys(os.path.abspath(path) for path in paths))
+
+
+def _sample_pool(indices, count):
+    """Sample a pool without replacement until another cycle is required."""
+    indices = list(indices)
+    if count <= 0:
+        return []
+    if not indices:
+        raise ValueError("cannot sample from an empty replay pool")
+    sampled = []
+    while len(sampled) < count:
+        order = torch.randperm(len(indices)).tolist()
+        remaining = count - len(sampled)
+        sampled.extend(indices[index] for index in order[:remaining])
+    return sampled
+
+
+def mixed_epoch_order(
+        natural_indices, replay_indices, natural_fraction, shuffle=True):
+    """Use every natural document and sample replay to the requested ratio."""
+    natural_indices = list(natural_indices)
+    replay_indices = list(replay_indices)
+    if not natural_indices:
+        raise ValueError("natural target pool is empty")
+    if not 0.0 < natural_fraction <= 1.0:
+        raise ValueError("natural_fraction must be in (0, 1]")
+    replay_count = round(
+        len(natural_indices) * (1.0 - natural_fraction) / natural_fraction)
+    replay_sample = _sample_pool(replay_indices, replay_count)
+    combined = natural_indices + replay_sample
+    if shuffle and len(combined) > 1:
+        order = torch.randperm(len(combined)).tolist()
+        combined = [combined[index] for index in order]
+    return combined
+
+
 def checkpoint_path(out_path):
     root, ext = os.path.splitext(out_path)
     return f"{root}.resume{ext or '.pt'}"
@@ -73,6 +119,9 @@ def save_resume_checkpoint(path, gate, opt, config, args, epoch, paths, history)
             "seed": args.seed,
             "init_gate": args.init_gate,
             "shuffle_targets": args.shuffle_targets,
+            "natural_fraction": args.natural_fraction,
+            "natural_targets": list(args.natural_targets or ()),
+            "replay_targets": list(args.replay_targets or ()),
         },
         "targets": list(paths),
         "history": history,
@@ -96,7 +145,13 @@ def load_resume_checkpoint(path, gate, opt, config, device):
         torch.set_rng_state(ckpt["rng_state"].cpu())
     if (device == "cuda" and ckpt.get("cuda_rng_state_all") is not None
             and torch.cuda.is_available()):
-        torch.cuda.set_rng_state_all(ckpt["cuda_rng_state_all"])
+        # ``map_location="cuda"`` also moves RNG byte tensors to CUDA, but
+        # PyTorch's RNG restoration API requires CPU ByteTensors.
+        cuda_rng_states = [
+            state.detach().cpu().to(dtype=torch.uint8)
+            for state in ckpt["cuda_rng_state_all"]
+        ]
+        torch.cuda.set_rng_state_all(cuda_rng_states)
 
     return int(ckpt.get("epoch", 0)), ckpt.get("history")
 
@@ -122,8 +177,17 @@ def emit(msg, progress):
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--targets", nargs="+", required=True,
-                    help="teacher .pt paths or globs (must have pooledQ/pooledK)")
+    ap.add_argument("--targets", nargs="+",
+                    help="ordinary teacher .pt paths or recursive globs")
+    ap.add_argument(
+        "--natural-targets", nargs="+",
+        help="primary natural teacher paths/globs used once per epoch")
+    ap.add_argument(
+        "--replay-targets", nargs="+",
+        help="old teacher paths/globs sampled as regression replay")
+    ap.add_argument(
+        "--natural-fraction", type=float, default=0.8,
+        help="natural share of each grouped epoch; default: 0.8")
     ap.add_argument("--epochs", type=int, default=200)
     ap.add_argument("--seed", type=int, default=None,
                     help="optional torch RNG seed; use one fixed seed for sweeps")
@@ -167,18 +231,51 @@ def main():
 
     if args.resume and args.init_gate:
         raise SystemExit("--resume and --init-gate cannot be combined")
+    grouped_inputs = bool(args.natural_targets or args.replay_targets)
+    if args.targets and grouped_inputs:
+        raise SystemExit(
+            "--targets cannot be combined with --natural-targets/"
+            "--replay-targets")
+    if grouped_inputs and not (
+            args.natural_targets and args.replay_targets):
+        raise SystemExit(
+            "grouped training requires both --natural-targets and "
+            "--replay-targets")
+    if not args.targets and not grouped_inputs:
+        raise SystemExit(
+            "provide --targets or both --natural-targets and "
+            "--replay-targets")
+    if not 0.0 < args.natural_fraction <= 1.0:
+        raise SystemExit("--natural-fraction must be in (0, 1]")
     if args.seed is not None:
         torch.manual_seed(args.seed)
         if torch.cuda.is_available():
             torch.cuda.manual_seed_all(args.seed)
 
-    paths = []
-    for p in args.targets:
-        paths.extend(sorted(glob.glob(p)) if any(c in p for c in "*?[") else [p])
+    natural_paths = expand_target_paths(args.natural_targets)
+    replay_paths = expand_target_paths(args.replay_targets)
+    paths = (
+        natural_paths + replay_paths
+        if grouped_inputs else expand_target_paths(args.targets)
+    )
     if not paths:
-        raise SystemExit(f"no target files matched {args.targets}")
+        raise SystemExit("no target files matched the supplied inputs")
+    if grouped_inputs:
+        if not natural_paths:
+            raise SystemExit(
+                f"no natural targets matched {args.natural_targets}")
+        if not replay_paths:
+            raise SystemExit(
+                f"no replay targets matched {args.replay_targets}")
+        overlap = set(natural_paths) & set(replay_paths)
+        if overlap:
+            raise SystemExit(
+                "natural and replay pools overlap: "
+                f"{sorted(overlap)[:3]}")
 
     docs = [load_teacher(p, device=args.device) for p in paths]
+    natural_indices = list(range(len(natural_paths)))
+    replay_indices = list(range(len(natural_paths), len(paths)))
     L = docs[0]["meta"]["num_layers"]
     d = docs[0]["meta"]["head_dim"]
     for doc, p in zip(docs, paths):
@@ -200,6 +297,17 @@ def main():
         print(f"initialized gate weights from {args.init_gate}")
     opt = torch.optim.Adam(gate.parameters(), lr=args.lr)
     print(f"gate params: {sum(p.numel() for p in gate.parameters())}  device={args.device}")
+    if grouped_inputs:
+        preview_replay = round(
+            len(natural_indices)
+            * (1.0 - args.natural_fraction)
+            / args.natural_fraction
+        )
+        preview_total = len(natural_indices) + preview_replay
+        print(
+            f"mixed epoch: natural={len(natural_indices)} replay_draws="
+            f"{preview_replay}/{len(replay_indices)} total={preview_total} "
+            f"natural_fraction={len(natural_indices) / preview_total:.3f}")
 
     resume_path = args.resume_out or checkpoint_path(args.out)
     graph_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "training_graphs")
@@ -237,8 +345,17 @@ def main():
         topk_tot, topk_rows = 0.0, 0
         needle_tot, needle_groups = 0.0, 0
         document_order = (
-            torch.randperm(len(docs)).tolist()
-            if args.shuffle_targets else range(len(docs))
+            mixed_epoch_order(
+                natural_indices,
+                replay_indices,
+                args.natural_fraction,
+                shuffle=args.shuffle_targets,
+            )
+            if grouped_inputs
+            else (
+                torch.randperm(len(docs)).tolist()
+                if args.shuffle_targets else range(len(docs))
+            )
         )
         for document_index in document_order:
             doc = docs[document_index]

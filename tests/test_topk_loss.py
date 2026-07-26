@@ -2,6 +2,7 @@
 import torch
 
 from selector.loss import needle_topk_loss, topk_membership_loss, topk_set_loss
+from selector.train import expand_target_paths, mixed_epoch_order
 
 
 def test_topk_loss_prefers_teacher_topk():
@@ -40,3 +41,26 @@ def test_needle_loss_prefers_needle_above_topk_threshold():
 
     assert bad_groups == good_groups == 1
     assert good_loss.item() < bad_loss.item()
+
+
+def test_mixed_epoch_order_uses_all_natural_and_twenty_percent_replay():
+    torch.manual_seed(7)
+    order = mixed_epoch_order(
+        natural_indices=range(8),
+        replay_indices=range(8, 20),
+        natural_fraction=0.8,
+        shuffle=True,
+    )
+    assert len(order) == 10
+    assert set(range(8)).issubset(order)
+    assert sum(index >= 8 for index in order) == 2
+
+
+def test_recursive_target_glob(tmp_path):
+    nested = tmp_path / "outer" / "inner"
+    nested.mkdir(parents=True)
+    target = nested / "teacher.pt"
+    target.write_bytes(b"x")
+    assert expand_target_paths([str(tmp_path / "**" / "*.pt")]) == [
+        str(target.resolve())
+    ]
