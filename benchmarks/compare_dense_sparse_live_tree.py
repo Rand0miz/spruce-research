@@ -49,7 +49,12 @@ from kernels.sparse_prefill import (
 )
 from scripts.eval_tree_traversal import load_gate, traverse_to_leaf_ids
 from scripts.export_selected_blocks import selected_ids_to_blocks
-from selector.targets import load_selector_features
+from scripts.route_overrides import force_needle_routes, teacher_topk_routes
+from selector.targets import load_selector_features, load_teacher
+from sparse.attention import (
+    SPARSE_PREFILL_ATTENTION,
+    register_sparse_prefill_attention,
+)
 from selector.tree import build_key_tree
 from teacher.prompt_replay import reconstruct_teacher_prompt
 
@@ -194,6 +199,33 @@ def live_route(gate, gate_config, target_path, *, beam, radix, k_selected,
     }
 
 
+def sparse_prefill_kwargs(backend, selected, block_size, kernel_variant):
+    """Prefill kwargs for either sparse backend; only Triton takes a variant."""
+    kwargs = {
+        "selected_blocks": selected,
+        "block_size": block_size,
+        "validate_selected_blocks_input": False,
+    }
+    if backend == "triton":
+        kwargs["kernel_variant"] = kernel_variant
+    return kwargs
+
+
+def _route_quality(selected, needle_block):
+    if needle_block is None or needle_block < 0:
+        return {
+            "needle_layer_group_hit_rate": float("nan"),
+            "needle_any_group_all_layers_rate": float("nan"),
+        }
+    final_reader = selected[0, :, :, -1]
+    needle_hits = (final_reader == needle_block).any(dim=-1)
+    return {
+        "needle_layer_group_hit_rate": float(needle_hits.float().mean().cpu()),
+        "needle_any_group_all_layers_rate": float(
+            needle_hits.any(dim=-1).float().mean().cpu()),
+    }
+
+
 def _warmup_inputs(encoded, warmup_tokens):
     return {name: value[:, :warmup_tokens] for name, value in encoded.items()}
 
@@ -210,7 +242,10 @@ def _warmup_selected(case, k_selected, warmup_tokens, device):
 
 def _run_sparse_cases(
         model, gate, gate_config, cases, args, tokenizer, *,
-        beam, k_selected):
+        beam, k_selected,
+        sparse_implementation=SPRUCE_TRITON_SPARSE_PREFILL):
+    backend = getattr(args, "backend", "triton")
+    route_mode = getattr(args, "route_mode", "learned")
     device = _model_device(model)
     results = {}
     for case_index, case in enumerate(cases):
@@ -220,6 +255,16 @@ def _run_sparse_cases(
             case["target"], device=args.selector_device)
         _sync(args.selector_device)
         feature_load_seconds = time.perf_counter() - load_started
+
+        teacher_routes = None
+        if route_mode == "teacher-top8":
+            teacher = load_teacher(case["target"], device="cpu")
+            teacher_routes = teacher_topk_routes(
+                teacher["target"], k_selected=k_selected,
+                local_window=args.local_window)
+            del teacher
+            gc.collect()
+
         for repeat in range(args.repeats):
             if device.type == "cuda":
                 torch.cuda.reset_peak_memory_stats(device)
@@ -232,15 +277,22 @@ def _run_sparse_cases(
                 features=features,
             )
             route_timing["feature_load_seconds"] = feature_load_seconds
-            _set_attention_backend(model, SPRUCE_TRITON_SPARSE_PREFILL)
+            if route_mode == "oracle-needle" and case["needle_block"] >= 0:
+                selected = force_needle_routes(selected, case["needle_block"])
+                route_timing.update(
+                    _route_quality(selected, case["needle_block"]))
+            elif route_mode == "teacher-top8":
+                selected = teacher_routes.to(device)
+                route_timing.update(
+                    _route_quality(selected, case["needle_block"]))
+            if route_mode != "learned" and repeat == 0:
+                validate_selected_blocks(
+                    selected.detach().cpu(), local_window=args.local_window)
+            _set_attention_backend(model, sparse_implementation)
             token_ids, model_timing = _generate(
                 model, case["encoded"], args.max_new_tokens,
-                prefill_kwargs={
-                    "selected_blocks": selected,
-                    "block_size": case["block_size"],
-                    "kernel_variant": args.kernel_variant,
-                    "validate_selected_blocks_input": False,
-                },
+                prefill_kwargs=sparse_prefill_kwargs(
+                    backend, selected, case["block_size"], args.kernel_variant),
             )
             answer = tokenizer.decode(token_ids, skip_special_tokens=True)
             answers.append(answer)
@@ -449,6 +501,8 @@ def selector_metadata(args, *, beam, k_selected):
         "layer_chunk": args.selector_layer_chunk,
         "beam": beam, "radix": args.radix,
         "k_selected": k_selected, "local_window": args.local_window,
+        "route_mode": getattr(args, "route_mode", "learned"),
+        "backend": getattr(args, "backend", "triton"),
     }
 
 
@@ -491,6 +545,18 @@ def main():
     parser.add_argument(
         "--kernel-variant", choices=KERNEL_VARIANTS, default="single_head",
         help="single_head is the measured control; other choices are isolated kernel ablations")
+    parser.add_argument(
+        "--route-mode", choices=("learned", "oracle-needle", "teacher-top8"),
+        default="learned",
+        help="learned: gate traversal routes (production); oracle-needle: "
+             "learned routes widened by one slot with the evidence block "
+             "forced into every causal row (sufficiency control); teacher-top8: "
+             "routes packed from the teacher's top-k mass, no gate influence "
+             "on selection (label-ceiling control)")
+    parser.add_argument(
+        "--backend", choices=("triton", "pytorch"), default="triton",
+        help="sparse prefill implementation; pytorch is the correctness "
+             "reference and the only option without Triton (Windows)")
     parser.add_argument("--out", required=True)
     parser.add_argument(
         "--plot", help="optional efficiency/accuracy PNG; also writes an adjacent CSV")
@@ -499,7 +565,10 @@ def main():
     args = parser.parse_args()
 
     if not torch.cuda.is_available():
-        raise SystemExit("CUDA is required for the Triton live-tree benchmark")
+        raise SystemExit("CUDA is required for the live-tree benchmark")
+    if args.route_mode != "learned" and args.k_values:
+        raise SystemExit(
+            "--route-mode overrides are only supported for the single-K path")
     if args.repeats < 1 or args.max_new_tokens < 1:
         raise SystemExit("--repeats and --max-new-tokens must be >= 1")
     if args.warmup_tokens < 0:
@@ -551,9 +620,14 @@ def main():
     dtype = {"auto": "auto", "float16": torch.float16, "bfloat16": torch.bfloat16}[args.dtype]
     warmup_tokens = min(args.warmup_tokens, cases[0]["seq_len"])
 
-    register_triton_sparse_prefill_attention()
+    if args.backend == "triton":
+        register_triton_sparse_prefill_attention()
+        sparse_implementation = SPRUCE_TRITON_SPARSE_PREFILL
+    else:
+        register_sparse_prefill_attention()
+        sparse_implementation = SPARSE_PREFILL_ATTENTION
     sparse_model = _load_model(
-        args.model, SPRUCE_TRITON_SPARSE_PREFILL, dtype,
+        args.model, sparse_implementation, dtype,
         args.load_offload_dir, yarn_factor=args.yarn_factor,
         original_max_position_embeddings=args.original_max_position_embeddings)
     sparse_results_by_k = {}
@@ -561,25 +635,25 @@ def main():
     device = _model_device(sparse_model)
     for k_selected, effective_beam in k_sweep:
         if warmup_tokens:
-            _set_attention_backend(sparse_model, SPRUCE_TRITON_SPARSE_PREFILL)
+            _set_attention_backend(sparse_model, sparse_implementation)
             _warmup(
                 sparse_model, _warmup_inputs(cases[0]["encoded"], warmup_tokens),
-                prefill_kwargs={
-                    "selected_blocks": _warmup_selected(
-                        cases[0], k_selected, warmup_tokens, device),
-                    "block_size": cases[0]["block_size"],
-                    "kernel_variant": args.kernel_variant,
-                    "validate_selected_blocks_input": False,
-                },
+                prefill_kwargs=sparse_prefill_kwargs(
+                    args.backend,
+                    _warmup_selected(cases[0], k_selected, warmup_tokens, device),
+                    cases[0]["block_size"], args.kernel_variant),
             )
         print(
             f"K sweep: K={k_selected} effective_beam={effective_beam}",
             flush=True)
         sparse_results_by_k[k_selected] = _run_sparse_cases(
             sparse_model, gate, gate_config, cases, args, tokenizer,
-            beam=effective_beam, k_selected=k_selected)
-        kernel_metadata_by_k[k_selected] = kernel_runtime_metadata(
-            args.kernel_variant)
+            beam=effective_beam, k_selected=k_selected,
+            sparse_implementation=sparse_implementation)
+        kernel_metadata_by_k[k_selected] = (
+            kernel_runtime_metadata(args.kernel_variant)
+            if args.backend == "triton"
+            else {"backend": "pytorch_reference"})
     sparse_model = _free_model(sparse_model)
     del gate
     gc.collect()
