@@ -101,6 +101,29 @@ def dense_evidence_routes(selected, needle_block, pad_value=PAD_VALUE,
     return out
 
 
+def dense_candidate_routes(selected, candidate_blocks, pad_value=PAD_VALUE):
+    """Deployable retrieve-then-re-encode routing: no oracle knowledge.
+
+    Dense reader row plus dense query rows for ``candidate_blocks`` — the
+    gate's own top-scoring reader-row blocks. Repairs the K/V of likely
+    evidence regions (the 32K corruption mechanism) at O(L) per densified row,
+    ~(M+1)/qb of dense prefill extra. Everything else keeps its learned routes.
+    """
+    out = dense_reader_routes(selected, pad_value=pad_value)
+    B, L, G, qb, width = out.shape
+    dense_row = torch.arange(qb, device=out.device, dtype=out.dtype)
+    for block in candidate_blocks:
+        block = int(block)
+        if not 0 <= block < qb:
+            raise ValueError(f"candidate block {block} outside [0,{qb})")
+        causal_width = block + 1
+        row = torch.full((width,), pad_value, dtype=out.dtype,
+                         device=out.device)
+        row[:causal_width] = dense_row[:causal_width]
+        out[:, :, :, block, :] = row
+    return out
+
+
 def teacher_topk_routes(target, k_selected, local_window=1):
     """Pack the teacher's top-``k_selected`` blocks per row into routes.
 

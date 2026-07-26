@@ -98,3 +98,17 @@ def test_dense_evidence_routes_ceiling_control():
     for q in range(2, 6):
         assert 2 in out[0, 0, 0, q].tolist()
     validate_selected_blocks(out)
+
+
+def test_dense_candidate_routes_no_oracle():
+    from scripts.route_overrides import dense_candidate_routes
+    sel = _toy_selected()
+    out = dense_candidate_routes(sel, candidate_blocks=[3])
+    # reader row dense
+    assert out[0, 0, 0, 5, :6].tolist() == [0, 1, 2, 3, 4, 5]
+    # candidate row 3 dense over causal prefix
+    row = out[0, 0, 0, 3].tolist()
+    assert row[:4] == [0, 1, 2, 3] and all(b == -1 for b in row[4:])
+    # untouched row keeps its set
+    assert set(out[0, 0, 0, 2].tolist()) - {-1} == {0, 1, 2}
+    validate_selected_blocks(out)

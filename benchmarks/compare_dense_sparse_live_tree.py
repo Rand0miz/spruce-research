@@ -50,6 +50,7 @@ from kernels.sparse_prefill import (
 from scripts.eval_tree_traversal import load_gate, traverse_to_leaf_ids
 from scripts.export_selected_blocks import selected_ids_to_blocks
 from scripts.route_overrides import (
+    dense_candidate_routes,
     dense_evidence_routes,
     dense_reader_routes,
     force_needle_routes,
@@ -261,6 +262,20 @@ def _run_sparse_cases(
         _sync(args.selector_device)
         feature_load_seconds = time.perf_counter() - load_started
 
+        candidate_blocks = None
+        if route_mode == "dense-candidates":
+            # Deployable candidate selection: the gate's own leaf scores at
+            # the reader row, max-aggregated over layers and KV groups. No
+            # teacher mass, no needle metadata.
+            with torch.no_grad():
+                reader_scores = gate(
+                    features["q_feat"][:, :, -1:], features["k_feat"])
+            pooled_scores = reader_scores[:, :, 0, :].amax(dim=(0, 1))
+            m = min(int(getattr(args, "candidate_blocks", 8)),
+                    pooled_scores.shape[0])
+            candidate_blocks = pooled_scores.topk(m).indices.tolist()
+            del reader_scores, pooled_scores
+
         teacher_routes = None
         if route_mode == "teacher-top8":
             teacher = load_teacher(case["target"], device="cpu")
@@ -297,6 +312,13 @@ def _run_sparse_cases(
                     neighborhood=getattr(args, "evidence_neighborhood", 0))
                 route_timing.update(
                     _route_quality(selected, case["needle_block"]))
+            elif route_mode == "dense-candidates":
+                selected = dense_candidate_routes(selected, candidate_blocks)
+                route_timing.update(
+                    _route_quality(selected, case["needle_block"]))
+                route_timing["candidate_blocks"] = list(candidate_blocks)
+                route_timing["candidate_contains_needle"] = (
+                    int(case["needle_block"]) in candidate_blocks)
             elif route_mode == "teacher-top8":
                 selected = teacher_routes.to(device)
                 route_timing.update(
@@ -578,7 +600,7 @@ def main():
     parser.add_argument(
         "--route-mode",
         choices=("learned", "oracle-needle", "teacher-top8", "dense-reader",
-                 "oracle-dense-evidence"),
+                 "oracle-dense-evidence", "dense-candidates"),
         default="learned",
         help="learned: gate traversal routes (production); oracle-needle: "
              "learned routes widened by one slot with the evidence block "
@@ -591,6 +613,11 @@ def main():
         "--backend", choices=("triton", "pytorch"), default="triton",
         help="sparse prefill implementation; pytorch is the correctness "
              "reference and the only option without Triton (Windows)")
+    parser.add_argument(
+        "--candidate-blocks", type=int, default=8,
+        help="dense-candidates only: number of gate-scored reader-row blocks "
+             "whose query rows are densified (retrieve-then-re-encode, no "
+             "oracle knowledge)")
     parser.add_argument(
         "--evidence-neighborhood", type=int, default=0,
         help="oracle-dense-evidence only: also densify the query rows of "
