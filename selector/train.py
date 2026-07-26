@@ -571,13 +571,14 @@ def main():
     empty_history = {
         "epochs": [], "kl": [], "topk": [], "boundary": [], "needle": [],
         "eval_epochs": [],
-        "eval_recall8": {}, "eval_needle8": {},
+        "eval_recall8": {}, "eval_needle8": {}, "eval_needle_union8": {},
     }
     # A fresh run must not inherit a partial history left by a prior crash.
     # Resume checkpoints carry their own matching history below.
     history = load_json(history_path, empty_history) if args.resume else empty_history
     history.setdefault("needle", [])
     history.setdefault("boundary", [])
+    history.setdefault("eval_needle_union8", {})
     start_epoch = 1
     if args.resume:
         resumed_epoch, checkpoint_history = load_resume_checkpoint(
@@ -672,33 +673,60 @@ def main():
                                          tuple(args.budgets), doc["meta"]["needle_block"])
                     r8 = met.get("recall@8", float("nan"))
                     nh = met.get("needle_hit@8", None)
+                    nu = met.get("needle_union@8", None)
+                    tu = met.get("teacher_needle_union@8", None)
                     requested = doc["meta"].get(
                         "requested_length", doc["meta"]["seq_len"])
                     tag = f"len{requested}"
                     bucket = buckets.setdefault(
-                        tag, {"recall": [], "needle": []})
+                        tag, {"recall": [], "needle": [], "union": [],
+                              "teacher_union": []})
                     bucket["recall"].append(r8)
                     if nh is not None:
                         bucket["needle"].append(nh)
+                    if nu is not None:
+                        bucket["union"].append(nu)
+                    if tu is not None:
+                        bucket["teacher_union"].append(tu)
                     if doc is not stored_doc:
                         del doc
             for tag in sorted(buckets):
                 recall_values = buckets[tag]["recall"]
                 needle_values = buckets[tag]["needle"]
+                union_values = buckets[tag]["union"]
+                teacher_union_values = buckets[tag]["teacher_union"]
                 mean_recall = sum(recall_values) / len(recall_values)
                 mean_needle = (
                     sum(needle_values) / len(needle_values)
                     if needle_values else None
                 )
+                mean_union = (
+                    sum(union_values) / len(union_values)
+                    if union_values else None
+                )
+                mean_teacher_union = (
+                    sum(teacher_union_values) / len(teacher_union_values)
+                    if teacher_union_values else None
+                )
                 history["eval_recall8"].setdefault(
                     tag, []).append(mean_recall)
                 history["eval_needle8"].setdefault(
                     tag, []).append(mean_needle)
+                history["eval_needle_union8"].setdefault(
+                    tag, []).append(mean_union)
                 line.append(
                     f"{tag} n={len(recall_values)} r@8={mean_recall:.3f}"
                     + (
                         f" ndl@8={mean_needle:.2f}"
                         if mean_needle is not None else ""
+                    )
+                    + (
+                        f" ndl_u@8={mean_union:.2f}"
+                        if mean_union is not None else ""
+                    )
+                    + (
+                        f" tchr_u@8={mean_teacher_union:.2f}"
+                        if mean_teacher_union is not None else ""
                     )
                 )
             emit("  ".join(line), progress)

@@ -173,9 +173,27 @@ def aggregate_cases(cases):
     for case in cases:
         requested = str(case["requested_length"])
         by_length.setdefault(requested, []).append(case["metrics"])
+    eligibility = {}
+    teacher_needle = [
+        case["metrics"]["teacher_needle"] for case in cases
+        if "teacher_needle" in case["metrics"]]
+    teacher_union = [
+        case["metrics"]["teacher_needle_union"] for case in cases
+        if "teacher_needle_union" in case["metrics"]]
+    if teacher_needle:
+        # Unconditional label ceiling: how often the teacher target itself
+        # keeps the evidence. Ratios elsewhere are relative to THIS, so a gate
+        # can score 1.0 while routing the evidence in only 60% of layers.
+        eligibility = {
+            "needle_mean": sum(teacher_needle) / len(teacher_needle),
+            "needle_min": min(teacher_needle),
+            "union_mean": sum(teacher_union) / len(teacher_union),
+            "union_min": min(teacher_union),
+        }
     return {
         "cases": len(cases),
         "overall": mean_metrics([case["metrics"] for case in cases]),
+        "teacher_eligibility": eligibility,
         "by_length": {
             length: {
                 "cases": len(rows),
@@ -402,6 +420,16 @@ def main():
             for label, cases in results.items()
         },
     }
+    for label, gate_result in report["gates"].items():
+        eligibility = gate_result["aggregate"].get("teacher_eligibility")
+        if eligibility:
+            print(
+                f"[{label}] teacher eligibility (unconditional): "
+                f"needle@{args.k_selected} mean {eligibility['needle_mean']:.3f} "
+                f"min {eligibility['needle_min']:.3f} | union mean "
+                f"{eligibility['union_mean']:.3f} min {eligibility['union_min']:.3f}",
+                flush=True,
+            )
     os.makedirs(os.path.dirname(os.path.abspath(args.out)), exist_ok=True)
     with open(args.out, "w", encoding="utf-8") as handle:
         json.dump(report, handle, indent=2)
