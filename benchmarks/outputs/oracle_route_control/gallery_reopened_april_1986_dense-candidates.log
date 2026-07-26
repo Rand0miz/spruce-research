@@ -1,0 +1,11 @@
+Loading weights:   0%|          | 0/338 [00:00<?, ?it/s]Loading weights:   0%|          | 1/338 [00:00<03:19,  1.69it/s]Loading weights:   9%|8         | 29/338 [00:00<00:05, 55.26it/s]Loading weights:  18%|#7        | 60/338 [00:00<00:02, 106.84it/s]Loading weights:  28%|##8       | 95/338 [00:00<00:01, 162.30it/s]Loading weights:  37%|###6      | 125/338 [00:01<00:01, 195.39it/s]Loading weights:  47%|####7     | 159/338 [00:01<00:00, 231.45it/s]Loading weights:  56%|#####5    | 189/338 [00:01<00:00, 215.88it/s]Loading weights:  69%|######8   | 232/338 [00:01<00:00, 264.86it/s]Loading weights:  78%|#######7  | 263/338 [00:01<00:00, 267.00it/s]Loading weights:  87%|########6 | 293/338 [00:01<00:00, 263.52it/s]Loading weights:  97%|#########7| 328/338 [00:01<00:00, 277.59it/s]Loading weights: 100%|##########| 338/338 [00:01<00:00, 195.85it/s]
+K sweep: K=10 effective_beam=8
+sparse 1/1 gallery_reopened_april_1986_L16384_d0.5_s20260725 tree=0.2364s prefill=16.2304s
+K=10 beam=8
+{
+  "cases": 1,
+  "sparse_exact_rate": 1.0,
+  "mean_sparse_fuzzy": 1.0,
+  "dense_skipped": true
+}
+full report -> benchmarks/outputs/oracle_route_control/gallery_reopened_april_1986_dense-candidates.json

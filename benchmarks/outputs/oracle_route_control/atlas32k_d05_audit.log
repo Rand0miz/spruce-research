@@ -1,0 +1,64 @@
+Loading weights:   0%|          | 0/338 [00:00<?, ?it/s]Loading weights:   0%|          | 1/338 [00:00<04:36,  1.22it/s]Loading weights:  26%|##5       | 87/338 [00:00<00:02, 118.50it/s]Loading weights:  36%|###5      | 120/338 [00:01<00:01, 138.15it/s]Loading weights:  43%|####3     | 147/338 [00:01<00:01, 123.86it/s]Loading weights:  49%|####9     | 167/338 [00:01<00:01, 124.77it/s]Loading weights:  55%|#####4    | 185/338 [00:01<00:01, 118.71it/s]Loading weights:  61%|######1   | 207/338 [00:01<00:01, 127.63it/s]Loading weights:  66%|######5   | 223/338 [00:02<00:00, 129.22it/s]Loading weights:  72%|#######1  | 243/338 [00:02<00:00, 123.53it/s]Loading weights:  76%|#######6  | 257/338 [00:02<00:00, 120.05it/s]Loading weights:  83%|########2 | 279/338 [00:02<00:00, 123.61it/s]Loading weights:  86%|########6 | 292/338 [00:02<00:00, 117.34it/s]Loading weights:  93%|#########3| 315/338 [00:02<00:00, 129.01it/s]Loading weights:  97%|#########7| 329/338 [00:02<00:00, 121.11it/s]Loading weights: 100%|##########| 338/338 [00:02<00:00, 116.59it/s]
+case: atlas_checkpoint_path_L32768_d0.5_s20260725
+needle_block: 256  audited prefill rows: 64 (question span NOT FOUND - fallback)
+answer: 'state/atlas.chk'
+exact: True  fuzzy: 1.0
+prefill: layer  max_mass  best(head,row/step)  n_rank<8
+prefill: L00  0.0060  (h0,63)  0
+prefill: L01  0.0042  (h5,32)  0
+prefill: L02  0.8050  (h3,46)  31
+prefill: L03  0.0530  (h8,26)  95
+prefill: L04  0.0820  (h4,39)  161
+prefill: L05  0.0993  (h4,46)  129
+prefill: L06  0.9333  (h7,45)  101
+prefill: L07  0.3005  (h4,50)  188
+prefill: L08  0.9949  (h3,48)  215
+prefill: L09  0.0937  (h8,57)  268
+prefill: L10  0.9181  (h4,47)  392
+prefill: L11  0.6014  (h10,47)  383
+prefill: L12  0.5747  (h6,27)  319
+prefill: L13  0.1258  (h1,46)  79
+prefill: L14  0.9988  (h3,50)  267
+prefill: L15  0.6591  (h0,49)  291
+prefill: L16  0.9654  (h2,51)  365
+prefill: L17  0.8081  (h2,51)  344
+prefill: L18  0.3025  (h1,46)  214
+prefill: L19  0.9994  (h3,50)  290
+prefill: L20  0.9603  (h3,47)  392
+prefill: L21  0.8295  (h11,48)  364
+prefill: L22  0.9587  (h4,49)  292
+prefill: L23  0.9945  (h4,49)  234
+prefill: L24  0.8021  (h11,48)  369
+prefill: L25  0.2157  (h6,44)  396
+prefill: L26  0.7789  (h9,48)  453
+prefill: L27  0.6358  (h6,48)  422
+decode: layer  max_mass  best(head,row/step)  n_rank<8
+decode: L00  0.0004  (h0,1)  0
+decode: L01  0.0225  (h7,3)  1
+decode: L02  0.9147  (h3,3)  8
+decode: L03  0.0201  (h11,3)  16
+decode: L04  0.4667  (h4,1)  20
+decode: L05  0.1271  (h4,3)  16
+decode: L06  0.8837  (h7,2)  24
+decode: L07  0.2914  (h4,3)  18
+decode: L08  0.9992  (h3,3)  25
+decode: L09  0.0679  (h8,2)  24
+decode: L10  0.6100  (h10,3)  42
+decode: L11  0.5979  (h10,3)  36
+decode: L12  0.7011  (h1,0)  46
+decode: L13  0.0776  (h1,0)  9
+decode: L14  0.9997  (h3,3)  33
+decode: L15  0.1020  (h2,0)  38
+decode: L16  0.8185  (h2,3)  46
+decode: L17  0.3208  (h2,3)  40
+decode: L18  0.2251  (h1,2)  22
+decode: L19  0.9280  (h3,1)  25
+decode: L20  0.5473  (h2,2)  48
+decode: L21  0.7795  (h11,2)  44
+decode: L22  0.8376  (h4,1)  35
+decode: L23  0.9973  (h4,0)  30
+decode: L24  0.3384  (h10,1)  33
+decode: L25  0.1925  (h4,1)  34
+decode: L26  0.3619  (h9,2)  48
+decode: L27  0.3787  (h2,2)  42
+report -> benchmarks/outputs/oracle_route_control/atlas32k_d05_attention_audit.json

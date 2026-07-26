@@ -1,0 +1,11 @@
+Loading weights:   0%|          | 0/338 [00:00<?, ?it/s]Loading weights:   0%|          | 1/338 [00:00<02:00,  2.79it/s]Loading weights:   8%|8         | 28/338 [00:00<00:04, 77.20it/s]Loading weights:  19%|#9        | 65/338 [00:00<00:01, 154.69it/s]Loading weights:  29%|##9       | 99/338 [00:00<00:01, 201.89it/s]Loading weights:  39%|###9      | 132/338 [00:00<00:00, 230.66it/s]Loading weights:  49%|####8     | 165/338 [00:00<00:00, 255.25it/s]Loading weights:  57%|#####7    | 194/338 [00:01<00:00, 181.36it/s]Loading weights:  65%|######4   | 219/338 [00:01<00:00, 190.20it/s]Loading weights:  73%|#######2  | 246/338 [00:01<00:00, 205.88it/s]Loading weights:  83%|########2 | 279/338 [00:01<00:00, 224.76it/s]Loading weights:  93%|#########3| 316/338 [00:01<00:00, 255.50it/s]Loading weights: 100%|##########| 338/338 [00:01<00:00, 198.57it/s]
+K sweep: K=10 effective_beam=8
+sparse 1/1 observatory_kepler_731_L32768_d0.9_s20260725 tree=0.4158s prefill=36.8086s
+K=10 beam=8
+{
+  "cases": 1,
+  "sparse_exact_rate": 1.0,
+  "mean_sparse_fuzzy": 1.0,
+  "dense_skipped": true
+}
+full report -> benchmarks/outputs/oracle_route_control/observatory_kepler_731_dense-candidates.json

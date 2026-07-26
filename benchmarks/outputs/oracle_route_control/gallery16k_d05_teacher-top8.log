@@ -1,0 +1,11 @@
+Loading weights:   0%|          | 0/338 [00:00<?, ?it/s]Loading weights:   0%|          | 1/338 [00:00<00:55,  6.05it/s]Loading weights:  11%|#1        | 38/338 [00:00<00:01, 156.62it/s]Loading weights:  19%|#8        | 64/338 [00:00<00:01, 193.51it/s]Loading weights:  29%|##8       | 98/338 [00:00<00:01, 229.54it/s]Loading weights:  36%|###6      | 123/338 [00:00<00:01, 189.38it/s]Loading weights:  45%|####5     | 153/338 [00:00<00:00, 217.11it/s]Loading weights:  55%|#####4    | 185/338 [00:00<00:00, 240.35it/s]Loading weights:  63%|######3   | 213/338 [00:01<00:00, 246.51it/s]Loading weights:  77%|#######6  | 260/338 [00:01<00:00, 308.23it/s]Loading weights:  87%|########6 | 293/338 [00:01<00:00, 303.19it/s]Loading weights:  98%|#########8| 332/338 [00:01<00:00, 325.69it/s]Loading weights: 100%|##########| 338/338 [00:01<00:00, 255.60it/s]
+K sweep: K=10 effective_beam=8
+sparse 1/1 gallery_reopened_april_1986_L16384_d0.5_s20260725 tree=0.2355s prefill=14.9724s
+K=10 beam=8
+{
+  "cases": 1,
+  "sparse_exact_rate": 0.0,
+  "mean_sparse_fuzzy": 0.0,
+  "dense_skipped": true
+}
+full report -> benchmarks/outputs/oracle_route_control/gallery16k_d05_teacher-top8.json

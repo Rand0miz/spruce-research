@@ -1,0 +1,11 @@
+Loading weights:   0%|          | 0/338 [00:00<?, ?it/s]Loading weights:   0%|          | 1/338 [00:00<02:05,  2.70it/s]Loading weights:   8%|7         | 27/338 [00:00<00:04, 71.26it/s]Loading weights:  19%|#8        | 63/338 [00:00<00:01, 149.87it/s]Loading weights:  26%|##6       | 88/338 [00:00<00:01, 176.90it/s]Loading weights:  37%|###6      | 124/338 [00:00<00:00, 225.60it/s]Loading weights:  45%|####4     | 152/338 [00:00<00:00, 240.24it/s]Loading weights:  54%|#####4    | 183/338 [00:01<00:00, 256.71it/s]Loading weights:  63%|######2   | 212/338 [00:01<00:00, 262.20it/s]Loading weights:  72%|#######2  | 244/338 [00:01<00:00, 272.54it/s]Loading weights:  81%|########  | 273/338 [00:01<00:00, 249.73it/s]Loading weights:  90%|########9 | 303/338 [00:01<00:00, 256.78it/s]Loading weights:  99%|#########8| 333/338 [00:01<00:00, 268.32it/s]Loading weights: 100%|##########| 338/338 [00:01<00:00, 215.99it/s]
+K sweep: K=10 effective_beam=8
+sparse 1/1 atlas_checkpoint_path_L32768_d0.5_s20260725 tree=0.5065s prefill=30.0083s
+K=10 beam=8
+{
+  "cases": 1,
+  "sparse_exact_rate": 0.0,
+  "mean_sparse_fuzzy": 0.3333333333333333,
+  "dense_skipped": true
+}
+full report -> benchmarks/outputs/oracle_route_control/atlas_checkpoint_path32k_dense-reader.json

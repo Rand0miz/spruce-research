@@ -1,0 +1,10 @@
+K sweep: K=10 effective_beam=8
+sparse 1/1 atlas_checkpoint_path_L32768_d0.5_s20260725 tree=0.4193s prefill=35.5026s
+K=10 beam=8
+{
+  "cases": 1,
+  "sparse_exact_rate": 0.0,
+  "mean_sparse_fuzzy": 0.3333333333333333,
+  "dense_skipped": true
+}
+full report -> benchmarks/outputs/oracle_route_control/atlas_checkpoint_path_dense-candidates.json

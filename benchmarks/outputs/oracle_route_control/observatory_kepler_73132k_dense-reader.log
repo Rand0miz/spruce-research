@@ -1,0 +1,11 @@
+Loading weights:   0%|          | 0/338 [00:00<?, ?it/s]Loading weights:   0%|          | 1/338 [00:00<01:20,  4.20it/s]Loading weights:  12%|#1        | 40/338 [00:00<00:02, 139.99it/s]Loading weights:  23%|##2       | 77/338 [00:00<00:01, 211.44it/s]Loading weights:  33%|###2      | 111/338 [00:00<00:00, 237.07it/s]Loading weights:  44%|####3     | 148/338 [00:00<00:00, 270.53it/s]Loading weights:  54%|#####3    | 182/338 [00:00<00:00, 285.88it/s]Loading weights:  64%|######3   | 216/338 [00:00<00:00, 299.50it/s]Loading weights:  73%|#######3  | 248/338 [00:01<00:00, 300.10it/s]Loading weights:  83%|########3 | 281/338 [00:01<00:00, 304.55it/s]Loading weights:  93%|#########2| 313/338 [00:01<00:00, 297.58it/s]Loading weights: 100%|##########| 338/338 [00:01<00:00, 265.56it/s]
+K sweep: K=10 effective_beam=8
+sparse 1/1 observatory_kepler_731_L32768_d0.9_s20260725 tree=0.3690s prefill=31.1936s
+K=10 beam=8
+{
+  "cases": 1,
+  "sparse_exact_rate": 0.0,
+  "mean_sparse_fuzzy": 0.0,
+  "dense_skipped": true
+}
+full report -> benchmarks/outputs/oracle_route_control/observatory_kepler_73132k_dense-reader.json

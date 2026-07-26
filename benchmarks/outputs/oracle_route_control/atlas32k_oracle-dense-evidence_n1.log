@@ -1,0 +1,11 @@
+Loading weights:   0%|          | 0/338 [00:00<?, ?it/s]Loading weights:   0%|          | 1/338 [00:00<03:10,  1.77it/s]Loading weights:   1%|1         | 5/338 [00:00<00:36,  9.12it/s]Loading weights:   5%|5         | 17/338 [00:00<00:10, 31.65it/s]Loading weights:  13%|#3        | 45/338 [00:00<00:03, 88.12it/s]Loading weights:  22%|##2       | 76/338 [00:01<00:01, 139.08it/s]Loading weights:  33%|###3      | 113/338 [00:01<00:01, 195.05it/s]Loading weights:  41%|####      | 138/338 [00:01<00:01, 146.24it/s]Loading weights:  47%|####6     | 158/338 [00:01<00:01, 131.23it/s]Loading weights:  52%|#####1    | 175/338 [00:01<00:01, 96.93it/s] Loading weights:  56%|#####5    | 189/338 [00:02<00:01, 96.69it/s]Loading weights:  60%|#####9    | 202/338 [00:02<00:01, 96.07it/s]Loading weights:  63%|######3   | 214/338 [00:02<00:01, 93.18it/s]Loading weights:  67%|######6   | 225/338 [00:02<00:01, 86.12it/s]Loading weights:  70%|######9   | 235/338 [00:02<00:01, 81.74it/s]Loading weights:  72%|#######2  | 244/338 [00:02<00:01, 78.48it/s]Loading weights:  75%|#######5  | 255/338 [00:02<00:01, 82.60it/s]Loading weights:  78%|#######8  | 264/338 [00:02<00:00, 83.59it/s]Loading weights:  81%|########  | 273/338 [00:03<00:00, 75.79it/s]Loading weights:  83%|########3 | 281/338 [00:03<00:00, 75.28it/s]Loading weights:  86%|########6 | 292/338 [00:03<00:00, 80.60it/s]Loading weights:  90%|########9 | 303/338 [00:03<00:00, 86.76it/s]Loading weights:  93%|#########3| 315/338 [00:03<00:00, 91.52it/s]Loading weights:  96%|#########6| 325/338 [00:03<00:00, 84.00it/s]Loading weights:  99%|#########8| 334/338 [00:03<00:00, 80.57it/s]Loading weights: 100%|##########| 338/338 [00:03<00:00, 87.87it/s]
+K sweep: K=10 effective_beam=8
+sparse 1/1 atlas_checkpoint_path_L32768_d0.5_s20260725 tree=0.6750s prefill=32.5279s
+K=10 beam=8
+{
+  "cases": 1,
+  "sparse_exact_rate": 0.0,
+  "mean_sparse_fuzzy": 0.3333333333333333,
+  "dense_skipped": true
+}
+full report -> benchmarks/outputs/oracle_route_control/atlas32k_oracle-dense-evidence_n1.json

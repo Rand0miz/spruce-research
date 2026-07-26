@@ -1,0 +1,11 @@
+Loading weights:   0%|          | 0/338 [00:00<?, ?it/s]Loading weights:   0%|          | 1/338 [00:00<00:59,  5.64it/s]Loading weights:   8%|8         | 28/338 [00:00<00:02, 120.64it/s]Loading weights:  19%|#8        | 63/338 [00:00<00:01, 196.62it/s]Loading weights:  30%|##9       | 101/338 [00:00<00:00, 252.07it/s]Loading weights:  40%|###9      | 134/338 [00:00<00:00, 267.12it/s]Loading weights:  51%|#####1    | 173/338 [00:00<00:00, 299.56it/s]Loading weights:  62%|######1   | 209/338 [00:00<00:00, 308.19it/s]Loading weights:  72%|#######1  | 243/338 [00:00<00:00, 298.57it/s]Loading weights:  83%|########3 | 281/338 [00:01<00:00, 316.36it/s]Loading weights:  93%|#########3| 316/338 [00:01<00:00, 323.37it/s]Loading weights: 100%|##########| 338/338 [00:01<00:00, 282.56it/s]
+K sweep: K=10 effective_beam=8
+sparse 1/1 gallery_reopened_april_1986_L16384_d0.5_s20260725 tree=0.2179s prefill=14.7351s
+K=10 beam=8
+{
+  "cases": 1,
+  "sparse_exact_rate": 1.0,
+  "mean_sparse_fuzzy": 1.0,
+  "dense_skipped": true
+}
+full report -> benchmarks/outputs/oracle_route_control/gallery16k_d05_dense-reader.json

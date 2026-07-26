@@ -1,0 +1,11 @@
+Loading weights:   0%|          | 0/338 [00:00<?, ?it/s]Loading weights:   0%|          | 1/338 [00:00<01:11,  4.74it/s]Loading weights:   8%|8         | 28/338 [00:00<00:02, 109.28it/s]Loading weights:  19%|#8        | 64/338 [00:00<00:01, 196.49it/s]Loading weights:  30%|##9       | 100/338 [00:00<00:00, 245.44it/s]Loading weights:  41%|####      | 137/338 [00:00<00:00, 278.47it/s]Loading weights:  54%|#####3    | 181/338 [00:00<00:00, 317.24it/s]Loading weights:  65%|######5   | 220/338 [00:00<00:00, 337.47it/s]Loading weights:  76%|#######5  | 256/338 [00:00<00:00, 329.36it/s]Loading weights:  86%|########6 | 291/338 [00:01<00:00, 334.82it/s]Loading weights:  96%|#########6| 326/338 [00:01<00:00, 327.30it/s]Loading weights: 100%|##########| 338/338 [00:01<00:00, 278.45it/s]
+K sweep: K=10 effective_beam=8
+sparse 1/1 gallery_reopened_april_1986_L16384_d0.5_s20260725 tree=0.1974s prefill=16.1349s
+K=10 beam=8
+{
+  "cases": 1,
+  "sparse_exact_rate": 0.0,
+  "mean_sparse_fuzzy": 0.0,
+  "dense_skipped": true
+}
+full report -> benchmarks/outputs/oracle_route_control/gallery16k_d05_oracle-needle.json

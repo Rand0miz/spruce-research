@@ -1,0 +1,64 @@
+Loading weights:   0%|          | 0/338 [00:00<?, ?it/s]Loading weights:   0%|          | 1/338 [00:00<00:54,  6.16it/s]Loading weights:  33%|###2      | 111/338 [00:00<00:00, 483.89it/s]Loading weights:  51%|#####     | 171/338 [00:00<00:00, 512.28it/s]Loading weights:  69%|######8   | 233/338 [00:00<00:00, 545.48it/s]Loading weights:  86%|########6 | 292/338 [00:00<00:00, 557.74it/s]Loading weights: 100%|##########| 338/338 [00:00<00:00, 515.14it/s]
+case: gallery_reopened_april_1986_L16384_d0.5_s20260725
+needle_block: 127  audited prefill rows: 64 (question span NOT FOUND - fallback)
+answer: '17 April 1986'
+exact: True  fuzzy: 1.0
+prefill: layer  max_mass  best(head,row/step)  n_rank<8
+prefill: L00  0.0098  (h2,3)  1
+prefill: L01  0.0140  (h9,26)  4
+prefill: L02  0.0140  (h6,19)  4
+prefill: L03  0.0043  (h6,63)  0
+prefill: L04  0.0070  (h5,38)  0
+prefill: L05  0.0047  (h4,57)  1
+prefill: L06  0.0096  (h9,12)  0
+prefill: L07  0.0073  (h1,39)  0
+prefill: L08  0.0119  (h7,52)  1
+prefill: L09  0.0302  (h5,9)  4
+prefill: L10  0.0241  (h4,45)  13
+prefill: L11  0.0302  (h5,48)  14
+prefill: L12  0.0268  (h6,46)  26
+prefill: L13  0.0162  (h6,39)  4
+prefill: L14  0.0937  (h4,38)  60
+prefill: L15  0.0262  (h3,47)  46
+prefill: L16  0.0310  (h2,31)  29
+prefill: L17  0.0493  (h6,45)  60
+prefill: L18  0.0315  (h1,46)  26
+prefill: L19  0.2769  (h3,45)  34
+prefill: L20  0.0962  (h6,47)  90
+prefill: L21  0.0537  (h0,50)  71
+prefill: L22  0.0557  (h4,44)  51
+prefill: L23  0.1132  (h2,45)  41
+prefill: L24  0.3171  (h11,45)  72
+prefill: L25  0.0456  (h11,38)  48
+prefill: L26  0.1794  (h4,45)  67
+prefill: L27  0.0858  (h3,45)  62
+decode: layer  max_mass  best(head,row/step)  n_rank<8
+decode: L00  0.0051  (h4,2)  1
+decode: L01  0.0077  (h5,2)  0
+decode: L02  0.0051  (h4,6)  0
+decode: L03  0.0040  (h11,6)  0
+decode: L04  0.0043  (h4,6)  0
+decode: L05  0.0063  (h7,6)  0
+decode: L06  0.0039  (h9,5)  0
+decode: L07  0.0054  (h4,4)  0
+decode: L08  0.0031  (h2,5)  0
+decode: L09  0.0070  (h8,4)  0
+decode: L10  0.0097  (h10,2)  1
+decode: L11  0.0117  (h5,4)  1
+decode: L12  0.0076  (h0,4)  5
+decode: L13  0.0014  (h1,6)  0
+decode: L14  0.0097  (h10,4)  1
+decode: L15  0.0080  (h3,4)  1
+decode: L16  0.0137  (h3,3)  4
+decode: L17  0.0062  (h7,3)  7
+decode: L18  0.0145  (h1,4)  11
+decode: L19  0.0042  (h1,7)  1
+decode: L20  0.0155  (h6,2)  13
+decode: L21  0.0207  (h9,3)  38
+decode: L22  0.0213  (h11,2)  21
+decode: L23  0.0150  (h8,3)  5
+decode: L24  0.0217  (h11,5)  18
+decode: L25  0.0290  (h11,3)  35
+decode: L26  0.0134  (h4,3)  33
+decode: L27  0.0251  (h11,1)  23
+report -> benchmarks/outputs/oracle_route_control/gallery16k_d05_attention_audit.json

@@ -1,0 +1,11 @@
+Loading weights:   0%|          | 0/338 [00:00<?, ?it/s]Loading weights:   0%|          | 1/338 [00:00<01:44,  3.21it/s]Loading weights:   9%|8         | 29/338 [00:00<00:03, 88.12it/s]Loading weights:  19%|#8        | 63/338 [00:00<00:01, 164.34it/s]Loading weights:  29%|##8       | 98/338 [00:00<00:01, 216.03it/s]Loading weights:  40%|####      | 136/338 [00:00<00:00, 255.05it/s]Loading weights:  51%|#####     | 172/338 [00:00<00:00, 278.91it/s]Loading weights:  61%|######1   | 207/338 [00:00<00:00, 292.58it/s]Loading weights:  71%|#######   | 239/338 [00:01<00:00, 279.55it/s]Loading weights:  81%|########1 | 274/338 [00:01<00:00, 294.16it/s]Loading weights:  90%|######### | 305/338 [00:01<00:00, 297.96it/s]Loading weights: 100%|##########| 338/338 [00:01<00:00, 248.08it/s]
+K sweep: K=10 effective_beam=8
+sparse 1/1 observatory_kepler_731_L32768_d0.9_s20260725 tree=0.5493s prefill=28.5391s
+K=10 beam=8
+{
+  "cases": 1,
+  "sparse_exact_rate": 0.0,
+  "mean_sparse_fuzzy": 0.6666666666666666,
+  "dense_skipped": true
+}
+full report -> benchmarks/outputs/oracle_route_control/observatory_kepler_73132k_oracle-needle.json
