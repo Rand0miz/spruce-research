@@ -59,7 +59,7 @@ def causal_block_mask(qb, kb, device=None):
     return k <= q                                   # [qb, kb] bool
 
 
-def load_teacher(path, device="cpu", eps=1e-9):
+def load_teacher(path, device="cpu", eps=1e-9, defer_normalization=False):
     d = torch.load(path, map_location=device)
     if d.get("proto") is None or d["pooledK"].dim() != 6:
         raise KeyError(
@@ -71,25 +71,22 @@ def load_teacher(path, device="cpu", eps=1e-9):
             f"{path} is a selector-feature-only artifact and has no dense "
             "teacher mass; it can be used for traversal/128K replay but not training")
 
+    stored_dtype = d["pooledQ"].dtype
     pooled = d["pooled"].float()      # [1, L, H, qb, kb]  teacher mass
-    q_feat = d["pooledQ"].float()[0]  # [L, G, qb, P, dd]  selector input (already grouped)
-    k_feat = d["pooledK"].float()[0]  # [L, G, kb, P, dd]
+    q_feat = (
+        d["pooledQ"][0]
+        if defer_normalization else d["pooledQ"].float()[0]
+    )
+    k_feat = (
+        d["pooledK"][0]
+        if defer_normalization else d["pooledK"].float()[0]
+    )
     pooled = pooled[0]                # [L, H, qb, kb]
 
     L, H, qb, kb = pooled.shape
     G = k_feat.shape[1]
     assert H % G == 0, f"H={H} not divisible by G={G}"
     rep = H // G
-
-    # Average the teacher mass over the query heads inside each kv group -> shared G axis.
-    mass = pooled.view(L, G, rep, qb, kb).mean(dim=2)         # [L, G, qb, kb]
-
-    # Row-normalize over causal keys -> teacher marginal p^t.
-    cmask = causal_block_mask(qb, kb, device=mass.device)    # [qb, kb]
-    mass = mass * cmask[None, None]                          # kill any future leakage
-    row = mass.sum(dim=-1, keepdim=True)                     # [L, G, qb, 1]
-    target = mass / row.clamp_min(eps)
-
     meta = {
         "seq_len": int(d["seq_len"]), "block_size": int(d["block_size"]),
         "requested_length": int(d.get("requested_length", d["seq_len"])),
@@ -102,5 +99,25 @@ def load_teacher(path, device="cpu", eps=1e-9):
         "case_id": d.get("case_id"),
         "depth": d.get("depth"),
     }
+
+    # Average the teacher mass over the query heads inside each kv group -> shared G axis.
+    mass = pooled.view(L, G, rep, qb, kb).mean(dim=2)         # [L, G, qb, kb]
+
+    # Apply causality before optionally caching compact unnormalized mass.
+    cmask = causal_block_mask(qb, kb, device=mass.device)    # [qb, kb]
+    mass = mass * cmask[None, None]                          # kill any future leakage
+    if defer_normalization:
+        return {
+            "q_feat": q_feat,
+            "k_feat": k_feat,
+            "mass": mass.to(stored_dtype),
+            "cmask": cmask,
+            "meta": meta,
+            "normalization_eps": float(eps),
+        }
+
+    # Row-normalize over causal keys -> teacher marginal p^t.
+    row = mass.sum(dim=-1, keepdim=True)                     # [L, G, qb, 1]
+    target = mass / row.clamp_min(eps)
     return {"q_feat": q_feat, "k_feat": k_feat, "target": target,
             "cmask": cmask, "row_mass": row.squeeze(-1), "meta": meta}

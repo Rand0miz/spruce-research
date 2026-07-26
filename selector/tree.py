@@ -201,6 +201,107 @@ def build_target_tree(target, row_mass=None, radix=2, eps=1e-9):
     return levels
 
 
+def tree_node_counts(num_leaf_nodes, radix=2, include_root=False):
+    """Return leaf-first node counts for the fixed key tree."""
+    _validate_radix(radix)
+    if num_leaf_nodes < 1:
+        raise ValueError("num_leaf_nodes must be >= 1")
+    counts = []
+    nodes = int(num_leaf_nodes)
+    while nodes > 1:
+        counts.append(nodes)
+        nodes = (nodes + radix - 1) // radix
+    if include_root:
+        counts.append(1)
+    return counts
+
+
+def _parent_levels(key_level, target_level, radix=2, eps=1e-9):
+    """Construct one parent key/target level from the current level."""
+    _validate_radix(radix)
+    if key_level.level != target_level.level:
+        raise ValueError(
+            f"level mismatch: key {key_level.level} vs target {target_level.level}")
+    nodes = int(key_level.features.shape[2])
+    if nodes != int(target_level.target.shape[-1]):
+        raise ValueError("key and target node counts differ")
+    if nodes <= 1:
+        raise ValueError("the root has no parent")
+
+    parent_count = (nodes + radix - 1) // radix
+    parent_features = _merge_level_prototypes(key_level.features, radix)
+    parent_ids = torch.arange(
+        parent_count, device=key_level.starts.device)
+    starts = key_level.starts[parent_ids * radix]
+    ends = key_level.ends[
+        ((parent_ids + 1) * radix - 1).clamp_max(nodes - 1)]
+
+    padded_nodes = parent_count * radix
+    target = target_level.target
+    if padded_nodes != nodes:
+        target = torch.cat([
+            target,
+            target.new_zeros(*target.shape[:-1], padded_nodes - nodes),
+        ], dim=-1)
+    parent_target = target.view(
+        *target.shape[:-1], parent_count, radix).sum(dim=-1)
+    parent_target = parent_target / parent_target.sum(
+        dim=-1, keepdim=True).clamp_min(eps)
+    qb = parent_target.shape[2]
+    query = torch.arange(qb, device=starts.device)[:, None]
+    cmask = starts[None, :] <= query
+    level = key_level.level + 1
+    return (
+        KeyTreeLevel(level, parent_features, starts, ends),
+        TargetTreeLevel(level, parent_target, cmask, starts, ends),
+    )
+
+
+def iter_tree_levels(k_feat, target, cmask, radix=2):
+    """Yield aligned key/teacher levels without retaining the whole tree.
+
+    Training can backpropagate one level at a time and keep peak activation
+    memory near the flat leaf-level run. The materialized builders remain the
+    evaluation path.
+    """
+    _validate_radix(radix)
+    if k_feat.dim() != 5:
+        raise ValueError(
+            f"k_feat must be [L,G,kb,P,d], got {tuple(k_feat.shape)}")
+    if target.dim() != 4:
+        raise ValueError(
+            f"target must be [L,G,qb,kb], got {tuple(target.shape)}")
+    kb = int(k_feat.shape[2])
+    if int(target.shape[-1]) != kb:
+        raise ValueError("key features and target have different leaf counts")
+    if cmask.shape != target.shape[-2:]:
+        raise ValueError(
+            f"cmask must be {tuple(target.shape[-2:])}, got {tuple(cmask.shape)}")
+
+    starts = torch.arange(kb, device=k_feat.device, dtype=torch.long)
+    ends = starts + 1
+    key_level = KeyTreeLevel(0, k_feat, starts, ends)
+    target_level = TargetTreeLevel(0, target, cmask, starts, ends)
+    while True:
+        yield key_level, target_level
+        if key_level.features.shape[2] == 1:
+            break
+        key_level, target_level = _parent_levels(
+            key_level, target_level, radix=radix)
+
+
+def ancestor_node_id(leaf_block, starts, ends):
+    """Return the unique node whose half-open range contains ``leaf_block``."""
+    leaf_block = int(leaf_block)
+    if leaf_block < 0:
+        return -1
+    matches = (starts <= leaf_block) & (leaf_block < ends)
+    indices = matches.nonzero(as_tuple=False).flatten()
+    if indices.numel() != 1:
+        return -1
+    return int(indices.item())
+
+
 def tree_kl_loss(gate, q_feat, key_levels, target_levels, level_weights=None):
     """Sum flat-gate KL over all key-tree levels.
 

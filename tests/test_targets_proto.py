@@ -3,6 +3,7 @@ import pytest
 import torch
 
 from selector.targets import load_selector_features, load_teacher
+from selector.train import move_document
 
 
 L, H, G, qb, kb, P, d = 2, 4, 2, 3, 3, 8, 4
@@ -27,6 +28,24 @@ def test_loads_proto_format(tmp_path):
     assert doc["k_feat"].shape == (L, G, kb, P, d), doc["k_feat"].shape
     assert doc["target"].shape == (L, G, qb, kb), doc["target"].shape
     assert doc["meta"]["proto"] == P
+
+
+def test_deferred_teacher_cache_normalizes_after_document_move(tmp_path):
+    p = tmp_path / "t.pt"
+    _make_proto_pt(p)
+    expected = load_teacher(p)
+    cached = load_teacher(p, defer_normalization=True)
+
+    assert cached["q_feat"].dtype == torch.float16
+    assert cached["k_feat"].dtype == torch.float16
+    assert cached["mass"].dtype == torch.float16
+    assert "target" not in cached
+
+    actual = move_document(cached, "cpu")
+    assert actual["q_feat"].dtype == torch.float32
+    assert actual["target"].dtype == torch.float32
+    torch.testing.assert_close(
+        actual["target"], expected["target"], atol=5e-4, rtol=5e-4)
 
 
 def test_loads_selector_features_without_teacher_mass(tmp_path):

@@ -1,10 +1,11 @@
-"""Train the flat selector gate against dumped teacher targets.
+"""Train the shared selector scorer against dumped teacher targets.
 
-Full supervision, no pruning at train time: score every key-block for every query-block,
-forward-KL against the teacher marginal, backprop into Wq/Wk only. The base model is
-never loaded here -- training reads the dumped tensors, so it is cheap to run many epochs
-on the laptop. Each document is one "batch"; the per-layer gate is shared across
-documents of different lengths (that is the whole point of pooling to fixed-dim features).
+Leaf-only mode preserves the original flat-gate recipe. ``--tree-supervision``
+scores every key node at every discriminative level with no pruning, using the
+same scorer later applied during recursive traversal. The base model is never
+loaded: training reads dumped tensors and updates Wq/Wk only. Each document is
+one batch; the per-layer gate is shared across lengths through fixed-width
+pooled features.
 
 Usage:
   python -m selector.train --targets teacher_targets/teacher_*.pt --epochs 200
@@ -21,9 +22,20 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import torch
 from selector.targets import load_teacher
 from selector.gate import FlatGate
-from selector.loss import kl_loss, needle_topk_loss, topk_membership_loss
+from selector.loss import (
+    kl_loss,
+    needle_topk_loss,
+    needle_union_topk_loss,
+    topk_boundary_loss,
+    topk_membership_loss,
+)
 from selector.plotting import load_json, save_training_plot, write_json
 from selector.recall import recall_metrics
+from selector.tree import (
+    ancestor_node_id,
+    iter_tree_levels,
+    tree_node_counts,
+)
 
 try:
     from tqdm.auto import tqdm
@@ -94,8 +106,31 @@ def atomic_torch_save(obj, path):
     os.replace(tmp, path)
 
 
-def save_gate(path, gate, config):
-    atomic_torch_save({"state_dict": gate.state_dict(), "config": config}, path)
+def training_recipe(args):
+    """Serializable settings that define the optimized selector objective."""
+    return {
+        "lr": args.lr,
+        "lambda_topk": args.lambda_topk,
+        "lambda_boundary": args.lambda_boundary,
+        "lambda_needle": args.lambda_needle,
+        "topk": args.topk,
+        "topk_margin": args.topk_margin,
+        "needle_topk": args.needle_topk,
+        "needle_margin": args.needle_margin,
+        "needle_objective": args.needle_objective,
+        "tree_supervision": args.tree_supervision,
+        "tree_radix": args.tree_radix,
+        "tree_beam": args.tree_beam,
+        "natural_fraction": args.natural_fraction,
+        "shuffle_targets": args.shuffle_targets,
+    }
+
+
+def save_gate(path, gate, config, train_args=None):
+    payload = {"state_dict": gate.state_dict(), "config": config}
+    if train_args is not None:
+        payload["train_args"] = dict(train_args)
+    atomic_torch_save(payload, path)
 
 
 def save_resume_checkpoint(path, gate, opt, config, args, epoch, paths, history):
@@ -107,11 +142,6 @@ def save_resume_checkpoint(path, gate, opt, config, args, epoch, paths, history)
         "config": config,
         "train_args": {
             "epochs": args.epochs,
-            "lr": args.lr,
-            "lambda_topk": args.lambda_topk,
-            "lambda_needle": args.lambda_needle,
-            "topk": args.topk,
-            "needle_topk": args.needle_topk,
             "proj_dim": args.proj_dim,
             "eval_every": args.eval_every,
             "budgets": list(args.budgets),
@@ -119,9 +149,11 @@ def save_resume_checkpoint(path, gate, opt, config, args, epoch, paths, history)
             "seed": args.seed,
             "init_gate": args.init_gate,
             "shuffle_targets": args.shuffle_targets,
+            "offload_targets": args.offload_targets,
             "natural_fraction": args.natural_fraction,
             "natural_targets": list(args.natural_targets or ()),
             "replay_targets": list(args.replay_targets or ()),
+            **training_recipe(args),
         },
         "targets": list(paths),
         "history": history,
@@ -131,12 +163,46 @@ def save_resume_checkpoint(path, gate, opt, config, args, epoch, paths, history)
     }, path)
 
 
-def load_resume_checkpoint(path, gate, opt, config, device):
+def validate_resume_recipe(saved_args, expected):
+    """Reject objective drift while accepting pre-tree flat checkpoints."""
+    saved_args = dict(saved_args or {})
+    legacy_defaults = {
+        "lambda_boundary": 0.0,
+        "topk_margin": 0.0,
+        "needle_margin": 0.0,
+        "needle_objective": "group",
+        "tree_supervision": False,
+        "tree_radix": 2,
+        "tree_beam": 8,
+    }
+    mismatches = []
+    for name, wanted in expected.items():
+        if name in saved_args:
+            actual = saved_args[name]
+        elif name in legacy_defaults:
+            actual = legacy_defaults[name]
+        else:
+            # Very old resume files did not serialize every sampler setting.
+            # Only compare fields that the checkpoint actually knows.
+            continue
+        if actual != wanted:
+            mismatches.append(f"{name}: saved={actual!r} requested={wanted!r}")
+    if mismatches:
+        raise SystemExit(
+            "resume training recipe differs from the checkpoint: "
+            + "; ".join(mismatches))
+
+
+def load_resume_checkpoint(
+        path, gate, opt, config, device, expected_train_args=None):
     ckpt = torch.load(path, map_location=device)
     ckpt_config = ckpt.get("config")
     if ckpt_config != config:
         raise SystemExit(
             f"resume checkpoint config {ckpt_config} does not match current {config}")
+    if expected_train_args is not None:
+        validate_resume_recipe(
+            ckpt.get("train_args"), expected_train_args)
 
     gate.load_state_dict(ckpt["state_dict"])
     if "optimizer" in ckpt:
@@ -175,6 +241,130 @@ def emit(msg, progress):
         print(msg)
 
 
+def move_document(doc, device):
+    """Move one compact CPU teacher document and normalize it on compute."""
+    device = torch.device(device)
+    if doc["q_feat"].device == device and "mass" not in doc:
+        return doc
+    moved = {
+        name: (
+            value.to(
+                device,
+                dtype=(
+                    torch.float32
+                    if torch.is_floating_point(value) else value.dtype
+                ),
+                non_blocking=device.type == "cuda",
+            )
+            if torch.is_tensor(value) else value
+        )
+        for name, value in doc.items()
+    }
+    if "mass" in moved:
+        mass = moved.pop("mass")
+        eps = float(moved.pop("normalization_eps", 1e-9))
+        row = mass.sum(dim=-1, keepdim=True)
+        moved["target"] = mass / row.clamp_min(eps)
+        moved["row_mass"] = row.squeeze(-1)
+    return moved
+
+
+def train_document(gate, optimizer, doc, args):
+    """Accumulate one optimizer step across every supervised tree level.
+
+    Each level is built and backpropagated independently, so the whole tree's
+    activations are never retained at once. Component losses are normalized by
+    the number of levels where they can affect a pruning decision; this keeps
+    their lambda scales comparable to the former leaf-only recipe.
+    """
+    needle_k = args.needle_topk or args.topk
+    if args.tree_supervision:
+        node_counts = tree_node_counts(
+            doc["meta"]["kb"], radix=args.tree_radix)
+    else:
+        node_counts = [doc["meta"]["kb"]]
+    if not node_counts:
+        raise ValueError("selector training requires at least two key blocks")
+
+    kl_levels = len(node_counts)
+    topk_levels = max(
+        sum(nodes > args.topk for nodes in node_counts), 1)
+    needle_levels = max(
+        sum(nodes > needle_k for nodes in node_counts), 1)
+    needle_loss_fn = (
+        needle_union_topk_loss
+        if args.needle_objective == "union"
+        else needle_topk_loss
+    )
+
+    stats = {
+        "kl_total": 0.0, "kl_rows": 0,
+        "topk_total": 0.0, "topk_rows": 0,
+        "boundary_total": 0.0, "boundary_rows": 0,
+        "needle_total": 0.0, "needle_units": 0,
+        "levels": 0,
+    }
+    optimizer.zero_grad()
+    for key_level, target_level in iter_tree_levels(
+            doc["k_feat"], doc["target"], doc["cmask"],
+            radix=args.tree_radix):
+        nodes = int(key_level.features.shape[2])
+        if nodes == 1:
+            break
+        if not args.tree_supervision and key_level.level > 0:
+            break
+
+        scores = gate(doc["q_feat"], key_level.features)
+        kl, valid_rows = kl_loss(
+            scores, target_level.target, target_level.cmask)
+        level_loss = kl / kl_levels
+        stats["kl_total"] += kl.item() * valid_rows
+        stats["kl_rows"] += valid_rows
+
+        if args.lambda_topk and nodes > args.topk:
+            membership, positives = topk_membership_loss(
+                scores, target_level.target, target_level.cmask,
+                k=args.topk)
+            level_loss = (
+                level_loss
+                + args.lambda_topk * membership / topk_levels
+            )
+            stats["topk_total"] += membership.item() * positives
+            stats["topk_rows"] += positives
+
+        if args.lambda_boundary and nodes > args.topk:
+            boundary, boundary_rows = topk_boundary_loss(
+                scores, target_level.target, target_level.cmask,
+                k=args.topk, margin=args.topk_margin)
+            level_loss = (
+                level_loss
+                + args.lambda_boundary * boundary / topk_levels
+            )
+            stats["boundary_total"] += boundary.item() * boundary_rows
+            stats["boundary_rows"] += boundary_rows
+
+        if args.lambda_needle and nodes > needle_k:
+            needle_node = ancestor_node_id(
+                doc["meta"]["needle_block"],
+                target_level.starts, target_level.ends)
+            needle, needle_units = needle_loss_fn(
+                scores, target_level.target, target_level.cmask,
+                needle_node, k=needle_k, margin=args.needle_margin)
+            level_loss = (
+                level_loss
+                + args.lambda_needle * needle / needle_levels
+            )
+            stats["needle_total"] += needle.item() * needle_units
+            stats["needle_units"] += needle_units
+
+        level_loss.backward()
+        stats["levels"] += 1
+        del scores, level_loss
+
+    optimizer.step()
+    return stats
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--targets", nargs="+",
@@ -193,17 +383,41 @@ def main():
                     help="optional torch RNG seed; use one fixed seed for sweeps")
     ap.add_argument("--lr", type=float, default=1e-3)
     ap.add_argument("--lambda-topk", type=float, default=0.5,
-                    help="weight of the top-k membership term (needle retention)")
+                    help="weight of broad teacher top-k membership BCE")
+    ap.add_argument(
+        "--lambda-boundary", type=float, default=0.0,
+        help="weight of hard teacher-top-k versus strongest-negative ranking")
     ap.add_argument("--lambda-needle", type=float, default=0.0,
                     help="weight of reader-row needle top-k retention; 0 disables it")
     ap.add_argument("--topk", type=int, default=8,
                     help="k for the membership term; match the KS1 budget")
+    ap.add_argument(
+        "--topk-margin", type=float, default=0.0,
+        help="score margin for the hard top-k boundary loss")
     ap.add_argument("--needle-topk", type=int, default=None,
                     help="needle retention budget; defaults to --topk")
+    ap.add_argument(
+        "--needle-margin", type=float, default=0.0,
+        help="score margin above the needle top-k threshold")
+    ap.add_argument(
+        "--needle-objective", choices=("group", "union"), default="group",
+        help="per-group legacy loss or any-group-per-layer retrieval objective")
+    ap.add_argument(
+        "--tree-supervision", action=argparse.BooleanOptionalAction,
+        default=False,
+        help="train on every discriminative key-tree level (default: leaf only)")
+    ap.add_argument("--tree-radix", type=int, default=2)
+    ap.add_argument(
+        "--tree-beam", type=int, default=8,
+        help="deployed traversal beam; must match --topk for tree training")
     ap.add_argument("--proj-dim", type=int, default=None)
     ap.add_argument("--eval-every", type=int, default=25)
     ap.add_argument("--budgets", type=int, nargs="+", default=[1, 2, 4, 8, 16])
     ap.add_argument("--device", default="cuda" if torch.cuda.is_available() else "cpu")
+    ap.add_argument(
+        "--offload-targets", action=argparse.BooleanOptionalAction,
+        default=False,
+        help="cache teacher tensors in CPU RAM and move one document at a time")
     ap.add_argument(
         "--init-gate",
         help="initialize weights from a gate checkpoint; cannot combine with --resume")
@@ -247,6 +461,18 @@ def main():
             "--replay-targets")
     if not 0.0 < args.natural_fraction <= 1.0:
         raise SystemExit("--natural-fraction must be in (0, 1]")
+    if args.topk < 1 or (args.needle_topk is not None and args.needle_topk < 1):
+        raise SystemExit("--topk and --needle-topk must be >= 1")
+    if args.tree_radix < 2 or args.tree_beam < 1:
+        raise SystemExit("--tree-radix must be >= 2 and --tree-beam >= 1")
+    if args.tree_supervision and args.topk != args.tree_beam:
+        raise SystemExit(
+            "tree-aware top-k supervision must match the deployed traversal "
+            "beam: set --topk equal to --tree-beam")
+    for name in ("lambda_topk", "lambda_boundary", "lambda_needle",
+                 "topk_margin", "needle_margin"):
+        if getattr(args, name) < 0:
+            raise SystemExit(f"--{name.replace('_', '-')} must be >= 0")
     if args.seed is not None:
         torch.manual_seed(args.seed)
         if torch.cuda.is_available():
@@ -273,7 +499,13 @@ def main():
                 "natural and replay pools overlap: "
                 f"{sorted(overlap)[:3]}")
 
-    docs = [load_teacher(p, device=args.device) for p in paths]
+    data_device = "cpu" if args.offload_targets else args.device
+    docs = [
+        load_teacher(
+            p, device=data_device,
+            defer_normalization=args.offload_targets)
+        for p in paths
+    ]
     natural_indices = list(range(len(natural_paths)))
     replay_indices = list(range(len(natural_paths), len(paths)))
     L = docs[0]["meta"]["num_layers"]
@@ -297,6 +529,18 @@ def main():
         print(f"initialized gate weights from {args.init_gate}")
     opt = torch.optim.Adam(gate.parameters(), lr=args.lr)
     print(f"gate params: {sum(p.numel() for p in gate.parameters())}  device={args.device}")
+    print(
+        f"teacher cache: device={data_device} "
+        f"per_document_transfer={args.offload_targets}")
+    print(
+        "training objective: "
+        f"{'all tree levels' if args.tree_supervision else 'leaf only'} "
+        f"radix={args.tree_radix} beam={args.tree_beam} topk={args.topk} "
+        f"lambda_topk={args.lambda_topk:g} "
+        f"lambda_boundary={args.lambda_boundary:g} "
+        f"lambda_needle={args.lambda_needle:g} "
+        f"needle_objective={args.needle_objective}"
+    )
     if grouped_inputs:
         preview_replay = round(
             len(natural_indices)
@@ -315,17 +559,20 @@ def main():
     plot_path = args.plot or os.path.join(graph_dir, f"{model_name}.png")
     history_path = args.history or os.path.join(graph_dir, f"{model_name}.json")
     empty_history = {
-        "epochs": [], "kl": [], "topk": [], "needle": [], "eval_epochs": [],
+        "epochs": [], "kl": [], "topk": [], "boundary": [], "needle": [],
+        "eval_epochs": [],
         "eval_recall8": {}, "eval_needle8": {},
     }
     # A fresh run must not inherit a partial history left by a prior crash.
     # Resume checkpoints carry their own matching history below.
     history = load_json(history_path, empty_history) if args.resume else empty_history
     history.setdefault("needle", [])
+    history.setdefault("boundary", [])
     start_epoch = 1
     if args.resume:
         resumed_epoch, checkpoint_history = load_resume_checkpoint(
-            args.resume, gate, opt, config, args.device)
+            args.resume, gate, opt, config, args.device,
+            expected_train_args=training_recipe(args))
         if checkpoint_history is not None:
             history = checkpoint_history
         start_epoch = resumed_epoch + 1
@@ -343,7 +590,8 @@ def main():
         gate.train()
         tot, nrows = 0.0, 0
         topk_tot, topk_rows = 0.0, 0
-        needle_tot, needle_groups = 0.0, 0
+        boundary_tot, boundary_rows = 0.0, 0
+        needle_tot, needle_units = 0.0, 0
         document_order = (
             mixed_epoch_order(
                 natural_indices,
@@ -358,42 +606,39 @@ def main():
             )
         )
         for document_index in document_order:
-            doc = docs[document_index]
-            scores = gate(doc["q_feat"], doc["k_feat"])
-            kl, nv = kl_loss(scores, doc["target"], doc["cmask"])
-            loss = kl
-            if args.lambda_topk:
-                tk, tnv = topk_membership_loss(
-                    scores, doc["target"], doc["cmask"], k=args.topk)
-                loss = loss + args.lambda_topk * tk
-                topk_tot += tk.item() * tnv
-                topk_rows += tnv
-            if args.lambda_needle:
-                needle_k = args.needle_topk or args.topk
-                nl, nng = needle_topk_loss(
-                    scores, doc["target"], doc["cmask"],
-                    doc["meta"]["needle_block"], k=needle_k,
-                )
-                loss = loss + args.lambda_needle * nl
-                needle_tot += nl.item() * nng
-                needle_groups += nng
-            opt.zero_grad()
-            loss.backward()
-            opt.step()
-            tot += kl.item() * nv
-            nrows += nv
+            stored_doc = docs[document_index]
+            doc = move_document(stored_doc, args.device)
+            step = train_document(gate, opt, doc, args)
+            tot += step["kl_total"]
+            nrows += step["kl_rows"]
+            topk_tot += step["topk_total"]
+            topk_rows += step["topk_rows"]
+            boundary_tot += step["boundary_total"]
+            boundary_rows += step["boundary_rows"]
+            needle_tot += step["needle_total"]
+            needle_units += step["needle_units"]
+            if doc is not stored_doc:
+                del doc
 
         kl_avg = tot / max(nrows, 1)
         topk_avg = topk_tot / max(topk_rows, 1) if args.lambda_topk else None
-        needle_avg = needle_tot / max(needle_groups, 1) if args.lambda_needle else None
+        boundary_avg = (
+            boundary_tot / max(boundary_rows, 1)
+            if args.lambda_boundary else None)
+        needle_avg = (
+            needle_tot / max(needle_units, 1)
+            if args.lambda_needle else None)
         history["epochs"].append(epoch)
         history["kl"].append(kl_avg)
         history["topk"].append(topk_avg)
+        history["boundary"].append(boundary_avg)
         history["needle"].append(needle_avg)
         if progress is not None:
             postfix = {"KL": f"{kl_avg:.4f}"}
             if topk_avg is not None:
                 postfix["topk"] = f"{topk_avg:.4f}"
+            if boundary_avg is not None:
+                postfix["boundary"] = f"{boundary_avg:.4f}"
             if needle_avg is not None:
                 postfix["needle"] = f"{needle_avg:.4f}"
             progress.set_postfix(postfix)
@@ -403,12 +648,15 @@ def main():
             line = [f"epoch {epoch:>4}  KL={kl_avg:.4f}"]
             if args.lambda_topk:
                 line.append(f"topk={topk_avg:.4f}")
+            if args.lambda_boundary:
+                line.append(f"boundary={boundary_avg:.4f}")
             if args.lambda_needle:
                 line.append(f"needle={needle_avg:.4f}")
             history["eval_epochs"].append(epoch)
             buckets = {}
             with torch.no_grad():
-                for doc in docs:
+                for stored_doc in docs:
+                    doc = move_document(stored_doc, args.device)
                     sc = gate(doc["q_feat"], doc["k_feat"])
                     met = recall_metrics(sc, doc["target"], doc["cmask"],
                                          tuple(args.budgets), doc["meta"]["needle_block"])
@@ -422,6 +670,8 @@ def main():
                     bucket["recall"].append(r8)
                     if nh is not None:
                         bucket["needle"].append(nh)
+                    if doc is not stored_doc:
+                        del doc
             for tag in sorted(buckets):
                 recall_values = buckets[tag]["recall"]
                 needle_values = buckets[tag]["needle"]
@@ -465,7 +715,7 @@ def main():
     if progress is not None:
         progress.close()
 
-    save_gate(args.out, gate, config)
+    save_gate(args.out, gate, config, train_args=training_recipe(args))
     print(f"saved gate -> {args.out}")
     print(f"training history -> {history_path}")
     if os.path.exists(plot_path):

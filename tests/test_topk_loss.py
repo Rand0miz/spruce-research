@@ -1,7 +1,13 @@
 """Tests for top-k membership loss."""
 import torch
 
-from selector.loss import needle_topk_loss, topk_membership_loss, topk_set_loss
+from selector.loss import (
+    needle_topk_loss,
+    needle_union_topk_loss,
+    topk_boundary_loss,
+    topk_membership_loss,
+    topk_set_loss,
+)
 from selector.train import expand_target_paths, mixed_epoch_order
 
 
@@ -40,6 +46,53 @@ def test_needle_loss_prefers_needle_above_topk_threshold():
         good, target, cmask, needle_block=2, k=1)
 
     assert bad_groups == good_groups == 1
+    assert good_loss.item() < bad_loss.item()
+
+
+def test_boundary_loss_focuses_hardest_topk_swap():
+    target = torch.tensor([[[[0.45, 0.35, 0.15, 0.05]]]])
+    cmask = torch.ones(1, 4, dtype=torch.bool)
+    separated = torch.tensor([[[[4.0, 3.0, 0.0, -1.0]]]])
+    swapped = torch.tensor([[[[4.0, 0.0, 3.0, -1.0]]]])
+
+    good_loss, good_rows = topk_boundary_loss(
+        separated, target, cmask, k=2, margin=0.5)
+    bad_loss, bad_rows = topk_boundary_loss(
+        swapped, target, cmask, k=2, margin=0.5)
+
+    assert good_rows == bad_rows == 1
+    assert good_loss.item() < bad_loss.item()
+
+
+def test_union_needle_loss_accepts_one_good_group_per_layer():
+    # Two layers, two groups, one reader row. The teacher supports the needle
+    # in both groups; retrieval only requires one routed group in each layer.
+    target = torch.tensor([
+        [[[0.05, 0.10, 0.80, 0.05]],
+         [[0.05, 0.10, 0.80, 0.05]]],
+        [[[0.05, 0.10, 0.80, 0.05]],
+         [[0.05, 0.10, 0.80, 0.05]]],
+    ])
+    cmask = torch.ones(1, 4, dtype=torch.bool)
+    one_good_group = torch.tensor([
+        [[[0.0, 1.0, 4.0, -1.0]],
+         [[3.0, 2.0, -1.0, 1.0]]],
+        [[[3.0, 2.0, -1.0, 1.0]],
+         [[0.0, 1.0, 4.0, -1.0]]],
+    ])
+    no_good_group = torch.tensor([
+        [[[3.0, 2.0, -1.0, 1.0]],
+         [[3.0, 2.0, -1.0, 1.0]]],
+        [[[3.0, 2.0, -1.0, 1.0]],
+         [[3.0, 2.0, -1.0, 1.0]]],
+    ])
+
+    good_loss, good_layers = needle_union_topk_loss(
+        one_good_group, target, cmask, needle_block=2, k=1)
+    bad_loss, bad_layers = needle_union_topk_loss(
+        no_good_group, target, cmask, needle_block=2, k=1)
+
+    assert good_layers == bad_layers == 2
     assert good_loss.item() < bad_loss.item()
 
 

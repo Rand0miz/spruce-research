@@ -1,0 +1,3 @@
+requested_length,seq_len,targets,dense_prefill_seconds,sparse_kernel_prefill_seconds,sparse_live_prefill_seconds,kernel_prefill_speedup,live_prefill_speedup,sparse_exact_rate,dense_exact_rate,sparse_minus_dense_exact_rate,sparse_only_correct,dense_only_correct,sparse_fuzzy,answers_match_rate,tree_build_seconds,tree_traversal_seconds,route_pack_seconds
+16384,16384,1,1.6227774640000234,1.2539603640000223,1.3140425940001705,1.2941218164372494,1.2349504280983854,0.0,1.0,-1.0,0,1,0.0,0.0,0.00547094000000925,0.0531124210000371,0.0013563580000663933
+32768,32762,2,3.9983048990000043,2.4782565240000167,2.6104862084998786,1.613353928570139,1.5316322629789485,0.0,1.0,-1.0,0,2,0.5,0.0,0.007005877499977942,0.12222621400002254,0.0017599980000113646

@@ -5,8 +5,11 @@ from selector.gate import FlatGate
 from selector.tree import (
     KeyTreeLevel,
     _merge_node_prototypes,
+    ancestor_node_id,
     build_key_tree,
     build_target_tree,
+    iter_tree_levels,
+    tree_node_counts,
     tree_kl_loss,
 )
 from scripts.eval_tree_traversal import (
@@ -106,6 +109,33 @@ def test_target_tree_sums_rows_and_masks_nodes():
     assert levels[1].cmask[1].tolist() == [True, False, False]
     # Query row 2 has causal content in node 1 because that node starts at leaf 2.
     assert levels[1].cmask[2].tolist() == [True, True, False]
+
+
+def test_streamed_tree_levels_match_materialized_builders():
+    torch.manual_seed(29)
+    L, G, qb, kb, P, d = 2, 2, 7, 7, 3, 4
+    k = torch.randn(L, G, kb, P, d)
+    raw = torch.rand(L, G, qb, kb)
+    cmask = torch.arange(kb)[None, :] <= torch.arange(qb)[:, None]
+    target = raw * cmask[None, None]
+    target = target / target.sum(dim=-1, keepdim=True).clamp_min(1e-9)
+
+    expected_keys = build_key_tree(k, radix=2)
+    expected_targets = build_target_tree(target, radix=2)
+    streamed = list(iter_tree_levels(k, target, cmask, radix=2))
+
+    assert tree_node_counts(kb, radix=2) == [7, 4, 2]
+    assert len(streamed) == len(expected_keys) == len(expected_targets)
+    for (key_level, target_level), expected_key, expected_target in zip(
+            streamed, expected_keys, expected_targets):
+        torch.testing.assert_close(
+            key_level.features, expected_key.features)
+        torch.testing.assert_close(
+            target_level.target, expected_target.target)
+        torch.testing.assert_close(
+            target_level.cmask, expected_target.cmask)
+        assert ancestor_node_id(
+            5, target_level.starts, target_level.ends) >= 0
 
 
 def test_candidate_only_traversal_matches_full_level_reference():

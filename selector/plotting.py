@@ -55,14 +55,22 @@ def save_training_plot(history, path):
     axes[0, 0].set(title="Training KL", xlabel="Epoch", ylabel="Loss")
     axes[0, 0].grid(alpha=0.25)
     topk = history.get("topk", [])
+    boundary = history.get("boundary", [])
     needle = history.get("needle", [])
     if any(v is not None for v in topk):
         axes[0, 1].plot(epochs, [float("nan") if v is None else v for v in topk],
                          color="tab:orange", label="generic top-k")
+    if any(v is not None for v in boundary):
+        axes[0, 1].plot(
+            epochs,
+            [float("nan") if v is None else v for v in boundary],
+            color="tab:red", label="hard boundary")
     if any(v is not None for v in needle):
         axes[0, 1].plot(epochs, [float("nan") if v is None else v for v in needle],
                          color="tab:purple", label="needle top-k")
-    if any(v is not None for v in topk) or any(v is not None for v in needle):
+    if (any(v is not None for v in topk)
+            or any(v is not None for v in boundary)
+            or any(v is not None for v in needle)):
         axes[0, 1].legend(fontsize=8)
     axes[0, 1].set(title="Retention Losses", xlabel="Epoch", ylabel="Loss")
     axes[0, 1].grid(alpha=0.25)

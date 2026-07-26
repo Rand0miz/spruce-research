@@ -2,7 +2,9 @@ from unittest.mock import Mock
 
 import torch
 
-from selector.train import load_resume_checkpoint
+import pytest
+
+from selector.train import load_resume_checkpoint, validate_resume_recipe
 
 
 def test_resume_moves_cuda_rng_states_back_to_cpu(monkeypatch):
@@ -43,3 +45,44 @@ def test_resume_moves_cuda_rng_states_back_to_cpu(monkeypatch):
     assert len(restored) == 1
     assert restored[0].device.type == "cpu"
     assert restored[0].dtype == torch.uint8
+
+
+def test_resume_recipe_rejects_tree_objective_drift():
+    saved = {
+        "lr": 2e-4,
+        "lambda_topk": 0.5,
+        "lambda_boundary": 0.5,
+        "lambda_needle": 1.0,
+        "topk": 8,
+        "topk_margin": 0.25,
+        "needle_topk": 8,
+        "needle_margin": 0.25,
+        "needle_objective": "union",
+        "tree_supervision": True,
+        "tree_radix": 2,
+        "tree_beam": 8,
+        "natural_fraction": 0.8,
+        "shuffle_targets": True,
+    }
+    expected = dict(saved)
+    expected["lambda_needle"] = 0.25
+
+    with pytest.raises(SystemExit, match="lambda_needle"):
+        validate_resume_recipe(saved, expected)
+
+
+def test_legacy_flat_resume_gets_safe_new_objective_defaults():
+    validate_resume_recipe(
+        {"lr": 5e-4, "lambda_topk": 0.75},
+        {
+            "lr": 5e-4,
+            "lambda_topk": 0.75,
+            "lambda_boundary": 0.0,
+            "topk_margin": 0.0,
+            "needle_margin": 0.0,
+            "needle_objective": "group",
+            "tree_supervision": False,
+            "tree_radix": 2,
+            "tree_beam": 8,
+        },
+    )

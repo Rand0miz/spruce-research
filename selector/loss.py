@@ -62,6 +62,46 @@ def topk_membership_loss(scores, target, cmask, k=8, row_valid_thresh=0.5):
     return 0.5 * (lp + ln), int(pos.sum())
 
 
+def topk_boundary_loss(scores, target, cmask, k=8, margin=0.0,
+                       row_valid_thresh=0.5):
+    """Rank every teacher top-k block above the hardest causal non-top-k block.
+
+    Balanced BCE is useful for broad set membership, but averaging all negatives
+    dilutes the few near-boundary mistakes that determine exact top-k recall.
+    This listwise boundary term focuses each eligible row on its weakest teacher
+    top-k score and strongest competing score.
+
+    Rows need more than ``k`` visible blocks and ``k`` positive-mass teacher
+    blocks. Returns ``(loss, eligible_rows)``.
+    """
+    _, _, _, kb = scores.shape
+    kk = min(int(k), kb)
+    if kk <= 0:
+        return scores.sum() * 0.0, 0
+
+    teacher_top = target.topk(kk, dim=-1).indices
+    teacher_values = target.gather(-1, teacher_top)
+    teacher_member = torch.zeros_like(target, dtype=torch.bool)
+    teacher_member.scatter_(-1, teacher_top, True)
+
+    visible = cmask[None, None]
+    valid = target.sum(dim=-1) > row_valid_thresh
+    has_choice = cmask.sum(dim=-1)[None, None] > kk
+    has_full_positive_set = (teacher_values > 0).all(dim=-1)
+    eligible = valid & has_choice & has_full_positive_set
+    n = int(eligible.sum())
+    if n == 0:
+        return scores.sum() * 0.0, 0
+
+    weakest_positive = scores.gather(-1, teacher_top).amin(dim=-1)
+    neg_inf = torch.finfo(scores.dtype).min
+    hardest_negative = scores.masked_fill(
+        ~(visible & ~teacher_member), neg_inf).amax(dim=-1)
+    loss = F.softplus(
+        hardest_negative - weakest_positive + float(margin))
+    return (loss * eligible).sum() / eligible.sum(), n
+
+
 def needle_topk_loss(scores, target, cmask, needle_block, k=8,
                      margin=0.0, row_valid_thresh=0.5):
     """Encourage the reader row to retain a known needle in its top-k blocks.
@@ -106,6 +146,60 @@ def needle_topk_loss(scores, target, cmask, needle_block, k=8,
     needle_scores = reader_scores[:, :, needle_block]
     loss = F.softplus(threshold - needle_scores + margin)
     return (loss * eligible).sum() / eligible.sum(), n
+
+
+def needle_union_topk_loss(scores, target, cmask, needle_block, k=8,
+                           margin=0.0, row_valid_thresh=0.5):
+    """Keep evidence in at least one KV group per teacher-eligible layer.
+
+    ``selected_blocks`` routes independently per KV group, while retrieval only
+    requires one group in a layer to carry the evidence forward. The existing
+    per-group needle loss averages every eligible group. This union objective
+    instead optimizes the best eligible group in each layer, matching the
+    per-layer any-group preservation metric used by the natural retrieval eval.
+
+    Returns ``(loss, eligible_layers)``.
+    """
+    L, _, qb, kb = scores.shape
+    if needle_block is None or not 0 <= int(needle_block) < kb:
+        return scores.sum() * 0.0, 0
+
+    needle_block = int(needle_block)
+    visible = cmask[-1]
+    if not bool(visible[needle_block]):
+        return scores.sum() * 0.0, 0
+
+    competitors = int(visible.sum()) - 1
+    kk = min(int(k), competitors)
+    if kk <= 0:
+        return scores.sum() * 0.0, 0
+
+    reader_scores = scores[:, :, qb - 1, :]
+    reader_target = target[:, :, qb - 1, :]
+    teacher_top = reader_target.topk(min(int(k), kb), dim=-1).indices
+    teacher_keeps_needle = (teacher_top == needle_block).any(dim=-1)
+    valid = reader_target.sum(dim=-1) > row_valid_thresh
+    eligible_groups = teacher_keeps_needle & valid
+    eligible_layers = eligible_groups.any(dim=1)
+    n = int(eligible_layers.sum())
+    if n == 0:
+        return scores.sum() * 0.0, 0
+
+    neg_inf = torch.finfo(scores.dtype).min
+    other_scores = reader_scores.masked_fill(
+        ~visible[None, None], neg_inf)
+    other_scores[:, :, needle_block] = neg_inf
+    threshold = other_scores.topk(kk, dim=-1).values[..., -1]
+    gaps = threshold - reader_scores[:, :, needle_block]
+
+    # Ineligible groups cannot satisfy the union. The minimum selects the
+    # easiest teacher-supported route in each layer and sends gradient there.
+    positive_inf = torch.finfo(scores.dtype).max
+    best_gap = gaps.masked_fill(~eligible_groups, positive_inf).amin(dim=1)
+    loss = F.softplus(best_gap + float(margin))
+    return (loss * eligible_layers).sum() / eligible_layers.sum(), n
+
+
 def topk_set_loss(scores, target, cmask, topk=8, margin=0.0, row_valid_thresh=0.5):
     """Compatibility wrapper for older training/test code.
 
