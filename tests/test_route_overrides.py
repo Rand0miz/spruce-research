@@ -72,3 +72,14 @@ def test_teacher_topk_routes_selects_teacher_mass():
     tight = teacher_topk_routes(target, k_selected=3, local_window=1)
     tight_reader = set(tight[0, 0, 0, 5].tolist())
     assert 0 in tight_reader and 3 not in tight_reader
+
+
+def test_dense_reader_routes_full_causal_reader_row():
+    from scripts.route_overrides import dense_reader_routes
+    sel = _toy_selected()
+    out = dense_reader_routes(sel)
+    assert out.shape[-1] == 6                      # widened to kb
+    assert out[0, 0, 0, 5].tolist() == [0, 1, 2, 3, 4, 5]
+    for q in range(5):                             # other rows keep their sets
+        assert set(out[0, 0, 0, q].tolist()) - {-1} == set(sel[0, 0, 0, q].tolist()) - {-1}
+    validate_selected_blocks(out)

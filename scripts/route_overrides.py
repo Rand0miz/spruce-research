@@ -50,6 +50,29 @@ def force_needle_routes(selected, needle_block, pad_value=PAD_VALUE):
     return keyed.masked_fill(keyed == sentinel, pad_value).to(selected.dtype)
 
 
+def dense_reader_routes(selected, pad_value=PAD_VALUE):
+    """Give the final (reader/question) query row EVERY causal block.
+
+    All other rows keep their learned routes, PAD-extended to the new width.
+    Separates 'reader-row budget too small' from 'document representations
+    corrupted by sparsity elsewhere': if generation still fails with a dense
+    reader row, access at the reader row was never the binding constraint.
+    """
+    if selected.dim() != 5:
+        raise ValueError(
+            f"selected must be [B,L,G,qb,K], got {tuple(selected.shape)}")
+    B, L, G, qb, K = selected.shape
+    kb = qb
+    width = max(K, kb)
+    device = selected.device
+    out = torch.full((B, L, G, qb, width), pad_value,
+                     dtype=selected.dtype, device=device)
+    out[..., :K] = selected
+    out[:, :, :, qb - 1, :] = torch.arange(
+        kb, device=device, dtype=selected.dtype)
+    return out
+
+
 def teacher_topk_routes(target, k_selected, local_window=1):
     """Pack the teacher's top-``k_selected`` blocks per row into routes.
 

@@ -49,7 +49,11 @@ from kernels.sparse_prefill import (
 )
 from scripts.eval_tree_traversal import load_gate, traverse_to_leaf_ids
 from scripts.export_selected_blocks import selected_ids_to_blocks
-from scripts.route_overrides import force_needle_routes, teacher_topk_routes
+from scripts.route_overrides import (
+    dense_reader_routes,
+    force_needle_routes,
+    teacher_topk_routes,
+)
 from selector.targets import load_selector_features, load_teacher
 from sparse.attention import (
     SPARSE_PREFILL_ATTENTION,
@@ -281,6 +285,10 @@ def _run_sparse_cases(
                 selected = force_needle_routes(selected, case["needle_block"])
                 route_timing.update(
                     _route_quality(selected, case["needle_block"]))
+            elif route_mode == "dense-reader":
+                selected = dense_reader_routes(selected)
+                route_timing.update(
+                    _route_quality(selected, case["needle_block"]))
             elif route_mode == "teacher-top8":
                 selected = teacher_routes.to(device)
                 route_timing.update(
@@ -377,6 +385,18 @@ def _run_dense_cases(model, cases, args, tokenizer):
 
 
 def aggregate_results(case_results):
+    if any(case["dense"] is None for case in case_results):
+        # --skip-dense diagnostic runs: retrieval accuracy against the known
+        # needle only, no paired dense timing or accuracy comparison.
+        return {
+            "cases": len(case_results),
+            "sparse_exact_rate": (
+                sum(case["sparse"]["exact"] for case in case_results)
+                / len(case_results)),
+            "mean_sparse_fuzzy": statistics.mean(
+                case["sparse"]["fuzzy"] for case in case_results),
+            "dense_skipped": True,
+        }
     kernel_speedups = [case["comparison"]["kernel_prefill_speedup"] for case in case_results]
     live_speedups = [case["comparison"]["live_prefill_speedup"] for case in case_results]
     total_speedups = [case["comparison"]["live_total_speedup"] for case in case_results]
@@ -474,18 +494,20 @@ def build_case_results(cases, sparse_results, dense_results):
     case_results = []
     for case in cases:
         sparse = sparse_results[case["case_key"]]
-        dense = dense_results[case["case_key"]]
+        dense = dense_results.get(case["case_key"]) if dense_results else None
         case_results.append({
             "case_id": case["case_id"], "seq_len": case["seq_len"],
             "requested_length": case["requested_length"],
             "block_size": case["block_size"], "needle_block": case["needle_block"],
             "teacher_target": case["target"], "sparse": sparse, "dense": dense,
-            "answers_match": sparse["answer"].strip() == dense["answer"].strip(),
+            "answers_match": (
+                sparse["answer"].strip() == dense["answer"].strip()
+                if dense is not None else None),
             "comparison": {
                 "kernel_prefill_speedup": dense["prefill_seconds"] / sparse["prefill_seconds"],
                 "live_prefill_speedup": dense["prefill_seconds"] / sparse["live_prefill_seconds"],
                 "live_total_speedup": dense["seconds"] / sparse["live_total_seconds"],
-            },
+            } if dense is not None else {},
         })
     return case_results
 
@@ -546,17 +568,25 @@ def main():
         "--kernel-variant", choices=KERNEL_VARIANTS, default="single_head",
         help="single_head is the measured control; other choices are isolated kernel ablations")
     parser.add_argument(
-        "--route-mode", choices=("learned", "oracle-needle", "teacher-top8"),
+        "--route-mode",
+        choices=("learned", "oracle-needle", "teacher-top8", "dense-reader"),
         default="learned",
         help="learned: gate traversal routes (production); oracle-needle: "
              "learned routes widened by one slot with the evidence block "
              "forced into every causal row (sufficiency control); teacher-top8: "
              "routes packed from the teacher's top-k mass, no gate influence "
-             "on selection (label-ceiling control)")
+             "on selection (label-ceiling control); dense-reader: learned "
+             "routes but the final reader row attends every causal block "
+             "(reader-budget control)")
     parser.add_argument(
         "--backend", choices=("triton", "pytorch"), default="triton",
         help="sparse prefill implementation; pytorch is the correctness "
              "reference and the only option without Triton (Windows)")
+    parser.add_argument(
+        "--skip-dense", action="store_true",
+        help="skip the paired dense run (8GB laptops cannot fit a full-length "
+             "dense SDPA prefill); sparse retrieval is still scored against "
+             "the target's known needle")
     parser.add_argument("--out", required=True)
     parser.add_argument(
         "--plot", help="optional efficiency/accuracy PNG; also writes an adjacent CSV")
@@ -659,14 +689,17 @@ def main():
     gc.collect()
     torch.cuda.empty_cache()
 
-    dense_model = _load_model(
-        args.model, "sdpa", dtype, args.load_offload_dir,
-        yarn_factor=args.yarn_factor,
-        original_max_position_embeddings=args.original_max_position_embeddings)
-    if warmup_tokens:
-        _warmup(dense_model, _warmup_inputs(cases[0]["encoded"], warmup_tokens))
-    dense_results = _run_dense_cases(dense_model, cases, args, tokenizer)
-    dense_model = _free_model(dense_model)
+    if args.skip_dense:
+        dense_results = {}
+    else:
+        dense_model = _load_model(
+            args.model, "sdpa", dtype, args.load_offload_dir,
+            yarn_factor=args.yarn_factor,
+            original_max_position_embeddings=args.original_max_position_embeddings)
+        if warmup_tokens:
+            _warmup(dense_model, _warmup_inputs(cases[0]["encoded"], warmup_tokens))
+        dense_results = _run_dense_cases(dense_model, cases, args, tokenizer)
+        dense_model = _free_model(dense_model)
 
     sweep_reports = []
     for k_selected, effective_beam in k_sweep:
