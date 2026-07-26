@@ -1,0 +1,112 @@
+{
+  "model": "Qwen/Qwen2.5-Coder-1.5B-Instruct",
+  "runtime": {
+    "platform": "Windows-11-10.0.26200-SP0",
+    "python": "3.12.10",
+    "torch": "2.12.1+cu126",
+    "cuda_runtime": "12.6",
+    "cuda_available": true,
+    "transformers": "5.13.0",
+    "triton": "3.7.1",
+    "gpu": {
+      "index": 0,
+      "name": "NVIDIA GeForce RTX 4070 Laptop GPU",
+      "total_memory_gb": 8.585216,
+      "compute_capability": "8.9"
+    }
+  },
+  "gate": "C:\\Users\\myles\\SPRUCE\\selector_ckpt\\natural160_replay40_lamt075_lamn025_k10_lr5e4_e300.pt",
+  "selector": {
+    "mode": "live_candidate_only_tree_traversal",
+    "route_representation": "compact_leaf_ids",
+    "feature_source": "pooled_qk_loaded_from_teacher_target",
+    "feature_extraction_included": false,
+    "feature_file_loading_included": false,
+    "compute_dtype": "float32",
+    "layer_chunk": 4,
+    "beam": 8,
+    "radix": 2,
+    "k_selected": 10,
+    "local_window": 1,
+    "route_mode": "oracle-needle",
+    "backend": "pytorch"
+  },
+  "kernel": {
+    "backend": "pytorch_reference"
+  },
+  "rope": {
+    "enabled": false,
+    "rope_type": "default",
+    "factor": 1.0,
+    "original_max_position_embeddings": 32768,
+    "max_position_embeddings": 32768,
+    "static": false
+  },
+  "repeats": 1,
+  "warmup_tokens": 64,
+  "cases": [
+    {
+      "case_id": "gallery_reopened_april_1986_L16384_d0.5_s20260725",
+      "seq_len": 16375,
+      "requested_length": 16384,
+      "block_size": 64,
+      "needle_block": 127,
+      "teacher_target": "C:\\Users\\myles\\SPRUCE\\teacher_targets\\1.5B_natural_heldout_verified\\teacher_gallery_reopened_april_1986_L16384_d0.5_s20260725_len16375_blk64_d0.5.pt",
+      "sparse": {
+        "exact": false,
+        "fuzzy": 0.0,
+        "answer": "1987",
+        "needle": "the restoration history records that the eastern gallery reopened to the public on 17 april 1986.",
+        "reference_answers": [
+          "17 April 1986",
+          "April 17 1986",
+          "April 17, 1986"
+        ],
+        "feature_load_seconds": 0.07796070000040345,
+        "tree_build_seconds": 0.0481904000043869,
+        "tree_traversal_seconds": 0.1305754999993951,
+        "route_pack_seconds": 0.018639399997482542,
+        "route_transfer_seconds": 0.0,
+        "selector_seconds": 0.19740530000126455,
+        "prefill_seconds": 16.13485689999652,
+        "decode_seconds": 0.48694390000309795,
+        "seconds": 16.62180079999962,
+        "live_prefill_seconds": 16.332262199997786,
+        "live_total_seconds": 16.819206100000883,
+        "needle_layer_group_hit_rate": 1.0,
+        "needle_any_group_all_layers_rate": 1.0,
+        "peak_memory_allocated_gb": 4.778312192,
+        "peak_memory_reserved_gb": 5.32676608,
+        "answer_repeat_match": true,
+        "timing_samples": [
+          {
+            "feature_load_seconds": 0.07796070000040345,
+            "tree_build_seconds": 0.0481904000043869,
+            "tree_traversal_seconds": 0.1305754999993951,
+            "route_pack_seconds": 0.018639399997482542,
+            "route_transfer_seconds": 0.0,
+            "selector_seconds": 0.19740530000126455,
+            "needle_layer_group_hit_rate": 1.0,
+            "needle_any_group_all_layers_rate": 1.0,
+            "seconds": 16.62180079999962,
+            "prefill_seconds": 16.13485689999652,
+            "decode_seconds": 0.48694390000309795,
+            "peak_memory_allocated_gb": 4.778312192,
+            "peak_memory_reserved_gb": 5.32676608,
+            "live_prefill_seconds": 16.332262199997786,
+            "live_total_seconds": 16.819206100000883
+          }
+        ]
+      },
+      "dense": null,
+      "answers_match": null,
+      "comparison": {}
+    }
+  ],
+  "aggregate": {
+    "cases": 1,
+    "sparse_exact_rate": 0.0,
+    "mean_sparse_fuzzy": 0.0,
+    "dense_skipped": true
+  }
+}
