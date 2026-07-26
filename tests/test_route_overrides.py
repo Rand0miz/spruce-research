@@ -83,3 +83,18 @@ def test_dense_reader_routes_full_causal_reader_row():
     for q in range(5):                             # other rows keep their sets
         assert set(out[0, 0, 0, q].tolist()) - {-1} == set(sel[0, 0, 0, q].tolist()) - {-1}
     validate_selected_blocks(out)
+
+
+def test_dense_evidence_routes_ceiling_control():
+    from scripts.route_overrides import dense_evidence_routes
+    sel = _toy_selected()
+    out = dense_evidence_routes(sel, needle_block=2)
+    # reader row dense
+    assert out[0, 0, 0, 5, :6].tolist() == [0, 1, 2, 3, 4, 5]
+    # evidence row dense over its causal prefix, PAD after
+    ev = out[0, 0, 0, 2].tolist()
+    assert ev[:3] == [0, 1, 2] and all(b == -1 for b in ev[3:])
+    # evidence present in every causal row
+    for q in range(2, 6):
+        assert 2 in out[0, 0, 0, q].tolist()
+    validate_selected_blocks(out)

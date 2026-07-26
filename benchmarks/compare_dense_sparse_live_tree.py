@@ -50,6 +50,7 @@ from kernels.sparse_prefill import (
 from scripts.eval_tree_traversal import load_gate, traverse_to_leaf_ids
 from scripts.export_selected_blocks import selected_ids_to_blocks
 from scripts.route_overrides import (
+    dense_evidence_routes,
     dense_reader_routes,
     force_needle_routes,
     teacher_topk_routes,
@@ -287,6 +288,13 @@ def _run_sparse_cases(
                     _route_quality(selected, case["needle_block"]))
             elif route_mode == "dense-reader":
                 selected = dense_reader_routes(selected)
+                route_timing.update(
+                    _route_quality(selected, case["needle_block"]))
+            elif (route_mode == "oracle-dense-evidence"
+                    and case["needle_block"] >= 0):
+                selected = dense_evidence_routes(
+                    selected, case["needle_block"],
+                    neighborhood=getattr(args, "evidence_neighborhood", 0))
                 route_timing.update(
                     _route_quality(selected, case["needle_block"]))
             elif route_mode == "teacher-top8":
@@ -569,7 +577,8 @@ def main():
         help="single_head is the measured control; other choices are isolated kernel ablations")
     parser.add_argument(
         "--route-mode",
-        choices=("learned", "oracle-needle", "teacher-top8", "dense-reader"),
+        choices=("learned", "oracle-needle", "teacher-top8", "dense-reader",
+                 "oracle-dense-evidence"),
         default="learned",
         help="learned: gate traversal routes (production); oracle-needle: "
              "learned routes widened by one slot with the evidence block "
@@ -582,6 +591,10 @@ def main():
         "--backend", choices=("triton", "pytorch"), default="triton",
         help="sparse prefill implementation; pytorch is the correctness "
              "reference and the only option without Triton (Windows)")
+    parser.add_argument(
+        "--evidence-neighborhood", type=int, default=0,
+        help="oracle-dense-evidence only: also densify the query rows of "
+             "blocks within +-N of the evidence (boundary-straddle control)")
     parser.add_argument(
         "--skip-dense", action="store_true",
         help="skip the paired dense run (8GB laptops cannot fit a full-length "

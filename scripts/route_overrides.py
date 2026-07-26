@@ -73,6 +73,34 @@ def dense_reader_routes(selected, pad_value=PAD_VALUE):
     return out
 
 
+def dense_evidence_routes(selected, needle_block, pad_value=PAD_VALUE,
+                          neighborhood=0):
+    """Dense reader row + dense evidence-block query row + evidence everywhere.
+
+    Ceiling diagnostic for the 32K failure: if the evidence block's own tokens
+    were contextualized densely (their query row attends every causal block)
+    AND the reader row is dense AND every row can reach the evidence, does
+    generation recover? ``neighborhood`` additionally densifies the query rows
+    of the blocks within +-N of the evidence (semantic-boundary straddle
+    control). Uses oracle knowledge of the needle — not deployable, purely
+    attribution.
+    """
+    widened = force_needle_routes(selected, needle_block, pad_value=pad_value)
+    out = dense_reader_routes(widened, pad_value=pad_value)
+    B, L, G, qb, width = out.shape
+    needle_block = int(needle_block)
+    dense_row = torch.arange(qb, device=out.device, dtype=out.dtype)
+    low = max(0, needle_block - int(neighborhood))
+    high = min(qb - 1, needle_block + int(neighborhood))
+    for block in range(low, high + 1):
+        causal_width = block + 1
+        row = torch.full((width,), pad_value, dtype=out.dtype,
+                         device=out.device)
+        row[:causal_width] = dense_row[:causal_width]
+        out[:, :, :, block, :] = row
+    return out
+
+
 def teacher_topk_routes(target, k_selected, local_window=1):
     """Pack the teacher's top-``k_selected`` blocks per row into routes.
 
