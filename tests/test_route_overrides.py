@@ -100,6 +100,26 @@ def test_dense_evidence_routes_ceiling_control():
     validate_selected_blocks(out)
 
 
+def test_candidate_span_collapses_overlap_and_clamps():
+    from scripts.route_overrides import candidate_span
+    # Adjacent candidates at W=1 overlap; union is 4 rows, not 2*(2*1+1)=6.
+    assert candidate_span([2, 3], qb=8, neighborhood=1) == [1, 2, 3, 4]
+    # Clamped at both ends rather than raising or wrapping.
+    assert candidate_span([0, 7], qb=8, neighborhood=2) == [0, 1, 2, 5, 6, 7]
+    assert candidate_span([3], qb=8) == [3]
+
+
+def test_dense_candidate_routes_span_densifies_neighbors():
+    from scripts.route_overrides import dense_candidate_routes
+    sel = _toy_selected()
+    out = dense_candidate_routes(sel, candidate_blocks=[3], neighborhood=1)
+    for block in (2, 3, 4):
+        row = out[0, 0, 0, block].tolist()
+        assert row[:block + 1] == list(range(block + 1))
+        assert all(entry == -1 for entry in row[block + 1:])
+    validate_selected_blocks(out)
+
+
 def test_dense_candidate_routes_no_oracle():
     from scripts.route_overrides import dense_candidate_routes
     sel = _toy_selected()

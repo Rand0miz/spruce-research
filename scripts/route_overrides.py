@@ -101,21 +101,46 @@ def dense_evidence_routes(selected, needle_block, pad_value=PAD_VALUE,
     return out
 
 
-def dense_candidate_routes(selected, candidate_blocks, pad_value=PAD_VALUE):
+def candidate_span(candidate_blocks, qb, neighborhood=0):
+    """Blocks actually densified for ``candidate_blocks`` at a given radius.
+
+    Each candidate expands to the clamped window [b-w, b+w]. Overlapping
+    windows collapse, so the count is NOT len(candidates)*(2w+1) — read the
+    real densified-row cost off this list rather than computing it.
+    """
+    if int(neighborhood) < 0:
+        raise ValueError(f"neighborhood must be >= 0, got {neighborhood}")
+    span = set()
+    for block in candidate_blocks:
+        block = int(block)
+        if not 0 <= block < qb:
+            raise ValueError(f"candidate block {block} outside [0,{qb})")
+        low = max(0, block - int(neighborhood))
+        high = min(qb - 1, block + int(neighborhood))
+        span.update(range(low, high + 1))
+    return sorted(span)
+
+
+def dense_candidate_routes(selected, candidate_blocks, pad_value=PAD_VALUE,
+                           neighborhood=0):
     """Deployable retrieve-then-re-encode routing: no oracle knowledge.
 
     Dense reader row plus dense query rows for ``candidate_blocks`` — the
     gate's own top-scoring reader-row blocks. Repairs the K/V of likely
     evidence regions (the 32K corruption mechanism) at O(L) per densified row,
     ~(M+1)/qb of dense prefill extra. Everything else keeps its learned routes.
+
+    ``neighborhood`` densifies +-N blocks around each candidate instead of the
+    candidate alone. This separates two readings of the inverted M curve (M=4
+    beats M=32): whether repair must be CONTIGUOUS around the evidence, or
+    whether scattered high-scoring blocks are equally good per row spent. Same
+    knob as ``dense_evidence_routes``, but driven by gate scores rather than
+    needle metadata, so it stays deployable.
     """
     out = dense_reader_routes(selected, pad_value=pad_value)
     B, L, G, qb, width = out.shape
     dense_row = torch.arange(qb, device=out.device, dtype=out.dtype)
-    for block in candidate_blocks:
-        block = int(block)
-        if not 0 <= block < qb:
-            raise ValueError(f"candidate block {block} outside [0,{qb})")
+    for block in candidate_span(candidate_blocks, qb, neighborhood):
         causal_width = block + 1
         row = torch.full((width,), pad_value, dtype=out.dtype,
                          device=out.device)

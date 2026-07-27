@@ -50,6 +50,7 @@ from kernels.sparse_prefill import (
 from scripts.eval_tree_traversal import load_gate, traverse_to_leaf_ids
 from scripts.export_selected_blocks import selected_ids_to_blocks
 from scripts.route_overrides import (
+    candidate_span,
     dense_candidate_routes,
     dense_evidence_routes,
     dense_reader_routes,
@@ -118,7 +119,7 @@ def prepare_cases(paths, tokenizer, prompt_bank=None):
 def live_route(gate, gate_config, target_path, *, beam, radix, k_selected,
                local_window, selector_device, model_device=None, validate=False,
                selector_dtype="float32", selector_layer_chunk=4,
-               features=None):
+               features=None, sink_blocks=0):
     """Build and traverse one tree now, returning compact selected blocks."""
     selector_device = torch.device(selector_device)
     if features is None:
@@ -161,7 +162,7 @@ def live_route(gate, gate_config, target_path, *, beam, radix, k_selected,
     started = time.perf_counter()
     selected = selected_ids_to_blocks(
         selected_ids, k_selected=k_selected, local_window=local_window,
-        key_blocks=meta["kb"])
+        key_blocks=meta["kb"], sink_blocks=sink_blocks)
     _sync(selector_device)
     route_pack_seconds = time.perf_counter() - started
 
@@ -295,6 +296,7 @@ def _run_sparse_cases(
                 validate=(repeat == 0), selector_dtype=args.selector_dtype,
                 selector_layer_chunk=args.selector_layer_chunk,
                 features=features,
+                sink_blocks=int(getattr(args, "sink_blocks", 0)),
             )
             route_timing["feature_load_seconds"] = feature_load_seconds
             if route_mode == "oracle-needle" and case["needle_block"] >= 0:
@@ -313,12 +315,22 @@ def _run_sparse_cases(
                 route_timing.update(
                     _route_quality(selected, case["needle_block"]))
             elif route_mode == "dense-candidates":
-                selected = dense_candidate_routes(selected, candidate_blocks)
+                neighborhood = int(getattr(args, "candidate_neighborhood", 0))
+                selected = dense_candidate_routes(
+                    selected, candidate_blocks, neighborhood=neighborhood)
+                span = candidate_span(
+                    candidate_blocks, selected.shape[3], neighborhood)
                 route_timing.update(
                     _route_quality(selected, case["needle_block"]))
                 route_timing["candidate_blocks"] = list(candidate_blocks)
                 route_timing["candidate_contains_needle"] = (
                     int(case["needle_block"]) in candidate_blocks)
+                route_timing["candidate_neighborhood"] = neighborhood
+                # Windows overlap, so the densified-row count is measured here
+                # rather than derived from M*(2w+1): this is the real cost.
+                route_timing["densified_rows"] = len(span)
+                route_timing["span_contains_needle"] = int(
+                    int(case["needle_block"]) in span)
             elif route_mode == "teacher-top8":
                 selected = teacher_routes.to(device)
                 route_timing.update(
@@ -553,6 +565,7 @@ def selector_metadata(args, *, beam, k_selected):
         "layer_chunk": args.selector_layer_chunk,
         "beam": beam, "radix": args.radix,
         "k_selected": k_selected, "local_window": args.local_window,
+        "sink_blocks": int(getattr(args, "sink_blocks", 0)),
         "route_mode": getattr(args, "route_mode", "learned"),
         "backend": getattr(args, "backend", "triton"),
     }
@@ -618,6 +631,17 @@ def main():
         help="dense-candidates only: number of gate-scored reader-row blocks "
              "whose query rows are densified (retrieve-then-re-encode, no "
              "oracle knowledge)")
+    parser.add_argument(
+        "--sink-blocks", type=int, default=0,
+        help="force the first N key blocks (attention sink) into every causal "
+             "row, outside the K budget, like the local window. 0 leaves the "
+             "sink competing for learned slots, so rows that rank it below K "
+             "drop it entirely")
+    parser.add_argument(
+        "--candidate-neighborhood", type=int, default=0,
+        help="dense-candidates only: also densify +-N query rows around each "
+             "candidate. 0 reproduces scattered top-M densification; N>0 tests "
+             "whether repair must be contiguous around the evidence")
     parser.add_argument(
         "--evidence-neighborhood", type=int, default=0,
         help="oracle-dense-evidence only: also densify the query rows of "

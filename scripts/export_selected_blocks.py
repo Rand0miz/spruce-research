@@ -78,13 +78,22 @@ def selected_mask_to_blocks(selected_mask, k_selected, local_window=1):
 
 @torch.no_grad()
 def selected_ids_to_blocks(
-        selected_ids, k_selected, local_window=1, key_blocks=None):
+        selected_ids, k_selected, local_window=1, key_blocks=None,
+        sink_blocks=0):
     """Pack compact traversal IDs directly into ``selected_blocks``.
 
     This preserves ``selected_mask_to_blocks`` policy exactly: forced local
     blocks take priority, then the smallest causal nonlocal traversal IDs fill
     the remaining slots. Work scales with the beam width rather than all key
     blocks.
+
+    ``sink_blocks`` forces the first N key blocks (the attention sink) into
+    every causal row, outside the learned budget — the same treatment the local
+    window already gets. With the default 0 the sink competes for learned slots
+    like any other block, so a row whose selector ranks it below K drops the
+    sink entirely, the failure mode StreamingLLM documents. Forced sink blocks
+    are excluded from the nonlocal candidate set and from the local window, so
+    no slot is spent twice and no duplicate can reach the output.
     """
     if selected_ids.dim() != 4:
         raise ValueError(
@@ -93,15 +102,21 @@ def selected_ids_to_blocks(
         raise ValueError(f"k_selected must be >= 1, got {k_selected}")
     if local_window < 0:
         raise ValueError(f"local_window must be >= 0, got {local_window}")
-    if k_selected < local_window + 1:
+    if sink_blocks < 0:
+        raise ValueError(f"sink_blocks must be >= 0, got {sink_blocks}")
+    # Sink IDs sort below local IDs, so an over-subscribed row would truncate
+    # away the RECENT blocks rather than the sink. Reject instead.
+    if k_selected < local_window + 1 + sink_blocks:
         raise ValueError(
-            f"k_selected={k_selected} cannot fit local window size {local_window + 1}")
+            f"k_selected={k_selected} cannot fit local window size "
+            f"{local_window + 1} plus {sink_blocks} sink block(s)")
 
     device = selected_ids.device
     qb = selected_ids.shape[2]
     kb = qb if key_blocks is None else int(key_blocks)
     if kb < 1:
         raise ValueError(f"key_blocks must be >= 1, got {kb}")
+    sink_blocks = min(int(sink_blocks), kb)
 
     ids = selected_ids.to(torch.long)
     query = torch.arange(qb, device=device, dtype=torch.long)
@@ -110,6 +125,7 @@ def selected_ids_to_blocks(
     nonlocal_valid = (
         (ids >= 0) & (ids < kb) & (ids <= q)
         & (ids < q - local_window)
+        & (ids >= sink_blocks)
     )
     nonlocal_ids = torch.where(
         nonlocal_valid, ids, torch.full_like(ids, sentinel))
@@ -120,7 +136,11 @@ def selected_ids_to_blocks(
             nonlocal_ids[..., 1:] != nonlocal_ids[..., :-1])
 
     local_count = (query + 1).clamp(max=local_window + 1)
-    remaining = k_selected - local_count
+    # A sink block only occupies a slot where it is causal AND falls outside
+    # the local window; near the start of the sequence the window already
+    # covers it, so double-counting here would silently shrink the budget.
+    sink_count = (query - local_window).clamp(min=0).clamp(max=sink_blocks)
+    remaining = k_selected - local_count - sink_count
     unique_rank = unique.cumsum(dim=-1)
     keep_nonlocal = unique & (
         unique_rank <= remaining[None, None, :, None])
@@ -139,7 +159,17 @@ def selected_ids_to_blocks(
     local_ids = local_ids[None, None].expand(
         selected_ids.shape[0], selected_ids.shape[1], -1, -1)
 
-    combined = torch.cat([nonlocal_ids, local_ids], dim=-1)
+    # Forced sink IDs, valid only where they sit strictly before the local
+    # window (the same condition sink_count above is derived from).
+    sink_offsets = torch.arange(sink_blocks, device=device, dtype=torch.long)
+    sink_ids = sink_offsets[None, :].expand(qb, -1)
+    sink_ids = torch.where(
+        sink_offsets[None, :] < (query[:, None] - local_window),
+        sink_ids, torch.full_like(sink_ids, sentinel))
+    sink_ids = sink_ids[None, None].expand(
+        selected_ids.shape[0], selected_ids.shape[1], -1, -1)
+
+    combined = torch.cat([nonlocal_ids, sink_ids, local_ids], dim=-1)
     packed = combined.sort(dim=-1).values[..., :k_selected]
     packed = packed.masked_fill(packed == sentinel, PAD_VALUE).to(torch.int32)
     return packed.unsqueeze(0)

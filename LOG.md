@@ -18,19 +18,64 @@ Rules (from CLAUDE.md):
 
 ---
 
-## Status snapshot — 2026-07-26
+## Status snapshot — 2026-07-27
 
 **Stage:** Root cause of the natural-retrieval failure is now measured, and it is NOT fixable by selector loss tuning. Three findings (2026-07-26 diagnostics, PyTorch reference backend on the laptop, kernel-independent): (1) the block-pooled, group-averaged teacher targets erase the evidence — unconditional teacher top-8 eligibility averages 0.64 per layer-group (0.00 worst case), and the teacher's own top-8 routes generate a distractor; the real dense retrieval signal lives in a few question-row TOKENS (mass up to 0.32 at L24) that query-side block pooling destroys. (2) Evidence access is not sufficient: forcing the evidence block into every route (verified hit 1.0) changes nothing. (3) At 16K a dense reader row (body still K=10 sparse) recovers the exact answer at ~0.4% extra cost; at 32K even dense-reader + K=64 fails — body sparsification corrupts document-side representations and close distractors win. Follow-up controls attributed the 32K failures: densifying the evidence block's own query row (plus dense reader) restores Observatory exactly, so the mechanism is evidence-K/V corruption under sparse prefill, repairable at O(L) per densified row; Atlas alone resists all partial densification and needs its own token-level audit. Deployable validation done: `--route-mode dense-candidates` (gate-scored top-8 reader-row blocks densified, no oracle) recovers 2/3 exact at ~2% extra prefill — the gate already ranks the evidence first on all three prompts. Atlas alone still fails every partial densification despite near-saturated dense evidence attention (0.999); next is a sparse-vs-dense differential audit on its layers. Colab Triton parity + full held-out validation of dense-candidates (`benchmarks/run_route_control_suite.py`) remain before paper claims or selector retraining. New tooling landed on branch `selector-diagnostics`: `--route-mode {learned,oracle-needle,teacher-top8,dense-reader}` and `--backend pytorch`/`--skip-dense` in the live benchmark, `scripts/audit_dense_attention.py`, `--needle-eligibility always` in the trainer (implemented, untrained), and union/teacher-ceiling metrics in trainer and natural-gate eval output.
+
+**Superseded by the 2026-07-26/27 Colab runs — kept for the diagnostic history, but read the
+newest entries first.** Three claims above are now known to be wrong or incomplete: the
+2/3 dense-candidates result was an anecdote (real rate on 25 held-out targets is 16/25); "the
+gate already ranks the evidence first" holds only at M>=8 (recall is 0.52 at M=1, 0.96 at M=4);
+and Atlas is not a unique outlier but an ordinary case of the depth pattern. Colab Triton
+parity is done. The Atlas differential audit was downgraded and never run.
+
+**Stage (current):** Route policy and route construction are **exhausted**. Sixteen distinct
+policies measured on the same 25 dense-verified natural held-out targets — M in {1,2,4,8,16,32},
+neighborhood W in {0,1,2}, K in {10,18,32,64}, sink S in {0,1,2} — and none exceeds **16/25**
+(`dense-candidates` M=4, S=0). Dense scores 25/25 on the same prompts. The 32K deep-evidence
+cell (d0.1) is **0.00 in every one of the sixteen**, and the 32K/d0.5 cell never exceeds 0.20.
+Efficiency is settled and is not the problem: every configuration beats dense on prefill
+(1.24-1.29x at 16K, 1.48-1.54x at 32K), the densified rows cost 0-3% at the useful budget, and
+sink forcing costs nothing measurable. The remaining gap is attributed to the frozen backbone
+being fed a representation distribution it never saw in training — the non-monotonic M curve
+(dense 25/25, M=4 16/25, M=32 9/25) is a mixture-mismatch signature, not an
+information-content one. The next untried lever is the unbuilt adaptation stage
+(LoRA/QLoRA adapters, backbone frozen, sparse prefill in the loop). Selector retraining is
+ruled out quantitatively, not by assertion: conditional exactness given the evidence row is
+densified is 0.62, so a perfect top-1 gate projects to ~15-16/25 — what M=4 already delivers.
 
 **Backbone:** Qwen2.5-Coder-1.5B (H=12, G=2 kv-groups). 3B = laptop ceiling; 7B = ARC only.
 
 **Built + validated:** chunked teacher extraction (P-prototype Q/K, offloading, GPU budget), chunked-vs-eager validator, `selected_blocks` frozen + validator, needle harness, flat gate, compact-ID candidate-only recursive traversal, PyTorch sparse reference, direct-index Triton sparse prefill with isolated causal/prescale/query-tile ablations, prefill-only CUDA profiler, K-sweep live-tree benchmark harness, repo-index parser, test suite.
 
+**Landed 2026-07-26/27 (not yet committed):** multi-target route-control suite
+`benchmarks/run_route_control_suite.py` (one child process per combination instead of per
+target, `--include-dense` so speedups are measured on the routes actually used, `--resume`,
+per-case CSV); route knobs `--candidate-blocks` / `--candidate-neighborhood` /
+`--sink-blocks` on the live benchmark and `--candidate-block-values` /
+`--candidate-neighborhood-values` / `--k-selected-values` / `--sink-block-values` on the suite;
+`candidate_span` + `neighborhood` in `scripts/route_overrides.py`; **attention-sink forcing**
+`sink_blocks` in `scripts/export_selected_blocks.py`; three Colab notebooks under `colab/`
+(`spruce_colab_route_control`, `spruce_colab_accuracy_ladder`, `spruce_colab_sink_test`);
+Colab source archive rebuilt from source, 160 entries, SHA-256
+`E5148A2D8F5F98AFDD087043D4ED29F941D84E63B3306403236428DD7525A33A` (previous archive kept as
+`spruce_colab_train_source.prev.zip`). Test suite 139 passed / 11 skipped.
+
 **Open checkpoints / kill switches:**
-- KS1 (Stage 2): not cleared. Flat worst recall@8 is 0.745 on natural held-out targets, and live Triton sparse generation retrieved 0/3 versus dense 3/3 at both K10 and K18 on the first 16K/32K natural smoke set.
-- Stage 2b: does a selector trained short (16-32K) generalize to long (64-128K) via needle harness? Not yet run.
+- KS1 (Stage 2): **not cleared**, now measured on the full held-out set rather than a smoke set. Best sparse configuration is 16/25 (0.64) against dense 25/25 on the same prompts; KS1 asks for >95% of dense retrieval quality. Split by length: 16K 12/14 (0.86), 32K 4/11 (0.36). `recall@8` around 0.745 was a block-level proxy that never predicted generation — treat it as a selection metric only.
+- Stage 2b: does a selector trained short (16-32K) generalize to long (64-128K) via needle harness? Not yet run. Higher risk than previously assumed: the gate is trained on 200 targets (160 natural + 40 replay) at 16K/32K only.
 - Quantization checkpoint: does quantizing the backbone hurt needle recall at target length? Not yet run.
 - KS2 (post-benchmark): tree beats/matches HiP at equal budget AND beats flat routing in real prefill cost. Blocked on Stage 3.
+- **Adaptation stage: unbuilt and unscoped.** No `peft`/LoRA anywhere in the repo; the backbone has been frozen for every result to date. Now the primary path.
+
+**Current challenges (open, in priority order):**
+1. **The 32K deep-evidence wall.** d0.1 = 0.00 across sixteen route/construction policies; d0.5 never above 0.20. Nothing in route space has moved it. This is the whole remaining accuracy gap.
+2. **Sink forcing and dense-candidates conflict.** Each helps alone (learned 3->8; dense-candidates 3->16) but together give 11/25. Densified rows already reach block 0, so the forced sink is pure budget overhead on the ~500 sparse body rows. Untried control: `dense-candidates` S=1 at **K=11**, restoring the slot the sink consumes. Cheap, one combination.
+3. **Older `learned` numbers understate the method.** The missing attention sink was a construction defect, fixed 2026-07-27. Every pre-fix `learned` figure in this log (3/25, 0/3 smoke, 32K 0.00) was measured with the sink competing for learned slots. Re-quote at S=1 before any of them reaches a paper.
+4. **Checkpoint provenance.** `selector/train.py:131` saves only `{"num_layers", "head_dim", "proj_dim"}` — no flags, no target list, no argv. Recipes survive only in filenames, so "which settings produced this gate" is currently unfalsifiable. Fix before adaptation training starts or the same doubt recurs.
+5. **Timing hygiene.** At `--repeats 2` the first case of each combination carries CUDA warmup and can read below 1.0x kernel speedup (worst observed 0.686x). Use `--repeats >= 3` for any quoted timing; medians are unaffected.
+6. **No memory win.** Sparse peak exceeds dense at both lengths (16K 4.79 vs 4.66 GB; 32K 6.52 vs 6.22 GB), including on the plain `learned` path. The dense baseline already runs a memory-efficient kernel — claim time, not memory.
+7. **Uncommitted work.** All tooling above is in the working tree only; nothing from 2026-07-26/27 has been committed.
 
 ---
 
@@ -38,7 +83,254 @@ Rules (from CLAUDE.md):
 
 <!-- Newest first. Paste eval_gate.py / eval_tree_traversal.py output into Number, distill to one line in Conclusion. -->
 
+## 2026-07-27 — Route-control tooling, sink forcing, and Colab archive rebuild (implementation)
+
+**Question:** implementation entry, no measured claim. What was built to run the 2026-07-26/27
+Colab campaign (runs 1-7), and what is the verified state of the code and the Colab archive?
+
+**Config:** local Windows dev box for implementation and tests; Colab L4 for execution. All
+route work goes through the frozen `selected_blocks` interface and `interfaces/validator.py`.
+
+**Number (verification, not measurement):**
+- `benchmarks/run_route_control_suite.py` rewritten: one child process per COMBINATION over all
+  targets rather than one per (target, mode, backend), cutting ~240 model loads to 4-9 and
+  making the full-set run feasible in one session. Adds `--include-dense`, `--resume`,
+  `--repeats`, per-case CSV, and sweeps `--candidate-block-values`,
+  `--candidate-neighborhood-values`, `--k-selected-values`, `--sink-block-values`.
+- `scripts/route_overrides.py`: `candidate_span` helper plus `neighborhood` on
+  `dense_candidate_routes`. Overlapping windows collapse, so densified-row cost is MEASURED and
+  reported (`densified_rows`), never derived as M*(2W+1).
+- `scripts/export_selected_blocks.py`: `sink_blocks` on `selected_ids_to_blocks`. Sink IDs are
+  excluded from the nonlocal candidate set and skipped where the local window already covers
+  them, so no slot is double-spent and no duplicate reaches the interface; rejects
+  `k_selected < local_window + 1 + sink_blocks` because sink IDs sort lowest and truncation
+  would otherwise drop the RECENT blocks. `sink_blocks=0` is byte-identical to the previous
+  behaviour, asserted by test, which is what protects every earlier benchmark.
+- `benchmarks/compare_dense_sparse_live_tree.py`: `--candidate-neighborhood`, `--sink-blocks`,
+  `sink_blocks` threaded through `live_route`, and `densified_rows` / `span_contains_needle` /
+  `sink_blocks` recorded per case and in the report's `selector` metadata.
+- Tests 131 -> **139 passed, 11 skipped**. New coverage: combo-stem suffixes, span cost from the
+  child rather than recomputed, sink default no-op, sink forced into every causal row, sink not
+  duplicated inside the local window, budget rejection.
+- Notebooks under `colab/`: `spruce_colab_route_control` (runs 1-3),
+  `spruce_colab_accuracy_ladder` (runs 4-6), `spruce_colab_sink_test` (run 7). All code cells
+  AST-checked with magics and backslash continuations stubbed — 0 syntax errors.
+- Colab archive rebuilt from source: 185 -> **160 entries** (25 `__pycache__`/`.pyc` dropped),
+  SHA-256 `E5148A2D8F5F98AFDD087043D4ED29F941D84E63B3306403236428DD7525A33A`, previous archive
+  retained as `spruce_colab_train_source.prev.zip`. Capability check passes for every file the
+  run-7 notebook requires, so that notebook needs no patch cells.
+
+**Conclusion:** The campaign infrastructure is in place and verified, and the one behavioural
+change in it — sink forcing — is proven a no-op at its default, so no earlier result is
+retroactively altered by the tooling itself. Two process lessons worth keeping. Notebook code
+cells must be AST-parsed before being sent (a `\n` collapsed inside a string literal cost a
+Colab session), and archive contents must be verified by CONTENT rather than pinned by digest,
+since the archive is rebuilt by hand. Nothing here is committed yet.
+
+## 2026-07-27 — Attention sink WAS being dropped: learned 3/25 -> 8/25, but the 32K d0.1 wall stands
+
+**Question:** `scripts/export_selected_blocks.py` forced only the local window
+`q-local_window..q`; block 0 competed for learned slots like any other block, and run 5 showed
+the gate spending rank 1 on it in 6/25 cases. Does forcing the sink outside the K budget —
+standard practice in block-sparse attention, never varied by the run 4-6 ladder — move the 32K
+depth wall that ten route policies could not?
+
+**Config:** Colab L4, same 25 dense-verified natural held-out targets, same gate
+`natural160_replay40_lamt075_lamn025_k10_lr5e4_e300.pt`, K=10, beam 8, Triton,
+`--include-dense`, repeats 2. New `--sink-blocks N` / `--sink-block-values`. S in {0,1,2} x
+{`learned`, `dense-candidates` M=4}. Artifacts:
+`SPRUCE_COLAB/outputs/sink_test/run7_sink/{summary,cases}.csv`.
+
+**Number:** S=0 reproduces both baselines exactly (`learned` 3/25, `dense-candidates` 16/25),
+so the run is trustworthy.
+
+| mode | S=0 | S=1 | S=2 |
+|---|---|---|---|
+| learned | 3/25 (0.12) | **8/25 (0.32)** | 8/25 (0.32) |
+| dense-candidates M=4 | **16/25 (0.64)** | 11/25 (0.44) | 11/25 (0.44) |
+
+By length — `learned`: 16K 3->5, 32K **0->3**. `dense-candidates`: 16K **12->7**, 32K 4->4.
+32K by depth, `learned`: d0.9 0.00 -> **0.667**, d0.5 0.00 -> 0.20, d0.1 0.00 -> **0.00**.
+32K by depth, `dense-candidates`: unchanged at d0.1 0.00 / d0.5 0.20 / d0.9 1.00 for every S.
+Median kernel speedup 1.27-1.32x across all six configurations; S costs nothing measurable.
+S=2 is identical to S=1 in every cell — one sink block is the whole effect.
+
+Mechanism, from per-case `needle_hit` (same case, `learned`, S=0 -> S=1): aquifer 32K d0.9
+0.589 -> 0.571; observatory 16K d0.9 0.804 -> 0.786; aquifer 16K d0.5 0.411 -> 0.393. The
+forced sink consumes one of the ~8 free slots, so evidence coverage drops slightly — and
+`learned` still gains 5 cases, meaning the sink is worth more than the slot it costs.
+For `dense-candidates` the picture inverts: `needle_hit` is 1.000 at every S (the reader row
+and the four candidate rows are dense, so they already attend block 0), so the sink adds
+nothing where it matters while still costing a slot on every one of the ~500 sparse body rows.
+All five regressions are 16K cases that were exact at S=0, and they fail as near misses
+(gallery 16K d0.9 "17 April 1986" -> "17 April 1987"; aquifer 16K d0.5 -> "Lake Vesta").
+
+**Conclusion:** The missing sink was a real construction defect and is now fixed: the pure
+sparse path nearly triples (3/25 -> 8/25) and takes its first 32K wins ever (0 -> 3). Any
+future `learned` baseline must be quoted at S=1; the S=0 numbers understate the method through
+a bug, not a method limitation.
+It is NOT the answer to the accuracy gap. Sink forcing and dense-candidates are **substitutes,
+not complements** — each helps alone, together they are worse than dense-candidates alone
+(16 -> 11), because densified rows already reach the sink and the forced slot is pure overhead
+on the sparse remainder. Best configuration is still `dense-candidates` M=4 S=0 at 16/25.
+Decisive for strategy: **32K d0.1 is 0.00 in all six configurations**, as it was in all ten
+route configurations of runs 4-6. Sixteen distinct route/construction policies, one immovable
+wall. Deep evidence at long context is not reachable by route construction.
+One control worth running before closing this line: `dense-candidates` S=1 at **K=11**, which
+restores the slot the sink consumes. If it returns to ~16/25 the regression is purely budget
+and the sink fix is free; if not, the interaction is real. Either way it will not move d0.1 —
+adaptation remains the only untried lever for deep evidence.
+
+## 2026-07-27 — Route policy is exhausted at 16/25: M peaks at 4, contiguity loses, K is inert
+
+**Question:** three levers left on the routing side after run 3. (a) Is M=4 the peak, or does
+the curve keep rising below it? (b) Must the repaired rows be CONTIGUOUS around the evidence,
+as the depth-ordered failures suggest, or are scattered high-scoring rows equally good per row
+spent? (c) Does the route budget K still bind once rows are repaired?
+
+**Config:** Colab L4, Qwen2.5-Coder-1.5B-Instruct, block_size 64, beam 8, Triton
+`single_head`, same 25 dense-verified natural held-out targets (16K/32K, depths d0.1/d0.5/d0.9)
+and same gate `natural160_replay40_lamt075_lamn025_k10_lr5e4_e300.pt` as runs 1-3.
+`benchmarks/run_route_control_suite.py` with new `--candidate-neighborhood-values` and
+`--k-selected-values`. Run 4: M in {1,2,4}, W=0, K=10, `--include-dense`, repeats 2. Run 5:
+M in {1,4} x W in {0,1,2}, K=10, dense skipped, repeats 1. Run 6: M=4, W=0,
+K in {10,18,32,64}, `--include-dense`, repeats 2. Artifacts:
+`SPRUCE_COLAB/outputs/accuracy_ladder/{run4_small_m,run5_span_vs_scatter,run6_k_sweep}/`.
+
+**Number:**
+
+Run 4 — M curve, both sides now measured (M=8/16/32 from run 3):
+
+| M | 1 | 2 | **4** | 8 | 16 | 32 | dense |
+|---|---|---|---|---|---|---|---|
+| exact | 11/25 | 14/25 | **16/25** | 12/25 | 9/25 | 9/25 | 25/25 |
+| candidate recall | 0.52 | 0.84 | 0.96 | 1.00 | 1.00 | 1.00 | — |
+
+`learned` floor 3/25, median kernel speedup 1.337x; dense-candidates 1.278-1.285x across M.
+
+Run 5 — matched-cost contiguous versus scattered: **M=1/W=2 (5 contiguous rows) 12/25 (0.48)
+versus M=4/W=0 (4 scattered rows) 16/25 (0.64)**. Scattered wins at lower cost. M=4 with W=1
+(9 rows) and W=2 (14 rows) both give 16/25 — identical to W=0 at 4 rows, so neighbors are pure
+cost. Widening W at M=1 lifts span recall 0.52 -> 0.72 but exact only 0.44 -> 0.48.
+Six of 25 cases have `densified_rows=2` at M=1/W=1, which means the gate's top-1 block was
+block 0 (window clamped): all six score 0 exact, span recall 0.00.
+
+Run 6 — K = 10/18/32/64 at M=4: **16/25 at every K**, identical rates, candidate recall 0.96
+throughout. Median kernel speedup 1.272/1.291/1.291/1.282 — raising K 6.4x costs essentially
+nothing here and buys nothing.
+
+Conditional accuracy given the evidence row WAS densified, at M=1: 8/13 = 0.62. Given it was
+NOT: 3/12 = 0.25.
+
+32K exact rate by depth, identical in all ten route configurations: d0.1 **0.00**,
+d0.5 **0.20**, d0.9 **1.00**. By length, every configuration at or below 16K 12/14, 32K 4/11.
+
+**Conclusion:** Route policy is exhausted. Ten distinct policies — M from 1 to 32, W from 0 to
+2, K from 10 to 64 — all land at or below 16/25, and the 32K depth wall (d0.1 = 0.00) does not
+move by a single case under any of them. This is the pre-declared plateau condition: stop
+tuning routes, the remaining gap belongs to the frozen backbone, and the next lever is the
+unbuilt adaptation stage.
+Three specific results worth carrying into the paper. (1) The M peak is a crossover, not the
+optimum of one effect: below M=4 the binding constraint is gate recall (0.52 at M=1), above it
+distractor amplification. (2) **Corrects the run-1 claim that the selector is saturated and
+retraining would optimize a ceiling metric.** Recall is 1.000 only at M>=8; at the operating
+point M=4 it is 0.96 and at M=1 it is 0.52. The conditional rate settles the question
+quantitatively instead: even when the evidence row IS densified, only 0.62 of cases are exact,
+so a perfect top-1 gate at M=1 projects to roughly 15-16/25 — what M=4 already delivers. The
+gate is still not the bottleneck, but the argument is now a measured conditional rate rather
+than an oracle anecdote. (3) The contiguity hypothesis is dead: repairing a span around the
+evidence is strictly worse per row than repairing scattered high-scoring blocks, so the depth
+ordering is not about locality of repair.
+Measurement caveat for anyone reading the per-case CSV: the first case of each combination
+shows a sub-1.0 kernel speedup (0.686x worst, aquifer 16K d0.1 at M=1) with selector time
+0.166s against a 0.104s norm. That is CUDA warmup at repeats=2, not a regression — medians are
+unaffected. Use repeats>=3 for any quoted timing.
+
+## 2026-07-26 — M sweep with the dense rows paired: cost is a non-issue, and MORE densification is WORSE
+
+**Question:** two things the first two Colab runs could not answer. (a) With the densified
+rows inside the measured routes, does sparse prefill still beat dense — specifically at 16K,
+where an earlier K18 run measured 0.887x (slower than dense)? (b) How does exact-retrieval
+rate trade against cost as the candidate budget M grows?
+
+**Config:** Colab L4 (not A100), Qwen2.5-Coder-1.5B-Instruct, block_size 64, K=10, beam 8,
+`--repeats 3`, `--include-dense` (paired dense run, so every speedup is measured on the same
+routes rather than inherited). Triton backend, `single_head`. 25 natural held-out targets
+(dense-verified via `screen_natural_prompts.py`), 16K and 32K, evidence depth d0.1/d0.5/d0.9.
+`benchmarks/run_route_control_suite.py --modes learned dense-candidates
+--candidate-block-values 4 8 16 32`. Outputs:
+`SPRUCE_COLAB/outputs/route_control_heldout/run3_triton_cost_msweep/{summary,cases}.csv`.
+
+**Number:**
+
+| mode | M | exact | rate | median kernel speedup | median live prefill |
+|---|---|---|---|---|---|
+| learned | — | 3/25 | 0.12 | 1.290 | 1.193 |
+| dense-candidates | 4 | **16/25** | **0.64** | 1.291 | 1.195 |
+| dense-candidates | 8 | 12/25 | 0.48 | 1.283 | 1.188 |
+| dense-candidates | 16 | 9/25 | 0.36 | 1.271 | 1.178 |
+| dense-candidates | 32 | 9/25 | 0.36 | 1.252 | 1.162 |
+| dense (paired) | — | 25/25 | 1.00 | — | — |
+
+Cost, per length, M=4: kernel prefill speedup 1.238–1.294x at 16K, 1.481–1.536x at 32K.
+Every one of the 100 dense-candidates cases is >1.0x; the worst case in the whole sweep is
+1.186x (council 16K, M=32). Same-case sparse prefill cost versus `learned`: +0.0–3.0% at M=4,
++7.3–8.3% at M=32. M=4 densifies 4 of 256 query blocks at 16K (1.6%) and 4 of 512 at 32K (0.8%).
+Peak memory: sparse 4.794 GB vs dense 4.658 GB at 16K (+2.9%), 6.516 vs 6.219 at 32K (+4.8%) —
+sparse costs MORE memory here, at every M including `learned`.
+Candidate recall 0.96 at M=4, 1.000 at M>=8.
+M=4 by length: 16K 12/14, 32K 4/11. By depth at 32K: d0.9 3/3, d0.5 1/5, d0.1 0/3.
+At 16K: d0.5 5/5, d0.9 5/5, d0.1 2/4.
+Failure text sharpens with M: gallery 16K d0.5 is exact at M=4 and M=8, but answers
+"4 September 1987" (a well-formed date from a distractor record) at M=16 and M=32.
+
+**Conclusion:** The efficiency worry is dead — dense rows cost 0–3% of prefill at the useful
+budget and the 16K advantage survives (1.24–1.29x), so the claim does NOT narrow to >=32K.
+The accuracy result is the opposite of the prediction after runs 1–2: M is an accuracy knob,
+and it runs backwards — M=4 gives 16/25 where M=8 gives 12/25 and M=32 gives 9/25, while full
+dense gives 25/25. The curve is non-monotonic between the two endpoints, so this is not an
+information-content effect. Two candidate mechanisms, not yet separated: (i) *distractor
+amplification* — beyond rank ~4 the gate's top-M are the highest-scoring near-miss distractors,
+and densifying them restores their representations to full fidelity so they compete with the
+evidence (supported by wrong answers becoming sharper and more specific as M grows); (ii)
+*mixture inconsistency* — heterogeneous dense/sparse rows in one layer. Discriminating run:
+densify ranks 5–8 only, versus ranks 1–4 only, at matched count. Default M drops from 8 to 4,
+and M=4 is now the sweep edge — M=1,2 must be measured before 4 is called optimal.
+Two further notes for the paper: `candidate_contains_needle` is useless as a predictor
+(the one M=4 case that misses the evidence block is exact; many M=8 cases that contain it are
+wrong), confirming the failure is downstream representation, not selection; and no memory win
+may be claimed at these lengths — the dense baseline already runs a memory-efficient kernel.
+`live_total_speedup` dips below 1.0 only on council (0.956 at M=4 → 0.925 at M=32), a
+generation-length artifact (sparse emits a long verbose answer, dense a short one), not a
+prefill regression.
+
+## 2026-07-26 - Triton/PyTorch parity on the held-out route-control suite: rates identical, two cases discordant
+
+**Question:** Does the Triton sparse-prefill kernel reproduce the PyTorch reference backend's conclusions on the same routes, so the dense-candidates result is a method finding rather than a kernel artifact?
+
+**Config:** Same Colab L4 session, gate, targets (25 re-screened natural held-out), K=10, beam=8, one repeat, 16 new tokens, `--skip-dense`. Only `--backend` differs between the two runs (`benchmarks/run_route_control_suite.py --backends pytorch`, run 2, versus `triton`, run 1). Artifacts: `SPRUCE_COLAB/outputs/route_control_heldout/run2_pytorch_parity/{summary,cases}.csv`.
+
+**Number:** Aggregate rates are identical: learned 3/25 exact on both backends, dense-candidates M=8 12/25 exact on both, candidate recall 1.000 on both. Per-case exactness agrees on 23 of 25 dense-candidates targets, with two discordant cases pointing in **opposite** directions: gallery 16K d0.1 (Triton "17 April 1986" exact 1, PyTorch "1987" exact 0) and observatory 32K d0.5 (PyTorch "Kepler Field 731" exact 1, Triton "Kepler Field 739" exact 0). The learned mode agrees 25/25 on exactness while differing in wrong-answer text on two cases (atlas 16K d0.5: "index/catalog/9882" versus "atlas/chk"; observatory 32K d0.1: "Northern Mosaic C" versus "Newer Interpretation"). Reference-backend prefill was 9.3-10.0s at 16K and 18.6-20.6s at 32K, against 1.28-1.33s and 2.52-2.72s for the Triton kernel on the same routes (a reference-versus-kernel ratio, not a dense speedup claim).
+
+**Conclusion:** Kernel attribution is closed for this finding: both the failure of learned routes (3/25) and the recovery under dense-candidates (12/25), plus the saturated 1.000 candidate recall, reproduce exactly on the plain-PyTorch reference, so none of it is a Triton artifact. The two discordant cases are borderline decodes flipped by ordinary floating-point differences between the two attention implementations - they cancel (one each way), show no systematic direction, and both involve answers already known to sit next to a close distractor ("739"/"731", "1987"/"1986"). The practical rule for the paper: aggregate exact rates are backend-stable, individual case answers are not, so no single-case claim should be made without stating the backend. This also means the depth-ordered failure pattern from run 1 is a property of the routing policy, not of the kernel.
+
+## 2026-07-26 - Dense-candidates on the full natural held-out set: 3/25 -> 12/25, and the residual failure is evidence DEPTH
+
+**Question:** Is deployable retrieve-then-re-encode (`--route-mode dense-candidates`, no oracle) a rate or an anecdote, and does the selector's ranking need retraining?
+
+**Config:** Colab L4 (23.6GB); Qwen2.5-Coder-1.5B-Instruct FP16; gate `natural160_replay40_lamt075_lamn025_k10_lr5e4_e300.pt`; Triton `single_head` sparse prefill; K=10, beam=8, local window 1, 16 new tokens, one repeat, `--skip-dense`. Held-out targets were not on Drive, so they were re-derived on Colab with the same protocol as the stored set: dense screening of `scripts/prompt_banks/natural_heldout.json` (6 cases x {16384, 32768} x depths {0.1, 0.5, 0.9}, seed 20260725, `screen_natural_prompts.py`) accepted 25 of 36 candidates, then `extract_teacher_targets.py --verified-manifest --features-only` (selector Q/K prototypes only; the modes used here never read teacher mass). This is a 25-target set re-screened under the same rules, not the previously stored 24 - dense verification is by construction (only dense-exact prompts are accepted). Runner: rewritten `benchmarks/run_route_control_suite.py` (one child process per backend x mode x M over all targets, per-case CSV). Archive SHA-256 45F7867DB0444B5570BB627A5526E546D04CC509C47DEFCF05872FB3F98C2559.
+
+**Number:** learned routes: 3/25 exact (council 16K d0.9, gallery 16K d0.9, turbine 16K d0.5). dense-candidates M=8: 12/25 exact. **Candidate recall was 1.000 on all 25 targets** - the gate's own top-8 reader-row blocks contained the evidence block every single time, and per-head/any-group needle hit rates were 1.0 by construction. The residual failures are ordered almost perfectly by evidence depth: d0.9 recovers 8/8, d0.5 recovers 3/10, d0.1 recovers 1/7. By length: 16K 9/14, 32K 3/11; at 32K only the d0.9 cases recover. Wrong answers remain close distractors from the prompt bank ("Kepler Field 739" for 731, "Lake Vesta" for Lake Orison, "cache/atlas/tmp" for state/atlas.chk). Measured sparse prefill cost of densification was small: 1.31s vs 1.28s at 16K and 2.67s vs 2.59s at 32K (about +2-3%, consistent with the (M+1)/qb arithmetic); four first-touch cases show Triton autotune outliers (up to 5.19s) that repeats=3 in the cost run will remove. No dense baseline in this run (`--skip-dense`). Artifacts: `SPRUCE_COLAB/outputs/route_control_heldout/run1_triton_accuracy/{summary,cases}.csv`.
+
+**Conclusion:** Retrieve-then-re-encode is a real effect at scale, not an anecdote - it quadruples exact retrieval (3/25 -> 12/25, 12% -> 48%) with no oracle knowledge, no retraining, and about 2-3% extra prefill - but it does not close the gap to dense (25/25 by construction). Two things are now settled. (1) **The selector's ranking is not the problem and does not need retraining for this failure**: candidate recall is 1.000 across every held-out target, so the evidence is already ranked first-tier at the reader row; any further selector training would optimize a metric that is already saturated. (2) **The binding constraint is the sparse span between evidence and reader**, measured as evidence depth: when the evidence sits near the question (d0.9) densifying the candidate rows recovers it every time, and recovery decays monotonically as the evidence moves earlier (d0.5 30%, d0.1 14%), worsening with length. This is consistent with the earlier Observatory attribution - the evidence block's K/V are repaired by densifying its own row, but every block *between* the evidence and the reader still reads that region through K=10 routes and propagates a corrupted representation forward. Next controls should target that span (densify candidate neighborhoods, or the causal rows between candidate and reader), not the selector loss. Triton/PyTorch parity and the dense-included cost + M sweep are still running; note that with candidate recall already 1.000 at M=8, larger M cannot add the evidence and the M knob is now primarily a cost knob, not an accuracy knob.
+
 ## 2026-07-26 — Deployable retrieve-then-re-encode recovers 2/3 natural failures without oracle knowledge
+**Amended 2026-07-27 — three claims below are superseded.** (a) 2/3 was three prompts; the rate
+on 25 dense-verified held-out targets is 16/25 at M=4 (12/25 at the M=8 used here). (b) "the
+gate already ranks the evidence first" holds only at M>=8, where candidate recall is 1.000;
+at M=4 it is 0.96 and at M=1 it is 0.52. (c) Atlas is not a sharply-posed unique outlier —
+atlas 16K recovers under dense-candidates, and atlas 32K d0.5 fails exactly like every other
+deep-evidence case. The differential audit proposed here was downgraded and never run.
 **Question:** Does densifying the gate's OWN top-M reader-row blocks (no needle metadata) recover the natural retrieval failures, and does the Atlas audit explain its resistance?
 **Config:** New `--route-mode dense-candidates --candidate-blocks 8`: gate leaf scores at the reader row, max-aggregated over layers/KV groups, top-8 blocks' query rows densified plus dense reader row; body keeps learned K=10 routes. Extra prefill cost ≈ (M+1)/qb of dense (≈1.8% at 512 blocks). Same harness (PyTorch reference, RTX 4070, FP16, `--skip-dense`, 16 tokens). Atlas token-level audit via `scripts/audit_dense_attention.py` (dense forward, exact-correct sanity gate passed).
 **Number:** Gallery 16K: "17 April 1986", exact 1; the gate self-selected the needle (block 127) as its top candidate. Observatory 32K d0.9: "Kepler Field 731", exact 1; needle (458) again top candidate — recovered from the stable "739" near-miss with zero oracle input. Atlas 32K d0.5: "cache/atlas/tmp", exact 0, even though the needle (256) was the top candidate and blocks 256/257 were both densified. Atlas audit: dense question rows attend the evidence block with far HIGHER mass than Gallery's (max 0.9994 at L19 h3, 0.96-0.99 at L14/16/20/22/23; hundreds of row-head pairs rank it top-8), and dense decodes "state/atlas.chk" exactly. Run artifacts in `benchmarks/outputs/oracle_route_control/`; suite runner `benchmarks/run_route_control_suite.py` packages the full mode-x-backend matrix for the Colab Triton parity rerun.
@@ -49,12 +341,22 @@ Rules (from CLAUDE.md):
 **Conclusion:** The 32K mechanism is now demonstrated for Observatory: sparse prefill corrupts the evidence block's own deep K/V (its 64 tokens attend ~10 of 512 blocks), and repairing just that one row's context — cost O(L) per densified row — restores exact retrieval. Combined with Gallery (dense reader row alone suffices at 16K), two of three failures are fully attributed and repaired by targeted densification totaling <1% extra prefill compute. Atlas resists every partial control (evidence access, dense reader, K=64, dense evidence row, ±1 neighborhood) while dense solves it — its answer is consistently a recombined path fragment, suggesting the required context is distributed beyond the evidence neighborhood; needs its own audit (token-level, per-row) before further densification guesses. Deployable design implied for the paper: sparse prefill + dense reader/question rows + second-pass re-densification of the selector's top evidence candidates ("retrieve then re-encode"), to be validated without oracle knowledge and with Triton parity on Colab.
 
 ## 2026-07-26 — K=64 body-budget sweep does not rescue 32K natural retrieval
+**Confirmed 2026-07-27 on the full held-out set.** Run 6 swept K = 10/18/32/64 at
+`dense-candidates` M=4 over all 25 targets and returned **16/25 at every K**, identical rates,
+with median kernel speedup barely moving (1.272/1.291/1.291/1.282). Route budget is not merely
+insufficient — it is inert. This entry's conclusion stands as written.
 **Question:** Does raising the selected-block budget from K=10 to K=64 (of 512 blocks; 6.4x) repair the two 32K natural failures, with and without a dense reader row?
 **Config:** Same harness/backbone/gate as the oracle-route entry (PyTorch reference backend, RTX 4070, FP16, `--skip-dense`); K=64, beam=64 (effective 62), one repeat, 16 new tokens; Atlas d0.5 and Observatory d0.9 32K held-out targets; modes learned and dense-reader.
 **Number:** Atlas K64 learned: "state/atlas/tmp" (hit 0.732); Atlas K64 dense-reader: "logs/atlas.chk" (hit 1.0). Observatory K64 learned: "Kepler Field 739" (hit 0.893); Observatory K64 dense-reader: "Kepler Field 739" (hit 1.0). All exact 0/4. Atlas answers drift toward the truth as budget grows ("atlas/audit/..." at K10 -> "state/atlas/tmp"/"logs/atlas.chk" at K64 — correct fragments recombined wrongly); Observatory is a stable near-miss "739" across every intervention (K10/K64, oracle injection, dense reader).
 **Conclusion:** Neither budget (to 12.5% of blocks) nor reader coverage nor evidence forcing recovers 32K natural retrieval, while the identical pipeline retrieves Gallery 16K exactly with a dense reader row — so the pipeline is sound and the failure is representational: under sparse prefill the model reconstructs plausible answer fragments instead of reading the evidence, and close distractors win. Do not attempt to fix this with needle-loss weighting. Next decisions are architectural and belong in a fresh design pass: (a) dense/high-budget reader-question rows as standard (fixes the 16K class nearly free), (b) measure at what body budget or with what selective densification (e.g., dense rows for evidence-neighborhood blocks) 32K recovers, (c) rerun this suite on Colab with the Triton kernel to confirm reference/kernel parity of these findings, and (d) only then decide whether KS1's recipe (train selector under corrected labels + new route policy) is still the binding step.
 
 ## 2026-07-26 — Oracle-route controls: evidence access is not the binding constraint; a dense reader row is
+**Amended 2026-07-27.** The central conclusion — evidence access is not sufficient — stands and
+is now quantified: conditional exactness given the evidence row is actually densified is 0.62,
+so even a perfect selector projects to ~15-16/25. But every `learned` number in this entry was
+measured with the attention sink competing for learned slots (fixed 2026-07-27); the sparse
+baseline here is understated by a construction defect. Re-measure at `--sink-blocks 1` before
+quoting any `learned` figure from this entry.
 **Question:** Is routing the evidence block into `selected_blocks` sufficient for correct sparse generation on the failing natural prompts, and if not, what is?
 **Config:** Local RTX 4070 Laptop 8GB; PyTorch sparse reference backend (`sparse.attention`), not Triton — kernel-independent by construction; Qwen2.5-Coder-1.5B-Instruct FP16; `natural160_replay40_lamt075_lamn025_k10_lr5e4_e300.pt`; K=10, beam=8, local window 1, 16 new tokens, one repeat; `--skip-dense` (a full-length dense SDPA prefill OOMs on 8GB when Transformers materializes the 4D mask — dense answers come from the stored dense-screen verification instead). New `--route-mode` controls in `benchmarks/compare_dense_sparse_live_tree.py`: `learned` (production), `oracle-needle` (learned routes widened one slot, evidence block forced into every causal row of every layer/group), `teacher-top8` (routes packed from teacher mass, no gate), `dense-reader` (learned routes everywhere except the final reader row, which attends every causal block). Gallery 16K d0.5 target (`teacher_gallery_reopened_april_1986_L16384_d0.5...`), dense-verified answer "17 April 1986".
 **Number:** learned: answer "1987", exact 0, needle layer-group hit 0.375/any-group 0.643. oracle-needle: injection verified at 1.000/1.000 hit rates, answer still "1987", exact 0. teacher-top8: teacher routes carry the needle in 0.000 of rows (matches the 0.00 unconditional eligibility measured earlier) and answer "4 September 1987" — an explicit distractor date. dense-reader: answer "17 April 1986", exact 1, with the document body still at learned K=10 sparsity. A dense reader row costs one query block × all key blocks ≈ 1/qb of dense prefill (~0.4% extra at 256 blocks).
@@ -86,12 +388,25 @@ Rules (from CLAUDE.md):
 **Conclusion:** The missing hierarchy-aligned training path is implemented, tested, resumable, and within the 8GB memory ceiling at 32K. Run one mixed 160-natural/40-replay continuation from the current gate with beam-aligned K8, boundary ranking, and union evidence retention; do not claim an improvement until the held-out flat, traversal, and Triton generation evaluations are rerun.
 
 ## 2026-07-26 — Beam16/K18 fails to rescue natural retrieval
+**Amended 2026-07-27.** Measured with the attention sink unforced (fixed 2026-07-27), so the
+0/3 understates the sparse path — `learned` at `--sink-blocks 1` scores 8/25 on the full
+held-out set versus 3/25 without. The conclusion that budget is not the root cause is
+nonetheless confirmed by run 6 (K=10/18/32/64 all identical). The 0.8872x kernel speedup on the
+16K Gallery case quoted here did not reproduce: every configuration in runs 3-7 beats dense at
+16K (1.24-1.29x). Treat that figure as a K18-specific or warmup artifact, not a property of the
+method.
 **Question:** Is the 0/3 K10 natural retrieval failure primarily caused by an overly aggressive beam/selected-block budget?
 **Config:** Colab NVIDIA L4 (23.66GB, compute capability 8.9); Linux; Python 3.12.13; PyTorch 2.11.0+cu128; Transformers 5.13.1; Triton 3.6.0; Qwen2.5-Coder-1.5B-Instruct in FP16; `natural160_replay40_lamt075_lamn025_k10_lr5e4_e300.pt`; the same three dense-verified held-out prompts at 16K shallow, 32K middle, and 32K deep; live radix-2 traversal; beam=16; K=18; local window=1; FP16 selector; four-layer selector chunks; `single_head` kernel with 8 warps/2 stages; one repeat; feature extraction and feature-file loading excluded.
 **Number:** Dense exact retrieval remained 3/3 and sparse exact retrieval remained 0/3; answers matched 0/3 and mean sparse/dense fuzzy score was 0.4444/1.0. Sparse produced wrong plausible alternatives: `path/to/atlas/chk` instead of `state/atlas.chk`, `1981` instead of `17 April 1986`, and `Kepler Field 739` instead of `Kepler Field 731`; the last is an explicit near-miss distractor in the held-out prompt bank. Per-head evidence-block hit rates were 0.4821 Atlas, 0.5357 Gallery, and 0.7500 Observatory; any-group-per-layer rates were 0.7857, 0.7500, and 0.8571. Median kernel/live-prefill/live-total speedups were 1.2914x/1.1348x/1.1099x; sum-weighted kernel/live-prefill speedups were 1.2776x/1.1636x. The 16K Gallery case was slower sparse, at 0.8872x kernel and 0.8434x live prefill; the two 32K cases were faster. Peak allocated memory was 6.459GB sparse versus 6.219GB dense.
 **Conclusion:** Doubling the traversal and selected-block budget does not repair natural retrieval, so K10 aggressiveness is not the root cause and K18 is not a viable fallback. The wrong but semantically close answers and incomplete evidence routing make selector/objective failure the leading diagnosis. Replay the exact same exported selected blocks through PyTorch sparse and Triton before editing the loss; parity would close the remaining kernel-attribution gap.
 
 ## 2026-07-26 — Natural160/replay40 live Triton retrieval failure
+**Amended 2026-07-27 — the headline is partly a bug, not a gate failure.** This 0/3 was measured
+with the attention sink competing for learned slots. With `--sink-blocks 1` the same `learned`
+path scores 8/25 on the full 25-target held-out set (3/25 without), including its first 32K
+wins. The conclusion "selector failure is the leading diagnosis" is now contradicted:
+`oracle-needle` (perfect selector) and `teacher-top8` (distillation ceiling) both fail, and
+conditional exactness given a densified evidence row is 0.62. Retrieval is not gate-limited.
 **Question:** Does the mixed natural/replay gate preserve dense retrieval when its live tree routes drive the Triton sparse-prefill kernel on representative dense-verified natural prompts?
 **Config:** User-run Colab development smoke using `natural160_replay40_lamt075_lamn025_k10_lr5e4_e300.pt`; Qwen2.5-Coder-1.5B-Instruct; three dense-verified held-out prompts chosen to cover 16K shallow, 32K middle, and 32K deep evidence; beam=8; K=10; local window=1; FP16 selector with four-layer chunks; `single_head` Triton kernel; FP16 model; 16 generated tokens; three repeats. Only the aggregated CSV was copied into the repository; the JSON with case answers, route-hit metrics, runtime metadata, and exact GPU identity is missing, so timings are development signal only.
 **Number:** Dense exact retrieval was 3/3 and sparse exact retrieval was 0/3; no sparse answer matched its paired dense answer. On the 16,384-token case, dense/sparse-kernel/sparse-live prefill was 1.6228/1.2540/1.3140 seconds, giving 1.2941x kernel and 1.2350x live-prefill speedup; dense/sparse exact was 1/1 versus 0/1 and sparse fuzzy score was 0.0. Across the two approximately 32K cases, mean dense/sparse-kernel/sparse-live prefill was 3.9983/2.4783/2.6105 seconds, giving 1.6134x kernel and 1.5316x live-prefill speedup; dense/sparse exact was 2/2 versus 0/2 and mean sparse fuzzy score was 0.5.
