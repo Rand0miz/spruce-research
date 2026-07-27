@@ -59,6 +59,17 @@ def test_pruned_block_cannot_change_output():
     assert torch.equal(output[0, 4:, 0], torch.zeros_like(output[0, 4:, 0]))
 
 
+def test_fp32_score_accumulation_prevents_fp16_qk_overflow():
+    query = torch.full((1, 1, 4, 64), 300.0, dtype=torch.float16)
+    key = torch.full((1, 1, 4, 64), 300.0, dtype=torch.float16)
+    value = torch.arange(4 * 64, dtype=torch.float16).reshape(1, 1, 4, 64)
+    output, _ = sparse_prefill_attention_forward(
+        _AttentionModule(), query, key, value, None,
+        selected_blocks=_selected(), block_size=2,
+    )
+    assert torch.isfinite(output).all()
+
+
 def test_rejects_decode_shape_and_bad_group_count():
     query = torch.randn(1, 2, 2, 4)
     key = value = torch.randn(1, 1, 3, 4)

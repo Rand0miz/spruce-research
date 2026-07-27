@@ -51,10 +51,12 @@ from scripts.eval_tree_traversal import load_gate, traverse_to_leaf_ids
 from scripts.export_selected_blocks import selected_ids_to_blocks
 from scripts.route_overrides import (
     candidate_span,
+    charged_route_density,
     dense_candidate_routes,
     dense_evidence_routes,
     dense_reader_routes,
     force_needle_routes,
+    teacher_dual_top_p_routes,
     teacher_topk_routes,
 )
 from selector.targets import load_selector_features, load_teacher
@@ -206,7 +208,8 @@ def live_route(gate, gate_config, target_path, *, beam, radix, k_selected,
     }
 
 
-def sparse_prefill_kwargs(backend, selected, block_size, kernel_variant):
+def sparse_prefill_kwargs(
+        backend, selected, block_size, kernel_variant, dense_layers=()):
     """Prefill kwargs for either sparse backend; only Triton takes a variant."""
     kwargs = {
         "selected_blocks": selected,
@@ -215,6 +218,7 @@ def sparse_prefill_kwargs(backend, selected, block_size, kernel_variant):
     }
     if backend == "triton":
         kwargs["kernel_variant"] = kernel_variant
+        kwargs["dense_layers"] = tuple(int(layer) for layer in dense_layers)
     return kwargs
 
 
@@ -278,11 +282,19 @@ def _run_sparse_cases(
             del reader_scores, pooled_scores
 
         teacher_routes = None
-        if route_mode == "teacher-top8":
+        if route_mode in ("teacher-top8", "teacher-dual-top-p"):
             teacher = load_teacher(case["target"], device="cpu")
-            teacher_routes = teacher_topk_routes(
-                teacher["target"], k_selected=k_selected,
-                local_window=args.local_window)
+            if route_mode == "teacher-top8":
+                teacher_routes = teacher_topk_routes(
+                    teacher["target"], k_selected=k_selected,
+                    local_window=args.local_window)
+            else:
+                teacher_routes = teacher_dual_top_p_routes(
+                    teacher["target"], top_p=args.teacher_top_p,
+                    block_size=case["block_size"],
+                    sink_tokens=args.spot_sink_tokens,
+                    recency_tokens=args.spot_recency_tokens,
+                    k_min_tokens=args.spot_k_min_tokens)
             del teacher
             gc.collect()
 
@@ -335,6 +347,19 @@ def _run_sparse_cases(
                 selected = teacher_routes.to(device)
                 route_timing.update(
                     _route_quality(selected, case["needle_block"]))
+            elif route_mode == "teacher-dual-top-p":
+                selected = teacher_routes.to(device)
+                route_timing.update(
+                    _route_quality(selected, case["needle_block"]))
+                route_timing.update({
+                    "teacher_top_p": float(args.teacher_top_p),
+                    "spot_sink_tokens": int(args.spot_sink_tokens),
+                    "spot_recency_tokens": int(args.spot_recency_tokens),
+                    "spot_k_min_tokens": int(args.spot_k_min_tokens),
+                    "oracle_route_width": int(selected.shape[-1]),
+                })
+            route_timing.update(charged_route_density(
+                selected, getattr(args, "dense_layers", ())))
             if route_mode != "learned" and repeat == 0:
                 validate_selected_blocks(
                     selected.detach().cpu(), local_window=args.local_window)
@@ -342,7 +367,8 @@ def _run_sparse_cases(
             token_ids, model_timing = _generate(
                 model, case["encoded"], args.max_new_tokens,
                 prefill_kwargs=sparse_prefill_kwargs(
-                    backend, selected, case["block_size"], args.kernel_variant),
+                    backend, selected, case["block_size"], args.kernel_variant,
+                    dense_layers=getattr(args, "dense_layers", ())),
             )
             answer = tokenizer.decode(token_ids, skip_special_tokens=True)
             answers.append(answer)
@@ -566,6 +592,7 @@ def selector_metadata(args, *, beam, k_selected):
         "beam": beam, "radix": args.radix,
         "k_selected": k_selected, "local_window": args.local_window,
         "sink_blocks": int(getattr(args, "sink_blocks", 0)),
+        "dense_layers": list(getattr(args, "dense_layers", ())),
         "route_mode": getattr(args, "route_mode", "learned"),
         "backend": getattr(args, "backend", "triton"),
     }
@@ -612,16 +639,31 @@ def main():
         help="single_head is the measured control; other choices are isolated kernel ablations")
     parser.add_argument(
         "--route-mode",
-        choices=("learned", "oracle-needle", "teacher-top8", "dense-reader",
+        choices=("learned", "oracle-needle", "teacher-top8",
+                 "teacher-dual-top-p", "dense-reader",
                  "oracle-dense-evidence", "dense-candidates"),
         default="learned",
         help="learned: gate traversal routes (production); oracle-needle: "
              "learned routes widened by one slot with the evidence block "
              "forced into every causal row (sufficiency control); teacher-top8: "
              "routes packed from the teacher's top-k mass, no gate influence "
-             "on selection (label-ceiling control); dense-reader: learned "
+             "on selection (label-ceiling control); teacher-dual-top-p: exact "
+             "dense-teacher dual-top-p routes adapted to sparse prefill "
+             "(nondeployable construction ceiling); dense-reader: learned "
              "routes but the final reader row attends every causal block "
              "(reader-budget control)")
+    parser.add_argument(
+        "--teacher-top-p", type=float, default=0.9,
+        help="teacher-dual-top-p only: residual nucleus mass in (0,1]")
+    parser.add_argument(
+        "--spot-sink-tokens", type=int, default=128,
+        help="teacher-dual-top-p only: reserved absolute sink prefix in tokens")
+    parser.add_argument(
+        "--spot-recency-tokens", type=int, default=256,
+        help="teacher-dual-top-p only: reserved causal recency window in tokens")
+    parser.add_argument(
+        "--spot-k-min-tokens", type=int, default=512,
+        help="teacher-dual-top-p only: minimum total selected budget in tokens")
     parser.add_argument(
         "--backend", choices=("triton", "pytorch"), default="triton",
         help="sparse prefill implementation; pytorch is the correctness "
@@ -647,6 +689,11 @@ def main():
         help="oracle-dense-evidence only: also densify the query rows of "
              "blocks within +-N of the evidence (boundary-straddle control)")
     parser.add_argument(
+        "--dense-layers", type=int, nargs="*", default=[],
+        help="zero-based decoder layers dispatched to dense SDPA while all "
+             "other layers keep compact Triton sparse routes; dense layers "
+             "are charged in reported attention density")
+    parser.add_argument(
         "--skip-dense", action="store_true",
         help="skip the paired dense run (8GB laptops cannot fit a full-length "
              "dense SDPA prefill); sparse retrieval is still scored against "
@@ -663,6 +710,15 @@ def main():
     if args.route_mode != "learned" and args.k_values:
         raise SystemExit(
             "--route-mode overrides are only supported for the single-K path")
+    if args.dense_layers and args.backend != "triton":
+        raise SystemExit("--dense-layers currently requires --backend triton")
+    if not 0.0 < args.teacher_top_p <= 1.0:
+        raise SystemExit("--teacher-top-p must be in (0,1]")
+    if any(value < 0 for value in (
+            args.spot_sink_tokens, args.spot_recency_tokens,
+            args.spot_k_min_tokens)):
+        raise SystemExit("SpotAttention token budgets must be non-negative")
+    args.dense_layers = sorted(set(args.dense_layers))
     if args.repeats < 1 or args.max_new_tokens < 1:
         raise SystemExit("--repeats and --max-new-tokens must be >= 1")
     if args.warmup_tokens < 0:
@@ -690,6 +746,14 @@ def main():
         tokenizer, yarn_factor=args.yarn_factor,
         original_max_position_embeddings=args.original_max_position_embeddings)
     cases = prepare_cases(paths, tokenizer, prompt_bank=args.prompt_bank)
+    layer_counts = {case["num_layers"] for case in cases}
+    if len(layer_counts) != 1:
+        raise SystemExit(f"targets disagree on model layer count: {layer_counts}")
+    num_layers = next(iter(layer_counts))
+    if any(layer < 0 or layer >= num_layers for layer in args.dense_layers):
+        raise SystemExit(
+            f"--dense-layers must be in [0,{num_layers}), got "
+            f"{args.dense_layers}")
     maximum_context = context_limit(
         yarn_factor=args.yarn_factor,
         original_max_position_embeddings=args.original_max_position_embeddings)
@@ -735,7 +799,8 @@ def main():
                 prefill_kwargs=sparse_prefill_kwargs(
                     args.backend,
                     _warmup_selected(cases[0], k_selected, warmup_tokens, device),
-                    cases[0]["block_size"], args.kernel_variant),
+                    cases[0]["block_size"], args.kernel_variant,
+                    dense_layers=args.dense_layers),
             )
         print(
             f"K sweep: K={k_selected} effective_beam={effective_beam}",

@@ -1,7 +1,12 @@
+import pytest
 import torch
 
 from interfaces.validator import validate_selected_blocks
-from scripts.route_overrides import force_needle_routes, teacher_topk_routes
+from scripts.route_overrides import (
+    charged_route_density,
+    force_needle_routes,
+    teacher_topk_routes,
+)
 
 
 def _toy_selected():
@@ -132,3 +137,79 @@ def test_dense_candidate_routes_no_oracle():
     # untouched row keeps its set
     assert set(out[0, 0, 0, 2].tolist()) - {-1} == {0, 1, 2}
     validate_selected_blocks(out)
+
+
+def test_teacher_dual_top_p_routes_are_causal_sorted_and_variable_width():
+    from scripts.route_overrides import teacher_dual_top_p_routes
+
+    # Uniform residual mass with one sink, one recency, p=0.5 and a two-block
+    # floor. Later rows therefore retain sink + recency + half the residual.
+    target = torch.zeros(1, 1, 6, 6)
+    for query in range(6):
+        target[0, 0, query, :query + 1] = 1.0 / (query + 1)
+    out = teacher_dual_top_p_routes(
+        target, top_p=0.5, block_size=1, sink_tokens=1,
+        recency_tokens=1, k_min_tokens=2)
+
+    assert out.shape == (1, 1, 1, 6, 4)
+    assert out[0, 0, 0, 0].tolist() == [0, -1, -1, -1]
+    assert out[0, 0, 0, 5].tolist() == [0, 1, 2, 5]
+    validate_selected_blocks(out, local_window=0)
+
+
+def test_teacher_dual_top_p_uses_token_equivalent_floor_and_reserves():
+    from scripts.route_overrides import teacher_dual_top_p_routes
+
+    target = torch.zeros(1, 1, 10, 10)
+    for query in range(10):
+        target[0, 0, query, :query + 1] = 1.0 / (query + 1)
+    out = teacher_dual_top_p_routes(
+        target, top_p=0.01, block_size=64, sink_tokens=128,
+        recency_tokens=256, k_min_tokens=512)
+
+    # 512 tokens / 64 = eight blocks minimum once eight causal blocks exist.
+    final = out[0, 0, 0, -1]
+    assert int((final >= 0).sum()) == 8
+    assert {0, 1}.issubset(set(final.tolist()))
+    assert {6, 7, 8, 9}.issubset(set(final.tolist()))
+    validate_selected_blocks(out)
+
+
+def test_teacher_dual_top_p_rejects_invalid_inputs():
+    from scripts.route_overrides import teacher_dual_top_p_routes
+
+    target = torch.ones(1, 1, 2, 2)
+    with pytest.raises(ValueError, match="top_p"):
+        teacher_dual_top_p_routes(target, top_p=0.0)
+    target[..., 0, 0] = float("nan")
+    with pytest.raises(ValueError, match="non-finite"):
+        teacher_dual_top_p_routes(target, top_p=0.9)
+
+
+def test_teacher_dual_top_p_unifies_head_groups_like_spotattention():
+    from scripts.route_overrides import teacher_dual_top_p_routes
+
+    target = torch.zeros(1, 2, 4, 4)
+    target[:, 0, :, 0] = 1.0
+    target[:, 1, :, 1] = 1.0
+    out = teacher_dual_top_p_routes(
+        target, top_p=0.5, block_size=1, sink_tokens=0,
+        recency_tokens=1, k_min_tokens=1)
+    assert torch.equal(out[:, :, 0], out[:, :, 1])
+
+
+def test_charged_route_density_counts_dense_layers_against_sparsity():
+    selected = _toy_selected()
+    sparse = charged_route_density(selected)
+    hybrid = charged_route_density(selected, dense_layers=[0])
+    assert sparse["charged_block_entries"] == 15
+    assert sparse["maximum_causal_block_entries"] == 21
+    assert sparse["charged_attention_fraction"] == 15 / 21
+    assert hybrid["charged_attention_fraction"] == 1.0
+    assert hybrid["charged_sparsity"] == 0.0
+    assert hybrid["dense_layers"] == [0]
+
+
+def test_charged_route_density_rejects_invalid_layer():
+    with pytest.raises(ValueError, match="dense layer"):
+        charged_route_density(_toy_selected(), dense_layers=[1])

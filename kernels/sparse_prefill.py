@@ -54,7 +54,8 @@ def selected_blocks_to_head_indices(selected_blocks, *, layer_idx, num_query_hea
 
 def triton_sparse_prefill_attention_forward(module, query, key, value, attention_mask, *,
                                              selected_blocks, block_size,
-                                             kernel_variant="single_head", **kwargs):
+                                             kernel_variant="single_head",
+                                             dense_layers=(), **kwargs):
     """Transformers AttentionInterface callback backed by Triton (prefill only)."""
     # SPRUCE deliberately keeps decode dense. ``generate`` keeps forwarding
     # selected_blocks after prefill, so dispatch one-token cached calls to the
@@ -69,6 +70,15 @@ def triton_sparse_prefill_attention_forward(module, query, key, value, attention
     if block_size != 64:
         raise ValueError("Triton SPRUCE backend currently requires block_size=64")
     layer_idx = int(getattr(module, "layer_idx"))
+    if dense_layers and layer_idx in {int(layer) for layer in dense_layers}:
+        # A dense layer is dispatched to PyTorch SDPA directly while every
+        # other layer retains the compact K-wide Triton route.  This is the
+        # honest hybrid implementation: widening selected_blocks to Qb would
+        # force the Triton slot loop over hundreds of PAD entries in sparse
+        # layers and make the measured cost meaningless.
+        from transformers.integrations.sdpa_attention import sdpa_attention_forward
+        return sdpa_attention_forward(
+            module, query, key, value, attention_mask, **kwargs)
     B, Hq, T, D = query.shape
     Hkv = key.shape[1]
     if Hq % Hkv:

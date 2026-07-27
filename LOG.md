@@ -18,7 +18,73 @@ Rules (from CLAUDE.md):
 
 ---
 
+## 2026-07-27 — SpotAttention-inspired sparse-prefill oracle stops at the cost gate
+**Question:** Did the apparently silent model-forward cell in
+`run_spotattention_discriminator.ipynb` fail to execute, or did the route preview intentionally
+leave no cost-eligible top-p settings to run?
+**Config:** Local reconstruction from the same full dense-teacher targets used by the frozen
+natural held-out campaign: 24 unique target files plus the historical duplicate Atlas 16K d0.5
+target, reproducing the logged 25-case split of 14 at 16K and 11 at 32K. Qwen2.5-Coder-1.5B
+teacher mass; block size 64; exact dense-teacher dual top-p routes at p={0.7,0.8,0.9}; 128 sink
+tokens, 256 recency tokens, and 512 minimum selected tokens. Predeclared cost gate: median
+charged attention fraction <=0.25. This was a route-only CPU reconstruction; no model forward
+or accuracy measurement was run.
+**Number:** Median charged attention fraction was 0.366803 at p=0.7, 0.488349 at p=0.8, and
+0.663797 at p=0.9 (charged sparsity 0.633197, 0.511651, and 0.336203). Maximum packed route
+width was 242, 312, and 397 blocks respectively. Even the minimum per-case charged fraction at
+p=0.7 was 0.287414, above the 0.25 ceiling. Eligible settings: 0/3.
+**Conclusion:** The third-last cell did run logically, but its loop body was skipped because
+`ELIGIBLE_TOP_P` was empty. This branch stops on cost before accuracy: paper-equivalent
+SpotAttention-inspired dual-top-p routing is too dense for the declared sparse-prefill product
+target, so running the expensive model forwards would violate the experiment's guardrail and
+cannot produce a passing result.
+
+## 2026-07-27 — SpotAttention scope correction and sparse-prefill oracle notebook
+**Question:** Can SpotAttention serve as the decisive frozen-backbone sparse-prefill baseline, and what is the cheapest valid experiment after the dense-band gate failed?
+**Config:** Re-read SpotAttention arXiv:2606.22874v1 rather than reconstructing its mechanism from memory. The paper trains a 4-head, 128-dim SparseKL indexer at block size 16 with a frozen backbone and dual top-p routing; defaults are p={0.7,0.8,0.9}, 128 sink tokens, 256 recency tokens, and a 512-token minimum. Its published downstream long-context accuracy protocol explicitly keeps prefill dense and applies sparse selection only at decode, so those numbers are not evidence for a plug-and-play sparse-prefill conversion. Added `teacher_dual_top_p_routes`: an explicitly nondeployable prefill oracle using the exact dense-teacher head-averaged distribution, paper-equivalent token budgets mapped to SPRUCE block size 64, variable-width PAD-packed routes, and honest charged-density accounting. Added `colab/run_spotattention_discriminator.ipynb`; it previews route cost on the frozen 25-prompt set and runs only p settings whose median charged attention fraction is <=0.25, with oracle gates of >=24/25 overall, 11/11 at 32K, and sum kernel-prefill speedup >1.0x. No model forward or held-out accuracy measurement was run locally.
+**Number:** Focused route/live-benchmark/sparse-kernel tests passed 27/27 with 10 CUDA-only cases skipped locally; notebook JSON validates; `git diff --check` reports no whitespace errors. Rebuilt `spruce_colab_train_source.zip` contains 173 entries, is 7,263,560 bytes, and has SHA-256 `5520508A0529B8CBE41B92CB88F757B48FB1D8D1E1BE2D7EF23107659E7F50F9`.
+**Conclusion:** Do not cite SpotAttention's accuracy as a sparse-prefill result. Run the oracle notebook first: failure closes this dynamic prefill construction without another selector-training run; success justifies implementing the real SparseKL indexer and then measuring live selector cost. This preserves the frozen-backbone plug-and-play question without conflating it with SpotAttention's dense-prefill/sparse-decode result.
+
+## 2026-07-27 — Four-layer dense-band plug-and-play gate fails
+**Question:** Can one charged four-layer dense SDPA band restore the best zero-training sparse policy from 16/25 to the required >=24/25 without surrendering the efficiency gain?
+**Config:** Colab L4; Qwen2.5-Coder-1.5B-Instruct FP16; frozen backbone; full 25-prompt dense-accepted natural held-out set; best existing `dense-candidates` M=4, K=10, W=0, S=0 routing; true hybrid dispatch with all other layers retaining compact Triton routes; paired dense timing; bands early={0,1,2,3}, middle={12,13,14,15}, late={24,25,26,27}. Predeclared gate: >=24/25 overall, 11/11 at 32K, <=4 dense layers, median charged attention fraction <=0.25, and sum-weighted live-prefill speedup >1.0x.
+**Number:** Early band was best at 17/25 exact: 12/14 at 16K and 5/11 at 32K, charged attention fraction 0.206574 (sparsity 0.793426), sum live-prefill speedup 1.144373x. Late band scored 16/25: 12/14 and 4/11, charged fraction 0.206289 (sparsity 0.793711), speedup 1.203250x. Middle band scored 15/25: 11/14 and 4/11, charged fraction 0.206467 (sparsity 0.793533), speedup 1.219308x. All 3/3 passed the cost gate and 0/3 passed the accuracy gate; best improvement over the 16/25 no-band baseline was +1 prompt.
+**Conclusion:** A four-layer dense band does not close the retrieval gap; the best result remains seven prompts short of the >=24/25 gate and six 32K prompts short of 11/11. Early placement helps slightly, but the effect is too small to justify another interpolation ladder toward dense. Strict zero-backbone-training plug-and-play is not supported by the current SPRUCE sparse construction. Do not proceed to LoRA automatically: the next decision is an explicit method redesign versus relaxing the product requirement to an automated adaptation conversion.
+
+## 2026-07-27 — Dense-layer-band hybrid and Colab decision notebook
+**Question:** Can the final zero-training rung test dense decoder-layer bands without widening every sparse layer's route tensor or hiding dense work from the reported sparsity?
+**Config:** Added optional `--dense-layers` hybrid dispatch: named decoder layers use causal dense SDPA while all other layers retain compact K-wide Triton routes. Added block-level charged attention fraction/sparsity accounting, propagated it through route-control case/summary CSVs, and fixed the PyTorch reference to accumulate QK scores and the probability-value product in FP32 before casting back to model dtype. Added `colab/run_dense_layer_bands.ipynb`, predeclaring three equal four-layer bands (0-3, 12-15, 24-27) on the best `dense-candidates` M=4/K=10 policy, a maximum median charged-attention fraction of 0.25, and the accuracy gate of >=24/25 overall plus 11/11 at 32K. No model forward was run.
+**Number:** Focused reference/route/hybrid/suite tests passed 33/33 with 10 Triton-CUDA cases skipped locally; both benchmark CLIs parse successfully; notebook JSON validates. Rebuilt `spruce_colab_train_source.zip` contains 172 entries, including the new notebook and all hybrid sources, is 7,255,601 bytes, and has SHA-256 `BF247D143F667ACAEAB7923576866DF63B7240A43DAA0F26541C121F25A1B3DA`; zero staging directories remain.
+**Conclusion:** Upload the rebuilt archive and run `colab/run_dense_layer_bands.ipynb`. Its result is the decision point for strict zero-training plug-and-play; it does not start LoRA automatically if all three bands miss.
+
+## 2026-07-27 — All-causal-block full-path equivalence at 16K and 32K
+**Question:** When every causal block is selected, does the complete SPRUCE attention path reproduce dense Qwen at real context lengths, separating sparse-path correctness from selector/pruning quality?
+**Config:** Colab NVIDIA L4 (22.03GiB); Python 3.12.13; PyTorch 2.11.0+cu128; Transformers 5.13.1; Triton 3.6.0; Qwen2.5-Coder-1.5B-Instruct FP16; native RoPE; block size 64; `single_head` Triton kernel; one matched dense-accepted held-out natural prompt (`aquifer_lake_orison`, depth 0.5, seed 20260725) at requested lengths 16,384 and 32,768; every causal block selected for all 28 layers and both KV groups. Predeclared acceptance: finite outputs, same top-1, top-10 overlap >=0.9, logits cosine >=0.999, final-hidden relative RMSE <=0.02.
+**Number:** Triton passed 2/2 lengths. At 16K (16,383 actual tokens), top-1 matched (`Lake`), top-10 overlap 1.0, logits cosine 0.99999309, logits relative RMSE 0.00144616, and final-hidden relative RMSE 0.00183988. At 32K (32,768 tokens), top-1 matched (`Lake`), top-10 overlap 1.0, logits cosine 0.99999303, logits relative RMSE 0.00155127, and final-hidden relative RMSE 0.00183441. Every captured Triton layer was finite; layer-0 relative RMSE was 0.00035081 at 16K and 0.00037136 at 32K. Dense/Triton forward times were 3.342/7.410s at 16K and 6.027/9.722s at 32K; these are correctness-run timings, not paper speed claims. The PyTorch reference failed 0/2: outputs were non-finite beginning at layer 0 at both lengths, with top-1 changing to token ID 0 and all error metrics becoming NaN.
+**Conclusion:** The production Triton all-block path is correct at both real lengths on this held-out prompt, so route construction/consumption, RoPE, masking, and the Triton kernel do not explain the natural-prompt accuracy gap when pruning is removed. The overall report is false only because the PyTorch reference has a separate long-context numerical defect. Its FP16 QK matmul occurs before FP32 softmax, unlike the Triton kernel's FP32 online-softmax state; confirm and fix score accumulation before treating earlier PyTorch-reference diagnostics as kernel-independent evidence. This is a one-prompt equivalence gate, not a full accuracy evaluation.
+
+## 2026-07-27 — Rebuilt Colab source archive for the all-blocks equivalence gate
+**Question:** Does the Colab source archive contain the exact runnable notebook and source needed for the 16K/32K dense-vs-all-causal-block correctness test?
+**Config:** Rebuilt `spruce_colab_train_source.zip` from the current workspace with `colab/rebuild_source_archive.ps1`; preserved the prior archive's benchmark evidence, refreshed all source/test trees, and included `colab/run_all_blocks_equivalence.ipynb`, `benchmarks/all_blocks_equivalence.py`, the updated PyTorch sparse reference, and its focused tests. No model forward or accuracy experiment was run.
+**Number:** 171 archive entries; 7,249,555 bytes; SHA-256 `9FD2B8E808DC9B8517AD8712A1488B015980F9BD4B65FC59CB9BB806C35F4389`; 5/5 required equivalence files verified present; zero leftover staging directories.
+**Conclusion:** The refreshed archive is ready to upload to `SPRUCE_COLAB` and run through `colab/run_all_blocks_equivalence.ipynb`; this entry is packaging verification only, not an equivalence result.
+
 ## Status snapshot — 2026-07-27
+
+**Stage (current after the all-block and dense-band gates):** The production Triton path is
+numerically equivalent to dense when every causal block is selected at both 16K and 32K, so
+integration, causal masking, RoPE, and the kernel are not the source of the natural-prompt
+gap. The final predeclared zero-training rung also failed: equal-cost four-layer dense bands
+scored early 17/25, late 16/25, and middle 15/25 against the required >=24/25; all retained
+79.3% charged sparsity and >1.14x sum-weighted live-prefill speedup. The best band recovered
+only one case, leaving the method seven cases short overall and six short at 32K. The current
+SPRUCE sparse construction therefore does not support the strict plug-and-play claim. LoRA is
+not an automatic next step: choose explicitly between redesigning the sparse construction
+(while keeping the backbone frozen) and redefining conversion as automated adaptation. The
+SpotAttention-inspired frozen-backbone prefill oracle is now also closed on its predeclared
+cost gate: exact dense-teacher dual-top-p routes charge median attention fractions of 0.367,
+0.488, and 0.664 for p={0.7,0.8,0.9}, so none qualifies for the <=0.25 ceiling and no accuracy
+forward is justified.
 
 **Stage:** Root cause of the natural-retrieval failure is now measured, and it is NOT fixable by selector loss tuning. Three findings (2026-07-26 diagnostics, PyTorch reference backend on the laptop, kernel-independent): (1) the block-pooled, group-averaged teacher targets erase the evidence — unconditional teacher top-8 eligibility averages 0.64 per layer-group (0.00 worst case), and the teacher's own top-8 routes generate a distractor; the real dense retrieval signal lives in a few question-row TOKENS (mass up to 0.32 at L24) that query-side block pooling destroys. (2) Evidence access is not sufficient: forcing the evidence block into every route (verified hit 1.0) changes nothing. (3) At 16K a dense reader row (body still K=10 sparse) recovers the exact answer at ~0.4% extra cost; at 32K even dense-reader + K=64 fails — body sparsification corrupts document-side representations and close distractors win. Follow-up controls attributed the 32K failures: densifying the evidence block's own query row (plus dense reader) restores Observatory exactly, so the mechanism is evidence-K/V corruption under sparse prefill, repairable at O(L) per densified row; Atlas alone resists all partial densification and needs its own token-level audit. Deployable validation done: `--route-mode dense-candidates` (gate-scored top-8 reader-row blocks densified, no oracle) recovers 2/3 exact at ~2% extra prefill — the gate already ranks the evidence first on all three prompts. Atlas alone still fails every partial densification despite near-saturated dense evidence attention (0.999); next is a sparse-vs-dense differential audit on its layers. Colab Triton parity + full held-out validation of dense-candidates (`benchmarks/run_route_control_suite.py`) remain before paper claims or selector retraining. New tooling landed on branch `selector-diagnostics`: `--route-mode {learned,oracle-needle,teacher-top8,dense-reader}` and `--backend pytorch`/`--skip-dense` in the live benchmark, `scripts/audit_dense_attention.py`, `--needle-eligibility always` in the trainer (implemented, untrained), and union/teacher-ceiling metrics in trainer and natural-gate eval output.
 

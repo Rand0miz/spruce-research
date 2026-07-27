@@ -52,6 +52,20 @@ def test_selected_blocks_head_indices_preserve_compact_rows():
     torch.testing.assert_close(indices[0, 0], indices[0, 1])
 
 
+def test_dense_layer_dispatch_uses_sdpa_without_triton():
+    torch.manual_seed(9)
+    query = torch.randn(1, 1, 64, 8)
+    key = torch.randn(1, 1, 64, 8)
+    value = torch.randn(1, 1, 64, 8)
+    selected = torch.zeros((1, 1, 1, 1, 1), dtype=torch.int32)
+    actual, _ = triton_sparse_prefill_attention_forward(
+        _AttentionModule(), query, key, value, None,
+        selected_blocks=selected, block_size=64, dense_layers=[0])
+    expected = torch.nn.functional.scaled_dot_product_attention(
+        query, key, value, is_causal=True).transpose(1, 2).contiguous()
+    torch.testing.assert_close(actual, expected)
+
+
 @pytest.mark.skipif(
     os.environ.get("RUN_TRITON_TESTS") != "1",
     reason="set RUN_TRITON_TESTS=1 on CUDA to compile and run Triton parity tests",

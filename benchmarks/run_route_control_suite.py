@@ -38,7 +38,7 @@ CANDIDATE_MODES = ("dense-candidates",)
 
 
 def combo_stem(backend, mode, candidate_blocks, neighborhood=0,
-               k_selected=None, sink_blocks=0):
+               k_selected=None, sink_blocks=0, dense_layers=()):
     parts = [backend, mode]
     if mode in CANDIDATE_MODES:
         parts.append(f"M{candidate_blocks}")
@@ -48,11 +48,13 @@ def combo_stem(backend, mode, candidate_blocks, neighborhood=0,
         parts.append(f"K{k_selected}")
     if sink_blocks:
         parts.append(f"S{sink_blocks}")
+    if dense_layers:
+        parts.append("D" + "-".join(str(layer) for layer in dense_layers))
     return "__".join(parts)
 
 
 def run_combo(args, targets, mode, backend, candidate_blocks, neighborhood,
-              k_selected, sink_blocks, out_json, log_path):
+              k_selected, sink_blocks, dense_layers, out_json, log_path):
     command = [
         sys.executable,
         os.path.join(ROOT, "benchmarks", "compare_dense_sparse_live_tree.py"),
@@ -75,6 +77,8 @@ def run_combo(args, targets, mode, backend, candidate_blocks, neighborhood,
         command.extend(["--prompt-bank", args.prompt_bank])
     if args.model:
         command.extend(["--model", args.model])
+    if dense_layers:
+        command.extend(["--dense-layers", *map(str, dense_layers)])
     with open(log_path, "w", encoding="utf-8") as log:
         log.write(" ".join(command) + "\n\n")
         log.flush()
@@ -115,6 +119,13 @@ def case_rows(report, mode, backend, candidate_blocks, neighborhood=0,
             # Measured by the child (overlapping windows collapse), so this is
             # the honest row cost of the route, not M*(2w+1).
             "densified_rows": sample.get("densified_rows"),
+            "dense_layers": " ".join(
+                str(layer) for layer in sample.get("dense_layers", [])),
+            "dense_layer_count": sample.get("dense_layer_count"),
+            "dense_layer_fraction": sample.get("dense_layer_fraction"),
+            "charged_attention_fraction": sample.get(
+                "charged_attention_fraction"),
+            "charged_sparsity": sample.get("charged_sparsity"),
             "span_contains_needle": sample.get("span_contains_needle"),
             "answer": sparse["answer"],
             "exact": int(bool(sparse["exact"])),
@@ -173,6 +184,13 @@ def combo_summary(report, rows, mode, backend, candidate_blocks,
             neighborhood if mode in CANDIDATE_MODES else ""),
         "median_densified_rows": _median(
             [row.get("densified_rows") for row in rows]),
+        "dense_layers": rows[0].get("dense_layers", "") if rows else "",
+        "dense_layer_count": (
+            rows[0].get("dense_layer_count") if rows else None),
+        "median_charged_attention_fraction": _median(
+            [row.get("charged_attention_fraction") for row in rows]),
+        "median_charged_sparsity": _median(
+            [row.get("charged_sparsity") for row in rows]),
         "span_recall": (
             sum(span_hits) / len(span_hits) if span_hits else None),
         "cases": len(rows),
@@ -231,6 +249,10 @@ def main():
         "--k-selected-values", type=int, nargs="+", default=None,
         help="route-budget sweep; overrides --k-selected when given")
     parser.add_argument("--k-selected", type=int, default=10)
+    parser.add_argument(
+        "--dense-layers", type=int, nargs="*", default=[],
+        help="zero-based decoder layers dispatched to dense SDPA in every "
+             "combination; charged density is copied into CSV summaries")
     parser.add_argument("--beam", type=int, default=8)
     parser.add_argument("--repeats", type=int, default=1)
     parser.add_argument("--max-new-tokens", type=int, default=16)
@@ -253,6 +275,9 @@ def main():
     k_values = args.k_selected_values or [args.k_selected]
     if any(value < 1 for value in k_values):
         raise SystemExit("--k-selected-values must be >= 1")
+    args.dense_layers = sorted(set(args.dense_layers))
+    if any(value < 0 for value in args.dense_layers):
+        raise SystemExit("--dense-layers must be non-negative")
 
     os.makedirs(args.out_dir, exist_ok=True)
     combos = []
@@ -277,8 +302,9 @@ def main():
     for index, combo in enumerate(combos, start=1):
         (backend, mode, candidate_blocks, neighborhood, k_selected,
          sink_blocks) = combo
-        stem = combo_stem(backend, mode, candidate_blocks, neighborhood,
-                          k_selected, sink_blocks)
+        stem = combo_stem(
+            backend, mode, candidate_blocks, neighborhood,
+            k_selected, sink_blocks, args.dense_layers)
         out_json = os.path.join(args.out_dir, f"{stem}.json")
         log_path = os.path.join(args.out_dir, f"{stem}.log")
         if args.resume and os.path.isfile(out_json):
@@ -288,7 +314,8 @@ def main():
             print(f"[{index}/{len(combos)}] {stem}: running", flush=True)
             code = run_combo(args, args.targets, mode, backend,
                              candidate_blocks, neighborhood, k_selected,
-                             sink_blocks, out_json, log_path)
+                             sink_blocks, args.dense_layers,
+                             out_json, log_path)
             if code != 0:
                 print(f"[{index}/{len(combos)}] {stem}: FAILED exit {code} "
                       f"(see {log_path})", flush=True)
@@ -321,6 +348,8 @@ def main():
         "case_id", "seq_len", "needle_block", "mode", "backend", "k_selected",
         "sink_blocks",
         "candidate_blocks", "candidate_neighborhood", "densified_rows",
+        "dense_layers", "dense_layer_count", "dense_layer_fraction",
+        "charged_attention_fraction", "charged_sparsity",
         "span_contains_needle",
         "answer", "exact", "fuzzy", "needle_hit",
         "any_group", "candidate_contains_needle", "sparse_prefill_seconds",
@@ -330,7 +359,9 @@ def main():
     ]
     summary_fields = [
         "mode", "backend", "k_selected", "sink_blocks", "candidate_blocks",
-        "candidate_neighborhood", "median_densified_rows", "span_recall",
+        "candidate_neighborhood", "median_densified_rows", "dense_layers",
+        "dense_layer_count", "median_charged_attention_fraction",
+        "median_charged_sparsity", "span_recall",
         "cases", "exact_count",
         "exact_rate", "mean_fuzzy", "candidate_recall", "dense_exact_rate",
         "median_kernel_prefill_speedup", "median_live_prefill_speedup",

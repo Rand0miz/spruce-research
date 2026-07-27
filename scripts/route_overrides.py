@@ -18,6 +18,41 @@ from scripts.export_selected_blocks import selected_ids_to_blocks
 PAD_VALUE = -1
 
 
+def charged_route_density(selected, dense_layers=()):
+    """Report block-attention density with dense layers charged honestly.
+
+    The denominator is every causal block pair in every layer/KV group. Sparse
+    layers contribute the number of non-PAD selected entries; layers dispatched
+    to dense SDPA contribute their complete causal triangle.
+    """
+    if selected.dim() != 5:
+        raise ValueError(
+            f"selected must be [B,L,G,qb,K], got {tuple(selected.shape)}")
+    B, L, G, qb, _ = selected.shape
+    layers = sorted({int(layer) for layer in dense_layers})
+    if any(layer < 0 or layer >= L for layer in layers):
+        raise ValueError(f"dense layer outside [0,{L}): {layers}")
+    dense_set = set(layers)
+    causal_per_layer = B * G * qb * (qb + 1) // 2
+    charged_entries = 0
+    for layer in range(L):
+        if layer in dense_set:
+            charged_entries += causal_per_layer
+        else:
+            charged_entries += int((selected[:, layer] >= 0).sum().item())
+    maximum_entries = causal_per_layer * L
+    fraction = charged_entries / maximum_entries if maximum_entries else 0.0
+    return {
+        "dense_layers": layers,
+        "dense_layer_count": len(layers),
+        "dense_layer_fraction": len(layers) / L,
+        "charged_block_entries": charged_entries,
+        "maximum_causal_block_entries": maximum_entries,
+        "charged_attention_fraction": fraction,
+        "charged_sparsity": 1.0 - fraction,
+    }
+
+
 def force_needle_routes(selected, needle_block, pad_value=PAD_VALUE):
     """Widen ``selected`` [B,L,G,qb,K] by one slot and guarantee ``needle_block``
     in every causally eligible row (query_block >= needle_block)."""
@@ -168,3 +203,110 @@ def teacher_topk_routes(target, k_selected, local_window=1):
     return selected_ids_to_blocks(
         ids, k_selected=int(k_selected), local_window=int(local_window),
         key_blocks=kb)
+
+
+def teacher_dual_top_p_routes(
+        target, top_p, block_size=64, sink_tokens=128,
+        recency_tokens=256, k_min_tokens=512, pad_value=PAD_VALUE,
+        unify_groups=True):
+    """Build an optimistic SpotAttention-inspired prefill oracle.
+
+    SpotAttention's published long-context accuracy path keeps prefill dense
+    and applies sparse selection at decode. This diagnostic deliberately
+    adapts its dual-top-p rule to every prefill query block, using the exact
+    dense teacher marginal instead of a learned selector. It is therefore a
+    construction ceiling, not a deployable SpotAttention reproduction.
+
+    ``target`` is the row-normalized dense teacher marginal [L,G,qb,kb].
+    SpotAttention predicts one head-averaged distribution shared by the
+    attention heads, so ``unify_groups=True`` averages SPRUCE's equal-sized
+    GQA groups and repeats that route back across the selected-block group
+    axis.
+    Token-sized paper defaults are converted to this run's block size:
+    a reserved absolute sink prefix, a reserved causal recency suffix, and a
+    minimum total selected-token floor. Nucleus selection runs only over the
+    residual distribution. Output is validator-compatible
+    [1,L,G,qb,K_max], with variable row budgets padded by ``pad_value``.
+    """
+    if target.dim() != 4:
+        raise ValueError(
+            f"target must be [L,G,qb,kb], got {tuple(target.shape)}")
+    if not 0.0 < float(top_p) <= 1.0:
+        raise ValueError(f"top_p must be in (0,1], got {top_p}")
+    if int(block_size) < 1:
+        raise ValueError(f"block_size must be >= 1, got {block_size}")
+    for name, value in (
+            ("sink_tokens", sink_tokens),
+            ("recency_tokens", recency_tokens),
+            ("k_min_tokens", k_min_tokens)):
+        if int(value) < 0:
+            raise ValueError(f"{name} must be non-negative, got {value}")
+    if not bool(torch.isfinite(target).all()):
+        raise ValueError("target contains non-finite values")
+    if bool((target < 0).any()):
+        raise ValueError("target contains negative mass")
+
+    L, G, qb, kb = target.shape
+    if unify_groups:
+        target = target.mean(dim=1, keepdim=True).expand(L, G, qb, kb)
+    if qb != kb:
+        raise ValueError(
+            "prefill dual-top-p currently requires equal query/key blocks, "
+            f"got qb={qb}, kb={kb}")
+    device = target.device
+    sink_blocks = min(
+        kb, (int(sink_tokens) + int(block_size) - 1) // int(block_size))
+    recency_blocks = min(
+        kb, (int(recency_tokens) + int(block_size) - 1) // int(block_size))
+    k_min_blocks = min(
+        kb, (int(k_min_tokens) + int(block_size) - 1) // int(block_size))
+
+    query_ids = torch.arange(qb, device=device)[:, None]
+    key_ids = torch.arange(kb, device=device)[None, :]
+    causal = key_ids <= query_ids
+    sink = (key_ids < sink_blocks) & causal
+    recency_start = (query_ids - recency_blocks + 1).clamp_min(0)
+    recency = (key_ids >= recency_start) & causal if recency_blocks else (
+        torch.zeros_like(causal))
+    reserved = sink | recency
+    residual = causal & ~reserved
+
+    expanded_residual = residual[None, None].expand(L, G, qb, kb)
+    negative = torch.full_like(target, -1.0)
+    residual_scores = torch.where(expanded_residual, target, negative)
+    order = residual_scores.argsort(dim=-1, descending=True)
+    ordered_mass = target.gather(-1, order)
+    ordered_valid = expanded_residual.gather(-1, order)
+    ordered_mass = torch.where(
+        ordered_valid, ordered_mass, torch.zeros_like(ordered_mass))
+
+    residual_count = ordered_valid.sum(dim=-1)
+    residual_mass = ordered_mass.sum(dim=-1)
+    cumulative = ordered_mass.cumsum(dim=-1)
+    threshold = residual_mass * float(top_p)
+    nucleus_count = (cumulative < threshold[..., None]).sum(dim=-1) + 1
+    nucleus_count = torch.where(
+        residual_count > 0, nucleus_count, torch.zeros_like(nucleus_count))
+    reserved_count = reserved.sum(dim=-1)[None, None].expand(L, G, qb)
+    floor_count = (k_min_blocks - reserved_count).clamp_min(0)
+    selected_residual_count = torch.maximum(
+        nucleus_count, floor_count).minimum(residual_count)
+
+    ranks = torch.arange(kb, device=device)
+    prefix = ranks < selected_residual_count[..., None]
+    residual_selected = torch.zeros(
+        (L, G, qb, kb), dtype=torch.bool, device=device)
+    residual_selected.scatter_(-1, order, prefix)
+    selected_mask = (
+        reserved[None, None].expand(L, G, qb, kb) | residual_selected)
+    selected_mask &= causal[None, None]
+
+    row_counts = selected_mask.sum(dim=-1)
+    width = max(1, int(row_counts.max().item()))
+    ids = torch.arange(kb, device=device, dtype=torch.int64)
+    ids = ids.view(1, 1, 1, kb).expand(L, G, qb, kb)
+    sentinel = kb + 1
+    packed = ids.masked_fill(~selected_mask, sentinel).sort(dim=-1).values
+    packed = packed[..., :width]
+    packed = packed.masked_fill(packed == sentinel, int(pad_value))
+    return packed.to(torch.int32).unsqueeze(0)

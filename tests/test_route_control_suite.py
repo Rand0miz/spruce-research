@@ -25,6 +25,11 @@ def _case(case_id, *, exact, contains_needle, seq_len=16375, dense=True):
             "candidate_contains_needle": contains_needle,
             "densified_rows": 12,
             "span_contains_needle": 1 if contains_needle else 0,
+            "dense_layers": [24, 25, 26, 27],
+            "dense_layer_count": 4,
+            "dense_layer_fraction": 4 / 28,
+            "charged_attention_fraction": 0.2,
+            "charged_sparsity": 0.8,
         }],
     }
     case = {
@@ -73,6 +78,9 @@ def test_combo_stem_carries_width_and_k_when_set():
     assert combo_stem("triton", "dense-candidates", 4, 0, 10) == (
         "triton__dense-candidates__M4__K10")
     assert combo_stem("triton", "learned", 4, 2, 32) == "triton__learned__K32"
+    assert combo_stem(
+        "triton", "dense-candidates", 4, 0, 10, 0, [24, 25, 26, 27]
+    ) == "triton__dense-candidates__M4__K10__D24-25-26-27"
 
 
 def test_case_rows_carry_candidate_flag_and_dense_pairing():
@@ -120,6 +128,10 @@ def test_span_cost_comes_from_the_child_not_from_m_times_width():
     summary = combo_summary(report, rows, "dense-candidates", "triton", 4, 2, 10)
     assert summary["median_densified_rows"] == 12
     assert summary["span_recall"] == 1.0
+    assert summary["dense_layers"] == "24 25 26 27"
+    assert summary["dense_layer_count"] == 4
+    assert summary["median_charged_attention_fraction"] == 0.2
+    assert summary["median_charged_sparsity"] == 0.8
 
 
 def test_combo_summary_blank_m_for_non_candidate_modes():

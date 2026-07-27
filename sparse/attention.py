@@ -111,6 +111,7 @@ def sparse_prefill_attention_forward(
     selected = selected_blocks[:, layer_idx].to(torch.long)
     qblocks = selected.shape[2]
     score_floor = torch.finfo(query.dtype).min
+    token_offsets = torch.arange(block_size, device=query.device)
 
     for qblock in range(qblocks):
         q_start = qblock * block_size
@@ -120,17 +121,32 @@ def sparse_prefill_attention_forward(
             for kv_head in range(Hkv):
                 block_ids = selected[batch_idx, kv_head, qblock]
                 block_ids = block_ids[block_ids >= 0]
-                key_indices = torch.cat([
-                    torch.arange(block * block_size, min((block + 1) * block_size, T),
-                                 device=query.device)
-                    for block in block_ids.tolist()
-                ])
+                if block_ids.numel() == 0:
+                    raise ValueError(
+                        "selected_blocks leaves an attention row empty at "
+                        f"batch={batch_idx}, layer={layer_idx}, "
+                        f"kv_head={kv_head}, query_block={qblock}"
+                    )
+                # Expand block IDs entirely on-device.  The previous
+                # ``block_ids.tolist()`` implementation forced a GPU
+                # synchronization for every query-block/head pair, which
+                # made the real-scale correctness reference needlessly slow.
+                key_indices = (
+                    block_ids[:, None] * block_size + token_offsets[None, :]
+                ).flatten()
+                key_indices = key_indices[key_indices < T]
                 head_start = kv_head * group_size
                 head_end = head_start + group_size
                 q = query[batch_idx:batch_idx + 1, head_start:head_end, q_start:q_end]
                 k = key[batch_idx:batch_idx + 1, kv_head:kv_head + 1].index_select(2, key_indices)
                 v = value[batch_idx:batch_idx + 1, kv_head:kv_head + 1].index_select(2, key_indices)
-                scores = torch.matmul(q, k.transpose(-1, -2)) / math.sqrt(D)
+                # Accumulate QK in FP32.  Casting only inside softmax is too
+                # late: at real context lengths Qwen contains outlier Q/K
+                # pairs whose FP16 dot product overflows to inf, making the
+                # entire probability row NaN.
+                scores = torch.matmul(
+                    q.float(), k.float().transpose(-1, -2)
+                ) / math.sqrt(D)
 
                 # Same-block routing is legal, but future tokens within the
                 # block are not. Keep causality even if no HF mask was passed.
@@ -141,10 +157,10 @@ def sparse_prefill_attention_forward(
                         batch_idx:batch_idx + 1, :, q_start:q_end
                     ].index_select(-1, key_indices)
                     scores = scores + sparse_mask.to(dtype=scores.dtype)
-                probabilities = torch.softmax(scores, dim=-1, dtype=torch.float32).to(query.dtype)
+                probabilities = torch.softmax(scores, dim=-1)
                 output[batch_idx:batch_idx + 1, head_start:head_end, q_start:q_end] = torch.matmul(
-                    probabilities, v
-                )
+                    probabilities, v.float()
+                ).to(query.dtype)
 
     # Transformers' Qwen attention module reshapes this directly to
     # [batch, tokens, hidden_size] before its output projection.  Attention
