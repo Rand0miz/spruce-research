@@ -124,6 +124,9 @@ try {
         "benchmarks/diagnose_residual_summaries.py",
         "benchmarks/evaluate_evidence_compiler.py",
         "benchmarks/benchmark_pre_qwen_e2e.py",
+        "benchmarks/benchmark_pre_qwen_natural_yarn_length.py",
+        "benchmarks/report_pre_qwen_natural_yarn.py",
+        "benchmarks/run_pre_qwen_natural_yarn_suite.py",
         "interfaces/evidence_compiler.py",
         "interfaces/pre_qwen_selector_spec.md",
         "interfaces/residual_summaries.py",
@@ -135,6 +138,7 @@ try {
         "tests/test_evidence_compiler.py",
         "tests/test_evidence_compiler_benchmark.py",
         "tests/test_pre_qwen_benchmark.py",
+        "tests/test_pre_qwen_natural_yarn_suite.py",
         "tests/test_pre_qwen_selector.py",
         "tests/test_residual_diagnostics.py",
         "tests/test_residual_summaries.py",
@@ -143,7 +147,9 @@ try {
         "colab/run_evidence_compiler_gate.ipynb",
         "colab/run_pre_qwen_beam16_followup.ipynb",
         "colab/run_pre_qwen_e2e.ipynb",
+        "colab/run_pre_qwen_natural_yarn_paper.ipynb",
         "colab/run_residual_summary_gate.ipynb",
+        "scripts/prompt_banks/natural_paper_untouched.json",
         "colab/rebuild_source_archive.ps1"
     )
     foreach ($entry in $required) {

@@ -18,6 +18,187 @@ Rules (from CLAUDE.md):
 
 ---
 
+## 2026-07-28 — Unscreened 16K–128K compiler beats dense by 15.6 points at 9.58x
+**Question:** On the first run of the sealed, unscreened natural paper bank, does the frozen
+beam-16 evidence compiler remain more accurate than full dense Qwen as context grows from
+16K to 128K, and does it retain a fully charged speed and memory advantage?
+**Config:** Colab run `natural_yarn_beam16_paper_v1`, completed
+`2026-07-28T07:13:10.625806+00:00`, from source archive SHA-256
+`1BA99CBA3681467B35F056E72C337E85DE8E50B0671C6C355FC8598F2F208595`
+and sealed prompt-bank SHA-256
+`74ACE23201F9FA73D3EE7AE633583215E44D37F4E6A84D82000B9B6B366DF5CE`.
+Hardware/software was one NVIDIA A100-SXM4-40GB (reported 42.406 GB), compute capability
+8.0, Python 3.12.13, PyTorch 2.11.0+cu128, CUDA runtime 12.8, Transformers 5.13.1, and
+Triton 3.6.0.
+
+Qwen2.5-Coder-1.5B-Instruct FP16 was frozen in both modes with matched static YaRN factor
+4.0 (32,768 original / 131,072 configured positions). The first-run matrix contained 12
+new semantic cases in 12 genres, requested lengths {16, 32, 48, 64, 80, 96, 112, 128} Ki
+tokens, depths {0.1, 0.5, 0.9}, and 288 paired prompts. The compiler used D=512 lexical
+features, radix 2, M=4 final selected blocks, beam=16 traversal, radius-1 paragraph expansion,
+and exact-text stitching. Each mode ran three alternating-order repeats with 32 greedy decode
+tokens; answers were stable across all repeats. There was no dense screening, prompt
+resampling, training, selector tuning, or index caching.
+
+The request boundary is fully charged from in-memory prompt/question strings. Dense includes
+full-prompt tokenization, transfer, full dense prefill, and dense decode. Compiled includes
+full-prompt offset tokenization, hierarchy construction, question features, top-down
+traversal, exact span expansion/stitching, compact tokenization, transfer, compact dense
+prefill, and dense decode. Deterministic synthetic prompt construction, model/tokenizer load,
+and one backend warm-up are reported separately and excluded symmetrically.
+**Number:** Overall dense exact was **192/288 (66.667%, Wilson 95% 61.034–71.860%)**.
+Compiled exact was **237/288 (82.292%, Wilson 95% 77.466–86.267%)**, an absolute
+**+15.625-point** improvement. Paired outcomes were 174 both correct, **63 compiler-only**,
+18 dense-only, and 33 neither; exact McNemar **p=5.2044e-7**. The compiled raw rate exceeded
+dense at all eight lengths:
+
+| Requested length | Dense | Compiler | Delta | Compiler-only / dense-only | McNemar p | Fully charged speedup |
+|---:|---:|---:|---:|---:|---:|---:|
+| 16K | 28/36 (77.8%) | 30/36 (83.3%) | +5.6 pt | 4 / 2 | 0.6875 | 2.485x |
+| 32K | 27/36 (75.0%) | 30/36 (83.3%) | +8.3 pt | 5 / 2 | 0.4531 | 4.112x |
+| 48K | 24/36 (66.7%) | 29/36 (80.6%) | +13.9 pt | 7 / 2 | 0.1797 | 5.778x |
+| 64K | 23/36 (63.9%) | 29/36 (80.6%) | +16.7 pt | 8 / 2 | 0.1094 | 7.421x |
+| 80K | 20/36 (55.6%) | 30/36 (83.3%) | +27.8 pt | 12 / 2 | 0.01294 | 9.183x |
+| 96K | 22/36 (61.1%) | 29/36 (80.6%) | +19.4 pt | 10 / 3 | 0.09229 | 10.617x |
+| 112K | 24/36 (66.7%) | 31/36 (86.1%) | +19.4 pt | 9 / 2 | 0.06543 | 12.431x |
+| 128K | 24/36 (66.7%) | 29/36 (80.6%) | +13.9 pt | 8 / 3 | 0.2266 | 14.083x |
+
+Across the five 64K–128K cells, dense scored 113/180 versus compiler 148/180
+(62.78% versus 82.22%, **+19.44 points**), with 47 compiler-only versus 12 dense-only
+(paired p=5.126e-6) and 11.163x sum-weighted speedup. The distance-from-query effect is the
+strongest accuracy result: at depth 0.1, dense scored 46/96 (47.92%) versus compiler 81/96
+(84.38%), +36.46 points, 40 compiler-only versus 5 dense-only (p=7.878e-8). Restricted to
+depth 0.1 at 64K–128K, dense was 24/60 (40.0%) versus compiler 50/60 (83.33%),
+**+43.33 points** (30 compiler-only / 4 dense-only, p=6.165e-6). At depths 0.5 and 0.9,
+the deltas were smaller: 69/96 versus 75/96 (+6.25 points) and 77/96 versus 81/96
+(+4.17 points).
+
+Fully charged summed per-case median request time was **1,368.499s dense versus 142.836s
+compiled**, or **9.58093x**. Overall median request time was 4.14547s versus 0.477956s;
+median model-prefill component was 3.73215s versus 0.0389413s. Median per-prompt speedup was
+8.2919x with IQR 4.9706–11.5383x. At 128K, median request latency was 10.7090s dense versus
+0.767158s compiled. Median compiler input was **1,849.5 tokens**, 2.4637% of the original;
+at 128K it was 1,842.5 tokens, 1.4061% retained. The compiler mean request components sum to
+0.49452s: offset/layout tokenization 53.90%, dense decode 24.54%, exact span stitching 9.77%,
+compact prefill 7.78%, hierarchy construction 2.37%, compact tokenization 1.13%, selection
+0.47%, and transfer 0.04%. The actual tree selection itself averages only 2.344ms; live
+full-prompt offset tokenization is the largest remaining cost.
+
+Median peak allocated GPU memory was 4.658 GB dense versus 3.269 GB compiled at 16K and
+15.582 GB versus 3.273 GB at 128K; the 128K allocated reduction is **79.0%**. Do not use
+the reserved-memory panel as a path comparison: both lines equal the dense allocator
+high-water mark at every length because dense and compiled alternate in one process and
+PyTorch retains cached reservations.
+
+Evidence routing explains the remaining errors cleanly. Direct M=4 recall was 232/288
+(80.56%); radius expansion raised it to 256/288 (88.89%), repairing 24 direct misses.
+When expanded evidence was present, compiler exact was **237/256 (92.58%)**, with 63
+compiler-only and zero dense-only rows. When expanded evidence was absent, compiler exact
+was **0/32**, and all 18 dense-only rows occurred in this subset. Thus every compiled exact
+answer had access to the expanded source evidence, and every dense-only loss is attributable
+to selection/expansion missing it rather than Qwen failing to read a selected packet.
+Radius repair is load-bearing: 21/24 of the direct-miss/expanded-hit rows became exact.
+
+The two non-routing read clusters are also identifiable. `paper_council_vote19_6` scored
+0/24 in both modes; with evidence present the model usually emitted the incomplete answer
+`19`, while missed packets selected the distractor `6-to-2`. `paper_astronomy_polaris_field508`
+had full expanded recall but compiled 17/24; six failures emitted `Polar Field 508` rather
+than the required `Polaris Field 508`, and one selected `Polar Mosaic Five`. The principal
+selector failure was `paper_engineering_alloy_r62`: compiled 4/24 versus dense 22/24 because
+expanded recall was only 4/24; all four evidence hits produced exact `R-62`.
+
+The predeclared semantic-case guardrail does **not** clear. Eight semantic cases have a
+positive compiler delta, three tie, and one (`alloy_r62`) is negative. The seeded 10,000-draw
+12-cluster bootstrap has median +15.625 points but 95% interval
+**[-5.556, +34.722] points**, so its lower bound crosses zero. The decision correctly records
+`compiled_more_accurate_raw_rate=true`, `raw_paired_mcnemar_significant=true`, and
+`semantic_case_cluster_bootstrap_supports_positive_delta=false`. The 288 repeated
+length/depth rows therefore support a strong result on this controlled distribution, but
+they are not 288 independent semantic tasks and do not yet justify a general-superiority
+claim.
+
+Synthetic prompt construction took 1,787.464s total outside request timing (overall median
+6.083s; 128K median 12.694s). All 288 candidate IDs are unique; every length report is
+complete with 36 cases, configuration and GPU metadata match across all eight files, and
+all dense/compiled repeat answers are stable. The primary combined report SHA-256 is
+`AE1DEB4939FA1D06111D663D80355BD4423D3627AC611F854D9EB827FC5FB35A`.
+Local artifacts are under
+`benchmarks/outputs/natural_yarn_beam16_full_results/`; the paper overview, length×depth
+heatmap, and GPU-memory charts were visually inspected. Twelve figures are present in both
+PNG and vector PDF alongside five CSV tables, the complete paired JSON, and `SUMMARY.md`.
+**Conclusion:** The central engineering/research mechanism is supported: converting selected
+regions back into a short, coherent exact-text document makes the frozen model both
+substantially more accurate and much faster than asking it to read the full long context,
+especially when the evidence is far from the final query. This is the first untouched,
+unscreened 16K–128K result for the frozen beam-16 configuration, and it achieves exactly the
+intended context-compilation behavior. Freeze this bank permanently. The next validation
+must add independent untouched semantic cases and external long-context tasks without tuning
+beam, M, D, radius, or packet formatting on these results; the current case-cluster interval
+is the remaining paper-claim blocker, not the row-level effect or the systems result.
+
+## 2026-07-28 — Unscreened 16K–128K natural YaRN paper suite packaged
+**Question:** Can the frozen beam-16 live evidence compiler be compared with full dense
+Qwen across the entire 16K–128K YaRN range, without dense-screening the generated prompts,
+while preserving enough paired detail and uncertainty reporting to test whether compilation
+can outperform dense reading at long context?
+**Config:** Implementation and harness verification only; no Qwen accuracy or latency result
+was produced locally. Added a new sealed prompt bank,
+`scripts/prompt_banks/natural_paper_untouched.json`, SHA-256
+`74ACE23201F9FA73D3EE7AE633583215E44D37F4E6A84D82000B9B6B366DF5CE`,
+with 12 previously unused semantic cases in 12 genres and three close distractors per case.
+The locked first-run matrix is Qwen2.5-Coder-1.5B-Instruct FP16, static YaRN factor 4.0
+(32,768 original / 131,072 configured positions), requested lengths
+{16,384, 32,768, 49,152, 65,536, 81,920, 98,304, 114,688, 131,072},
+evidence depths {0.1, 0.5, 0.9}, seed 20260728, D=512, M=4 final blocks, beam=16,
+radix 2, radius-1 paragraph repair, 32 generated tokens, and three alternating-order
+repeats. The dense and compiled modes use the same generated prompt and frozen backbone;
+there is no dense acceptance filter, prompt resampling, selector tuning, or training.
+
+Prompt synthesis is deterministic harness setup and is timed separately, not hidden. Both
+request timers exclude model/tokenizer load and one backend warm-up. Dense charges
+full-prompt tokenization, transfer, dense prefill, and dense decode. Compiled charges
+full-prompt offset tokenization, lexical hierarchy construction, question features,
+top-down traversal, exact-span expansion and stitching, compact-prompt tokenization,
+transfer, compact dense prefill, and dense decode. Index caching is disabled.
+**Number:** The complete matrix contains **288 paired prompts** (12 semantic cases × three
+depths × eight lengths) and **1,728 measured model requests** (two modes × three repeats).
+Every paired case is atomically checkpointed; every completed length regenerates partial
+paper artifacts, and a length is considered resumable-complete only after its expected case
+count and final prompt-build summary are present.
+
+The final reporter writes the complete paired JSON, a Markdown summary, and five CSV tables
+(raw cases, by length, by depth, by semantic case, and length×depth). It produces **12
+paper figures in both 220-DPI PNG and vector PDF**: accuracy with Wilson intervals, paired
+outcomes, latency/speedup, compiled latency components, context compression, direct/expanded
+evidence recall, length×depth heatmaps, semantic-case accuracy, a four-panel overview, peak
+GPU memory, per-prompt speedup median/IQR, and excluded prompt-construction time. Statistical
+controls include exact paired McNemar and a seeded 10,000-draw semantic-case cluster bootstrap
+of the compiler-minus-dense accuracy delta. The notebook only marks a positive accuracy
+effect as cluster-supported when that bootstrap's lower 95% bound exceeds zero; even then its
+decision record limits the interpretation to this controlled retrieval distribution.
+
+A tokenizer-only construction control on the first sealed case at depth 0.5 produced 16,346
+prompt tokens inside the 16,352-token budget at requested 16K (needle block 127; 2.654s
+harness construction), and 131,027 prompt tokens inside the 131,040-token budget at requested
+128K (needle block 1,022; 30.264s construction). No model read or answer screening was run on
+either control.
+
+Full local verification passed **203 tests / 13 skipped** with the single existing top-k-loss
+warning. The exact focused Colab control set passed **21/21** with only SWIG deprecation
+warnings. The paper-report suite alone passed 6/6; all 12 synthetic figures were rendered and
+the heatmap, memory, and speedup figures were visually inspected. Python compileall,
+notebook-cell AST parsing, CLI help, and `git diff --check` passed. The notebook has 9 cells /
+7 code cells. The refreshed `spruce_colab_train_source.zip` contains **214 entries**, is
+**7,365,183 bytes**, has zero Python cache entries, and has SHA-256
+`1BA99CBA3681467B35F056E72C337E85DE8E50B0671C6C355FC8598F2F208595`.
+The recoverable prior archive is
+`spruce_colab_train_source.pre_rebuild_20260728_010730.zip`.
+**Conclusion:** The resumable first-run comparison is ready in
+`colab/run_pre_qwen_natural_yarn_paper.ipynb`. Its actual accuracy, speed, memory, and
+long-context curves remain unmeasured until the Colab run completes. A compiler advantage
+must be judged from paired wins/losses and the semantic-case-clustered interval—not from the
+288-row raw rate alone—and cannot by itself establish general model-quality superiority.
+
 ## 2026-07-28 — Beam-16 candidate slack recovers 25/25 at 7.52x fully charged speed
 **Question:** Was beam=M=4 prematurely pruning useful lexical branches, and can wider
 traversal recover the two live-compiler errors without increasing the final M=4 Qwen packet
@@ -693,6 +874,35 @@ selector training. Because beam 16 was tested after the 25 cases were opened, tr
 engineering result, not a new untouched gate. Freeze the configuration and move to ~100 new
 untouched prompts before a paper/toolkit accuracy claim.
 
+**Stage (current after the 16K–128K paper-suite implementation):** The frozen beam-16
+configuration is now packaged for its first unscreened scaling run on a newly sealed bank.
+The matrix has 288 paired rows from 12 independent semantic cases, three evidence depths,
+and eight exact 16K increments through 128K under matched static YaRN. It checkpoints every
+case to Drive and emits paired statistics, a case-clustered bootstrap, five CSV tables, and
+12 PNG + 12 vector-PDF figures. No model result exists yet. Treat the 288 rows as repeated
+length/depth observations from 12 semantic clusters, not as 288 independent task concepts.
+The active next step is the Colab run; do not change beam, D, M, radius, packet formatting,
+the prompt bank, or the declared analysis after seeing partial results.
+
+**Stage (current after the completed unscreened 16K–128K run):** The context compiler
+achieves its intended behavior on the sealed scaling suite. It scores 237/288 (82.29%)
+against dense 192/288 (66.67%), wins 63 paired rows while losing 18, and is faster at every
+length (2.49x at 16K to 14.08x at 128K; 9.58x sum-weighted overall). At 64K–128K it is
+148/180 versus dense 113/180. The improvement is strongest when evidence is farthest from
+the final query: depth-0.1 accuracy is 81/96 versus 46/96 overall and 50/60 versus 24/60
+at 64K–128K. The mechanism is now explicit: all 237 compiler successes include expanded
+evidence, all 32 expanded-evidence misses fail, and all 18 dense-only rows are evidence
+misses. Exact-text recompilation solves representation/readability; remaining accuracy work
+is evidence-location recall and independent semantic coverage.
+
+The systems result is strong on one A100-SXM4-40GB: median compact context is 1,849.5 tokens,
+median allocated GPU memory stays near 3.27 GB instead of growing from 4.66 to 15.58 GB, and
+fully charged selection/compilation plus model execution remains faster at every tested
+length. The paper guardrail remains open: a 12-semantic-case clustered bootstrap gives
+[-5.56, +34.72] points even though row-level McNemar p=5.20e-7. Do not describe this as
+general superiority. Freeze the opened bank and expand validation with new independent
+semantic cases and external tasks.
+
 **Stage:** Root cause of the natural-retrieval failure is now measured, and it is NOT fixable by selector loss tuning. Three findings (2026-07-26 diagnostics, PyTorch reference backend on the laptop, kernel-independent): (1) the block-pooled, group-averaged teacher targets erase the evidence — unconditional teacher top-8 eligibility averages 0.64 per layer-group (0.00 worst case), and the teacher's own top-8 routes generate a distractor; the real dense retrieval signal lives in a few question-row TOKENS (mass up to 0.32 at L24) that query-side block pooling destroys. (2) Evidence access is not sufficient: forcing the evidence block into every route (verified hit 1.0) changes nothing. (3) At 16K a dense reader row (body still K=10 sparse) recovers the exact answer at ~0.4% extra cost; at 32K even dense-reader + K=64 fails — body sparsification corrupts document-side representations and close distractors win. Follow-up controls attributed the 32K failures: densifying the evidence block's own query row (plus dense reader) restores Observatory exactly, so the mechanism is evidence-K/V corruption under sparse prefill, repairable at O(L) per densified row; Atlas alone resists all partial densification and needs its own token-level audit. Deployable validation done: `--route-mode dense-candidates` (gate-scored top-8 reader-row blocks densified, no oracle) recovers 2/3 exact at ~2% extra prefill — the gate already ranks the evidence first on all three prompts. Atlas alone still fails every partial densification despite near-saturated dense evidence attention (0.999); next is a sparse-vs-dense differential audit on its layers. Colab Triton parity + full held-out validation of dense-candidates (`benchmarks/run_route_control_suite.py`) remain before paper claims or selector retraining. New tooling landed on branch `selector-diagnostics`: `--route-mode {learned,oracle-needle,teacher-top8,dense-reader}` and `--backend pytorch`/`--skip-dense` in the live benchmark, `scripts/audit_dense_attention.py`, `--needle-eligibility always` in the trainer (implemented, untrained), and union/teacher-ceiling metrics in trainer and natural-gate eval output.
 
 **Superseded by the 2026-07-26/27 Colab runs — kept for the diagnostic history, but read the
@@ -749,12 +959,12 @@ timing, and charged-entry accounting; the residual development diagnostic and
 `interfaces/evidence_compiler.py`, `selector/evidence.py`,
 `benchmarks/evaluate_evidence_compiler.py`, and
 `colab/run_evidence_compiler_gate.ipynb`; plus the prior route-control/accuracy/sink notebooks.
-The current Colab source archive includes residual summaries, the evidence compiler, and the
-live pre-Qwen selector/charged benchmark:
-206 entries, 7,336,464 bytes, SHA-256
-`381D4E742AC01016CFBBAB6B76CE28673ABAF3D62B6AF8FFC6AF26C37549D266`.
-Current workspace verification is **197 passed / 13 skipped**; the focused real-tokenizer
-pre-Qwen/compiler integration run passes 16/16.
+The current Colab source archive includes residual summaries, the evidence compiler, the live
+pre-Qwen selector/charged benchmark, and the unscreened 16K–128K YaRN paper suite:
+214 entries, 7,365,183 bytes, SHA-256
+`1BA99CBA3681467B35F056E72C337E85DE8E50B0671C6C355FC8598F2F208595`.
+Current workspace verification is **203 passed / 13 skipped**; the focused real-tokenizer
+pre-Qwen/compiler/paper integration run passes 21/21.
 
 **Open checkpoints / kill switches:**
 - KS1 (Stage 2): **not cleared**, now measured on the full held-out set rather than a smoke set.
@@ -782,9 +992,13 @@ pre-Qwen/compiler integration run passes 16/16.
   exact-text compiler can still be made deployable without changing the frozen-backbone claim.
 
 **Current challenges (open, in priority order):**
-1. **Run the frozen beam-16 configuration on ~100 new untouched prompts.** Do not sweep beam,
-   D, M, radius, or packet formatting on that set. Report answer accuracy, expanded evidence
-   recall, fully charged speed, and semantic-case-clustered uncertainty before a claim.
+1. **Expand independent semantic validation without touching the completed suite.** The
+   frozen beam-16 run is complete and positive on its controlled distribution: 237/288 versus
+   dense 192/288 at 9.58x, but its 12-case cluster interval still crosses zero. Do not sweep
+   beam, D, M, radius, packet formatting, scoring, prompt generation, or analysis on this now
+   opened bank. Add new independent semantic cases and external long-context tasks with the
+   exact locked method; report both paired and case-clustered uncertainty before a general
+   paper/toolkit accuracy claim.
 2. **The sparse 32K wall is now an attributed representation failure.** Exact-route and
    residual-summary sparse prefill topped out at 4/11 and 5/11, while the same source locations
    re-encoded densely score 11/11 locally. Preserve that result on the complete manifest and
