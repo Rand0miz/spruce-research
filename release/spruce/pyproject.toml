@@ -1,0 +1,79 @@
+[build-system]
+requires = ["hatchling>=1.27"]
+build-backend = "hatchling.build"
+
+[project]
+name = "spruce-attn"
+version = "0.1.0"
+description = "Training-free hierarchical exact-text compilation for long-context language models"
+readme = "README.md"
+requires-python = ">=3.10"
+license = {file = "LICENSE"}
+authors = [
+  {name = "SPRUCE contributors"},
+]
+keywords = [
+  "long-context",
+  "retrieval",
+  "language-models",
+  "qwen",
+  "context-compression",
+]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "License :: OSI Approved :: Apache Software License",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+dependencies = [
+  "torch>=2.4",
+  "transformers>=4.45",
+]
+
+[project.optional-dependencies]
+dev = [
+  "build>=1.2",
+  "pytest>=8",
+  "twine>=5",
+]
+
+[project.scripts]
+spruce = "spruce_attn.cli:main"
+
+[project.urls]
+Homepage = "https://github.com/Rand0miz/spruce"
+Repository = "https://github.com/Rand0miz/spruce"
+Issues = "https://github.com/Rand0miz/spruce/issues"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/spruce_attn"]
+
+[tool.hatch.build.targets.sdist]
+include = [
+  "/src",
+  "/tests",
+  "/examples",
+  "/docs",
+  "/colab",
+  "/benchmarks",
+  "/.github",
+  "/README.md",
+  "/RELEASE_MANIFEST.md",
+  "/LICENSE",
+  "/NOTICE",
+  "/CHANGELOG.md",
+  "/CONTRIBUTING.md",
+  "/SECURITY.md",
+  "/pyproject.toml",
+]
+
+[tool.pytest.ini_options]
+addopts = "-ra"
+testpaths = ["tests"]
+pythonpath = ["src"]
+markers = [
+  "integration: requires a locally cached external tokenizer or model",
+]

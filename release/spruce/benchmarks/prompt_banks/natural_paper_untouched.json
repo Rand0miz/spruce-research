@@ -1,0 +1,175 @@
+{
+  "description": "Twelve new natural-prose retrieval cases reserved for the first beam-16 dense-versus-compiler YaRN paper sweep. Do not use for tuning, screening, selector training, or packet-format development before that run.",
+  "format": "natural_prose_v1",
+  "sealed_utc": "2026-07-28T00:00:00Z",
+  "cases": [
+    {
+      "id": "paper_geology_vesper_member",
+      "builder": "natural_prose_v1",
+      "genre": "geological survey bulletin",
+      "evidence": "The final geological survey assigned the dark basalt seam to the Vesper Member. Petrographic review distinguished it from the overlying ash-rich unit despite their similar field color.",
+      "needle": "The final geological survey assigned the dark basalt seam to the Vesper Member.",
+      "question": "\n\nQuestion: Which geological member contains the dark basalt seam? Answer with only the member name.",
+      "answers": ["Vesper Member", "the Vesper Member"],
+      "distractors": [
+        "An early field map placed the seam in the Caligo Member, but laboratory review rejected that assignment.",
+        "The pale tuff above the seam remains part of the Orison Member.",
+        "A neighboring quarry exposes the Meridian Member without the dark basalt seam."
+      ]
+    },
+    {
+      "id": "paper_clinical_nalorex_18mg",
+      "builder": "natural_prose_v1",
+      "genre": "clinical protocol amendment",
+      "evidence": "Protocol amendment seven sets the evening Nalorex dose at 18 milligrams for the maintenance cohort. The safety committee approved the change after reviewing the second pharmacokinetic panel.",
+      "needle": "Protocol amendment seven sets the evening Nalorex dose at 18 milligrams for the maintenance cohort.",
+      "question": "\n\nQuestion: What evening Nalorex dose does amendment seven set for the maintenance cohort? Answer with only the dose.",
+      "answers": ["18 milligrams", "18 mg", "18mg"],
+      "distractors": [
+        "The induction cohort receives 24 milligrams in the morning under a different schedule.",
+        "A draft amendment proposed 16 milligrams of Nalorex but was withdrawn before approval.",
+        "The placebo preparation is dispensed in an 18-milliliter container, which is not a dose."
+      ]
+    },
+    {
+      "id": "paper_archive_heron_case",
+      "builder": "natural_prose_v1",
+      "genre": "diplomatic archive inventory",
+      "evidence": "The accession inventory places the signed Elmridge correspondence in the Heron document case. Its wax-seal fragments are enclosed in a separate sleeve within the same case.",
+      "needle": "The accession inventory places the signed Elmridge correspondence in the Heron document case.",
+      "question": "\n\nQuestion: Which document case contains the signed Elmridge correspondence? Answer with only the case name.",
+      "answers": ["Heron document case", "Heron"],
+      "distractors": [
+        "The Kestrel case contains unsigned Elmridge translation drafts.",
+        "A superseded shelf list incorrectly sent researchers to the Lark document case.",
+        "The Finch cabinet stores photographs of the signing ceremony rather than the correspondence."
+      ]
+    },
+    {
+      "id": "paper_software_solstice_socket",
+      "builder": "natural_prose_v1",
+      "genre": "software operations manual",
+      "evidence": "The Solstice relay opens its local control socket at run/solstice/control.sock after initialization. Health checks use the socket only after the readiness marker appears.",
+      "needle": "The Solstice relay opens its local control socket at run/solstice/control.sock after initialization.",
+      "question": "\n\nQuestion: At what path does the Solstice relay open its local control socket? Answer with only the path.",
+      "answers": ["run/solstice/control.sock"],
+      "distractors": [
+        "Relay diagnostics are appended to logs/solstice/control.log and cannot accept commands.",
+        "The retired Equinox relay used run/equinox/relay.sock.",
+        "A packaging example mentions tmp/solstice.sock but the production service never binds there."
+      ]
+    },
+    {
+      "id": "paper_ecology_marrow_islet",
+      "builder": "natural_prose_v1",
+      "genre": "coastal ecology census",
+      "evidence": "The autumn census confirmed Marrow Islet as the only nesting site used by the silver-crowned tern in the inner bay. Observers recorded fledglings on three ledges after the storm season.",
+      "needle": "The autumn census confirmed Marrow Islet as the only nesting site used by the silver-crowned tern in the inner bay.",
+      "question": "\n\nQuestion: Which inner-bay site did the census confirm for the silver-crowned tern? Answer with only the site name.",
+      "answers": ["Marrow Islet"],
+      "distractors": [
+        "Silver-crowned terns feed near Pelican Shoal but no nests were found there.",
+        "A spring reconnaissance listed Tern Rock as a possible site before the autumn census.",
+        "Outer-bay cormorants occupy Lantern Islet, a different colony."
+      ]
+    },
+    {
+      "id": "paper_rail_northstar_platform8",
+      "builder": "natural_prose_v1",
+      "genre": "rail service notice",
+      "evidence": "The revised evening notice assigns the Northstar sleeper to platform 8 at Bellweather Central. The platform change begins with Friday's departure and remains in force through the bridge works.",
+      "needle": "The revised evening notice assigns the Northstar sleeper to platform 8 at Bellweather Central.",
+      "question": "\n\nQuestion: Which platform is assigned to the Northstar sleeper at Bellweather Central? Answer with only the platform number.",
+      "answers": ["platform 8", "8"],
+      "distractors": [
+        "The Northstar used platform 6 before the bridge works began.",
+        "A preliminary notice proposed platform 9 but was replaced by the revised notice.",
+        "The Daybreak express continues to depart from platform 8 in the morning."
+      ]
+    },
+    {
+      "id": "paper_astronomy_polaris_field508",
+      "builder": "natural_prose_v1",
+      "genre": "observatory catalog revision",
+      "evidence": "The consolidated observatory catalog names the corrected polar mosaic Polaris Field 508. The revision merges two overlapping notebook entries and applies the new astrometric solution.",
+      "needle": "The consolidated observatory catalog names the corrected polar mosaic Polaris Field 508.",
+      "question": "\n\nQuestion: What name does the consolidated catalog give the corrected polar mosaic? Answer with only the catalog name.",
+      "answers": ["Polaris Field 508"],
+      "distractors": [
+        "Polaris Field 580 is a southern standard field used for calibration.",
+        "The notebook label Polar Mosaic Five was retired during consolidation.",
+        "Polaris Field 518 borders the corrected mosaic but remains a separate entry."
+      ]
+    },
+    {
+      "id": "paper_maritime_beacon76_3",
+      "builder": "natural_prose_v1",
+      "genre": "harbor communications directive",
+      "evidence": "The harbor directive reserves 76.3 megahertz for the Bracken Point emergency beacon. Operators must verify the frequency before the monthly battery exercise.",
+      "needle": "The harbor directive reserves 76.3 megahertz for the Bracken Point emergency beacon.",
+      "question": "\n\nQuestion: What frequency is reserved for the Bracken Point emergency beacon? Answer with only the frequency.",
+      "answers": ["76.3 megahertz", "76.3 MHz", "76.3"],
+      "distractors": [
+        "Routine harbor notices use 76.8 megahertz.",
+        "An obsolete directive listed 73.6 megahertz for Bracken Point.",
+        "The portable rescue radios switch to 76.3 kilohertz during a bench test, not beacon operation."
+      ]
+    },
+    {
+      "id": "paper_council_vote19_6",
+      "builder": "natural_prose_v1",
+      "genre": "municipal council record",
+      "evidence": "The certified minutes show that the Eastbank drainage amendment passed by 19 votes to 6. The clerk corrected the tally before the mayor signed the record.",
+      "needle": "The certified minutes show that the Eastbank drainage amendment passed by 19 votes to 6.",
+      "question": "\n\nQuestion: What vote tally passed the Eastbank drainage amendment? Answer with only the tally.",
+      "answers": ["19 votes to 6", "19 to 6", "19-6"],
+      "distractors": [
+        "The preliminary clerk sheet reported 18 votes to 7 before correction.",
+        "A separate parks motion passed 16 votes to 9 later that evening.",
+        "The drainage committee recommended the amendment by a 6-to-2 vote."
+      ]
+    },
+    {
+      "id": "paper_museum_azurite_1911",
+      "builder": "natural_prose_v1",
+      "genre": "museum conservation dossier",
+      "evidence": "The conservation dossier dates the azurite restoration on the Selwyn panel to 1911. Ultraviolet imaging separates that campaign from a smaller varnish repair completed decades later.",
+      "needle": "The conservation dossier dates the azurite restoration on the Selwyn panel to 1911.",
+      "question": "\n\nQuestion: In what year was the azurite restoration on the Selwyn panel completed? Answer with only the year.",
+      "answers": ["1911"],
+      "distractors": [
+        "A 1917 inventory describes the restored panel but does not date the treatment.",
+        "The varnish repair was completed in 1941.",
+        "A draft label mistakenly attributed the azurite restoration to 1901."
+      ]
+    },
+    {
+      "id": "paper_agriculture_lumen_barley",
+      "builder": "natural_prose_v1",
+      "genre": "agricultural field-trial report",
+      "evidence": "The highland field trial selected Lumen barley for expanded planting after the third frost season. Its emergence remained uniform on the exposed northern plots.",
+      "needle": "The highland field trial selected Lumen barley for expanded planting after the third frost season.",
+      "question": "\n\nQuestion: Which barley variety did the highland field trial select for expanded planting? Answer with only the variety.",
+      "answers": ["Lumen barley", "Lumen"],
+      "distractors": [
+        "Haven barley produced a larger early yield but suffered frost damage.",
+        "A planning memo recommended Lucent barley before the third season's measurements.",
+        "The lowland comparison retained Meridian barley without expanding it."
+      ]
+    },
+    {
+      "id": "paper_engineering_alloy_r62",
+      "builder": "natural_prose_v1",
+      "genre": "turbopump maintenance specification",
+      "evidence": "The approved turbopump specification requires alloy R-62 for the replacement thrust collar. Thermal cycling eliminated the earlier D-17 material from consideration.",
+      "needle": "The approved turbopump specification requires alloy R-62 for the replacement thrust collar.",
+      "question": "\n\nQuestion: Which alloy is required for the replacement thrust collar? Answer with only the alloy code.",
+      "answers": ["R-62", "R62"],
+      "distractors": [
+        "Alloy D-17 appeared in the prototype collar and failed thermal cycling.",
+        "The outer pump casing uses alloy R-26.",
+        "Fasteners on the same maintenance order specify alloy R-60."
+      ]
+    }
+  ]
+}

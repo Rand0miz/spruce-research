@@ -18,6 +18,60 @@ Rules (from CLAUDE.md):
 
 ---
 
+## 2026-07-28 — Clean v0.1.0 open-source release candidate packaged
+**Question:** Can the verified training-free beam-16 evidence compiler be separated from the
+2.5 GiB research worktree into a small, installable, auditable public-release bundle without
+shipping credentials, model checkpoints, obsolete experiments, or unverified sparse-kernel
+paths?
+**Config:** Packaging and verification only; no new model evaluation was run. The release was
+assembled under `release/spruce/` from research commit
+`4fae139e1f79510886467f45844bf14985422603`. The distribution name is `spruce-attn`
+version 0.1.0 with import package `spruce_attn`, a `spruce` console entry point, a typed
+Python API, Python `src/` layout, Apache-2.0 candidate licensing, GitHub Actions for
+Python 3.10–3.12 tests and trusted PyPI publishing, focused unit tests, two examples, and a
+browser-runnable Colab quickstart. The public defaults are frozen to block size 64,
+four candidate blocks, one-block paragraph expansion, beam 16, 512 lexical features,
+unigram fraction 0.5, IDF power 2.0, and radix 2.
+
+The bundle contains the training-free tokenizer-level lexical hierarchy, exact-text evidence
+compiler, public compile/generate/answer API, CLI, YaRN configuration helper, release and
+contribution documentation, sealed prompt-bank specification, and immutable paper evidence.
+It deliberately excludes learned-selector checkpoints, model weights, optimizer state,
+experimental sparse-attention kernels, `.env` files, credentials, Git history, caches,
+bytecode, and obsolete experiment outputs. The embedded primary report is
+`benchmarks/paper_results/natural_yarn_beam16/combined_report.json`, SHA-256
+`AE1DEB4939FA1D06111D663D80355BD4423D3627AC611F854D9EB827FC5FB35A`; the embedded
+prompt bank is SHA-256
+`74ACE23201F9FA73D3EE7AE633583215E44D37F4E6A84D82000B9B6B366DF5CE`.
+**Number:** `python -m compileall` passed for the runtime, tests, and examples. All
+**14/14 focused tests passed** in 5.27 seconds. The five-cell Colab notebook parsed as valid
+notebook JSON and all ordinary Python source parsed after excluding its two IPython shell/
+magic lines. `python -m build` produced both standard distribution artifacts and
+`twine check` passed both:
+
+- wheel: `spruce_attn-0.1.0-py3-none-any.whl`, 27,236 bytes, SHA-256
+  `2068EA7BC46ABDACC89AA6DB6108649948377CCBB2C665462077082D5D534159`;
+- source distribution: `spruce_attn-0.1.0.tar.gz`, 1,671,678 bytes, SHA-256
+  `BA47B18615D4AF5DFABB5680B30CF4DD01EF61A73B085A7B9F4EC3926D950DEA`.
+
+The wheel was installed with `--no-deps` into a fresh Python 3.12 virtual environment using
+the host's already installed dependencies. The installed `spruce info` console command ran,
+reported version 0.1.0 and the frozen beam-16 configuration, and an isolated import/default
+configuration smoke test passed.
+
+The final archive is `release/spruce_official_release_v0.1.0.zip`: **3,420,537 bytes**,
+69 files, 6,276,929 uncompressed bytes, SHA-256
+`2F5749B138EE74BE2792C09BD499BAF87442A4E841E54098CC7BB0E7AF4ADE0D`.
+ZIP CRC validation passed; every required source, package, test, Colab, distribution, and
+paper-evidence entry was present. The archive scan found zero `.env`, credential/key,
+`.pt`, `.pth`, `.ckpt`, `.safetensors`, bytecode, Git-history, pytest-cache, or build-cache
+entries. A companion checksum file is
+`release/spruce_official_release_v0.1.0.sha256`.
+**Conclusion:** The clean v0.1.0 release candidate is ready for owner review and transfer to
+the official GitHub repository. Before publication, the owner must still confirm the final
+repository/package namespaces, copyright attribution, and Apache-2.0 licensing choice; the
+archive is verified but has not been uploaded to GitHub or PyPI.
+
 ## 2026-07-28 — Unscreened 16K–128K compiler beats dense by 15.6 points at 9.58x
 **Question:** On the first run of the sealed, unscreened natural paper bank, does the frozen
 beam-16 evidence compiler remain more accurate than full dense Qwen as context grows from

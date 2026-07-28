@@ -1,0 +1,39 @@
+{
+  "model": "Qwen/Qwen2.5-Coder-1.5B-Instruct",
+  "lengths": [
+    16384,
+    32768,
+    49152,
+    65536,
+    81920,
+    98304,
+    114688,
+    131072
+  ],
+  "depths": [
+    0.1,
+    0.5,
+    0.9
+  ],
+  "semantic_cases": 12,
+  "paired_prompts": 288,
+  "measured_model_requests": 1728,
+  "prompt_screening": "none",
+  "seed": 20260728,
+  "repeats": 3,
+  "max_new_tokens": 32,
+  "block_size": 64,
+  "candidate_blocks": 4,
+  "block_radius": 1,
+  "boundary": "paragraph",
+  "beam": 16,
+  "feature_dim": 512,
+  "unigram_fraction": 0.5,
+  "idf_power": 2.0,
+  "radix": 2,
+  "dtype": "float16",
+  "yarn_factor": 4.0,
+  "original_max_position_embeddings": 32768,
+  "bootstrap_iterations": 10000,
+  "prompt_bank_sha256": "74ACE23201F9FA73D3EE7AE633583215E44D37F4E6A84D82000B9B6B366DF5CE"
+}

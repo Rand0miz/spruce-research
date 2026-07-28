@@ -1,0 +1,11 @@
+SPRUCE
+Copyright 2026 SPRUCE contributors
+
+This product is licensed under the Apache License, Version 2.0.
+
+No Qwen or other language-model weights are included in this distribution.
+Model weights and tokenizers are separate works governed by their respective
+licenses and terms.
+
+The default evidence-compiler package does not include the experimental
+third-party-derived Triton kernels preserved in the SPRUCE research archive.
