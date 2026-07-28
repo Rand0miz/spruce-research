@@ -1,0 +1,165 @@
+[1/24] teacher_aquifer_lake_orison_L16384_d0.1_s20260725_len16383_blk64_d0.1.pt
+  oracle: exact=1 tokens=571 blocks=[25]
+  flat: exact=0 tokens=1252 blocks=[127, 128, 255, 0]
+  tree: exact=0 tokens=1252 blocks=[127, 128, 255, 0]
+[2/24] teacher_aquifer_lake_orison_L16384_d0.5_s20260725_len16383_blk64_d0.5.pt
+  oracle: exact=1 tokens=589 blocks=[127]
+  flat: exact=1 tokens=981 blocks=[128, 255, 127, 0]
+  tree: exact=1 tokens=981 blocks=[128, 255, 127, 0]
+[3/24] teacher_aquifer_lake_orison_L16384_d0.9_s20260725_len16383_blk64_d0.9.pt
+  oracle: exact=1 tokens=704 blocks=[228]
+  flat: exact=1 tokens=1719 blocks=[255, 228, 127, 0]
+  tree: exact=1 tokens=1719 blocks=[255, 228, 127, 0]
+[4/24] teacher_aquifer_lake_orison_L32768_d0.1_s20260725_len32768_blk64_d0.1.pt
+  oracle: exact=1 tokens=524 blocks=[51]
+  flat: exact=1 tokens=1584 blocks=[51, 256, 0, 511]
+  tree: exact=1 tokens=1584 blocks=[51, 256, 0, 511]
+[5/24] teacher_aquifer_lake_orison_L32768_d0.5_s20260725_len32768_blk64_d0.5.pt
+  oracle: exact=1 tokens=688 blocks=[255]
+  flat: exact=1 tokens=1092 blocks=[255, 256, 0, 511]
+  tree: exact=1 tokens=1092 blocks=[255, 256, 0, 511]
+[6/24] teacher_aquifer_lake_orison_L32768_d0.9_s20260725_len32768_blk64_d0.9.pt
+  oracle: exact=1 tokens=645 blocks=[459]
+  flat: exact=1 tokens=1116 blocks=[459, 460, 0, 511]
+  tree: exact=1 tokens=1116 blocks=[459, 460, 0, 511]
+[7/24] teacher_atlas_checkpoint_path_L16384_d0.5_s20260725_len16383_blk64_d0.5.pt
+  oracle: exact=1 tokens=652 blocks=[127]
+  flat: exact=1 tokens=1089 blocks=[128, 127, 0, 255]
+  tree: exact=1 tokens=1089 blocks=[128, 127, 0, 255]
+[8/24] teacher_atlas_checkpoint_path_L16384_d0.9_s20260725_len16383_blk64_d0.9.pt
+  oracle: exact=0 tokens=591 blocks=[228]
+  flat: exact=1 tokens=1620 blocks=[228, 128, 0, 255]
+  tree: exact=1 tokens=1620 blocks=[228, 128, 0, 255]
+[9/24] teacher_atlas_checkpoint_path_L32768_d0.5_s20260725_len32767_blk64_d0.5.pt
+  oracle: exact=1 tokens=544 blocks=[256]
+  flat: exact=1 tokens=1219 blocks=[256, 128, 510, 511]
+  tree: exact=1 tokens=1219 blocks=[256, 128, 510, 511]
+[10/24] teacher_council_larkspur_method_L16384_d0.9_s20260725_len16378_blk64_d0.9.pt
+  oracle: exact=1 tokens=590 blocks=[228]
+  flat: exact=1 tokens=1328 blocks=[228, 255, 127, 229]
+  tree: exact=1 tokens=1328 blocks=[228, 255, 127, 229]
+[11/24] teacher_gallery_reopened_april_1986_L16384_d0.1_s20260725_len16384_blk64_d0.1.pt
+  oracle: exact=1 tokens=573 blocks=[25]
+  flat: exact=1 tokens=1497 blocks=[25, 255, 0, 129]
+  tree: exact=1 tokens=1497 blocks=[25, 255, 0, 129]
+[12/24] teacher_gallery_reopened_april_1986_L16384_d0.5_s20260725_len16375_blk64_d0.5.pt
+  oracle: exact=1 tokens=545 blocks=[127]
+  flat: exact=1 tokens=1006 blocks=[127, 255, 0, 128]
+  tree: exact=1 tokens=1006 blocks=[127, 255, 0, 128]
+[13/24] teacher_gallery_reopened_april_1986_L16384_d0.9_s20260725_len16377_blk64_d0.9.pt
+  oracle: exact=1 tokens=759 blocks=[228]
+  flat: exact=1 tokens=1751 blocks=[228, 0, 255, 191]
+  tree: exact=1 tokens=1751 blocks=[228, 0, 255, 191]
+[14/24] teacher_gallery_reopened_april_1986_L32768_d0.5_s20260725_len32756_blk64_d0.5.pt
+  oracle: exact=1 tokens=738 blocks=[255]
+  flat: exact=1 tokens=1163 blocks=[256, 255, 511, 459]
+  tree: exact=1 tokens=1163 blocks=[256, 255, 511, 459]
+[15/24] teacher_gallery_reopened_april_1986_L32768_d0.9_s20260725_len32756_blk64_d0.9.pt
+  oracle: exact=1 tokens=647 blocks=[459]
+  flat: exact=1 tokens=1358 blocks=[459, 460, 255, 256]
+  tree: exact=1 tokens=1358 blocks=[459, 460, 255, 256]
+[16/24] teacher_observatory_kepler_731_L16384_d0.5_s20260725_len16373_blk64_d0.5.pt
+  oracle: exact=1 tokens=489 blocks=[127]
+  flat: exact=1 tokens=685 blocks=[255, 127, 128, 254]
+  tree: exact=1 tokens=685 blocks=[255, 127, 128, 254]
+[17/24] teacher_observatory_kepler_731_L16384_d0.9_s20260725_len16373_blk64_d0.9.pt
+  oracle: exact=1 tokens=649 blocks=[228]
+  flat: exact=1 tokens=1682 blocks=[255, 228, 127, 0]
+  tree: exact=1 tokens=1682 blocks=[255, 228, 127, 0]
+[18/24] teacher_observatory_kepler_731_L32768_d0.1_s20260725_len32766_blk64_d0.1.pt
+  oracle: exact=1 tokens=589 blocks=[51]
+  flat: exact=1 tokens=1192 blocks=[511, 51, 129, 52]
+  tree: exact=1 tokens=1192 blocks=[511, 51, 129, 52]
+[19/24] teacher_observatory_kepler_731_L32768_d0.5_s20260725_len32766_blk64_d0.5.pt
+  oracle: exact=1 tokens=611 blocks=[255]
+  flat: exact=1 tokens=1472 blocks=[256, 255, 459, 511]
+  tree: exact=1 tokens=1472 blocks=[256, 255, 459, 511]
+[20/24] teacher_observatory_kepler_731_L32768_d0.9_s20260725_len32758_blk64_d0.9.pt
+  oracle: exact=1 tokens=708 blocks=[458]
+  flat: exact=1 tokens=1458 blocks=[458, 459, 255, 511]
+  tree: exact=1 tokens=1458 blocks=[458, 459, 255, 511]
+[21/24] teacher_turbine_alloy_k47_L16384_d0.1_s20260725_len16373_blk64_d0.1.pt
+  oracle: exact=1 tokens=574 blocks=[25]
+  flat: exact=1 tokens=1389 blocks=[25, 255, 254, 128]
+  tree: exact=1 tokens=1389 blocks=[25, 255, 254, 128]
+[22/24] teacher_turbine_alloy_k47_L16384_d0.5_s20260725_len16378_blk64_d0.5.pt
+  oracle: exact=1 tokens=484 blocks=[127]
+  flat: exact=1 tokens=938 blocks=[127, 255, 128, 0]
+  tree: exact=1 tokens=938 blocks=[127, 255, 128, 0]
+[23/24] teacher_turbine_alloy_k47_L32768_d0.1_s20260725_len32759_blk64_d0.1.pt
+  oracle: exact=1 tokens=585 blocks=[51]
+  flat: exact=1 tokens=1684 blocks=[511, 51, 0, 256]
+  tree: exact=1 tokens=1684 blocks=[511, 51, 0, 256]
+[24/24] teacher_turbine_alloy_k47_L32768_d0.5_s20260725_len32768_blk64_d0.5.pt
+  oracle: exact=1 tokens=609 blocks=[255]
+  flat: exact=1 tokens=1465 blocks=[256, 459, 255, 511]
+  tree: exact=1 tokens=1465 blocks=[256, 459, 255, 511]
+{
+  "oracle": {
+    "cases": 24,
+    "exact_count": 23,
+    "exact_rate": 0.9583333333333334,
+    "by_requested_length": {
+      "16384": {
+        "cases": 13,
+        "exact_count": 12,
+        "exact_rate": 0.9230769230769231
+      },
+      "32768": {
+        "cases": 11,
+        "exact_count": 11,
+        "exact_rate": 1.0
+      }
+    },
+    "median_compiled_prompt_tokens": 590.5,
+    "median_compression_fraction": 0.029709040518257002,
+    "median_prefill_seconds": 0.2233914000025834,
+    "needle_block_recall": 1.0,
+    "expanded_needle_recall": 1.0
+  },
+  "flat": {
+    "cases": 24,
+    "exact_count": 23,
+    "exact_rate": 0.9583333333333334,
+    "by_requested_length": {
+      "16384": {
+        "cases": 13,
+        "exact_count": 12,
+        "exact_rate": 0.9230769230769231
+      },
+      "32768": {
+        "cases": 11,
+        "exact_count": 11,
+        "exact_rate": 1.0
+      }
+    },
+    "median_compiled_prompt_tokens": 1343.0,
+    "median_compression_fraction": 0.054338835371203806,
+    "median_prefill_seconds": 0.29537074999825563,
+    "needle_block_recall": 0.9583333333333334,
+    "expanded_needle_recall": 0.9583333333333334
+  },
+  "tree": {
+    "cases": 24,
+    "exact_count": 23,
+    "exact_rate": 0.9583333333333334,
+    "by_requested_length": {
+      "16384": {
+        "cases": 13,
+        "exact_count": 12,
+        "exact_rate": 0.9230769230769231
+      },
+      "32768": {
+        "cases": 11,
+        "exact_count": 11,
+        "exact_rate": 1.0
+      }
+    },
+    "median_compiled_prompt_tokens": 1343.0,
+    "median_compression_fraction": 0.054338835371203806,
+    "median_prefill_seconds": 0.276530900002399,
+    "needle_block_recall": 0.9583333333333334,
+    "expanded_needle_recall": 0.9583333333333334
+  }
+}
+wrote benchmarks\outputs\evidence_compiler\frozen25_M4_R1_paragraph.json

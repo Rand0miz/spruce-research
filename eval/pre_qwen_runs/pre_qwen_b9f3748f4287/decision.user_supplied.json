@@ -1,0 +1,102 @@
+{
+  "kind": "spruce_pre_qwen_decision_v1",
+  "created_utc": "2026-07-28T04:10:06.794184+00:00",
+  "archive_sha256": "B9F3748F42875308B9FE13EA15619DDED42CE4237E56378168D6BDDCBD90E7C2",
+  "run_id": "pre_qwen_b9f3748f4287",
+  "report_path": "/content/drive/MyDrive/SPRUCE_COLAB/outputs/pre_qwen_b9f3748f4287/pre_qwen_e2e_25.json",
+  "locked_config": {
+    "candidate_blocks": 4,
+    "block_radius": 1,
+    "boundary": "paragraph",
+    "beam": 4,
+    "feature_dim": 512,
+    "unigram_fraction": 0.5,
+    "idf_power": 2.0,
+    "radix": 2,
+    "repeats": 3,
+    "max_new_tokens": 32
+  },
+  "timing_scope": {
+    "input_state": "prompt and question strings already in memory",
+    "excluded": [
+      "manifest file read",
+      "model/tokenizer load",
+      "one backend warm-up"
+    ],
+    "dense_charged": [
+      "full-prompt tokenization",
+      "host-to-device input transfer",
+      "dense prefill",
+      "dense decode"
+    ],
+    "compiled_charged": [
+      "full-prompt offset tokenization",
+      "lexical hierarchy construction",
+      "question feature construction",
+      "top-down tree traversal",
+      "exact-text span expansion and stitching",
+      "compact-prompt tokenization",
+      "host-to-device input transfer",
+      "dense prefill",
+      "dense decode"
+    ],
+    "index_cache": "disabled; rebuilt on every measured repeat"
+  },
+  "aggregate": {
+    "cases": 25,
+    "dense": {
+      "cases": 25,
+      "exact_count": 25,
+      "exact_rate": 1.0,
+      "sum_request_seconds": 75.26522239000013,
+      "median_request_seconds": 1.965489658000024,
+      "median_prefill_seconds": 1.6826297819999922
+    },
+    "compiled": {
+      "cases": 25,
+      "exact_count": 23,
+      "exact_rate": 0.92,
+      "sum_request_seconds": 10.09463826000001,
+      "median_request_seconds": 0.39792242600003647,
+      "median_prefill_seconds": 0.12029411899999332,
+      "median_input_tokens": 1761,
+      "median_compression_fraction": 0.08453885124824513,
+      "needle_block_recall": 0.84,
+      "expanded_needle_recall": 0.96
+    },
+    "by_requested_length": {
+      "16384": {
+        "dense": {
+          "cases": 14,
+          "exact_count": 14,
+          "exact_rate": 1.0
+        },
+        "compiled": {
+          "cases": 14,
+          "exact_count": 12,
+          "exact_rate": 0.8571428571428571
+        },
+        "sum_dense_request_seconds": 26.53196198699993,
+        "sum_compiled_request_seconds": 5.288261476999935
+      },
+      "32768": {
+        "dense": {
+          "cases": 11,
+          "exact_count": 11,
+          "exact_rate": 1.0
+        },
+        "compiled": {
+          "cases": 11,
+          "exact_count": 11,
+          "exact_rate": 1.0
+        },
+        "sum_dense_request_seconds": 48.7332604030002,
+        "sum_compiled_request_seconds": 4.806376783000076
+      }
+    },
+    "sum_weighted_speedup": 7.455960327794852
+  },
+  "accuracy_gate_passed": false,
+  "speed_gate_passed": true,
+  "deployability_gate_passed": false
+}

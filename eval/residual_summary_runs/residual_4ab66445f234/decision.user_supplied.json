@@ -1,0 +1,52 @@
+{
+  "kind": "spruce_residual_summary_decision_v1",
+  "created_utc": "2026-07-28T01:08:20.454012+00:00",
+  "archive_sha256": "4AB66445F2347BA8D934DD712AB9288053A3C37297888741207148462A9ABF1D",
+  "run_id": "residual_4ab66445f234",
+  "output_root": "/content/drive/MyDrive/SPRUCE_COLAB/outputs/residual_4ab66445f234",
+  "development_case_ids": [
+    "compressor_alloy_t19",
+    "planning_alder_framework",
+    "reading_room_september_1992",
+    "reserve_cedar_spring"
+  ],
+  "development_lengths": [
+    16384,
+    32768
+  ],
+  "frozen_prompt_count": 25,
+  "selected_prototypes": 1,
+  "selection": {
+    "rule": "smallest P with attention-output RMSE <= 1.05 * best",
+    "rmse_by_prototypes": {
+      "1": 0.285620915118175,
+      "2": 0.28510014941185047,
+      "4": 0.2842079434047811
+    },
+    "threshold": 0.2984183405750202,
+    "selected_prototypes": 1,
+    "final_hidden_relative_rmse_reduction_vs_exact_by_length": {
+      "16384": -0.13985190286102253,
+      "32768": -0.056138554394957296
+    }
+  },
+  "final_hidden_rmse_reduction_vs_exact": {
+    "16k": -0.13985190286102253,
+    "32k": -0.056138554394957296
+  },
+  "frozen": {
+    "exact_total": 17,
+    "cases_total": 25,
+    "exact_16k": 12,
+    "cases_16k": 14,
+    "exact_32k": 5,
+    "cases_32k": 11,
+    "median_charged_attention_fraction": 0.0754182655457459,
+    "deterministic_accuracy_and_cost_signal": false,
+    "learned_compressor_eligible": false
+  },
+  "full_product_gate": {
+    "passed": false,
+    "reason": "pending Triton summary implementation and matched live-prefill speed measurement"
+  }
+}

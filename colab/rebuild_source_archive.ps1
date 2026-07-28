@@ -95,6 +95,20 @@ foreach ($file in $sourceFiles) {
     Copy-Item -LiteralPath $file.FullName -Destination $destination -Force
 }
 
+# LOG.md records the archive hash after packaging, so embedding it would make
+# that hash self-referential and inevitably stale. Keep the authoritative log
+# in the workspace and exclude any root copy inherited from an older archive.
+$stagedLog = Join-Path $stage "LOG.md"
+if (Test-Path -LiteralPath $stagedLog) {
+    $resolvedLog = [IO.Path]::GetFullPath($stagedLog)
+    $stagePrefix = $stage + [IO.Path]::DirectorySeparatorChar
+    if (-not $resolvedLog.StartsWith(
+            $stagePrefix, [StringComparison]::OrdinalIgnoreCase)) {
+        throw "Refusing unsafe staged-log delete: $resolvedLog"
+    }
+    Remove-Item -LiteralPath $stagedLog -Force
+}
+
 Compress-Archive -Path (Join-Path $stage "*") `
     -DestinationPath $rebuiltZip -CompressionLevel Optimal
 
@@ -107,9 +121,29 @@ try {
     )
     $required = @(
         "benchmarks/all_blocks_equivalence.py",
+        "benchmarks/diagnose_residual_summaries.py",
+        "benchmarks/evaluate_evidence_compiler.py",
+        "benchmarks/benchmark_pre_qwen_e2e.py",
+        "interfaces/evidence_compiler.py",
+        "interfaces/pre_qwen_selector_spec.md",
+        "interfaces/residual_summaries.py",
+        "selector/evidence.py",
+        "selector/pre_qwen.py",
+        "sparse/summaries.py",
         "sparse/attention.py",
         "tests/test_all_blocks_equivalence.py",
+        "tests/test_evidence_compiler.py",
+        "tests/test_evidence_compiler_benchmark.py",
+        "tests/test_pre_qwen_benchmark.py",
+        "tests/test_pre_qwen_selector.py",
+        "tests/test_residual_diagnostics.py",
+        "tests/test_residual_summaries.py",
+        "tests/test_summary_pooling.py",
         "colab/run_all_blocks_equivalence.ipynb",
+        "colab/run_evidence_compiler_gate.ipynb",
+        "colab/run_pre_qwen_beam16_followup.ipynb",
+        "colab/run_pre_qwen_e2e.ipynb",
+        "colab/run_residual_summary_gate.ipynb",
         "colab/rebuild_source_archive.ps1"
     )
     foreach ($entry in $required) {

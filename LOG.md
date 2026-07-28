@@ -18,6 +18,578 @@ Rules (from CLAUDE.md):
 
 ---
 
+## 2026-07-28 — Beam-16 candidate slack recovers 25/25 at 7.52x fully charged speed
+**Question:** Was beam=M=4 prematurely pruning useful lexical branches, and can wider
+traversal recover the two live-compiler errors without increasing the final M=4 Qwen packet
+or sacrificing end-to-end speed?
+**Config:** Colab follow-up `pre_qwen_beam16_381d4e742ac0`, completed
+`2026-07-28T04:36:42.208299+00:00`, from source archive SHA-256
+`381D4E742AC01016CFBBAB6B76CE28673ABAF3D62B6AF8FFC6AF26C37549D266`.
+The only method change from the completed beam-4 run was traversal beam 4 -> 16.
+Qwen2.5-Coder-1.5B-Instruct FP16, the same 25 prompts, D=512, M=4 final blocks,
+unigram fraction 0.5, squared block IDF, radix 2, radius-1 paragraph repair, three
+alternating-order repeats, 32 generated tokens, and the fully charged timing boundary were
+otherwise unchanged. Index caching remained disabled and the hierarchy was rebuilt on every
+measured request. The dense baseline was rerun on the same loaded model/GPU rather than
+reusing old timing.
+
+This is explicitly a follow-up on an opened set:
+`evaluation_status=followup_on_opened_25_cases_not_untouched_gate` and
+`untouched_gate_claim=false`. It establishes engineering behavior, not a new untouched
+scientific claim.
+**Number:** Dense and compiled both achieved **25/25 exact (100%)**. Compiled split
+**14/14 at 16K** and **11/11 at 32K**. Relative to beam 4, compiled accuracy rose from
+23/25 to 25/25 and radius-expanded evidence recall rose from 24/25 to **25/25**. Direct
+M=4 evidence-block recall remained **21/25 (84%)**, so the fixed radius repair continues to
+be load-bearing. The unchanged direct recall plus two recovered answers means candidate
+slack changed which surrounding/source passages reached the final packet, not merely whether
+the exact needle block ranked in the four direct selections.
+
+Median compiled input was **1,833 tokens (8.963% of original)**, only 72 tokens above the
+beam-4 median of 1,761 despite the wider traversal because final M remained four. Summed
+per-case median fully charged time was **74.0856s dense** versus **9.85087s compiled**,
+giving **7.52072x sum-weighted speedup**. Median request time was 1.91307s dense versus
+0.398316s compiled; median prefill component was 1.63516s versus 0.123718s. By length,
+sum-weighted speedup was **5.10308x at 16K** (26.1276s / 5.11997s) and **10.1372x at
+32K** (47.9580s / 4.73090s). The small apparent speed increase versus beam 4 (7.456x ->
+7.521x) is ordinary run noise, not evidence that a wider beam is faster.
+
+The supplied decision is preserved at
+`eval/pre_qwen_runs/pre_qwen_beam16_381d4e742ac0/decision.user_supplied.json`. Drive
+artifacts are
+`MyDrive/SPRUCE_COLAB/outputs/pre_qwen_beam16_381d4e742ac0/pre_qwen_beam16_e2e_25.json`,
+`MyDrive/SPRUCE_COLAB/outputs/pre_qwen_beam16_381d4e742ac0/decision.json`,
+`MyDrive/SPRUCE_COLAB/outputs/pre_qwen_beam16_381d4e742ac0.zip`, and stable pointer
+`MyDrive/SPRUCE_COLAB/outputs/pre_qwen_beam16_latest.json`.
+**Conclusion:** The no-slack diagnosis is supported: widening traversal alone recovers both
+answers and complete expanded evidence coverage while retaining the same four-block model
+input and essentially identical 7.5x fully charged speed. **Do not retrain a selector.**
+Freeze beam=16 as the engineering configuration and validate it on approximately 100 new,
+untouched prompts before making a paper/toolkit accuracy claim.
+
+## 2026-07-28 — Beam-16 Colab test-order failure fixed before benchmark
+**Question:** Why did the beam-16 notebook stop in its pre-benchmark pytest cell on a fresh
+Colab runtime, and can the launcher make the real failure visible if it recurs?
+**Config:** User-reported Colab environment: torch 2.11.0+cu128 and transformers 5.13.1.
+The subprocess running the focused integration suite exited with status 1 before any model
+benchmark. The pasted traceback contained only `CalledProcessError`, not pytest's underlying
+stdout. Inspection of the test order found that the notebook ran integration tests before
+downloading Qwen, while the real-tokenizer tests intentionally call
+`AutoTokenizer.from_pretrained(..., local_files_only=True)`. On a fresh runtime this can fail
+solely because the cache is empty, even though the later benchmark would have downloaded the
+same tokenizer.
+**Number:** No beam-16 accuracy or timing number was produced. Patched
+`colab/run_pre_qwen_beam16_followup.ipynb` to download
+`Qwen/Qwen2.5-Coder-1.5B-Instruct`'s tokenizer before pytest, capture combined pytest
+stdout/stderr, print it, and only then call `check_returncode()`. Notebook JSON remains valid
+at 8 cells / 6 code cells; all code cells parse after removing the `%cd` magic. The focused
+non-integration controls pass **14/14** locally. The refreshed upload ZIP contains 206
+entries, is 7,336,464 bytes, and has SHA-256
+`381D4E742AC01016CFBBAB6B76CE28673ABAF3D62B6AF8FFC6AF26C37549D266`.
+The recoverable previous archive is
+`spruce_colab_train_source.pre_rebuild_20260728_002754.zip`.
+**Conclusion:** This was a launcher/test-order problem, not a beam-16 result. Re-upload the
+refreshed ZIP and rerun from the first cell. If pytest still fails, its complete output will
+now be printed and can be diagnosed directly rather than hidden behind `CalledProcessError`.
+
+## 2026-07-28 — Beam-16 one-variable Colab follow-up packaged
+**Question:** Can the no-slack beam=M=4 diagnosis be tested with one isolated selector
+change while preserving the same M=4 Qwen packet and the fully charged timing contract?
+**Config:** Implementation/packaging only; no beam-16 model result was produced locally.
+Added `colab/run_pre_qwen_beam16_followup.ipynb`. The notebook loads the completed beam-4
+decision from `MyDrive/SPRUCE_COLAB/outputs/pre_qwen_latest.json`, asserts that the only
+changed method parameter is beam 4 -> 16, and reruns the same 25 prompts with
+Qwen2.5-Coder-1.5B-Instruct FP16, D=512, M=4, radius-1 paragraph repair, radix 2, three
+alternating-order repeats, and 32 generated tokens. The full dense baseline is rerun on the
+same loaded model/GPU; no old timing is reused. Index caching remains disabled.
+
+Because the 25 prompts were already opened by the beam-4 decision, the notebook explicitly
+records `evaluation_status=followup_on_opened_25_cases_not_untouched_gate` and
+`untouched_gate_claim=false`. This run may establish an engineering repair but cannot be
+presented as a second untouched accuracy gate. Results use a separate stable pointer,
+`MyDrive/SPRUCE_COLAB/outputs/pre_qwen_beam16_latest.json`, so the original beam-4 pointer
+is not overwritten.
+**Number:** Notebook JSON parses as nbformat 4 with **8 cells / 6 code cells**; every code
+cell parses after removing the one Colab `%cd` magic. Focused selector/compiler/benchmark
+verification passed **16/16** with the same SWIG deprecation warnings. `git diff --check`
+passed. The refreshed `spruce_colab_train_source.zip` contains **206 entries**, is
+**7,336,260 bytes**, and has SHA-256
+`6FC32AB7FA879E1C48EFF7A7C9A9EFE9BC2479246BA9694FC02DB78B0BC248C1`.
+The recoverable previous archive is
+`spruce_colab_train_source.pre_rebuild_20260728_002240.zip`.
+**Conclusion:** Upload the refreshed ZIP and run the beam-16 notebook. A gain from 23/25 to
+at least 24/25 with speed still above 1.0x would validate candidate slack as the engineering
+repair, but the result must remain labeled a follow-up on an opened set until confirmed on
+new untouched prompts.
+
+## 2026-07-28 — Fully charged live pre-Qwen path is 7.46x faster but misses accuracy by one
+**Question:** Does the locked tokenizer-only hierarchy preserve the evidence-compiler
+accuracy gate while remaining faster than ordinary full-dense Qwen after charging every live
+request cost?
+**Config:** Colab run `pre_qwen_b9f3748f4287`, completed
+`2026-07-28T04:10:06.794184+00:00`, from source archive SHA-256
+`B9F3748F42875308B9FE13EA15619DDED42CE4237E56378168D6BDDCBD90E7C2`.
+Qwen2.5-Coder-1.5B-Instruct FP16; 25 frozen dense-accepted prompts (14 at 16K,
+11 at 32K); D=512 Boolean hashed lexical sketches; half unigram and half adjacent-token
+buckets; squared block-IDF question weights; radix-2 max/union tree; M=4 output blocks;
+beam=4; radius-1 paragraph repair; 32 generated tokens; three repeats with dense/compiled
+execution order alternated. The index was disabled as a cache and rebuilt on every measured
+repeat.
+
+Both paths started from prompt/question strings already resident in memory. Model and
+tokenizer loading, manifest reading, and one backend warm-up were excluded from both.
+Dense charged full-prompt tokenization, transfer, dense prefill, and dense decode. Compiled
+charged full-prompt offset tokenization, hierarchy construction, question features,
+top-down traversal, exact-text expansion/stitching, compact tokenization, transfer, dense
+prefill, and dense decode.
+**Number:** Dense retained **25/25 exact**. The live compiled path achieved **23/25 exact
+(92.0%)**, split **12/14 at 16K** and **11/11 at 32K**. It therefore missed the predeclared
+accuracy gate (>=24/25 overall and 11/11 at 32K) by exactly one overall answer while fully
+clearing the long-context cell. Direct M=4 evidence-block recall was **21/25 (84.0%)**;
+radius-1 expansion raised evidence recall to **24/25 (96.0%)**. The aggregate payload does
+not contain the case-level intersection, so it cannot establish whether the one
+expanded-evidence miss was one of the two generation failures, or name the other failure.
+
+Median compiled input was **1,761 tokens**, or **8.454%** of the original prompt. Summed
+per-case median fully charged request time was **75.2652s dense** versus **10.0946s
+compiled**, a **7.45596x sum-weighted speedup**. Median request time was 1.96549s dense
+versus 0.397922s compiled; median model-prefill component was 1.68263s versus 0.120294s.
+By length, the sum-weighted speedup was **5.01714x at 16K** (26.5320s / 5.28826s) and
+**10.13929x at 32K** (48.7333s / 4.80638s). The speed gate passed; the combined
+deployability gate failed only because the accuracy gate failed.
+
+Mechanistically, the locked selector has no retrieval slack: beam width equals final output
+width (beam=M=4). A max/union parent score is an admissible but loose lexical upper bound:
+different descendant blocks can collectively contain different question features and make
+their parent appear strongly relevant even when no leaf contains the complete evidence
+phrase. Retaining only four parents can therefore prune the true leaf before final scoring.
+The small D=512 hash can add collision-based false matches, and exact subword overlap cannot
+distinguish affirmative evidence from lexically similar negated or provisional distractors.
+Radius expansion repaired three of four direct block misses, demonstrating that block
+boundaries are a secondary issue, but it cannot recover a branch pruned farther away.
+
+The supplied decision is preserved at
+`eval/pre_qwen_runs/pre_qwen_b9f3748f4287/decision.user_supplied.json`; Drive artifacts are
+`MyDrive/SPRUCE_COLAB/outputs/pre_qwen_b9f3748f4287/pre_qwen_e2e_25.json`,
+`MyDrive/SPRUCE_COLAB/outputs/pre_qwen_b9f3748f4287/decision.json`,
+`MyDrive/SPRUCE_COLAB/outputs/pre_qwen_b9f3748f4287.zip`, and stable pointer
+`MyDrive/SPRUCE_COLAB/outputs/pre_qwen_latest.json`. The browser connection opened, but the
+available connector exposes no Drive download or cell execution, so the case-level report
+was not independently copied locally.
+**Conclusion:** The implementation is not a general failure: it demonstrates a large,
+fully charged end-to-end speed signal and perfect 32K accuracy. It fails the strict product
+gate by one answer because selection/read robustness is one case below the frozen threshold.
+Do not tune beam or D on these 25 cases. First retrieve the case-level report for clean
+failure attribution; then develop a wider candidate beam plus exact leaf/paragraph reranking
+on separate prompts. With a 7.46x timing margin, visiting more than four candidates is the
+highest-probability repair and is unlikely to erase the speed advantage, but it must be
+measured rather than assumed.
+
+## 2026-07-27 — Live pre-Qwen selector, charged benchmark, and Colab artifact verified
+**Question:** Is the tokenizer-only hierarchy integrated with exact-text compilation, covered
+by correctness tests, exposed through a reproducible fully charged benchmark, and packaged
+for the frozen 25-case Colab decision run?
+**Config:** Implementation/packaging verification only; no successful dense 16K/32K model
+comparison was produced in this step. Added `selector/pre_qwen.py`,
+`interfaces/pre_qwen_selector_spec.md`,
+`benchmarks/benchmark_pre_qwen_e2e.py`, focused selector/aggregate tests, reusable-layout
+compilation, and `colab/run_pre_qwen_e2e.ipynb`. The benchmark alternates dense/compiled
+order across repeats, reports per-component medians and outer request wall time, rebuilds the
+index on every compiled request, and defines the primary speed statistic as summed per-case
+median dense request time divided by summed per-case median compiled request time. The Colab
+configuration is locked at D=512, M=4, beam=4, radix 2, radius 1, paragraph boundaries,
+three repeats, FP16, and 32 decode tokens. It requires an L4/A100-class GPU with at least
+20GiB and the exact 25-prompt Drive manifest.
+**Number:** Full repository verification passed **197 tests**, skipped 13 opt-in/platform
+tests, and retained the one pre-existing `test_topk_loss.py` scalar-conversion warning.
+Focused verification with opt-in real-tokenizer integration passed **16/16**; the only
+additional warnings were three SWIG deprecation messages at interpreter shutdown.
+`colab/run_pre_qwen_e2e.ipynb` parses as nbformat 4 with 11 cells and 7 code cells; the
+benchmark CLI parses; Python compileall and `git diff --check` passed.
+
+The refreshed `spruce_colab_train_source.zip` contains **202 entries**, is **7,330,445
+bytes**, and has SHA-256
+`B9F3748F42875308B9FE13EA15619DDED42CE4237E56378168D6BDDCBD90E7C2`.
+All seven required pre-Qwen selector/spec/benchmark/test/notebook entries were independently
+verified inside the archive, with zero `__pycache__` or `.pyc` entries. The recoverable
+previous archive is
+`spruce_colab_train_source.pre_rebuild_20260727_235802.zip`. `LOG.md` remains deliberately
+excluded so recording the archive's own hash is not self-referential.
+**Conclusion:** The implementation and reproducible Colab decision artifact are ready. The
+only remaining work for this request is the actual >=20GiB frozen run. Until its Drive
+decision reports both the accuracy and speed gates, the live compiler is a promising
+selection result—not a deployable performance claim.
+
+## 2026-07-27 — Fully charged benchmark local smoke reaches the known 8GB ceiling
+**Question:** Can one matched 16K dense-versus-compiled request be executed locally as a
+runtime smoke before the frozen Colab evaluation?
+**Config:** `benchmarks/benchmark_pre_qwen_e2e.py` on the RTX 4070 Laptop GPU (8GB),
+Qwen2.5-Coder-1.5B-Instruct FP16, first dense-accepted 16K prompt, one repeat, eight
+generated tokens, locked pre-Qwen D=512 / M=4 / beam=4 / radius-1 paragraph configuration.
+This was a plumbing smoke only; it was not the frozen 25-case evaluation.
+**Number:** Model load and backend warm-up completed. The first full-dense 16K prefill then
+failed before producing an answer or JSON report: PyTorch requested an additional 11.99GiB
+while only 2.04GiB of the 8.00GiB device remained free (4.55GiB allocated and 0.285GiB
+reserved but unallocated at failure). No accuracy or latency number was produced.
+**Conclusion:** The laptop cannot run this matched full-dense control, consistent with the
+standing separation between 8GB development and long-context benchmark hardware. This is
+not evidence for or against the compiler. Keep the Colab notebook's >=20GiB L4/A100 guard
+and run the complete matched comparison there; do not weaken the dense baseline to fit 8GB.
+
+## 2026-07-27 — Cheap pre-Qwen lexical hierarchy locks at D=512 / beam=4
+**Question:** Can the saved Q/K selector-feature dependency be replaced by a live,
+query-independent document representation that is cheap to construct before any Qwen
+forward, while retaining the evidence locations needed by the exact-text compiler?
+**Config:** Laptop development and held-out selection-only diagnostics; no Qwen model forward
+and no generation accuracy or GPU speed claim. The new path in `selector/pre_qwen.py`
+tokenizes the exact stored prompt with offsets, clips to the source-document token range,
+hashes unigram and adjacent-token IDs into a fixed-width Boolean block sketch, computes
+document frequency over 64-token leaves, and constructs a leaf-first radix-2 hierarchy by
+Boolean max/union. At request time, the question is hashed through the same mapping and
+weighted by squared block IDF; top-down traversal keeps a fixed beam and returns M=4 exact
+source blocks. Parent union preserves rare lexical cues instead of averaging them away.
+Stable node IDs use leaf-first level offsets. This path has no Qwen hidden states, Q/K,
+selector checkpoint, learned encoder, or external embedding model.
+
+Configuration selection used only the four predeclared `natural_train.json` development
+cases (`reserve_cedar_spring`, `reading_room_september_1992`,
+`planning_alder_framework`, `compressor_alloy_t19`), each at 16K and 32K, depth 0.5 and
+seed 20260725. The sweep was D={512,1024,2048,4096} and beam={4,8,16,32}, with fixed M=4,
+radix 2, and the already-locked compiler radius of one block. The selection rule was:
+maximize expanded evidence-block recall, then choose the smallest D and beam. After locking
+D=512 / beam=4, the configuration was run once without tuning on the 60 dense-accepted
+natural held-out prompts available in
+`benchmarks/outputs/screen outputs/accepted.json` (33 at 16K, 27 at 32K).
+**Number:** Every one of the 16 development configurations recovered the evidence directly
+on **8/8** prompts and after radius expansion on **8/8**. The tie rule therefore selected
+the smallest setting, **D=512 and beam=4**. At this setting the maximum visited-node count
+was 63; development median index construction was 0.00941s and median traversal was 0.00115s
+on the laptop CPU. Those timings are single-pass engineering diagnostics, not benchmark
+numbers.
+
+On the locked 60-prompt held-out selection diagnostic, direct M=4 evidence recall was
+**58/60 (96.67%)** and radius-1 expanded recall was **60/60 (100%)**. The 16K split was
+31/33 direct and 33/33 expanded; the 32K split was 27/27 direct and 27/27 expanded.
+Median full-prompt offset tokenization/layout time was 0.06541s, and median hierarchy
+construction plus question encoding and traversal was 0.006953s on the RTX 4070 Laptop
+host. No generation was run, so these selection recalls cannot be quoted as answer accuracy.
+The exact frozen 25-case manifest on Drive was not touched during tuning and remains the
+single final accuracy/speed evaluation.
+**Conclusion:** A genuinely live pre-Qwen selector input path now exists and its cheapest
+tested setting preserves every held-out evidence location after the compiler's already-fixed
+one-block repair. This removes the saved-feature blocker at the representation level.
+Deployability is still unproven until the manifest-complete Colab run charges full-prompt
+tokenization, hierarchy construction, traversal, stitching, compact tokenization, transfer,
+dense prefill, and decode against the matched full-dense path on the same GPU.
+
+## 2026-07-27 — Evidence compiler clears the complete 25-case accuracy gate
+**Question:** Does the locked exact-text evidence compiler preserve the strong local result
+on the manifest-complete 25 dense-accepted natural prompts, including all eleven 32K cases,
+without tuning its packet format or selector budget on that set?
+**Config:** Colab run `evidence_compiler_dc8ee8103764`, completed
+`2026-07-28T03:35:12.211235+00:00`, from source archive SHA-256
+`DC8EE8103764C0F57A8739F516444F9480DC4BDCB22A6E7682A03802D6FFA300`.
+Qwen2.5-Coder-1.5B-Instruct and the selector remained frozen. The configuration was locked
+from the preceding 24-case laptop diagnostic: M=4 candidate blocks, one-block expansion,
+paragraph-boundary repair, radix-2 beam-8 traversal, selector layer chunk 4, CPU selector,
+32 generated tokens, one repeat. The accepted manifest supplied 25 exact stored prompts:
+14 at 16K and 11 at 32K. Each selected location was mapped back to exact original text,
+stitched in source order with provenance labels, and re-encoded through ordinary dense SDPA.
+No sparse hidden states, sparse K/V, omitted-region summaries, paraphrasing, or learned
+compressor were used.
+
+The three predeclared modes shared the compiler and dense reader. `oracle` used the known
+evidence block and is attribution-only. `flat` scored every document leaf at the reader row
+and remains an O(n) ceiling. `tree` used the recursive SPRUCE traversal and reranked only its
+bounded final-reader leaf union. Selector inputs for flat/tree were saved Q/K features
+produced by teacher extraction; feature extraction was not included in the reported prefill
+time.
+**Number:** Oracle, flat, and tree each achieved **24/25 exact (96.0%)**. Every mode split
+**13/14 at 16K (92.86%)** and **11/11 at 32K (100%)**. The locked tree therefore clears the
+predeclared accuracy gate of at least 24/25 overall and 11/11 at 32K. Oracle evidence recall
+was 25/25; flat and tree direct and radius-expanded evidence recall were each **24/25
+(96.0%)**. Matching oracle/tree exact counts despite different evidence recall means the
+aggregate decision alone cannot prove they failed on the same case; use the case-level Drive
+report before attributing the remaining error.
+
+Median compiled prompt size was **590 tokens (2.987% of original)** for oracle and **1,358
+tokens (5.727%)** for flat/tree. Median dense compiled-prefill time on the Colab runtime was
+0.04054s oracle, 0.08896s flat, and 0.08664s tree. These are compiled-reader component times,
+not end-to-end TTFT: the run used one repeat, selector device was CPU, and live feature
+construction plus complete selection/stitching cost is absent. The notebook correctly records
+`accuracy_gate_passed=true`, `deployability_gate_passed=false`, with the blocker that no cheap
+live pre-Qwen feature path or matched end-to-end speed measurement exists.
+
+The supplied decision is preserved at
+`eval/evidence_compiler_runs/evidence_compiler_dc8ee8103764/decision.user_supplied.json`.
+Drive artifacts are
+`MyDrive/SPRUCE_COLAB/outputs/evidence_compiler_dc8ee8103764/evidence_compiler_25.json`,
+`MyDrive/SPRUCE_COLAB/outputs/evidence_compiler_dc8ee8103764/decision.json`,
+`MyDrive/SPRUCE_COLAB/outputs/evidence_compiler_dc8ee8103764.zip`, and stable pointer
+`MyDrive/SPRUCE_COLAB/outputs/evidence_compiler_latest.json`. The current connector exposes
+no Drive download, so the case-level report and ZIP were not independently copied locally;
+provenance is recorded beside the preserved aggregate decision.
+**Conclusion:** The exact-text evidence-compiler idea works on the complete accuracy gate.
+The frozen recursive selector plus dense compact reread recovers the required 24/25 overall
+and all 11 long 32K cases while presenting only 5.73% of the original tokens to Qwen. This
+supports the diagnosis that the old failure was primarily sparse representation corruption,
+not an inability to locate or read the evidence. It does **not** yet establish SPRUCE as a
+deployable or faster method. The active engineering problem is now a cheap pre-Qwen
+hierarchical document representation and a matched end-to-end benchmark charging feature
+construction, tree selection, text stitching, transfer, dense prefill, and decode.
+
+## 2026-07-27 — Evidence compiler recovers 23/24 with a fresh dense read
+**Question:** Is SPRUCE's primary failure that Qwen cannot read selected evidence after it
+has been contextualized through the unfamiliar sparse attention graph, and can the same
+selected locations work when their original text is stitched into a short coherent prompt
+and re-encoded densely?
+**Config:** Laptop development diagnostic on the RTX 4070 Laptop GPU (8GB; not paper timing),
+Qwen2.5-Coder-1.5B-Instruct FP16 with an ordinary SDPA dense read, frozen backbone and frozen
+gate `natural160_replay40_lamt075_lamn025_k10_lr5e4_e300.pt`. Added the exact-text evidence
+compiler in `interfaces/evidence_compiler.py` and diagnostic
+`benchmarks/evaluate_evidence_compiler.py`. Source block IDs are mapped back to the original
+prompt text, clipped to the document (never the chat wrapper or question), expanded by one
+block, repaired to paragraph boundaries, merged in source order, labeled with original
+block/token provenance, and placed before the unchanged question in a fresh dense chat prompt.
+No omitted-region summaries, sparse hidden states, or sparse K/V are read.
+
+The configuration was locked after one Gallery 16K smoke case: M=4, block radius=1,
+paragraph boundaries, 32 generated tokens, one repeat. It was then run unchanged on all **24
+unique dense-accepted natural held-out targets available locally** (13 at 16K, 11 at 32K).
+This local directory is one target short of the later Colab-re-screened 25-case manifest, so
+this is a 24-case diagnostic rather than the complete gate. The set has also already been
+used by prior SPRUCE work and is not an untouched claim set.
+
+Three selection controls used the same compiler and dense reader:
+
+- `oracle`: the known evidence block, attribution only.
+- `flat`: the frozen gate scores every document leaf at the final reader row and keeps M=4;
+  this is an O(n) selection ceiling, not the recursive complexity claim.
+- `tree`: radix-2 beam-8 SPRUCE traversal, union the final-reader leaves across layers/groups,
+  then score only that bounded union and keep M=4.
+
+Selector Q/K inputs came from saved teacher-extraction features. Feature load is measured, but
+the original feature-extraction pass is absent, so none of these totals is deployable TTFT.
+Artifact:
+`benchmarks/outputs/evidence_compiler/frozen25_M4_R1_paragraph.json`; console record:
+`benchmarks/outputs/evidence_compiler/frozen25_M4_R1_paragraph.log`.
+**Number:** All three modes achieved **23/24 exact (95.83%)**, split **12/13 at 16K
+(92.31%)** and **11/11 at 32K (100%)**. This is a large change from the prior sparse-prefill
+results on the same task family: exact-only routing reached 16/25 and deterministic residual
+summaries reached 17/25, with only 5/11 at 32K.
+
+The error attribution is clean. Oracle evidence was present 24/24 but missed one 16K Atlas
+case by generating the incomplete path `/atlas.chk` rather than the accepted full path; the
+M=4 packets supplied additional context and answered that case correctly. Flat and tree
+candidate packets both missed only Aquifer 16K depth 0.1. In that case neither selected nor
+expanded blocks contained the evidence, and the answer was the nearby distractor `Lake
+Calden`. Conditional on selecting the evidence block, flat/tree dense packets were **23/23
+exact**. Flat and recursive tree produced the same final M=4 blocks on **24/24 cases**. The
+tree's pre-rerank final-reader union ranged from 49 to 112 unique blocks.
+
+Median compiled prompt size was **590.5 tokens (2.971% of the original prompt)** for oracle
+and **1,343 tokens (5.434%)** for flat/tree. Median dense compiled-prefill time was 0.223s
+oracle, 0.295s flat, and 0.277s tree; median peak allocated memory was 3.176GB oracle and
+3.390GB flat/tree. Median CPU selection time was 0.191s for the flat ceiling and 1.540s for
+the current unoptimized recursive tree; median compilation was about 0.10s. These laptop
+component timings are diagnostic only: the saved-feature path omits live feature extraction,
+the run used one repeat, and no matched full-dense end-to-end comparison was made.
+
+The implementation is covered by 13 passing lightweight compiler/benchmark tests plus one
+passing Qwen-tokenizer integration test. Tests prove stable/valid source IDs, document-only
+clipping, paragraph-boundary repair, source-order preservation, adjacent-span merging,
+provenance labels, no silent span dropping, rejection of wrapper-only selections, flat/tree
+document filtering, bounded tree candidates, aggregation, and CLI parsing.
+
+Full repository verification after integration passed **192 tests**, skipped 12 opt-in/platform
+tests, and retained the one pre-existing `test_topk_loss.py` scalar-conversion warning.
+`colab/run_evidence_compiler_gate.ipynb` parses as nbformat 4 with 13 cells and 8 code cells;
+the benchmark CLI parses; and `git diff --check` passed. The refreshed
+`spruce_colab_train_source.zip` contains **193 entries**, is **7,311,357 bytes**, and has
+SHA-256 `DC8EE8103764C0F57A8739F516444F9480DC4BDCB22A6E7682A03802D6FFA300`.
+The rebuild script verified the compiler interface, selector ranker, benchmark, tests, and
+notebook inside the archive. The recoverable previous archive is
+`spruce_colab_train_source.pre_rebuild_20260727_223828.zip`. `LOG.md` is deliberately
+excluded from the ZIP because recording the ZIP's own hash inside it would be
+self-referential; the workspace copy remains the record of record.
+**Conclusion:** The user's read-distribution hypothesis is strongly supported. When the
+selected locations are returned to exact source text and re-encoded together through normal
+dense attention, the previous 32K wall disappears on all 11 locally available cases. The
+remaining selector-packet failure is selection, not reading: evidence absent implies failure;
+evidence present gives 23/23. This does **not** yet establish a deployable speedup or preserve
+the original sparse-attention conversion claim because the diagnostic consumes pre-extracted
+Q/K features, and the flat ceiling is O(n). Next: run the manifest-complete Colab 25-case
+version, then replace offline Q/K features with a genuinely cheap pre-Qwen hierarchical
+document selector before any toolkit or paper claim.
+
+## 2026-07-27 — Deterministic residual summaries fail the decision ladder
+**Question:** Does complete residual coverage with deterministic live mean-K/V prototypes
+repair the frozen Qwen2.5-Coder-1.5B sparse-prefill representation enough to clear the
+plug-and-play gate, or at least show the predeclared signal required to justify a learned
+compressor?
+**Config:** Colab run `residual_4ab66445f234`, completed
+`2026-07-28T01:08:20.454012+00:00`, from source archive SHA-256
+`4AB66445F2347BA8D934DD712AB9288053A3C37297888741207148462A9ABF1D`.
+The backbone and selector remained frozen. Prototype count P was tuned only on four
+`natural_train.json` development cases
+(`compressor_alloy_t19`, `planning_alder_framework`,
+`reading_room_september_1992`, `reserve_cedar_spring`) at 16,384 and 32,768 tokens,
+disjoint from the frozen 25-prompt evaluation set. P={1,2,4} used the predeclared rule:
+select the smallest P whose sampled attention-output RMSE is no more than 1.05 times the
+best P. The selected P was then evaluated exactly once on the frozen 25 prompts. Exact
+routes used the existing dense-candidates M=4/K=10/W=0/S=0 policy; residual summaries
+covered every omitted causal region. The charged-attention fraction counts one entry per
+valid prototype and 64 entries per exact block. This run did not implement or time a Triton
+summary loop.
+**Number:** Development attention-output RMSE was **0.2856209151 for P=1**,
+**0.2851001494 for P=2**, and **0.2842079434 for P=4**. The within-5% threshold was
+0.2984183406, so all three settings qualified and the rule correctly selected **P=1**;
+P=1 was only about **0.50%** worse than the best P=4. Despite complete residual coverage,
+final-hidden relative RMSE versus exact-only sparse attention became worse, not better:
+the reported reduction was **-13.985% at 16K** and **-5.614% at 32K**.
+
+On the frozen set, P=1 produced **17/25 exact overall (68.0%)**, split
+**12/14 at 16K (85.7%)** and **5/11 at 32K (45.5%)**. Relative to the prior best exact-only
+dense-candidates result (16/25, 12/14 at 16K, 4/11 at 32K), deterministic summaries recovered
+only one additional 32K case. The median charged-attention fraction was
+**0.0754183**, comfortably below the <=0.25 cost ceiling, but accuracy missed the
+plug-and-play requirements by **7 cases overall** and **6 cases at 32K**. The deterministic
+accuracy-and-cost signal is false. Learned-compressor eligibility is also false: 17/25 is
+below the >=20/25 branch, while both length-specific final-hidden improvements are negative
+rather than >=30%. No matched live-prefill speedup exists because Triton summary support was
+not built; therefore the full product gate is false as well.
+
+The exact decision payload supplied after the run is preserved at
+`eval/residual_summary_runs/residual_4ab66445f234/decision.user_supplied.json`. Drive paths
+reported by the notebook are
+`MyDrive/SPRUCE_COLAB/outputs/residual_4ab66445f234/decision.json`,
+`MyDrive/SPRUCE_COLAB/outputs/residual_4ab66445f234.zip`, and the stable pointer
+`MyDrive/SPRUCE_COLAB/outputs/residual_summary_latest.json`. The current connector exposed
+Colab session connection but no Drive download/cell-execution operation, and no local Drive
+sync or authenticated Drive CLI was present, so the full ZIP was not independently copied
+or bundle-verified locally; provenance is recorded beside the preserved payload.
+**Conclusion:** Deterministic residual summaries fail both the plug-and-play gate and the
+predeclared learned-compressor eligibility gate. Per the frozen decision ladder, **stop:
+do not train the learned compressor and do not implement the Triton summary loop**. Complete
+mean summaries marginally improve frozen exactness from 16/25 to 17/25 at very low charged
+attention, but they worsen final-hidden fidelity at both lengths and leave the 32K retrieval
+wall essentially intact. The next step requires an explicit contribution decision outside
+this residual-summary branch, most plausibly scoping automated sparse-in-the-loop adaptation
+or pivoting the claim; it is not more P tuning.
+
+## 2026-07-27 — Residual-summary Colab decision notebook and refreshed upload ZIP
+**Question:** Can the deterministic residual-summary experiment be launched from the IDE with
+the current local source ZIP, run without copying that ZIP to Drive, preserve the frozen-set
+decision order, and leave a predictable Drive result pointer for later agent retrieval?
+**Config:** Packaging and harness verification only; no Qwen model forward, development RMSE,
+frozen accuracy, or latency measurement was run. Added
+`colab/run_residual_summary_gate.ipynb`, a 17-cell notebook with 10 code cells. Its first
+interaction uses `google.colab.files.upload()` and requires exactly one local ZIP. It hashes
+the uploaded bytes, unpacks them into `/content/SPRUCE`, and verifies residual interface,
+pooling, attention, diagnostics, live benchmark, and suite markers before using GPU time.
+Drive is mounted only after source upload and is used for the existing selector checkpoint
+`MyDrive/SPRUCE_COLAB/selector_ckpt/natural160_replay40_lamt075_lamn025_k10_lr5e4_e300.pt`,
+the frozen accepted manifest
+`MyDrive/SPRUCE_COLAB/screens/natural_heldout_accepted_20260726.json`, and durable outputs.
+
+The notebook predeclares four disjoint `natural_train.json` development cases, lengths
+{16,384, 32,768}, depth 0.5, 64 sampled token positions, dense-candidates M=4/K=10/W=0/S=0,
+and P={1,2,4}. Added `benchmarks/diagnose_residual_summaries.py`: dense SDPA runs once per
+development prompt; the exact-only PyTorch reference and each P setting then compare the same
+sampled positions at every attention-module output and decoder-layer output. Squared errors
+are accumulated globally rather than averaging per-layer ratios. P selection is frozen to the
+smallest P with attention-output RMSE <=1.05 times the best RMSE. Only that P proceeds to one
+frozen 25-prompt PyTorch accuracy/cost run. The notebook explicitly leaves the full product
+gate false until conditional Triton summary support supplies matched live-prefill speed.
+
+Results are written under
+`MyDrive/SPRUCE_COLAB/outputs/residual_<source-hash-prefix>/`. The final cell writes
+`decision.json`, packages the full result directory as a Drive ZIP, and updates the stable
+pointer `MyDrive/SPRUCE_COLAB/outputs/residual_summary_latest.json` with the run ID, source
+SHA-256, decision path, bundle path, and completion time. This lets the connected Colab
+session locate and print the result without requiring the user to browse Drive.
+**Number:** Full repository verification passed **179 tests**, with **11 opt-in/platform tests
+skipped** and the same one pre-existing `test_topk_loss.py` scalar-conversion warning.
+Focused residual/diagnostic/suite verification passed 37/37; notebook JSON parses as nbformat
+4 with 17 cells and 10 code cells; both diagnostic and existing benchmark CLIs parse; and
+`git diff --check` passed. Rebuilt `spruce_colab_train_source.zip` contains **183 entries**,
+is **7,289,503 bytes**, and has SHA-256
+`4AB66445F2347BA8D934DD712AB9288053A3C37297888741207148462A9ABF1D`. Required notebook,
+diagnostic, residual interface/pooling, and test entries were verified by the rebuild script.
+The recoverable prior archive is
+`spruce_colab_train_source.pre_rebuild_20260727_130949.zip`.
+**Conclusion:** Open `colab/run_residual_summary_gate.ipynb` through the connected Colab
+session, run all, select the refreshed local ZIP when the first cell asks, and authorize Drive
+once in the second setup cell. After those two interactions the run is unattended. Do not
+interpret notebook completion as a full plug-and-play pass unless a later Triton run also
+clears the >1.0x matched live-prefill gate.
+
+## 2026-07-27 — Deterministic hierarchical residual summaries implemented
+**Question:** Can SPRUCE preserve the existing exact `selected_blocks` route while replacing
+every omitted causal block with a deterministic, complete tree frontier of compressed live
+K/V summaries, without changing the summary-disabled PyTorch reference behavior?
+**Config:** Development implementation only; no held-out prompt, model-forward accuracy run,
+or paper latency measurement. The Qwen backbone and selector remain frozen. Exact routing
+continues to use the unchanged `selected_blocks: int32 [B,L,G,Q,K]` contract. Added
+`residual_summary_nodes: int32 [B,L,G,Q,S]`, with stable leaf-first binary-tree IDs, odd-tail
+ceil-halving rollup matching `selector.tree`, trailing `-1` padding, and `S` chosen from the
+largest complete frontier in the supplied route tensor rather than from a truncation budget.
+The deterministic compressor runs independently inside every decoder-layer attention callback
+from that layer's live post-RoPE K/V. Each residual node is divided into P={1,2,4} contiguous
+token ranges; each nonempty prototype stores FP32-accumulated mean K, mean V, token count, and
+`log(token_count)`. Exact-token logits and prototype logits are concatenated before one
+softmax. Padding tokens are excluded from means/counts by reducing the 4D additive attention
+mask over query rows. The learned compressor and Triton summary loop were deliberately not
+implemented because both are conditional on a deterministic held-out accuracy signal.
+
+**Implementation:**
+- Added `interfaces/residual_summaries.py` and
+  `interfaces/residual_summaries_spec.md`. `build_residual_tree_layout` assigns stable IDs;
+  `build_residual_summary_nodes` recursively splits future/partially causal or exact-overlapping
+  nodes and emits the maximal complete omitted frontier; and
+  `validate_residual_summary_nodes` proves causality, sorted/unique/trailing padding,
+  no exact-summary overlap, no summary-summary overlap, complete causal-prefix coverage, and
+  maximality.
+- Added `sparse/summaries.py`. Vectorized prefix reductions construct every node/prototype
+  table for the current decoder layer without materializing token-by-token attention.
+  Empty/tail prototypes carry count zero and `-inf` log-count bias and are removed before the
+  mixed softmax. `residual_attention_density` charges one entry per valid prototype and
+  `block_size` entries per exact block; PAD slots are free.
+- Extended `sparse/attention.py` only behind `residual_summaries=True`. The default path keeps
+  the prior exact sparse score/value computation. Mean summaries use
+  `q·mean(K)/sqrt(d) + log(count)` and concatenate mean V with exact V for the shared
+  probability-value product.
+- Added shared CLI/config controls in `sparse/config.py`:
+  `--residual-summaries`, `--summary-prototypes {1,2,4}`,
+  `--summary-mode {mean,learned}`, and `--summary-checkpoint`. The one-prompt replay, live-tree
+  benchmark, and route-control suite accept the controls. Triton plus summaries is rejected
+  explicitly. Learned mode requires a checkpoint and then stops with the deterministic-gate
+  message rather than silently falling back to means.
+- Extended live timing honestly. `live_prefill_seconds` now includes selector/tree routing,
+  residual tree-layout construction, maximal-frontier construction, CPU/GPU transfer, and the
+  model prefill. Per-layer summary construction and mixed attention are both inside the
+  measured model-prefill interval. Reports mark this explicitly and include exact-entry,
+  prototype-entry, charged-entry, and maximum causal-entry counts.
+
+**Number:** Full repository verification passed **179 tests**, with **11 opt-in/platform tests
+skipped** and one pre-existing `test_topk_loss.py` warning about converting a grad tensor to a
+Python scalar. `git diff --check` passed. New controls cover tree layouts corresponding to
+16K/32K/64K/128K at block size 64 (256/512/1024/2048 leaves), odd leaf counts, duplicated-range
+odd-tail ancestors with stable distinct IDs, partial final blocks, padding masks, GQA
+(2 query heads per KV head in the mathematical control), FP16, BF16, and P={1,2,4}. The
+multiplicity control uses identical keys and non-identical values and reproduces dense causal
+attention after summary pooling, which is stronger than the trivial identical-K/V control.
+The all-exact route produces `S=0` and retains dense equivalence. Passing a residual tensor
+while `residual_summaries=False` is bitwise identical to the previous summary-disabled output.
+These are software/mathematical verification results, not held-out retrieval accuracy or
+speed measurements.
+**Conclusion:** The deterministic correctness-first residual-summary branch is ready for the
+predeclared development P sweep and then one frozen 25-case evaluation. Do not quote an
+accuracy or speed improvement yet, do not train the learned compressor yet, and do not extend
+the Triton kernel yet. Select the smallest P whose development attention-output RMSE is within
+5% of the best P; proceed to learned compression only if deterministic summaries reach at
+least 20/25 exact or reduce final-hidden relative RMSE by at least 30% at both 16K and 32K.
+
 ## 2026-07-27 — SpotAttention-inspired sparse-prefill oracle stops at the cost gate
 **Question:** Did the apparently silent model-forward cell in
 `run_spotattention_discriminator.ipynb` fail to execute, or did the route preview intentionally
@@ -86,6 +658,41 @@ cost gate: exact dense-teacher dual-top-p routes charge median attention fractio
 0.488, and 0.664 for p={0.7,0.8,0.9}, so none qualifies for the <=0.25 ceiling and no accuracy
 forward is justified.
 
+**Stage (current after the residual-summary decision run):** The frozen-backbone hierarchical
+residual-summary redesign is empirically closed. The predeclared development rule selected
+P=1 (attention-output RMSE 0.285621, within 0.50% of P=4), then the one allowed frozen-set
+evaluation scored 17/25 overall, 12/14 at 16K, and 5/11 at 32K. Median charged attention was
+only 0.0754, but the method missed the accuracy gates by seven cases overall and six at 32K.
+More importantly, final-hidden relative RMSE was worse than exact-only sparse attention at
+both lengths (-13.99% and -5.61% reported reduction). This fails both routes into learned
+compression (neither >=20/25 nor >=30% hidden-RMSE improvement at both lengths). Per the
+decision ladder, learned compression and the Triton summary loop must not be built. The
+frozen-backbone plug-and-play construction claim is not supported; the next contribution
+choice is an explicit adaptation/pivot decision, not another summary hyperparameter sweep.
+
+**Stage (current after the complete evidence-compiler gate):** The frozen-backbone
+exact-text compiler clears its accuracy target. Use SPRUCE only to locate source regions,
+return to their original text, stitch coherent paragraph spans, and re-encode the compact
+packet with ordinary dense Qwen attention. On the manifest-complete 25 cases, the locked
+M=4/radius-1/paragraph recursive-tree path scores 24/25 overall and 11/11 at 32K while
+presenting a median 1,358 tokens (5.73% of the original) to Qwen. Flat and tree match exactly,
+and both evidence recall and exactness are 24/25. This strongly supports sparse representation
+corruption as the old failure and makes evidence compilation the active branch ahead of
+backbone adaptation. It does **not** clear the product/speed gate: selector inputs are still
+pre-extracted Q/K features, the reported 0.0866s is only dense compiled prefill, and no matched
+end-to-end measurement charges live feature construction, selection, stitching, transfer, and
+decode. The active gate is now deployability through a cheap pre-Qwen hierarchical document
+representation.
+
+**Stage (current after the beam-16 engineering follow-up):** The saved-Q/K dependency is
+removed and the complete live path is fast. D=512 / M=4 / beam=16 scores 25/25 overall,
+14/14 at 16K, and 11/11 at 32K while achieving 7.521x sum-weighted request speedup with
+every preprocessing, transfer, prefill, and decode cost charged. Expanded evidence recall is
+25/25. This repairs the beam-4 result (23/25 at 7.456x) with traversal slack alone and no
+selector training. Because beam 16 was tested after the 25 cases were opened, treat it as an
+engineering result, not a new untouched gate. Freeze the configuration and move to ~100 new
+untouched prompts before a paper/toolkit accuracy claim.
+
 **Stage:** Root cause of the natural-retrieval failure is now measured, and it is NOT fixable by selector loss tuning. Three findings (2026-07-26 diagnostics, PyTorch reference backend on the laptop, kernel-independent): (1) the block-pooled, group-averaged teacher targets erase the evidence — unconditional teacher top-8 eligibility averages 0.64 per layer-group (0.00 worst case), and the teacher's own top-8 routes generate a distractor; the real dense retrieval signal lives in a few question-row TOKENS (mass up to 0.32 at L24) that query-side block pooling destroys. (2) Evidence access is not sufficient: forcing the evidence block into every route (verified hit 1.0) changes nothing. (3) At 16K a dense reader row (body still K=10 sparse) recovers the exact answer at ~0.4% extra cost; at 32K even dense-reader + K=64 fails — body sparsification corrupts document-side representations and close distractors win. Follow-up controls attributed the 32K failures: densifying the evidence block's own query row (plus dense reader) restores Observatory exactly, so the mechanism is evidence-K/V corruption under sparse prefill, repairable at O(L) per densified row; Atlas alone resists all partial densification and needs its own token-level audit. Deployable validation done: `--route-mode dense-candidates` (gate-scored top-8 reader-row blocks densified, no oracle) recovers 2/3 exact at ~2% extra prefill — the gate already ranks the evidence first on all three prompts. Atlas alone still fails every partial densification despite near-saturated dense evidence attention (0.999); next is a sparse-vs-dense differential audit on its layers. Colab Triton parity + full held-out validation of dense-candidates (`benchmarks/run_route_control_suite.py`) remain before paper claims or selector retraining. New tooling landed on branch `selector-diagnostics`: `--route-mode {learned,oracle-needle,teacher-top8,dense-reader}` and `--backend pytorch`/`--skip-dense` in the live benchmark, `scripts/audit_dense_attention.py`, `--needle-eligibility always` in the trainer (implemented, untrained), and union/teacher-ceiling metrics in trainer and natural-gate eval output.
 
 **Superseded by the 2026-07-26/27 Colab runs — kept for the diagnostic history, but read the
@@ -95,8 +702,9 @@ gate already ranks the evidence first" holds only at M>=8 (recall is 0.52 at M=1
 and Atlas is not a unique outlier but an ordinary case of the depth pattern. Colab Triton
 parity is done. The Atlas differential audit was downgraded and never run.
 
-**Stage (current):** Route policy and route construction are **exhausted**. Sixteen distinct
-policies measured on the same 25 dense-verified natural held-out targets — M in {1,2,4,8,16,32},
+**Stage (current):** Exact-route policy and exact-route construction are **exhausted**.
+Sixteen distinct policies measured on the same 25 dense-verified natural held-out targets —
+M in {1,2,4,8,16,32},
 neighborhood W in {0,1,2}, K in {10,18,32,64}, sink S in {0,1,2} — and none exceeds **16/25**
 (`dense-candidates` M=4, S=0). Dense scores 25/25 on the same prompts. The 32K deep-evidence
 cell (d0.1) is **0.00 in every one of the sixteen**, and the 32K/d0.5 cell never exceeds 0.20.
@@ -105,14 +713,27 @@ Efficiency is settled and is not the problem: every configuration beats dense on
 sink forcing costs nothing measurable. The remaining gap is attributed to the frozen backbone
 being fed a representation distribution it never saw in training — the non-monotonic M curve
 (dense 25/25, M=4 16/25, M=32 9/25) is a mixture-mismatch signature, not an
-information-content one. The next untried lever is the unbuilt adaptation stage
-(LoRA/QLoRA adapters, backbone frozen, sparse prefill in the loop). Selector retraining is
+information-content one. Deterministic residual summaries tested and rejected the last
+within-attention frozen-backbone construction lever: complete coverage moves 16/25 to only
+17/25 and worsens final-hidden fidelity at both 16K and 32K. Exact-text evidence compilation,
+which restores normal dense reading over a ~5% packet, is now the active non-adaptation branch.
+The unbuilt LoRA/QLoRA stage remains a fallback only if a cheap live compiler selector cannot
+preserve the 23/24 accuracy signal. Selector retraining is
 ruled out quantitatively, not by assertion: conditional exactness given the evidence row is
 densified is 0.62, so a perfect top-1 gate projects to ~15-16/25 — what M=4 already delivers.
 
 **Backbone:** Qwen2.5-Coder-1.5B (H=12, G=2 kv-groups). 3B = laptop ceiling; 7B = ARC only.
 
-**Built + validated:** chunked teacher extraction (P-prototype Q/K, offloading, GPU budget), chunked-vs-eager validator, `selected_blocks` frozen + validator, needle harness, flat gate, compact-ID candidate-only recursive traversal, PyTorch sparse reference, direct-index Triton sparse prefill with isolated causal/prescale/query-tile ablations, prefill-only CUDA profiler, K-sweep live-tree benchmark harness, repo-index parser, test suite.
+**Built + validated:** chunked teacher extraction (P-prototype Q/K, offloading, GPU budget),
+chunked-vs-eager validator, `selected_blocks` frozen + validator, needle harness, flat gate,
+compact-ID candidate-only recursive traversal, PyTorch sparse reference, direct-index Triton
+sparse prefill with isolated causal/prescale/query-tile ablations, deterministic hierarchical
+residual-tree interface/frontier validator, live mean-K/V prototype pooling with multiplicity
+bias, prototype-aware cost accounting, summary-disabled regression controls, prefill-only CUDA
+profiler, K-sweep live-tree benchmark harness, exact-text evidence compiler with block/paragraph
+boundary modes and source provenance, flat/tree/oracle compiler evaluation harness, repo-index
+parser, tokenizer-only lexical block hierarchy, fully charged dense-vs-compiled benchmark,
+test suite.
 
 **Landed 2026-07-26/27 (not yet committed):** multi-target route-control suite
 `benchmarks/run_route_control_suite.py` (one child process per combination instead of per
@@ -121,27 +742,75 @@ per-case CSV); route knobs `--candidate-blocks` / `--candidate-neighborhood` /
 `--sink-blocks` on the live benchmark and `--candidate-block-values` /
 `--candidate-neighborhood-values` / `--k-selected-values` / `--sink-block-values` on the suite;
 `candidate_span` + `neighborhood` in `scripts/route_overrides.py`; **attention-sink forcing**
-`sink_blocks` in `scripts/export_selected_blocks.py`; three Colab notebooks under `colab/`
-(`spruce_colab_route_control`, `spruce_colab_accuracy_ladder`, `spruce_colab_sink_test`);
-Colab source archive rebuilt from source, 160 entries, SHA-256
-`E5148A2D8F5F98AFDD087043D4ED29F941D84E63B3306403236428DD7525A33A` (previous archive kept as
-`spruce_colab_train_source.prev.zip`). Test suite 139 passed / 11 skipped.
+`sink_blocks` in `scripts/export_selected_blocks.py`; deterministic residual-summary layout,
+frontier, validator, mean-K/V pooling, mixed-softmax PyTorch attention, CLI controls, live
+timing, and charged-entry accounting; the residual development diagnostic and
+`colab/run_residual_summary_gate.ipynb`; evidence compilation in
+`interfaces/evidence_compiler.py`, `selector/evidence.py`,
+`benchmarks/evaluate_evidence_compiler.py`, and
+`colab/run_evidence_compiler_gate.ipynb`; plus the prior route-control/accuracy/sink notebooks.
+The current Colab source archive includes residual summaries, the evidence compiler, and the
+live pre-Qwen selector/charged benchmark:
+206 entries, 7,336,464 bytes, SHA-256
+`381D4E742AC01016CFBBAB6B76CE28673ABAF3D62B6AF8FFC6AF26C37549D266`.
+Current workspace verification is **197 passed / 13 skipped**; the focused real-tokenizer
+pre-Qwen/compiler integration run passes 16/16.
 
 **Open checkpoints / kill switches:**
-- KS1 (Stage 2): **not cleared**, now measured on the full held-out set rather than a smoke set. Best sparse configuration is 16/25 (0.64) against dense 25/25 on the same prompts; KS1 asks for >95% of dense retrieval quality. Split by length: 16K 12/14 (0.86), 32K 4/11 (0.36). `recall@8` around 0.745 was a block-level proxy that never predicted generation — treat it as a selection metric only.
+- KS1 (Stage 2): **not cleared**, now measured on the full held-out set rather than a smoke set.
+  The best frozen-backbone sparse result is deterministic residual P=1 at 17/25 (0.68) against
+  dense 25/25 on the same prompts; KS1 asks for >95% of dense retrieval quality. Split by
+  length: 16K 12/14 (0.86), 32K 5/11 (0.45). `recall@8` around 0.745 was a block-level proxy
+  that never predicted generation — treat it as a selection metric only.
 - Stage 2b: does a selector trained short (16-32K) generalize to long (64-128K) via needle harness? Not yet run. Higher risk than previously assumed: the gate is trained on 200 targets (160 natural + 40 replay) at 16K/32K only.
 - Quantization checkpoint: does quantizing the backbone hurt needle recall at target length? Not yet run.
 - KS2 (post-benchmark): tree beats/matches HiP at equal budget AND beats flat routing in real prefill cost. Blocked on Stage 3.
-- **Adaptation stage: unbuilt and unscoped.** No `peft`/LoRA anywhere in the repo; the backbone has been frozen for every result to date. Now the primary path.
+- Residual-summary gate: **closed — failed.** P=1 scored 17/25 overall and 5/11 at 32K with
+  median charged attention 0.0754. Final-hidden relative-RMSE reductions were negative at both
+  lengths. Neither the plug-and-play gate nor learned-compressor eligibility cleared; do not
+  train the merger or build its Triton loop.
+- Evidence-compiler accuracy gate: **passed.** Locked recursive M=4, radius-1 paragraph packets
+  score 24/25 overall and 11/11 at 32K on the manifest-complete Colab set. Median compiled
+  context is 1,358 tokens (5.73% of original). This is an accuracy/readability result only.
+- Evidence-compiler engineering gate: **passed on the opened 25-case follow-up.** Beam 16,
+  with final M still four, scores 25/25 and retains 7.521x fully charged sum-weighted speedup;
+  expanded evidence recall is 25/25. This confirms candidate slack as the repair. It is not
+  an untouched validation because beam was changed after seeing the beam-4 result. Freeze
+  beam 16 and require approximately 100 new untouched prompts before a paper/toolkit claim.
+- **Adaptation stage: fallback, still unbuilt and unscoped.** No `peft`/LoRA exists in the repo;
+  the backbone has been frozen for every result to date. Do not start adaptation while the
+  exact-text compiler can still be made deployable without changing the frozen-backbone claim.
 
 **Current challenges (open, in priority order):**
-1. **The 32K deep-evidence wall.** d0.1 = 0.00 across sixteen route/construction policies; d0.5 never above 0.20. Nothing in route space has moved it. This is the whole remaining accuracy gap.
-2. **Sink forcing and dense-candidates conflict.** Each helps alone (learned 3->8; dense-candidates 3->16) but together give 11/25. Densified rows already reach block 0, so the forced sink is pure budget overhead on the ~500 sparse body rows. Untried control: `dense-candidates` S=1 at **K=11**, restoring the slot the sink consumes. Cheap, one combination.
-3. **Older `learned` numbers understate the method.** The missing attention sink was a construction defect, fixed 2026-07-27. Every pre-fix `learned` figure in this log (3/25, 0/3 smoke, 32K 0.00) was measured with the sink competing for learned slots. Re-quote at S=1 before any of them reaches a paper.
-4. **Checkpoint provenance.** `selector/train.py:131` saves only `{"num_layers", "head_dim", "proj_dim"}` — no flags, no target list, no argv. Recipes survive only in filenames, so "which settings produced this gate" is currently unfalsifiable. Fix before adaptation training starts or the same doubt recurs.
-5. **Timing hygiene.** At `--repeats 2` the first case of each combination carries CUDA warmup and can read below 1.0x kernel speedup (worst observed 0.686x). Use `--repeats >= 3` for any quoted timing; medians are unaffected.
-6. **No memory win.** Sparse peak exceeds dense at both lengths (16K 4.79 vs 4.66 GB; 32K 6.52 vs 6.22 GB), including on the plain `learned` path. The dense baseline already runs a memory-efficient kernel — claim time, not memory.
-7. **Uncommitted work.** All tooling above is in the working tree only; nothing from 2026-07-26/27 has been committed.
+1. **Run the frozen beam-16 configuration on ~100 new untouched prompts.** Do not sweep beam,
+   D, M, radius, or packet formatting on that set. Report answer accuracy, expanded evidence
+   recall, fully charged speed, and semantic-case-clustered uncertainty before a claim.
+2. **The sparse 32K wall is now an attributed representation failure.** Exact-route and
+   residual-summary sparse prefill topped out at 4/11 and 5/11, while the same source locations
+   re-encoded densely score 11/11 locally. Preserve that result on the complete manifest and
+   stop treating more within-attention route construction as the active lever.
+3. **Sink forcing and dense-candidates conflict.** Each helps alone (learned 3->8;
+   dense-candidates 3->16) but together give 11/25. Densified rows already reach block 0, so
+   the forced sink is pure budget overhead on the ~500 sparse body rows. Untried control:
+   `dense-candidates` S=1 at **K=11**, restoring the slot the sink consumes. This is a cheap
+   cleanup control, not a plausible rescue for the failed plug-and-play gate.
+4. **Older `learned` numbers understate the method.** The missing attention sink was a
+   construction defect, fixed 2026-07-27. Every pre-fix `learned` figure in this log (3/25,
+   0/3 smoke, 32K 0.00) was measured with the sink competing for learned slots. Re-quote at
+   S=1 before any of them reaches a paper.
+5. **Checkpoint provenance.** `selector/train.py:131` saves only
+   `{"num_layers", "head_dim", "proj_dim"}` — no flags, no target list, no argv. Recipes
+   survive only in filenames, so "which settings produced this gate" is currently
+   unfalsifiable. Fix before learned-summary or adaptation training starts.
+6. **Timing hygiene.** At `--repeats 2` the first case of each combination carries CUDA warmup
+   and can read below 1.0x kernel speedup (worst observed 0.686x). Use `--repeats >= 3` for any
+   quoted timing; summary timing must include residual layout/frontier/transfer and live K/V
+   construction.
+7. **No established memory win.** Sparse peak exceeds dense at both lengths (16K 4.79 vs
+   4.66 GB; 32K 6.52 vs 6.22 GB) on the prior exact-only path. Residual summaries add temporary
+   FP32 prefix reductions and node tables; profile them before making any memory claim.
+8. **Uncommitted work.** All tooling above, including residual summaries, is in the working
+   tree only; nothing from 2026-07-26/27 has been committed.
 
 ---
 

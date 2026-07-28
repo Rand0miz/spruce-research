@@ -25,8 +25,17 @@ from configs.long_context import (
     context_limit,
     load_model_config,
 )
+from interfaces.residual_summaries import (
+    build_residual_summary_nodes,
+    validate_residual_summary_nodes,
+)
 from interfaces.validator import validate_selected_blocks
 from sparse.attention import SPARSE_PREFILL_ATTENTION, register_sparse_prefill_attention
+from sparse.config import (
+    ResidualSummaryConfig,
+    add_residual_summary_arguments,
+    residual_summary_config_from_args,
+)
 from sparse.plotting import save_sparse_replay_plot
 from kernels.sparse_prefill import (
     SPRUCE_TRITON_SPARSE_PREFILL,
@@ -42,7 +51,9 @@ def model_device(model) -> torch.device:
 def run_once(
         model_name, implementation, inputs, selected, block_size, torch_dtype,
         load_offload_dir, *, yarn_factor=1.0,
-        original_max_position_embeddings=QWEN_NATIVE_CONTEXT):
+        original_max_position_embeddings=QWEN_NATIVE_CONTEXT,
+        residual_summary_nodes=None,
+        summary_config: ResidualSummaryConfig | None = None):
     from transformers import AutoModelForCausalLM
 
     os.makedirs(load_offload_dir, exist_ok=True)
@@ -73,6 +84,19 @@ def run_once(
             block_size=block_size,
             validate_selected_blocks_input=False,
         )
+    if summary_config is not None and summary_config.enabled:
+        if implementation != SPARSE_PREFILL_ATTENTION:
+            raise ValueError(
+                "residual summaries are currently implemented only by the "
+                "PyTorch reference backend"
+            )
+        if residual_summary_nodes is None:
+            raise ValueError("enabled residual summaries require a complete frontier")
+        kwargs.update(
+            residual_summary_nodes=residual_summary_nodes.to(device),
+            validate_residual_summary_nodes_input=False,
+            **summary_config.attention_kwargs(),
+        )
     # Do not call the CausalLM wrapper: its [batch, seq_len, vocab] logits are
     # enormous at 16K-32K (and converting them to fp32 caused the reported OOM).
     # The final hidden state is enough to obtain the next-token distribution,
@@ -102,6 +126,7 @@ def main():
         "--backend", choices=("pytorch", "triton"), default="pytorch",
         help="sparse attention implementation; Triton is 64-token, unpadded, prefill-only",
     )
+    add_residual_summary_arguments(parser)
     parser.add_argument("--selected-blocks", required=True, help=".pt produced by export_selected_blocks.py")
     parser.add_argument(
         "--teacher-target",
@@ -136,6 +161,12 @@ def main():
     parser.add_argument("--plot-kv-group", type=int, default=0, help="KV group to show in routing heatmap")
     parser.add_argument("--plot-top-k", type=int, default=15, help="number of next-token candidates to show")
     args = parser.parse_args()
+    try:
+        summary_config = residual_summary_config_from_args(args)
+    except ValueError as error:
+        parser.error(str(error))
+    if summary_config.enabled and args.backend != "pytorch":
+        parser.error("--residual-summaries currently requires --backend pytorch")
 
     from transformers import AutoTokenizer
 
@@ -145,6 +176,14 @@ def main():
     selected = artifact["selected_blocks"]
     meta = artifact["meta"]
     validate_selected_blocks(selected)
+    residual_nodes = None
+    if summary_config.enabled:
+        residual_nodes = build_residual_summary_nodes(
+            selected, validate_selected=False
+        )
+        validate_residual_summary_nodes(
+            selected, residual_nodes, validate_selected=False
+        )
     block_size = int(meta["block_size"])
 
     teacher_target = args.teacher_target or meta.get("source")
@@ -200,14 +239,27 @@ def main():
         args.model, sparse_implementation, encoded, selected, block_size, dtype,
         args.load_offload_dir, yarn_factor=args.yarn_factor,
         original_max_position_embeddings=args.original_max_position_embeddings,
+        residual_summary_nodes=residual_nodes,
+        summary_config=summary_config,
     )
     print(
         f"sparse replay passed: backend={args.backend} case={teacher_meta['case_id']} "
-        f"next-token logits shape={tuple(sparse_logits.shape)} block_size={block_size}"
+        f"next-token logits shape={tuple(sparse_logits.shape)} block_size={block_size} "
+        f"residual_summaries={summary_config.enabled} "
+        f"summary_prototypes={summary_config.prototypes}"
     )
 
     if args.save_logits:
-        torch.save({"logits": sparse_logits, "selected_blocks": args.selected_blocks, "meta": meta}, args.save_logits)
+        torch.save(
+            {
+                "logits": sparse_logits,
+                "selected_blocks": args.selected_blocks,
+                "residual_summary_nodes": residual_nodes,
+                "summary_config": summary_config.__dict__,
+                "meta": meta,
+            },
+            args.save_logits,
+        )
         print(f"saved sparse logits to {args.save_logits}")
 
     if args.plot:

@@ -1,0 +1,128 @@
+{
+  "kind": "spruce_pre_qwen_beam_followup_v1",
+  "created_utc": "2026-07-28T04:36:42.208299+00:00",
+  "archive_sha256": "381D4E742AC01016CFBBAB6B76CE28673ABAF3D62B6AF8FFC6AF26C37549D266",
+  "run_id": "pre_qwen_beam16_381d4e742ac0",
+  "report_path": "/content/drive/MyDrive/SPRUCE_COLAB/outputs/pre_qwen_beam16_381d4e742ac0/pre_qwen_beam16_e2e_25.json",
+  "evaluation_status": "followup_on_opened_25_cases_not_untouched_gate",
+  "untouched_gate_claim": false,
+  "only_method_change": {
+    "beam": [
+      4,
+      16
+    ]
+  },
+  "config": {
+    "candidate_blocks": 4,
+    "block_radius": 1,
+    "boundary": "paragraph",
+    "beam": 16,
+    "feature_dim": 512,
+    "unigram_fraction": 0.5,
+    "idf_power": 2.0,
+    "radix": 2,
+    "repeats": 3,
+    "max_new_tokens": 32
+  },
+  "timing_scope": {
+    "input_state": "prompt and question strings already in memory",
+    "excluded": [
+      "manifest file read",
+      "model/tokenizer load",
+      "one backend warm-up"
+    ],
+    "dense_charged": [
+      "full-prompt tokenization",
+      "host-to-device input transfer",
+      "dense prefill",
+      "dense decode"
+    ],
+    "compiled_charged": [
+      "full-prompt offset tokenization",
+      "lexical hierarchy construction",
+      "question feature construction",
+      "top-down tree traversal",
+      "exact-text span expansion and stitching",
+      "compact-prompt tokenization",
+      "host-to-device input transfer",
+      "dense prefill",
+      "dense decode"
+    ],
+    "index_cache": "disabled; rebuilt on every measured repeat"
+  },
+  "aggregate": {
+    "cases": 25,
+    "dense": {
+      "cases": 25,
+      "exact_count": 25,
+      "exact_rate": 1.0,
+      "sum_request_seconds": 74.08559276699987,
+      "median_request_seconds": 1.913067328000011,
+      "median_prefill_seconds": 1.6351617799999758
+    },
+    "compiled": {
+      "cases": 25,
+      "exact_count": 25,
+      "exact_rate": 1.0,
+      "sum_request_seconds": 9.850865187999716,
+      "median_request_seconds": 0.3983157789999723,
+      "median_prefill_seconds": 0.12371830699999009,
+      "median_input_tokens": 1833,
+      "median_compression_fraction": 0.08963243375259494,
+      "needle_block_recall": 0.84,
+      "expanded_needle_recall": 1.0
+    },
+    "by_requested_length": {
+      "16384": {
+        "dense": {
+          "cases": 14,
+          "exact_count": 14,
+          "exact_rate": 1.0
+        },
+        "compiled": {
+          "cases": 14,
+          "exact_count": 14,
+          "exact_rate": 1.0
+        },
+        "sum_dense_request_seconds": 26.12761237799998,
+        "sum_compiled_request_seconds": 5.1199663909999344
+      },
+      "32768": {
+        "dense": {
+          "cases": 11,
+          "exact_count": 11,
+          "exact_rate": 1.0
+        },
+        "compiled": {
+          "cases": 11,
+          "exact_count": 11,
+          "exact_rate": 1.0
+        },
+        "sum_dense_request_seconds": 47.957980388999886,
+        "sum_compiled_request_seconds": 4.7308987969997816
+      }
+    },
+    "sum_weighted_speedup": 7.520719383841597
+  },
+  "comparison_to_beam4": {
+    "beam": {
+      "baseline": 4,
+      "followup": 16
+    },
+    "compiled_exact_count": {
+      "baseline": 23,
+      "followup": 25,
+      "delta": 2
+    },
+    "expanded_needle_recall": {
+      "baseline": 0.96,
+      "followup": 1.0
+    },
+    "sum_weighted_speedup": {
+      "baseline": 7.455960327794852,
+      "followup": 7.520719383841597
+    }
+  },
+  "engineering_accuracy_threshold_met": true,
+  "speed_threshold_met": true
+}

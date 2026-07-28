@@ -11,7 +11,16 @@ from typing import Optional
 
 import torch
 
+from interfaces.residual_summaries import (
+    build_residual_tree_layout,
+    validate_residual_summary_nodes,
+)
 from interfaces.validator import validate_selected_blocks
+from sparse.config import SUMMARY_MODES, SUMMARY_PROTOTYPES
+from sparse.summaries import (
+    build_kv_summary_table,
+    token_validity_from_attention_mask,
+)
 
 
 SPARSE_PREFILL_ATTENTION = "spruce_sparse_prefill"
@@ -81,6 +90,12 @@ def sparse_prefill_attention_forward(
     selected_blocks: torch.Tensor,
     block_size: int,
     validate_selected_blocks_input: bool = True,
+    residual_summaries: bool = False,
+    residual_summary_nodes: Optional[torch.Tensor] = None,
+    summary_prototypes: int = 1,
+    summary_mode: str = "mean",
+    summary_checkpoint: Optional[str] = None,
+    validate_residual_summary_nodes_input: bool = True,
     **kwargs,
 ) -> tuple[torch.Tensor, None]:
     """Transformers AttentionInterface implementation for sparse prefill.
@@ -95,6 +110,36 @@ def sparse_prefill_attention_forward(
         query, key, value, selected_blocks, block_size, layer_idx,
         validate_blocks=validate_selected_blocks_input,
     )
+    if summary_prototypes not in SUMMARY_PROTOTYPES:
+        raise ValueError(
+            f"summary_prototypes must be one of {SUMMARY_PROTOTYPES}, "
+            f"got {summary_prototypes}"
+        )
+    if summary_mode not in SUMMARY_MODES:
+        raise ValueError(
+            f"summary_mode must be one of {SUMMARY_MODES}, got {summary_mode!r}"
+        )
+    if residual_summaries:
+        if residual_summary_nodes is None:
+            raise ValueError(
+                "residual_summaries=True requires residual_summary_nodes; "
+                "construct the complete frontier before model forward"
+            )
+        if summary_mode == "learned":
+            if not summary_checkpoint:
+                raise ValueError(
+                    "summary_mode='learned' requires summary_checkpoint"
+                )
+            raise NotImplementedError(
+                "The learned compressor is gated on deterministic-summary "
+                "evaluation and is not implemented before that gate passes."
+            )
+        if validate_residual_summary_nodes_input:
+            validate_residual_summary_nodes(
+                selected_blocks,
+                residual_summary_nodes,
+                validate_selected=not validate_selected_blocks_input,
+            )
 
     B, Hq, T, D = query.shape
     Hkv = key.shape[1]
@@ -108,10 +153,35 @@ def sparse_prefill_attention_forward(
     # literal block-sparse operation, this prevents the reference path from
     # allocating [batch, heads, seq_len, seq_len] scores.
     output = torch.empty_like(query)
-    selected = selected_blocks[:, layer_idx].to(torch.long)
+    selected = selected_blocks[:, layer_idx].to(
+        device=query.device, dtype=torch.long
+    )
     qblocks = selected.shape[2]
     score_floor = torch.finfo(query.dtype).min
     token_offsets = torch.arange(block_size, device=query.device)
+    residual = None
+    summary_table = None
+    if residual_summaries:
+        if residual_summary_nodes.shape[:4] != selected_blocks.shape[:4]:
+            raise ValueError(
+                "residual_summary_nodes must match selected_blocks through "
+                "the query-block dimension"
+            )
+        residual = residual_summary_nodes[:, layer_idx].to(
+            device=query.device, dtype=torch.long
+        )
+        layout = build_residual_tree_layout(qblocks)
+        token_mask = token_validity_from_attention_mask(
+            attention_mask, batch=B, seq_len=T
+        )
+        summary_table = build_kv_summary_table(
+            key,
+            value,
+            layout,
+            block_size=block_size,
+            prototypes=summary_prototypes,
+            token_mask=token_mask,
+        )
 
     for qblock in range(qblocks):
         q_start = qblock * block_size
@@ -157,9 +227,45 @@ def sparse_prefill_attention_forward(
                         batch_idx:batch_idx + 1, :, q_start:q_end
                     ].index_select(-1, key_indices)
                     scores = scores + sparse_mask.to(dtype=scores.dtype)
+
+                combined_values = v.float()
+                if residual is not None:
+                    node_ids = residual[batch_idx, kv_head, qblock]
+                    node_ids = node_ids[node_ids >= 0]
+                    if node_ids.numel():
+                        summary_counts = summary_table.counts[
+                            batch_idx
+                        ].index_select(0, node_ids).flatten()
+                        valid_prototypes = summary_counts > 0
+                        summary_keys = summary_table.keys[
+                            batch_idx, kv_head
+                        ].index_select(0, node_ids).flatten(0, 1)
+                        summary_values = summary_table.values[
+                            batch_idx, kv_head
+                        ].index_select(0, node_ids).flatten(0, 1)
+                        summary_bias = summary_table.log_counts[
+                            batch_idx
+                        ].index_select(0, node_ids).flatten()
+                        summary_keys = summary_keys[valid_prototypes]
+                        summary_values = summary_values[valid_prototypes]
+                        summary_bias = summary_bias[valid_prototypes]
+                        if summary_keys.numel():
+                            summary_scores = torch.matmul(
+                                q.float(),
+                                summary_keys[None, None].transpose(-1, -2),
+                            ) / math.sqrt(D)
+                            summary_scores = (
+                                summary_scores
+                                + summary_bias[None, None, None, :]
+                            )
+                            scores = torch.cat([scores, summary_scores], dim=-1)
+                            combined_values = torch.cat(
+                                [combined_values, summary_values[None, None]],
+                                dim=2,
+                            )
                 probabilities = torch.softmax(scores, dim=-1)
                 output[batch_idx:batch_idx + 1, head_start:head_end, q_start:q_end] = torch.matmul(
-                    probabilities, v.float()
+                    probabilities, combined_values
                 ).to(query.dtype)
 
     # Transformers' Qwen attention module reshapes this directly to

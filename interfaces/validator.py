@@ -60,3 +60,12 @@ def validate_selected_blocks(t: torch.Tensor, local_window: int = LOCAL_WINDOW) 
                             f"Padding is not trailing-only at [b={b}, l={l}, g={g}, q={q}]: "
                             f"{row}"
                         )
+
+
+def validate_residual_summary_nodes(*args, **kwargs) -> None:
+    """Lazy compatibility export for the residual partition validator."""
+    from interfaces.residual_summaries import (
+        validate_residual_summary_nodes as _validate,
+    )
+
+    _validate(*args, **kwargs)

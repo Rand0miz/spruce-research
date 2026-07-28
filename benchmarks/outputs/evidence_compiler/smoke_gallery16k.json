@@ -1,0 +1,377 @@
+{
+  "kind": "spruce_evidence_compiler_eval_v1",
+  "model": "Qwen/Qwen2.5-Coder-1.5B-Instruct",
+  "runtime": {
+    "platform": "Windows-11-10.0.26200-SP0",
+    "python": "3.12.10",
+    "torch": "2.12.1+cu126",
+    "cuda_runtime": "12.6",
+    "cuda_available": true,
+    "transformers": "5.13.0",
+    "triton": "3.7.1",
+    "gpu": {
+      "index": 0,
+      "name": "NVIDIA GeForce RTX 4070 Laptop GPU",
+      "total_memory_gb": 8.585216,
+      "compute_capability": "8.9"
+    }
+  },
+  "gate": "C:\\Users\\myles\\SPRUCE\\selector_ckpt\\natural160_replay40_lamt075_lamn025_k10_lr5e4_e300.pt",
+  "selector_feature_provenance": "saved teacher-extraction Q/K features; extraction time excluded",
+  "config": {
+    "modes": [
+      "oracle",
+      "flat",
+      "tree"
+    ],
+    "candidate_blocks": 4,
+    "block_radius": 1,
+    "boundary": "paragraph",
+    "beam": 8,
+    "radix": 2,
+    "selector_layer_chunk": 4,
+    "selector_device": "cpu",
+    "repeats": 1,
+    "max_new_tokens": 32
+  },
+  "rope": {
+    "enabled": false,
+    "rope_type": "default",
+    "factor": 1.0,
+    "original_max_position_embeddings": 32768,
+    "max_position_embeddings": 32768,
+    "static": false
+  },
+  "cases": [
+    {
+      "target": "C:\\Users\\myles\\SPRUCE\\teacher_targets\\1.5B_natural_heldout_verified\\teacher_gallery_reopened_april_1986_L16384_d0.5_s20260725_len16375_blk64_d0.5.pt",
+      "case_id": "gallery_reopened_april_1986_L16384_d0.5_s20260725",
+      "requested_length": 16384,
+      "seq_len": 16375,
+      "block_size": 64,
+      "needle_block": 127,
+      "modes": {
+        "oracle": {
+          "answer": "17 April 1986",
+          "answer_repeat_match": true,
+          "exact": true,
+          "fuzzy": 1.0,
+          "prefill_seconds": 0.3837433000007877,
+          "decode_seconds": 0.6289299999916693,
+          "seconds": 1.012673299992457,
+          "peak_memory_allocated_gb": 3.166837248,
+          "peak_memory_reserved_gb": 3.1981568,
+          "timing_samples": [
+            {
+              "seconds": 1.012673299992457,
+              "prefill_seconds": 0.3837433000007877,
+              "decode_seconds": 0.6289299999916693,
+              "peak_memory_allocated_gb": 3.166837248,
+              "peak_memory_reserved_gb": 3.1981568
+            }
+          ],
+          "selection": {
+            "blocks": [
+              127
+            ],
+            "scores": null,
+            "selection_seconds": 0.0,
+            "selection_complexity": "oracle_attribution_only",
+            "tree_candidate_union": null
+          },
+          "feature_load_seconds": 0.22188000001187902,
+          "compile_seconds": 0.10563369998999406,
+          "packet": {
+            "selected_blocks": [
+              127
+            ],
+            "expanded_blocks": [
+              126,
+              127,
+              128
+            ],
+            "span_count": 1,
+            "spans": [
+              {
+                "source_token_start": 8014,
+                "source_token_end": 8429,
+                "source_char_start": 38139,
+                "source_char_end": 40110,
+                "source_blocks": [
+                  126,
+                  127,
+                  128
+                ],
+                "text_chars": 1971
+              }
+            ],
+            "original_prompt_tokens": 16375,
+            "evidence_source_tokens": 415,
+            "compiled_prompt_tokens": 545,
+            "compression_fraction": 0.033282442748091605
+          },
+          "selected_contains_needle": true,
+          "expanded_contains_needle": true,
+          "diagnostic_total_seconds": 1.34018699999433
+        },
+        "flat": {
+          "answer": "17 April 1986",
+          "answer_repeat_match": true,
+          "exact": true,
+          "fuzzy": 1.0,
+          "prefill_seconds": 0.21957930001372006,
+          "decode_seconds": 0.716513199993642,
+          "seconds": 0.9360925000073621,
+          "peak_memory_allocated_gb": 3.277840384,
+          "peak_memory_reserved_gb": 3.309305856,
+          "timing_samples": [
+            {
+              "seconds": 0.9360925000073621,
+              "prefill_seconds": 0.21957930001372006,
+              "decode_seconds": 0.716513199993642,
+              "peak_memory_allocated_gb": 3.277840384,
+              "peak_memory_reserved_gb": 3.309305856
+            }
+          ],
+          "selection": {
+            "blocks": [
+              127,
+              255,
+              0,
+              128
+            ],
+            "scores": [
+              7.790194988250732,
+              7.579131603240967,
+              7.037267684936523,
+              6.991444110870361
+            ],
+            "selection_seconds": 0.6395963999966625,
+            "selection_complexity": "flat_O(n)_diagnostic_ceiling",
+            "tree_candidate_union": null
+          },
+          "feature_load_seconds": 0.22188000001187902,
+          "compile_seconds": 0.0721585999999661,
+          "packet": {
+            "selected_blocks": [
+              0,
+              127,
+              128,
+              255
+            ],
+            "expanded_blocks": [
+              0,
+              1,
+              126,
+              127,
+              128,
+              129,
+              254,
+              255
+            ],
+            "span_count": 3,
+            "spans": [
+              {
+                "source_token_start": 38,
+                "source_token_end": 268,
+                "source_char_start": 210,
+                "source_char_end": 1333,
+                "source_blocks": [
+                  0,
+                  1
+                ],
+                "text_chars": 1123
+              },
+              {
+                "source_token_start": 8014,
+                "source_token_end": 8429,
+                "source_char_start": 38139,
+                "source_char_end": 40110,
+                "source_blocks": [
+                  126,
+                  127,
+                  128,
+                  129
+                ],
+                "text_chars": 1971
+              },
+              {
+                "source_token_start": 16172,
+                "source_token_end": 16350,
+                "source_char_start": 76835,
+                "source_char_end": 77652,
+                "source_blocks": [
+                  254,
+                  255
+                ],
+                "text_chars": 817
+              }
+            ],
+            "original_prompt_tokens": 16375,
+            "evidence_source_tokens": 823,
+            "compiled_prompt_tokens": 1006,
+            "compression_fraction": 0.06143511450381679
+          },
+          "selected_contains_needle": true,
+          "expanded_contains_needle": true,
+          "diagnostic_total_seconds": 1.8697275000158697
+        },
+        "tree": {
+          "answer": "17 April 1986",
+          "answer_repeat_match": true,
+          "exact": true,
+          "fuzzy": 1.0,
+          "prefill_seconds": 0.18153970000275876,
+          "decode_seconds": 0.4987379999947734,
+          "seconds": 0.6802776999975322,
+          "peak_memory_allocated_gb": 3.277840384,
+          "peak_memory_reserved_gb": 3.309305856,
+          "timing_samples": [
+            {
+              "seconds": 0.6802776999975322,
+              "prefill_seconds": 0.18153970000275876,
+              "decode_seconds": 0.4987379999947734,
+              "peak_memory_allocated_gb": 3.277840384,
+              "peak_memory_reserved_gb": 3.309305856
+            }
+          ],
+          "selection": {
+            "blocks": [
+              127,
+              255,
+              0,
+              128
+            ],
+            "scores": [
+              7.790194988250732,
+              7.579131603240967,
+              7.037267684936523,
+              6.991444110870361
+            ],
+            "selection_seconds": 1.5922308999870438,
+            "selection_complexity": "recursive_O(log_n)_plus_bounded_rerank",
+            "tree_candidate_union": 71
+          },
+          "feature_load_seconds": 0.22188000001187902,
+          "compile_seconds": 0.06663030000345316,
+          "packet": {
+            "selected_blocks": [
+              0,
+              127,
+              128,
+              255
+            ],
+            "expanded_blocks": [
+              0,
+              1,
+              126,
+              127,
+              128,
+              129,
+              254,
+              255
+            ],
+            "span_count": 3,
+            "spans": [
+              {
+                "source_token_start": 38,
+                "source_token_end": 268,
+                "source_char_start": 210,
+                "source_char_end": 1333,
+                "source_blocks": [
+                  0,
+                  1
+                ],
+                "text_chars": 1123
+              },
+              {
+                "source_token_start": 8014,
+                "source_token_end": 8429,
+                "source_char_start": 38139,
+                "source_char_end": 40110,
+                "source_blocks": [
+                  126,
+                  127,
+                  128,
+                  129
+                ],
+                "text_chars": 1971
+              },
+              {
+                "source_token_start": 16172,
+                "source_token_end": 16350,
+                "source_char_start": 76835,
+                "source_char_end": 77652,
+                "source_blocks": [
+                  254,
+                  255
+                ],
+                "text_chars": 817
+              }
+            ],
+            "original_prompt_tokens": 16375,
+            "evidence_source_tokens": 823,
+            "compiled_prompt_tokens": 1006,
+            "compression_fraction": 0.06143511450381679
+          },
+          "selected_contains_needle": true,
+          "expanded_contains_needle": true,
+          "diagnostic_total_seconds": 2.561018899999908
+        }
+      }
+    }
+  ],
+  "aggregate": {
+    "oracle": {
+      "cases": 1,
+      "exact_count": 1,
+      "exact_rate": 1.0,
+      "by_requested_length": {
+        "16384": {
+          "cases": 1,
+          "exact_count": 1,
+          "exact_rate": 1.0
+        }
+      },
+      "median_compiled_prompt_tokens": 545,
+      "median_compression_fraction": 0.033282442748091605,
+      "median_prefill_seconds": 0.3837433000007877,
+      "needle_block_recall": 1.0,
+      "expanded_needle_recall": 1.0
+    },
+    "flat": {
+      "cases": 1,
+      "exact_count": 1,
+      "exact_rate": 1.0,
+      "by_requested_length": {
+        "16384": {
+          "cases": 1,
+          "exact_count": 1,
+          "exact_rate": 1.0
+        }
+      },
+      "median_compiled_prompt_tokens": 1006,
+      "median_compression_fraction": 0.06143511450381679,
+      "median_prefill_seconds": 0.21957930001372006,
+      "needle_block_recall": 1.0,
+      "expanded_needle_recall": 1.0
+    },
+    "tree": {
+      "cases": 1,
+      "exact_count": 1,
+      "exact_rate": 1.0,
+      "by_requested_length": {
+        "16384": {
+          "cases": 1,
+          "exact_count": 1,
+          "exact_rate": 1.0
+        }
+      },
+      "median_compiled_prompt_tokens": 1006,
+      "median_compression_fraction": 0.06143511450381679,
+      "median_prefill_seconds": 0.18153970000275876,
+      "needle_block_recall": 1.0,
+      "expanded_needle_recall": 1.0
+    }
+  }
+}

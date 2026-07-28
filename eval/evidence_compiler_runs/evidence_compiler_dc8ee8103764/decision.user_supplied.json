@@ -1,0 +1,92 @@
+{
+  "kind": "spruce_evidence_compiler_decision_v1",
+  "created_utc": "2026-07-28T03:35:12.211235+00:00",
+  "archive_sha256": "DC8EE8103764C0F57A8739F516444F9480DC4BDCB22A6E7682A03802D6FFA300",
+  "run_id": "evidence_compiler_dc8ee8103764",
+  "report_path": "/content/drive/MyDrive/SPRUCE_COLAB/outputs/evidence_compiler_dc8ee8103764/evidence_compiler_25.json",
+  "locked_config": {
+    "modes": [
+      "oracle",
+      "flat",
+      "tree"
+    ],
+    "candidate_blocks": 4,
+    "block_radius": 1,
+    "boundary": "paragraph",
+    "beam": 8,
+    "radix": 2,
+    "selector_layer_chunk": 4,
+    "selector_device": "cpu",
+    "repeats": 1,
+    "max_new_tokens": 32
+  },
+  "oracle": {
+    "cases": 25,
+    "exact_count": 24,
+    "exact_rate": 0.96,
+    "by_requested_length": {
+      "16384": {
+        "cases": 14,
+        "exact_count": 13,
+        "exact_rate": 0.9285714285714286
+      },
+      "32768": {
+        "cases": 11,
+        "exact_count": 11,
+        "exact_rate": 1.0
+      }
+    },
+    "median_compiled_prompt_tokens": 590,
+    "median_compression_fraction": 0.02986624320527698,
+    "median_prefill_seconds": 0.040542394999988574,
+    "needle_block_recall": 1.0,
+    "expanded_needle_recall": 1.0
+  },
+  "flat": {
+    "cases": 25,
+    "exact_count": 24,
+    "exact_rate": 0.96,
+    "by_requested_length": {
+      "16384": {
+        "cases": 14,
+        "exact_count": 13,
+        "exact_rate": 0.9285714285714286
+      },
+      "32768": {
+        "cases": 11,
+        "exact_count": 11,
+        "exact_rate": 1.0
+      }
+    },
+    "median_compiled_prompt_tokens": 1358,
+    "median_compression_fraction": 0.057271950177066794,
+    "median_prefill_seconds": 0.08895781800003988,
+    "needle_block_recall": 0.96,
+    "expanded_needle_recall": 0.96
+  },
+  "tree": {
+    "cases": 25,
+    "exact_count": 24,
+    "exact_rate": 0.96,
+    "by_requested_length": {
+      "16384": {
+        "cases": 14,
+        "exact_count": 13,
+        "exact_rate": 0.9285714285714286
+      },
+      "32768": {
+        "cases": 11,
+        "exact_count": 11,
+        "exact_rate": 1.0
+      }
+    },
+    "median_compiled_prompt_tokens": 1358,
+    "median_compression_fraction": 0.057271950177066794,
+    "median_prefill_seconds": 0.08664217600005486,
+    "needle_block_recall": 0.96,
+    "expanded_needle_recall": 0.96
+  },
+  "accuracy_gate_passed": true,
+  "deployability_gate_passed": false,
+  "deployability_blocker": "selector consumes saved teacher-extraction Q/K features; no cheap live pre-Qwen feature path or matched end-to-end speed exists"
+}

@@ -27,6 +27,13 @@ import subprocess
 import sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+if ROOT not in sys.path:
+    sys.path.insert(0, ROOT)
+
+from sparse.config import (
+    add_residual_summary_arguments,
+    residual_summary_config_from_args,
+)
 
 DEFAULT_MODES = (
     "learned", "oracle-needle", "dense-reader", "oracle-dense-evidence",
@@ -38,7 +45,8 @@ CANDIDATE_MODES = ("dense-candidates",)
 
 
 def combo_stem(backend, mode, candidate_blocks, neighborhood=0,
-               k_selected=None, sink_blocks=0, dense_layers=()):
+               k_selected=None, sink_blocks=0, dense_layers=(),
+               summary_prototypes=None):
     parts = [backend, mode]
     if mode in CANDIDATE_MODES:
         parts.append(f"M{candidate_blocks}")
@@ -50,6 +58,8 @@ def combo_stem(backend, mode, candidate_blocks, neighborhood=0,
         parts.append(f"S{sink_blocks}")
     if dense_layers:
         parts.append("D" + "-".join(str(layer) for layer in dense_layers))
+    if summary_prototypes is not None:
+        parts.append(f"RS-P{summary_prototypes}")
     return "__".join(parts)
 
 
@@ -79,6 +89,15 @@ def run_combo(args, targets, mode, backend, candidate_blocks, neighborhood,
         command.extend(["--model", args.model])
     if dense_layers:
         command.extend(["--dense-layers", *map(str, dense_layers)])
+    if args.summary_config.enabled:
+        command.extend([
+            "--residual-summaries",
+            "--summary-prototypes", str(args.summary_config.prototypes),
+            "--summary-mode", args.summary_config.mode,
+        ])
+        if args.summary_config.checkpoint:
+            command.extend([
+                "--summary-checkpoint", args.summary_config.checkpoint])
     with open(log_path, "w", encoding="utf-8") as log:
         log.write(" ".join(command) + "\n\n")
         log.flush()
@@ -260,11 +279,19 @@ def main():
         "--include-dense", action="store_true",
         help="keep the paired dense run so speedups are measured on the same "
              "routes (required for any efficiency claim about dense rows)")
+    add_residual_summary_arguments(parser)
     parser.add_argument(
         "--resume", action="store_true",
         help="skip combinations whose report JSON already exists")
     parser.add_argument("--out-dir", required=True)
     args = parser.parse_args()
+    try:
+        args.summary_config = residual_summary_config_from_args(args)
+    except ValueError as error:
+        parser.error(str(error))
+    if args.summary_config.enabled and any(
+            backend != "pytorch" for backend in args.backends):
+        parser.error("--residual-summaries requires --backends pytorch")
 
     if any(value < 1 for value in args.candidate_block_values):
         raise SystemExit("--candidate-block-values must be >= 1")
@@ -304,7 +331,11 @@ def main():
          sink_blocks) = combo
         stem = combo_stem(
             backend, mode, candidate_blocks, neighborhood,
-            k_selected, sink_blocks, args.dense_layers)
+            k_selected, sink_blocks, args.dense_layers,
+            summary_prototypes=(
+                args.summary_config.prototypes
+                if args.summary_config.enabled else None
+            ))
         out_json = os.path.join(args.out_dir, f"{stem}.json")
         log_path = os.path.join(args.out_dir, f"{stem}.log")
         if args.resume and os.path.isfile(out_json):

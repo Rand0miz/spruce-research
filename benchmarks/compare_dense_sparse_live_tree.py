@@ -40,6 +40,11 @@ from benchmarks.compare_dense_sparse import (
     runtime_metadata,
 )
 from eval.score import score_retrival
+from interfaces.residual_summaries import (
+    build_residual_summary_nodes,
+    build_residual_tree_layout,
+    validate_residual_summary_nodes,
+)
 from interfaces.validator import validate_selected_blocks
 from kernels.sparse_prefill import (
     KERNEL_VARIANTS,
@@ -64,6 +69,12 @@ from sparse.attention import (
     SPARSE_PREFILL_ATTENTION,
     register_sparse_prefill_attention,
 )
+from sparse.config import (
+    ResidualSummaryConfig,
+    add_residual_summary_arguments,
+    residual_summary_config_from_args,
+)
+from sparse.summaries import residual_attention_density
 from selector.tree import build_key_tree
 from teacher.prompt_replay import reconstruct_teacher_prompt
 
@@ -209,7 +220,8 @@ def live_route(gate, gate_config, target_path, *, beam, radix, k_selected,
 
 
 def sparse_prefill_kwargs(
-        backend, selected, block_size, kernel_variant, dense_layers=()):
+        backend, selected, block_size, kernel_variant, dense_layers=(),
+        residual_nodes=None, summary_config=None):
     """Prefill kwargs for either sparse backend; only Triton takes a variant."""
     kwargs = {
         "selected_blocks": selected,
@@ -219,6 +231,14 @@ def sparse_prefill_kwargs(
     if backend == "triton":
         kwargs["kernel_variant"] = kernel_variant
         kwargs["dense_layers"] = tuple(int(layer) for layer in dense_layers)
+    if summary_config is not None and summary_config.enabled:
+        if residual_nodes is None:
+            raise ValueError("residual summary mode requires a complete frontier")
+        kwargs.update(
+            residual_summary_nodes=residual_nodes,
+            validate_residual_summary_nodes_input=False,
+            **summary_config.attention_kwargs(),
+        )
     return kwargs
 
 
@@ -251,12 +271,31 @@ def _warmup_selected(case, k_selected, warmup_tokens, device):
     return selected
 
 
+def _warmup_summary_selected(case, warmup_tokens, device):
+    """Small validator-compliant local route for the summary reference path."""
+    qblocks = math.ceil(warmup_tokens / case["block_size"])
+    selected = torch.full(
+        (1, case["num_layers"], case["num_groups"], qblocks, 2),
+        -1,
+        dtype=torch.int32,
+        device=device,
+    )
+    for query_block in range(qblocks):
+        start = max(0, query_block - 1)
+        row = torch.arange(
+            start, query_block + 1, dtype=torch.int32, device=device
+        )
+        selected[..., query_block, : row.numel()] = row
+    return selected
+
+
 def _run_sparse_cases(
         model, gate, gate_config, cases, args, tokenizer, *,
         beam, k_selected,
         sparse_implementation=SPRUCE_TRITON_SPARSE_PREFILL):
     backend = getattr(args, "backend", "triton")
     route_mode = getattr(args, "route_mode", "learned")
+    summary_config = getattr(args, "summary_config", ResidualSummaryConfig())
     device = _model_device(model)
     results = {}
     for case_index, case in enumerate(cases):
@@ -358,17 +397,66 @@ def _run_sparse_cases(
                     "spot_k_min_tokens": int(args.spot_k_min_tokens),
                     "oracle_route_width": int(selected.shape[-1]),
                 })
-            route_timing.update(charged_route_density(
-                selected, getattr(args, "dense_layers", ())))
             if route_mode != "learned" and repeat == 0:
                 validate_selected_blocks(
                     selected.detach().cpu(), local_window=args.local_window)
+            residual_nodes = None
+            residual_route_seconds = 0.0
+            if summary_config.enabled:
+                started = time.perf_counter()
+                residual_layout = build_residual_tree_layout(selected.shape[3])
+                route_timing["residual_tree_build_seconds"] = (
+                    time.perf_counter() - started
+                )
+                started = time.perf_counter()
+                residual_nodes = build_residual_summary_nodes(
+                    selected,
+                    layout=residual_layout,
+                    validate_selected=False,
+                )
+                _sync(device)
+                route_timing["residual_frontier_and_transfer_seconds"] = (
+                    time.perf_counter() - started
+                )
+                residual_route_seconds = (
+                    route_timing["residual_tree_build_seconds"]
+                    + route_timing["residual_frontier_and_transfer_seconds"]
+                )
+                route_timing["residual_route_seconds"] = residual_route_seconds
+                if repeat == 0:
+                    validate_residual_summary_nodes(
+                        selected.detach().cpu(),
+                        residual_nodes.detach().cpu(),
+                        validate_selected=False,
+                    )
+                route_timing.update({
+                    "dense_layers": [],
+                    "dense_layer_count": 0,
+                    "dense_layer_fraction": 0.0,
+                    **residual_attention_density(
+                        selected,
+                        residual_nodes,
+                        seq_len=case["seq_len"],
+                        block_size=case["block_size"],
+                        prototypes=summary_config.prototypes,
+                    ),
+                })
+            else:
+                route_timing.update(charged_route_density(
+                    selected, getattr(args, "dense_layers", ())))
+                route_timing.update({
+                    "residual_tree_build_seconds": 0.0,
+                    "residual_frontier_and_transfer_seconds": 0.0,
+                    "residual_route_seconds": 0.0,
+                })
             _set_attention_backend(model, sparse_implementation)
             token_ids, model_timing = _generate(
                 model, case["encoded"], args.max_new_tokens,
                 prefill_kwargs=sparse_prefill_kwargs(
                     backend, selected, case["block_size"], args.kernel_variant,
-                    dense_layers=getattr(args, "dense_layers", ())),
+                    dense_layers=getattr(args, "dense_layers", ()),
+                    residual_nodes=residual_nodes,
+                    summary_config=summary_config),
             )
             answer = tokenizer.decode(token_ids, skip_special_tokens=True)
             answers.append(answer)
@@ -381,16 +469,26 @@ def _run_sparse_cases(
             else:
                 sample["peak_memory_allocated_gb"] = 0.0
                 sample["peak_memory_reserved_gb"] = 0.0
-            sample["live_prefill_seconds"] = sample["selector_seconds"] + sample["prefill_seconds"]
-            sample["live_total_seconds"] = sample["selector_seconds"] + sample["seconds"]
+            sample["live_prefill_seconds"] = (
+                sample["selector_seconds"]
+                + residual_route_seconds
+                + sample["prefill_seconds"]
+            )
+            sample["live_total_seconds"] = (
+                sample["selector_seconds"]
+                + residual_route_seconds
+                + sample["seconds"]
+            )
             samples.append(sample)
-            del selected
+            del selected, residual_nodes
         del features
         gc.collect()
 
         timing_keys = (
             "feature_load_seconds", "tree_build_seconds", "tree_traversal_seconds",
             "route_pack_seconds", "route_transfer_seconds", "selector_seconds",
+            "residual_tree_build_seconds",
+            "residual_frontier_and_transfer_seconds", "residual_route_seconds",
             "prefill_seconds", "decode_seconds", "seconds", "live_prefill_seconds",
             "live_total_seconds", "needle_layer_group_hit_rate",
             "needle_any_group_all_layers_rate",
@@ -581,6 +679,7 @@ def build_case_results(cases, sparse_results, dense_results):
 
 
 def selector_metadata(args, *, beam, k_selected):
+    summary_config = getattr(args, "summary_config", ResidualSummaryConfig())
     return {
         "mode": "live_candidate_only_tree_traversal",
         "route_representation": "compact_leaf_ids",
@@ -595,6 +694,13 @@ def selector_metadata(args, *, beam, k_selected):
         "dense_layers": list(getattr(args, "dense_layers", ())),
         "route_mode": getattr(args, "route_mode", "learned"),
         "backend": getattr(args, "backend", "triton"),
+        "residual_summaries": summary_config.enabled,
+        "summary_prototypes": summary_config.prototypes,
+        "summary_mode": summary_config.mode,
+        "summary_checkpoint": summary_config.checkpoint,
+        "summary_construction_included_in_prefill_seconds": (
+            summary_config.enabled
+        ),
     }
 
 
@@ -668,6 +774,7 @@ def main():
         "--backend", choices=("triton", "pytorch"), default="triton",
         help="sparse prefill implementation; pytorch is the correctness "
              "reference and the only option without Triton (Windows)")
+    add_residual_summary_arguments(parser)
     parser.add_argument(
         "--candidate-blocks", type=int, default=8,
         help="dense-candidates only: number of gate-scored reader-row blocks "
@@ -704,9 +811,20 @@ def main():
     parser.add_argument(
         "--load-offload-dir", default=os.path.join(tempfile.gettempdir(), "spruce_hf_load_offload"))
     args = parser.parse_args()
+    try:
+        args.summary_config = residual_summary_config_from_args(args)
+    except ValueError as error:
+        parser.error(str(error))
 
     if not torch.cuda.is_available():
         raise SystemExit("CUDA is required for the live-tree benchmark")
+    if args.summary_config.enabled and args.backend != "pytorch":
+        raise SystemExit("--residual-summaries currently requires --backend pytorch")
+    if args.summary_config.enabled and args.summary_config.mode == "learned":
+        raise SystemExit(
+            "learned residual summaries remain gated on deterministic-summary "
+            "evaluation; run --summary-mode mean first"
+        )
     if args.route_mode != "learned" and args.k_values:
         raise SystemExit(
             "--route-mode overrides are only supported for the single-K path")
@@ -794,14 +912,29 @@ def main():
     for k_selected, effective_beam in k_sweep:
         if warmup_tokens:
             _set_attention_backend(sparse_model, sparse_implementation)
+            if args.summary_config.enabled:
+                warmup_selected = _warmup_summary_selected(
+                    cases[0], warmup_tokens, device
+                )
+                warmup_residual = build_residual_summary_nodes(
+                    warmup_selected, validate_selected=False
+                )
+            else:
+                warmup_selected = _warmup_selected(
+                    cases[0], k_selected, warmup_tokens, device
+                )
+                warmup_residual = None
             _warmup(
                 sparse_model, _warmup_inputs(cases[0]["encoded"], warmup_tokens),
                 prefill_kwargs=sparse_prefill_kwargs(
                     args.backend,
-                    _warmup_selected(cases[0], k_selected, warmup_tokens, device),
+                    warmup_selected,
                     cases[0]["block_size"], args.kernel_variant,
-                    dense_layers=args.dense_layers),
+                    dense_layers=args.dense_layers,
+                    residual_nodes=warmup_residual,
+                    summary_config=args.summary_config),
             )
+            del warmup_selected, warmup_residual
         print(
             f"K sweep: K={k_selected} effective_beam={effective_beam}",
             flush=True)
