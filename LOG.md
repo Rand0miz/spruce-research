@@ -18,6 +18,319 @@ Rules (from CLAUDE.md):
 
 ---
 
+## 2026-07-28 — IEEE conference paper draft (Intro/Background/Methods/Results)
+**Question:** Can the completed unscreened 16K–128K beam-16 evidence-compiler result be
+written up as an IEEE conference submission within a 5-page body limit, without overstating
+any claim the log does not support?
+**Config:** Writing and typesetting only; no model run, no new number. Drafted
+`paper/main.tex` against the mentor-supplied simplified `IEEEtran` conference template
+(guidance text removed, `\bibliographystyle{IEEEtran}` and `thebibliography` structure kept;
+the eight `\bibitem` entries were replaced with the real HiP / SeerAttention / SpotAttention /
+HISA / QUOKA / CompactAttention / Qwen2.5-Coder / YaRN references, since the template's
+placeholder citations would have been wrong in-text). Every number is quoted from the
+2026-07-28 unscreened run entry and
+`benchmarks/outputs/natural_yarn_beam16_full_results/paper_artifacts/tables/*.csv`; nothing
+was recomputed or estimated.
+
+Framing is compiler-only per owner decision: the thesis is that dense access does not
+guarantee effective retrieval, and the prior sparse-attention negative results appear only as
+a five-sentence design-rationale paragraph in Methods (Section III-A), not as a contribution.
+
+**Title and acronym (owner-decided).** Title: *SPRUCE: Source-Preserving Context Compilation
+for Long-Context Question Answering.* The SPRUCE name is kept — it is the repo name, the
+PyPI distribution `spruce-attn`, and the identifier used throughout this log — but the
+backronym is **re-expanded** to
+**Source-Preserving Recursive Untrained Context Extraction**, introduced at first use in
+Section I. The original "Sparse, Preserving, Recursive, Unified Context Extension" no longer
+describes the method: it is not sparse attention and it does not extend the context window.
+Every word of the new expansion is true of the shipped method — source-preserving is the
+exact-text property, recursive is the radix-2 tree, untrained is the training-free selector.
+
+**Follow-up required:** `CLAUDE.md` still carries the old expansion and must be updated to
+match before the repo and the paper are shown together. Note also that the title says
+"Compilation" while the backronym ends in "Extraction"; this is deliberate (the paper's term
+for the method is *context compiler*) but can be aligned by retitling to "Source-Preserving
+Context Extraction" if the mismatch is judged sloppy.
+**Owner master copy adopted 2026-07-29.** `paper/main.tex` in the folder is now the owner's
+edited version, verbatim except for the fixes below; earlier assistant-side drafts are
+superseded. Owner edits retained: original title
+(*SPRUCE: Hierarchical Exact-Text Context Compilation for Long-Context Retrieval with a
+Frozen Backbone*), author block naming Myles McDaniel, and the figure filename
+`fig_compiled_latency.pdf`. The figure on disk was renamed from `fig_components.pdf` to match,
+and `make_figures.py` was updated so it regenerates under the new name.
+
+Fixes applied to the master copy: removed a stray orphan `(Fig.~\ref{fig:latency}),` line
+left dangling after the memory paragraph (it rendered as a one-item paragraph); restored the
+missing comma in "repairing 24 direct misses, 21 of which became exact answers"; and attached
+the Fig. 4 cross-reference to the sentence that actually discusses it, in Section IV-C.
+
+**Figure 4 placement — resolved as `[b]`, bottom of column.** The owner first asked for it
+directly above Section IV-D. `[b]`, `[!b]`, and `[!ht]` all declined that position (LaTeX
+deferred to the foot or head of the next column), and declaring the float earlier fixed the
+position but renumbered it to Fig. 3. `\usepackage{float}` plus `\begin{figure}[H]` did pin it
+above the heading, but `[H]` is non-floating: the figure would not fit in the remainder of
+column 1, so LaTeX could not move it and instead stretched that column's inter-paragraph glue
+to justify it. The result was large visible gaps on page 5 and the body spilling past the page
+limit. **Reverted.** Final state is `\begin{figure}[b]` with the `float` package removed;
+Fig. 4 sits at the foot of the column and the gaps are gone.
+
+**Page-limit lever, recorded because it was not obvious:** with two figures on page 5 the page
+was float-bound, not text-bound — roughly 40 words of prose cuts did not move the 2-line
+overflow at all. What fixed it was setting Fig. 4 to `0.88\columnwidth`, which is the figure's
+*native* render width (3.03 in); at `\columnwidth` it had been scaled up 1.12x. Label sizes are
+therefore unchanged. Prefer figure-width adjustment over prose cuts when a page is float-bound.
+Confirmed again when the Conclusion was added: roughly 150 words of prose cuts moved the
+overflow by only two lines, while taking Fig. 3 from `\columnwidth` to `0.88` and then `0.80`
+moved it by five. **Current widths: Fig. 3 at `0.80\columnwidth`, Fig. 4 at
+`0.88\columnwidth`.** Fig. 4 is at its native size and must not go below `0.88` — its 6.0 pt
+legend stops being readable. Fig. 3 is a two-line plot with larger labels and has more room.
+
+**Fig. 4 above the Section IV-D heading — final answer is a forced column break.** With
+`[b]` the figure sits at the foot of column 1 but *below* the IV-D heading, because IV-D
+starts partway up that column. `[H]` puts it above the heading but stretches the column
+(rejected earlier). The working solution is `\newpage` immediately before
+`\subsection{Where the remaining errors come from}`: it ends column 1, so column 1 reads
+IV-C text then Fig. 4, and IV-D begins at the top of column 2. Figure 4 therefore precedes
+IV-D in reading order with no stretched glue.
+
+**Consequence to remember:** the forced break makes any leftover space in column 1
+unrecoverable, so **prose cuts before the break no longer buy anything** — Sections IV-D,
+IV-E and the Conclusion must now fit column 2 of page 5 on their own. Roughly 25 words were
+cut from exactly those sections to land it (merged the two non-routing failure cases into one
+sentence, trimmed a redundant percentage, tightened the conditioning paragraph).
+
+**The mirror of that rule: text and figure size *before* the break are free, and were used to
+close the gap.** The break left column 1 ending several lines short of the bottom float,
+which read as an obvious hole between the end of IV-C and Fig. 4. Fixed two ways, both free:
+(1) every earlier trim was **restored** — the full reserved-memory reason in IV-C, the
+no-tuning list in III-F, what the compiler cannot see in III-B, the compilation step in III-D,
+the SeerAttention/-R qualification and the composability sentence in II-B, the
+"inside attention" statement in II-A, the route-policy variants in III-A, and the
+"not the original document length" contrast in III-E; (2) **Fig. 3 was enlarged** from
+`0.80\columnwidth` back to `1.00` (its native 3.40 in render), consuming the remaining
+column height. Counter-intuitive but correct: with a forced break, making a figure *bigger*
+closes a gap, because the column's text content is fixed and cannot grow to fill it.
+Current widths: **Fig. 3 at `1.00\columnwidth`, Fig. 4 at `0.88`.**
+
+**Column placement — what actually controls it.** Fig. 4 kept landing in the right-hand column
+while its discussion sat in the left. Neither `[b]`/`[!b]` nor relaxed float fractions
+(`\topfraction`, `\bottomfraction`, `\textfraction`, `bottomnumber`) moved it, and declaring it
+*before* the memory float fixed the column but renumbered it to Fig. 3. The controlling factor
+is **where in the text stream the float is declared**: both floats were declared after the
+IV-C paragraphs that fill column 1, so by the time LaTeX queued them that column was committed.
+Moving both declarations to immediately after the `\subsection{Efficiency and memory}` heading,
+keeping memory first, lets LaTeX reserve top *and* bottom of column 1 — memory `[t]` at the
+top, components `[b]` at the foot — while declaration order preserves Fig. 3 / Fig. 4. The
+relaxed float fractions were left in the preamble; they are not doing the work but are harmless
+and give the output routine more room. Final: both figures in column 1, column 2 all text, no
+stretched gaps, body ends on page 5.
+
+**Conclusion section added 2026-07-29, then restructured to the owner's requested arc.**
+Section V follows: what the space looks like now -> what methods it uses (cited) -> however,
+our result -> what we can therefore claim -> however, more research needed. Concretely, three
+paragraphs: (1) long context is standard and the literature treats what remains as an
+efficiency problem, naming the four related methods by mechanism with citations, noting all
+select *inside* attention and all measure against dense as the reference, then pivoting to
+"that reference is not a ceiling" with the dense numbers; (2) the compiled result; (3) the
+scope limit, the future work, and the composability note.
+
+Built largely by *relocation*: the "we do not claim general superiority" paragraph moved out
+of Section IV-E and the orthogonality point out of Section II-B, so neither claim appears
+twice. Paid for across many small trims — the Intro contributions run-in (the Conclusion now
+carries that synthesis), II-A's shared-framing sentence, II-B's phase argument, III-A's
+prior-negative list, III-E's complexity note, IV-B, IV-C, IV-D, II-C — plus figure widths
+(below). No number or result was dropped.
+
+Two echoes were deliberately cut from the Conclusion rather than from their primary homes:
+the mechanism sentence ("every compiled success contained the expanded evidence...") which
+still appears in the Intro contributions and in Section IV-D, and the longer form of the
+composability note. Also fixed a circular cross-reference: the IV-C sentence "we report
+allocated memory only, for the reason given in Fig. 3" sat directly beside Fig. 3; it now
+says "in the caption".
+
+**Case-ID presentation normalised.** Section IV-D previously dropped bare identifiers into
+running prose (`council_vote19_6`, `astronomy_polaris_field508`, `engineering_alloy_r62`),
+which read as unexplained tokens. They now follow the Section IV-E pattern of a readable noun
+phrase with the identifier in parentheses: "the civic case (`council_vote19_6`)", "the
+astronomy case (`polaris_field508`)", "the engineering case (`alloy_r62`)". Genre names come
+from the 12 genres already listed in Section II-C, so no new information is introduced. Keep
+this convention for any future case reference.
+
+**REFRAMED 2026-07-30 from sparse attention to context compilation (mentor-directed).**
+The advisor's read: the paper is about algorithmic processing, not LLM internals. The pipeline
+is Long Prompt -> Compiler -> Relevant Prompt -> Transformer -> Answer, so the transformer
+stops being the bottleneck; the interesting distinction is that *dense attention is not
+necessarily an accuracy ceiling in long-context retrieval*; and "if that is fundamentally a
+compiler problem, stop talking about sparse attention." Owner agreed and added that the method
+is model-agnostic. Extra experiments explicitly deferred for this submission.
+
+Changes made — framing only, no new results:
+- **Title:** *SPRUCE: Context Compilation for Long-Context Retrieval.*
+- **Acronym re-expanded again** to **Source-Preserving Recursive Untrained Compilation
+  Engine**, so "Compilation" sits in the name. (Was "...Context Extraction", itself a
+  replacement for the original sparse-attention backronym. `CLAUDE.md` still carries the
+  oldest version and remains out of date.)
+- **Abstract** now opens by naming the paradigm: "We introduce context compilation, a
+  preprocessing paradigm in which a long prompt is algorithmically transformed into a much
+  smaller one before inference, leaving the model untouched."
+- **Keywords:** dropped "sparse attention", added "context compilation, prompt preprocessing".
+- **Section II-A** retitled *Making the model's read cheaper*; the five in-attention methods
+  are now positioned as related work that keeps the transformer in the critical path, not as
+  the family this paper belongs to. II-B retitled *Where selection happens*; compilation is
+  described as sitting **outside** that taxonomy.
+- **Model-agnosticism stated and scoped**: the compiler consumes only tokenizer output, so it
+  is independent of architecture, weights and attention implementation; validated on one
+  backbone, with larger and non-Qwen models named as the open path.
+- **Conclusion** now names the reviewer-anticipated validation path explicitly — LongBench,
+  RULER, InfiniteBench, larger/non-Qwen backbones, head-to-head against the in-attention
+  methods — and states "we report a paradigm and one controlled result, not a benchmark
+  claim." Closes on the compiler-optimization programme (dead-context elimination, structural,
+  table-aware, code-aware passes).
+- The phrase "sparse attention" no longer appears anywhere in the paper.
+
+Cost of the reframe, all paid from Sections IV-D/IV-E/Conclusion: the astronomy failure case
+(`polaris_field508`, full recall but 17/24 on near-misses) was **cut** — it was a second
+example of a failure mode the civic case already illustrates. The `alloy_r62` selector failure
+and the recall-split argument are intact.
+
+**Constant-packet / linear-cost result surfaced 2026-07-30.** The strongest systems claim was
+buried in Section IV-C and is now stated in all four places that carry it: abstract,
+contributions, Section III-E, and the Conclusion.
+
+The claim, verified against `by_length.csv`: the model's packet is **near-constant and
+detached from context length** — 1,806.5 / 1,904.5 / 1,731.5 / 1,928.5 / 1,844.5 / 1,876.5 /
+1,913.0 / 1,842.5 tokens across 16K-128K, a ±5 percent band with no trend, while retained
+fraction falls 11.05 percent -> 1.41 percent. Consequently the model's input, prefill and KV
+cache are all **O(1) in n**, and the only n-dependent work is CPU tokenization and indexing,
+making the whole request **O(n)** where the dense arm carries a quadratic attention term.
+
+**Framing rules for this claim, agreed with the owner:**
+- Do **not** present it as improving the original learned-tree design from `O(n log n)` to
+  `O(n)`. Those are different architectures, the learned tree never cleared KS1 (17/25 vs
+  dense 25/25), and the comparison invites a request for a baseline that does not exist in
+  working form. The compiler *sidesteps* selector cost by never putting the long context
+  through the model.
+- Selection alone (`O(βD log(n/B))`) genuinely *is* sub-linear; the standing "no sub-linear
+  total cost" rule applies to the total, which is linear. Section III-E now says both.
+- GPU memory is O(1); **host** memory is still O(n) (offset token list plus block sketches,
+  ~260 KB at 128K). The flat 3.27 GB is largely FP16 backbone weights, so the honest claim is
+  that the *KV cache* stopped growing.
+- The O(1) packet is bought with fixed `M`, the same choice behind expanded recall sliding
+  94.4 percent -> 86.1 percent. Constant packet and decaying recall are one decision.
+
+**Open follow-ups this raised (not yet run):**
+1. **Packet size is corpus-dependent.** The budget is fixed in *blocks*, but paragraph-boundary
+   repair converts that to a token count that depends on the source document's paragraph
+   lengths. This bank has uniform synthetic paragraphs. Long-paragraph corpora (contracts,
+   untranscribed speech, minified code) could produce much larger packets at the same `M`.
+   Either measure on a real corpus or add a token ceiling to the expansion step before
+   claiming O(1) packets generally.
+2. **An M sweep on the compiler would locate the accuracy optimum.** Cost permits generous
+   scaling — the total stays Θ(n) for any `m = O(√n)`, so `M = 4√(n/16K)` (M≈11 at 128K,
+   packet ~5,200 tokens) would still be roughly 10x faster than dense. The binding constraint
+   is not cost but that a larger packet re-imports the distractor problem the paper is about.
+   The sweep should plot expanded recall (rising in M) against exact accuracy given evidence
+   present (falling in M). **The old M sweep in this log — dense 25/25, M=4 16/25, M=32 9/25 —
+   is NOT evidence here**; it was the sparse-attention path, where large M hurt through
+   representation mismatch, a mechanism the compiler does not have. Needs fresh prompts, since
+   the current bank is opened.
+
+**STILL OUTSTANDING — bibliography not yet applied to the file.** `paper/main.tex` still
+carries the unedited IEEE template placeholder list. `b1` renders as Eason/Noble/Sneddon on
+Bessel functions but is cited in text as HiP; `b2` is Maxwell but cited as SeerAttention;
+`b3` is Jacobs/Bean but cited as SpotAttention; `b4` as HISA; `b5` as QUOKA; `b7` as
+Qwen2.5-Coder. Only `b8` (YaRN) is correct. Every technical citation currently resolves to an
+unrelated reference. A verified replacement list was delivered to the owner in chat on
+2026-07-29 but was **not** written to the file at their request.
+
+Two substantive findings from verifying that list against arXiv, which must survive even if
+the chat copy is lost:
+
+- **`b2` was doing double duty.** The text cites `b2` for both SeerAttention and
+  SeerAttention-R, but these are separate papers: SeerAttention is arXiv 2410.13276 (Gao,
+  Zeng, Du, Cao, Zhou, Qi, Lai, So, Cao, Yang, Yang; prefill) and SeerAttention-R is arXiv
+  2506.08889 (decode). Table I distinguishes them *by phase*, which is the paper's own
+  argument, so citing one entry for both undercuts it. Splitting them shifts SpotAttention
+  b3->b4, HISA b4->b5, QUOKA b5->b6 across roughly nine call sites.
+- **`b6` (CompactAttention, arXiv 2605.16839, Song, Jo, Kang, Kim) is never cited** in the
+  current text. Either cite it in related work — `paper-notes.md` already flags it as the
+  nearest neighbour worth distinguishing from — or drop the entry.
+
+Verified identifiers for the rest: HiP arXiv 2406.09827; SpotAttention arXiv 2606.22874
+(Ahmad, Yun); HISA arXiv 2603.28458 (Xu, Meng, Jiang, et al.); QUOKA arXiv 2602.08722 (Jones,
+Park, Morse, Lee, Lott, Langston); Qwen2.5-Coder arXiv 2409.12186; YaRN arXiv 2309.00071.
+
+**Final figure set (four), after owner-directed revisions:** Fig. 1 fully charged request
+latency + sum-weighted speedup, two panels, full width (the `03_latency_and_speedup` pairing);
+Fig. 2 length×depth accuracy heatmaps, full width; Fig. 3 compiled request components by
+stage (the `04_compiled_latency_components` stacked bars), placed `[b]` at the foot of the
+Section IV-C column; Fig. 4 allocated GPU memory.
+
+The **evidence-recall figure was dropped**, not the memory figure — the constant-memory line
+is a headline systems result and stays. The recall numbers it carried are now fully in the
+Section IV-D body text (232/288 direct, 256/288 expanded, 24 of 56 direct misses repaired,
+21 becoming exact), including the "expansion is load-bearing, not cosmetic" line that had
+lived in its caption. `make_figures.py` still emits `fig_recall.pdf`; it is simply not
+included by `main.tex`, so it can be restored without regenerating anything.
+
+Fig. 3 is drawn from the per-case `compiled` timing fields in `combined_report.json`
+(`layout_tokenize`/`index`/`selection`/`compile`/`compact_tokenize`/`input_transfer`/
+`prefill`/`decode` seconds), averaged per length. The eight shipped stages are merged into
+**six** so the bands stay distinguishable at one-column size: index+selection are combined as
+"Index + traversal" and compact tokenization+transfer are combined. It is rendered at
+3.03 x 2.04 in and included at 0.95 columnwidth, so the 6.0 pt legend lands at roughly 6.3 pt.
+Do not shrink further; below this the legend stops being readable. The four-panel `09_paper_overview` composite was
+**dropped**: its accuracy and speedup panels duplicated Table II, its recall panel duplicated
+Fig. 4, and its context-retained panel duplicated two numbers already stated in Section IV-C.
+The latency panel earns its space in a way the composite's accuracy panel did not — it is the
+only place the superlinear dense curve is visible against the near-flat compiled curve, which
+is the systems claim.
+
+**Page budget.** Trading the memory figure for the components figure paid for itself: the
+Section III-A prior-negative-results list and the Section III-E charged-cost enumeration were
+both restored in full, and the contributions returned to an itemized list. Cuts that remain
+in force are the Section IV-C component enumeration (Fig. 3 carries it) and small trims in
+II-B, IV-B, IV-D, and IV-E; the 128K
+latency pair lives in the Fig. 1 caption rather than the body. The body now ends partway down
+page 5 with references beginning on page 5 and only entries [7]-[8] on page 6, so there is
+roughly a third of a page of genuine slack for the still-unwritten Discussion, Limitations,
+and Conclusion sections.
+
+All four figures are **re-rendered for print** by
+`paper/figures/make_figures.py`, which reads the same
+`paper_artifacts/tables/*.csv` the shipped PNGs were built from — no number is re-derived,
+only the drawing. The first attempt embedded the shipped 220-DPI figures scaled down to
+0.60-0.72 of their box to fit the page limit, which made axis labels illegible; the fix was
+to render each figure at its exact final print size (7.16 in text width, 3.40 in column
+width) with 8 pt serif labels and 7.5 pt ticks, so nothing is scaled and fonts land at their
+stated point size. Panels are lettered (a)-(d) and captions reference them.
+
+The shipped two-panel `10_peak_gpu_memory` figure was deliberately NOT used: its
+reserved-memory panel is contaminated because dense and compiled alternate in one process
+and PyTorch retains cached reservations, so both reserved traces equal the dense high-water
+mark. The replacement plots allocated memory only, and both the caption and Section IV-C
+state the exclusion and its reason explicitly.
+
+Claim guardrails honored: no "linear selection" or "sub-linear total cost" language;
+Section III-E states preprocessing is O(n) and that the benefit is what the quadratic term is
+applied to. SpotAttention's protocol is described as dense-prefill / sparse-decode and
+Table I marks its accuracy phase as decode with a footnote; SeerAttention vs SeerAttention-R
+is separated by phase; QUOKA is given its confirmed prefill complexity only, with no invented
+decode Big-O. Section IV-E reports the case-clustered bootstrap alongside McNemar and closes
+on the owner-approved wording rather than a general-superiority claim.
+**Number:** No experimental number produced. Typesetting verification: `pdflatex` compiles
+clean with **zero errors, zero overfull hboxes, and no undefined references**; the document is
+**6 pages total with the body ending on page 5**, references beginning on page 5 and finishing
+on page 6, meeting the 5-page-excluding-bibliography limit at full-size figures.
+`IEEEtran.cls` and `IEEEtran.bst` are vendored into `paper/` so the directory compiles
+standalone, and `paper/figures/make_figures.py` regenerates all four figures from the
+tables and resolves its paths from its own location.
+**Conclusion:** The draft is ready for owner review of the title, author block, and reference
+formatting. It makes no claim beyond the sealed bank. Discussion, Limitations, Conclusion, and
+the abstract's final wording are still to be written, and the open blocker is unchanged: new
+independent semantic cases and an external long-context benchmark under the locked
+configuration before any general accuracy claim.
+
 ## 2026-07-28 — Clean v0.1.0 open-source release candidate packaged
 **Question:** Can the verified training-free beam-16 evidence compiler be separated from the
 2.5 GiB research worktree into a small, installable, auditable public-release bundle without

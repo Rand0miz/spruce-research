@@ -1,0 +1,14 @@
+{
+	"folders": [
+		{
+			"path": ".."
+		},
+		{
+			"name": "spruce_colab_train_source.zip",
+			"uri": "zip:c:\\Users\\myles\\SPRUCE\\spruce_colab_train_source.zip"
+		}
+	],
+	"settings": {
+		"powershell.cwd": "SPRUCE"
+	}
+}
