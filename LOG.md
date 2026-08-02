@@ -14,9 +14,157 @@ Rules (from CLAUDE.md):
 - Numbers reported on held-out documents only. `eval_gate.py --targets` must point at docs the gate did NOT train on, or the number is overfit and meaningless.
 - `recall@k` is a **block-level proxy**, not the KS1 ">95% of dense RULER" number. True RULER needs the sparse generate path (kernel + Qwen swap), which does not exist yet.
 - All latency numbers on ONE fixed GPU (one A100-80GB or H200). Laptop timings are development signal, not paper numbers.
-- Never write "linear selection" or "sub-linear total." Selector is O(log L) per query block → O(n log n) total prefill selection, O(n·k) attention read.
+- **Locked default is `feature_dim=1024`** as of 2026-08-01 (see that day's sweep entry). D=512 is the superseded published setting; any number quoted at 512 must say so.
+- Complexity has three cases; name the one you mean. Uncached request O(n) — every measured number here is currently this case. Selector alone O(βD log(n/B)). Cached index O(log n) per query, only the first query on a document paying the O(n) build; sub-linear **per query** is a true and permitted claim, scoped to that case. Never attach sublinearity to a measured number until the warm-index run exists. Never write "linear selection" — selection is logarithmic. Supersedes the old blanket ban on "sub-linear total," which over-corrected.
 
 ---
+
+## 2026-08-01 — natural YaRN v2 at D=1024, cached-index run, and the stitch fix
+**Question:** Does D=1024 hold on a full paper-format run, and does a prebuilt index
+make per-query cost sublinear in context length?
+
+### Run A — natural YaRN v2, feature_dim 1024
+**Config:** `benchmarks/outputs/natural_yarn_beam16_paper_v2/`. Same sealed bank
+(sha 74ACE232...), 288 paired prompts, seed 20260728, 3 repeats, beam 16, M=4,
+radius 1, B=64, YaRN factor 4, feature_dim 1024.
+**Number:** dense 192/288 (66.667%), compiler 255/288 (88.542%), delta +21.875 pt.
+**Compiler-only 63, dense-only 0** — SPRUCE loses on no prompt. Exact McNemar
+p=2.1684e-19. Cluster bootstrap [+10.755%, +35.069%]. Expanded recall 100.0% at every
+length. Positive at all 8 lengths, +11.1 to +30.6 pt. Sum-weighted speedup 31.874x
+(5.82x at 16K to 55.49x at 128K).
+**Conclusion:** confirms the sweep exactly (255/288) and adds the stronger fact that
+dense-only losses are zero. **The speedup is not comparable to the published 9.58x:**
+that was A100, and this is ~3.4x higher on identical accuracy, which is hardware, not
+method. Confirm the GPU from `length_reports/*.json` runtime metadata before quoting
+any v2 latency.
+
+### Run B — cached index, feature_dim 512, NVIDIA L4
+**Config:** `benchmarks/outputs/cached_index_v1/`. Three arms per prompt — dense,
+cold (index rebuilt per request), cached (index built once per document, charged
+separately) — plus 2 decoy questions per document. 288 prompts, 301.8 min.
+**Number:** dense 192/288, cold 237/288, **cached 237/288, identical to cold**; the
+run's assertion that cold and cached select identical blocks and return identical
+answers held on every case, so the cache is a pure function of the document.
+Median request dense 14.5858 s, cold 0.5697 s, cached 0.2963 s. Speedups cold
+30.224x, cached 57.713x, cached-vs-cold 1.91x. Build 0.054 s at 16K to 0.520 s at
+128K; index 0.26 to 2.06 MiB; tree 9 to 12 levels.
+
+Fits: traversal **+0.2129 ms per tree level, R2=0.9694** — O(log n) selection
+confirmed empirically. Build **+4.07e-6 s per token, R2=0.9988** — linear, expected.
+Cached request **+0.852 ms per Ki token, R2=0.928** — *not* flat.
+
+Cached components, median ms (16K -> 128K): traversal 2.02 -> 2.61, compact tokenize
+5.56 -> 5.76, prefill 121.6 -> 124.2, decode 123.3 -> 125.3, **stitch 15.66 -> 91.38**.
+Everything flat except the stitch.
+**Conclusion:** the sublinear-per-query claim is NOT supported by this run. Selection
+is logarithmic as claimed, but `compile_evidence_spans` was linear in n, so the cached
+request was linear too. This run also used the superseded D=512 and an L4; both need
+redoing. Correction to an earlier estimate: break-even against the cold path is k~1,
+not k~n/log n, because cold is approximately build plus cached, so caching pays from
+the second query. That is a different question from whether per-query cost is
+sublinear in n, and only the latter failed.
+
+### Fix — two full-document scans removed from the stitch
+`interfaces/evidence_compiler.py`. (1) `token_range_for_char_range` enumerated every
+offset, O(n) per span; it now takes an optional token window and falls back to the
+full scan if the window misses. (2) `_expand_to_paragraph` searched out to the
+document edges and, on a missing delimiter, *returned* those edges — so a span with no
+nearby blank line pulled in the whole document. Search is now bounded to +/-8192 chars
+with the span itself as fallback. `compile_evidence_spans` derives each span's token
+window from its character growth (a token spans at least one character, so character
+growth bounds token growth) and propagates it through the merge.
+**Verification:** repo tests need pytest and transformers, neither installed on the
+dev laptop, so they have NOT run. A dependency-free check over five document shapes
+and 40 selections confirmed the bounded window returns token ranges identical to the
+old full scan and that span text is still exact source; the no-blank-line document now
+covers 0.541% of itself instead of 100%. **Run
+`pytest tests/test_evidence_compiler.py tests/test_evidence_compiler_benchmark.py
+tests/test_pre_qwen_selector.py` before trusting this.** The re-run must reproduce
+255/288 at D=1024; if accuracy moves, the paragraph fallback was live and the window
+needs widening. `release/spruce/src/spruce_attn/compiler.py`, the shipped sprucekit
+copy, still has both defects.
+
+### DECISION 3: L4 becomes the reporting GPU, with A100 kept as a second row
+Owner decision. L4 is commodity inference hardware and defensible on deployment
+grounds, but speedup is a ratio and a slower GPU inflates it by degrading the dense
+arm, not by improving SPRUCE — 9.58x on A100 against 30.2x on L4 for the same method.
+Reporting both ("the advantage holds across accelerator classes") uses the larger
+number while making hardware sensitivity a stated finding rather than an unexplained
+choice. Every latency number in the paper must then come from L4; `CLAUDE.md`'s
+fixed-GPU rule still names A100-80GB/H200 and needs updating.
+
+**Next:** re-run cached at D=1024 on L4 with the fixed stitch
+(`colab/run_cached_index_tests.ipynb`, now set to feature_dim 1024 and writing to
+`cached_index_v2`), expecting the stitch flat near 15 ms and the cached request
+~243 -> ~258 ms across 16K-128K. Until that lands, no sublinearity claim may attach to
+a measured number — and `paper/main.tex` already carries "Sublinear Per-Query" in its
+title, which is currently unsupported.
+
+## 2026-08-01 — feature_dim sweep: dense vs D=512 / 1024 / 4096
+**Question:** Does a wider Boolean sketch fix the selection misses that cause every
+compiler loss at D=512, and at what cost?
+**Config:** Sealed `natural_paper_untouched` bank, 12 cases x 8 lengths (16K-128K) x 3
+depths = 288 paired prompts, seed 20260728, 3 repeats, beam 16, M=4, radius 1,
+paragraph repair, B=64, FP16, static YaRN factor 4. Four arms measured per prompt in
+one session (dense + D=512/1024/4096), arm order rotated per repeat. One
+A100-SXM4-40GB, 119.8 min wall clock. `colab/run_feature_dim_sweep.ipynb`; outputs in
+`benchmarks/outputs/feature_dim_sweep_v1/`.
+
+**Number:**
+
+| arm | exact | vs dense | McNemar | speedup | index ms | traversal ms | median tokens |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| dense | 192/288 (66.667%) | - | - | - | - | - | 73,690 |
+| D=512 | 237/288 (82.292%) | +15.625 | 5.20e-07 | 9.41x | 12.14 | 2.525 | 1,849.5 |
+| D=1024 | 255/288 (88.542%) | +21.875 | 2.17e-19 | 9.42x | 13.09 | 2.772 | 1,894.5 |
+| D=4096 | 252/288 (87.500%) | +20.833 | 2.26e-16 | 9.31x | 17.55 | 3.251 | 1,887.5 |
+
+Recall: D=512 direct 232/288, expanded 256/288 (repaired 24), accuracy given evidence
+present 237/256, absent 0/32. D=1024 direct 260/288, **expanded 288/288**. D=4096
+direct 265/288, **expanded 288/288**.
+
+Case-clustered bootstrap (10,000 draws): D=512 +15.62 pt [-5.56, +34.72] crosses
+zero; D=1024 +21.53 pt [+10.42, +35.07]; D=4096 +20.49 pt [+9.72, +33.33].
+
+Head-to-head paired: D=1024 vs D=512 21 wins / 3 losses, p=2.77e-04. D=4096 vs D=512
+21/6, p=5.93e-03. **D=1024 vs D=4096 5/2, p=0.453 — not distinguishable.**
+
+Per case at D=1024: `alloy_r62` (the D=512 "principal selector failure", 4/24 with
+expanded recall 4/24) is **24/24 with 24/24 recall**. `council_vote19_6` stays 0/24 in
+every arm but its recall rises 12/24 -> 24/24, confirming a reading failure and not a
+routing one. `polaris_field508` degrades monotonically with width, 17 -> 15 -> 14 at
+full recall throughout — the only trend pointing the wrong way.
+
+**Replication check:** dense (192/288) and D=512 (237/288, with the 232/256/24 recall
+split) reproduce the 2026-07-28 published run exactly. Prompts and harness verified
+sound; the D=1024 gain is a real effect, not drift.
+
+**Conclusion — DECISION 1: the locked base is now `feature_dim=1024`.** It removes the
+selection-miss failure mode entirely (expanded recall 288/288, so every remaining
+error is a reading failure), lifts the case-clustered interval off zero, converts the
+paper's only negative case into a win, and costs +0.95 ms of index build with no
+change in speedup. D=4096 is not distinguishable from D=1024 and costs more, so the
+sweep stops at 1024. Every config, default and spec that still says 512 is superseded
+and must be updated: `benchmarks/*` argparse defaults, `selector/pre_qwen.py`,
+`release/spruce/src/spruce_attn/api.py`, `interfaces/pre_qwen_selector_spec.md`.
+Gates the paper rewrite: abstract, Table 2, both figures, Sections IV-A/B/C/D and V-D
+all change; the dense half of every comparison stands unchanged.
+
+**DECISION 2: caching is going in, to make per-query execution sub-linear.** The index
+is a pure function of the document and not of the query, so it can be built once and
+reused; a query against a cached index costs O(log n) traversal over a constant-size
+packet, and only the first query on a document pays the O(n) build. This is a real
+change of claim, not a reinterpretation of existing numbers — the published figures
+all rebuild the index every request and remain the uncached linear case. Status:
+**planned, not measured.** `colab/run_cached_index_tests.ipynb` is written (dense vs
+cold vs cached, 18 figures, asserts cold and cached select identical blocks and return
+identical answers) but has not been run and is not yet syntax-validated. Until that
+run lands, no sublinearity claim may be attached to a measured number. Open risks to
+settle when it does: amortization is n/k + log n over k queries, so the honest
+break-even is k ~ n/log n; the cache holds the document and offsets, so host memory
+becomes O(n) per cached document even though time does not; and framing shifts SPRUCE
+from a per-prompt compiler toward a document index, which changes the comparison set
+from HiP/SeerAttention/SpotAttention to BM25 and vector stores.
 
 ## 2026-07-28 — IEEE conference paper draft (Intro/Background/Methods/Results)
 **Question:** Can the completed unscreened 16K–128K beam-16 evidence-compiler result be
@@ -155,6 +303,39 @@ phrase with the identifier in parentheses: "the civic case (`council_vote19_6`)"
 astronomy case (`polaris_field508`)", "the engineering case (`alloy_r62`)". Genre names come
 from the 12 genres already listed in Section II-C, so no new information is introduced. Keep
 this convention for any future case reference.
+
+**Package naming decided 2026-07-30: `sprucekit`.** The v0.1.0 bundle was built as distribution
+`spruce-attn` / import `spruce_attn` / console script `spruce`. After the reframe, "attn" is
+actively wrong — it advertises sparse attention, which the paper now explicitly is not.
+**Rename before first upload; PyPI names cannot be reused once published.**
+
+PyPI availability checked 2026-07-30: `spruce` is **taken** (abandoned 2014 placeholder,
+v0.0.0, no description, no releases since — a PEP 541 name-retention request is possible later
+but should not block release). `spruce-compiler` is **taken** (physics/audio synthesis package,
+May 2025). Verified free at time of checking: `sprucekit`, `sprucengine`, `sprucecompile`,
+`pyspruce`, `spruce-engine`, `spruce-compile`, `contextcompiler`.
+
+**Import-namespace hazard:** the existing `spruce-compiler` package documents
+`from spruce import Variable, diff`, so it has claimed the bare `spruce` *import* namespace.
+Do **not** import as `spruce` — anyone with both installed gets a broken environment. Use
+`import sprucekit`. Note PyPI normalizes only separators, not concatenation, so `spruce-engine`
+and `sprucengine` are distinct names; registering one does not reserve the other.
+
+**Console-script collision:** that same package installs a `spruce` console command
+(`spruce demo`, `spruce version`). Our bundle currently also installs `spruce`. Rename the
+entry point to `sprucekit` to avoid a PATH conflict.
+
+**Rename checklist before upload:** distribution name, import package and `src/` directory,
+console entry point, `spruce info` output, README and install instructions, the Colab
+quickstart, both examples, the focused tests that import the package, and the GitHub Actions
+trusted-publishing workflow. The archive SHA-256s recorded in the 2026-07-28 release entry
+become stale once this is done — rebuild and re-record.
+
+**Architecture decision:** the compiler library and the future agentic harness stay **separate
+packages**. `sprucekit` is the library the paper describes — small, dependency-light,
+citable, slow-moving. The harness (API clients, tool loop, config) becomes its own package
+depending on it, so harness churn cannot destabilize the artifact people cite, and the library
+stays attractive to anyone who only wants context compilation.
 
 **REFRAMED 2026-07-30 from sparse attention to context compilation (mentor-directed).**
 The advisor's read: the paper is about algorithmic processing, not LLM internals. The pipeline

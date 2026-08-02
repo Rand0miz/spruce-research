@@ -1,0 +1,51 @@
+{
+  "kind": "spruce_cached_index_v1",
+  "created_utc": "2026-08-01T21:52:43.902933+00:00",
+  "archive_sha256": "1BA99CBA3681467B35F056E72C337E85DE8E50B0671C6C355FC8598F2F208595",
+  "prompt_bank_sha256": "74ACE23201F9FA73D3EE7AE633583215E44D37F4E6A84D82000B9B6B366DF5CE",
+  "gpu": "NVIDIA L4",
+  "prompts": 288,
+  "wall_clock_seconds": 18105.961308012,
+  "overall": {
+    "dense": {
+      "exact_count": 192,
+      "exact_rate": 0.6666666666666666,
+      "median_request_seconds": 14.585770486500223,
+      "sum_request_seconds": 5087.53334817801
+    },
+    "cold": {
+      "exact_count": 237,
+      "exact_rate": 0.8229166666666666,
+      "median_request_seconds": 0.5696884039998622,
+      "sum_request_seconds": 168.32867390299896
+    },
+    "cached": {
+      "exact_count": 237,
+      "exact_rate": 0.8229166666666666,
+      "median_request_seconds": 0.2962749105000171,
+      "sum_request_seconds": 88.15210496600218
+    },
+    "speedup": {
+      "cold_vs_dense": 30.223806973669564,
+      "cached_vs_dense": 57.71312381184919,
+      "cached_vs_cold": 1.909525291176185
+    }
+  },
+  "fits": {
+    "cached_ms_per_ki_token": {
+      "slope": 0.8518791897352564,
+      "intercept": 238.88109633913604,
+      "r2": 0.9281320860660629
+    },
+    "traversal_ms_per_tree_level": {
+      "slope": 0.21293767701609506,
+      "intercept": 0.299006294444204,
+      "r2": 0.9693870051762183
+    },
+    "build_seconds_per_token": {
+      "slope": 4.069670953299431e-06,
+      "intercept": -0.019313005982318,
+      "r2": 0.9987877093583525
+    }
+  }
+}

@@ -146,16 +146,33 @@ def _as_offsets(values) -> tuple[tuple[int, int], ...]:
 
 def token_range_for_char_range(
         offsets: Sequence[tuple[int, int]], char_start: int,
-        char_end: int) -> tuple[int, int]:
-    """Return the minimal token range overlapping a half-open char range."""
+        char_end: int, *, search_start: int = 0,
+        search_end: int | None = None) -> tuple[int, int]:
+    """Return the minimal token range overlapping a half-open char range.
+
+    ``search_start``/``search_end`` bound the scan to a token window. The
+    default scans everything, which is O(n) in prompt tokens; callers that
+    already know roughly where the span lives pass a window so a per-query
+    stitch does not walk the whole document. Offsets are not reliably
+    monotonic -- chat-template specials carry (0, 0) -- so this stays a scan
+    over a bounded slice rather than a bisect over the whole list.
+    """
     if not 0 <= int(char_start) < int(char_end):
         raise ValueError(
             f"invalid character range [{char_start},{char_end})")
+    lo = max(0, int(search_start))
+    hi = len(offsets) if search_end is None else min(
+        len(offsets), int(search_end))
     overlapping = [
-        index for index, (start, end) in enumerate(offsets)
+        lo + index
+        for index, (start, end) in enumerate(offsets[lo:hi])
         if end > start and end > int(char_start) and start < int(char_end)
     ]
     if not overlapping:
+        if lo > 0 or hi < len(offsets):
+            # The window guess was wrong. Fall back to the full scan rather
+            # than report a locatable span as unlocatable.
+            return token_range_for_char_range(offsets, char_start, char_end)
         raise ValueError(
             f"no tokenizer offsets overlap [{char_start},{char_end})")
     return overlapping[0], overlapping[-1] + 1
@@ -227,13 +244,40 @@ def _char_range_for_tokens(
         end for _, end in overlapping)
 
 
+# A paragraph break is expected within a few blocks of any selected span. The
+# search is bounded so one stitch cannot scan the whole document, and so the
+# no-delimiter case cannot silently swallow it either.
+PARAGRAPH_SEARCH_CHARS = 8192
+
+
 def _expand_to_paragraph(
         text: str, start: int, end: int,
-        lower: int, upper: int) -> tuple[int, int]:
-    left_delimiter = text.rfind("\n\n", lower, start)
-    expanded_start = lower if left_delimiter < 0 else left_delimiter + 2
-    right_delimiter = text.find("\n\n", end, upper)
-    expanded_end = upper if right_delimiter < 0 else right_delimiter
+        lower: int, upper: int, *,
+        window: int = PARAGRAPH_SEARCH_CHARS) -> tuple[int, int]:
+    """Grow a span outward to paragraph edges, searching a bounded window.
+
+    Without the bound this is O(n) per span, and worse: the old fallback on a
+    missing delimiter was ``lower``/``upper``, the document edges, so a span
+    in a document with no blank lines pulled in the whole document.
+
+    The document edge is still the right answer when the search *reached* it.
+    A span inside the opening paragraph has no delimiter to its left because
+    the document starts there, and snapping to ``lower`` costs at most one
+    window. Only a window that stopped short of the edge falls back to the
+    span itself, which is exactly the pathological case the bound exists for.
+    """
+    search_floor = max(lower, start - int(window))
+    left_delimiter = text.rfind("\n\n", search_floor, start)
+    if left_delimiter >= 0:
+        expanded_start = left_delimiter + 2
+    else:
+        expanded_start = lower if search_floor <= lower else start
+    search_ceiling = min(upper, end + int(window))
+    right_delimiter = text.find("\n\n", end, search_ceiling)
+    if right_delimiter >= 0:
+        expanded_end = right_delimiter
+    else:
+        expanded_end = upper if search_ceiling >= upper else end
     return expanded_start, expanded_end
 
 
@@ -275,14 +319,20 @@ def compile_evidence_spans(
             char_end -= 1
         if char_end <= char_start:
             continue
+        trimmed_start, trimmed_end = char_start, char_end
         if boundary == "paragraph":
             char_start, char_end = _expand_to_paragraph(
                 full_prompt, char_start, char_end,
                 layout.document_char_start, layout.document_char_end)
+        # A token spans at least one character, so character growth bounds
+        # token growth. That makes this window a safe over-estimate and keeps
+        # the later char-to-token lookup off the full offset list.
         provisional.append({
             "char_start": char_start,
             "char_end": char_end,
             "blocks": set(run),
+            "token_lo": token_start - (trimmed_start - char_start),
+            "token_hi": token_end + (char_end - trimmed_end),
         })
 
     if not provisional:
@@ -297,13 +347,23 @@ def compile_evidence_spans(
                 previous["char_end"] = max(
                     previous["char_end"], item["char_end"])
                 previous["blocks"].update(item["blocks"])
+                previous["token_lo"] = min(
+                    previous["token_lo"], item["token_lo"])
+                previous["token_hi"] = max(
+                    previous["token_hi"], item["token_hi"])
                 continue
         merged.append(item)
 
     spans = []
     for item in merged:
+        # Bounded by the block window the span came from, widened by however
+        # far paragraph repair moved its edges. Keeps the stitch off the full
+        # offset list; token_range_for_char_range re-scans everything if the
+        # window ever proves too tight.
         token_start, token_end = token_range_for_char_range(
-            layout.offsets, item["char_start"], item["char_end"])
+            layout.offsets, item["char_start"], item["char_end"],
+            search_start=max(0, item["token_lo"] - 1),
+            search_end=min(len(layout.offsets), item["token_hi"] + 1))
         text = full_prompt[item["char_start"]:item["char_end"]]
         if not text.strip():
             continue

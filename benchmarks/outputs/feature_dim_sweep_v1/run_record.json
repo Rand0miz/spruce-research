@@ -1,0 +1,70 @@
+{
+  "kind": "spruce_feature_dim_sweep_v1",
+  "created_utc": "2026-08-01T07:34:38.170966+00:00",
+  "archive_sha256": "1BA99CBA3681467B35F056E72C337E85DE8E50B0671C6C355FC8598F2F208595",
+  "prompt_bank_sha256": "74ACE23201F9FA73D3EE7AE633583215E44D37F4E6A84D82000B9B6B366DF5CE",
+  "gpu": "NVIDIA A100-SXM4-40GB",
+  "wall_clock_seconds": 7188.990777465,
+  "cases": 288,
+  "arms": {
+    "dense": {
+      "exact_count": 192,
+      "exact_rate": 0.6666666666666666,
+      "accuracy_delta_vs_dense": null,
+      "mcnemar_exact_p": null,
+      "cluster_bootstrap": null,
+      "sum_weighted_speedup_vs_dense": null,
+      "expanded_recall_rate": null,
+      "median_input_tokens": 73690.0,
+      "median_index_ms": null
+    },
+    "512": {
+      "exact_count": 237,
+      "exact_rate": 0.8229166666666666,
+      "accuracy_delta_vs_dense": 0.15625,
+      "mcnemar_exact_p": 5.204403564731416e-07,
+      "cluster_bootstrap": {
+        "median": 0.15625,
+        "lower_95": -0.05555555555555555,
+        "upper_95": 0.3472222222222222,
+        "crosses_zero": true
+      },
+      "sum_weighted_speedup_vs_dense": 9.410967984192933,
+      "expanded_recall_rate": 0.8888888888888888,
+      "median_input_tokens": 1849.5,
+      "median_index_ms": 12.144257500040112
+    },
+    "1024": {
+      "exact_count": 255,
+      "exact_rate": 0.8854166666666666,
+      "accuracy_delta_vs_dense": 0.21875,
+      "mcnemar_exact_p": 2.168404344971009e-19,
+      "cluster_bootstrap": {
+        "median": 0.2152777777777778,
+        "lower_95": 0.10416666666666667,
+        "upper_95": 0.3506944444444444,
+        "crosses_zero": false
+      },
+      "sum_weighted_speedup_vs_dense": 9.420023902418064,
+      "expanded_recall_rate": 1.0,
+      "median_input_tokens": 1894.5,
+      "median_index_ms": 13.092636500005028
+    },
+    "4096": {
+      "exact_count": 252,
+      "exact_rate": 0.875,
+      "accuracy_delta_vs_dense": 0.20833333333333334,
+      "mcnemar_exact_p": 2.2562247209423347e-16,
+      "cluster_bootstrap": {
+        "median": 0.2048611111111111,
+        "lower_95": 0.09722222222222222,
+        "upper_95": 0.3333333333333333,
+        "crosses_zero": false
+      },
+      "sum_weighted_speedup_vs_dense": 9.311946681521377,
+      "expanded_recall_rate": 1.0,
+      "median_input_tokens": 1887.5,
+      "median_index_ms": 17.546704000096724
+    }
+  }
+}
