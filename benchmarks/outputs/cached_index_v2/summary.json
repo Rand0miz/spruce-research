@@ -1,0 +1,541 @@
+{
+  "kind": "spruce_cached_index_summary_v1",
+  "created_utc": "2026-08-02T06:07:32.782066+00:00",
+  "config": {
+    "model": "Qwen/Qwen2.5-Coder-1.5B-Instruct",
+    "prompt_bank_sha256": "74ACE23201F9FA73D3EE7AE633583215E44D37F4E6A84D82000B9B6B366DF5CE",
+    "depths": [
+      0.1,
+      0.5,
+      0.9
+    ],
+    "seed": 20260728,
+    "repeats": 3,
+    "decoy_queries": 2,
+    "max_new_tokens": 32,
+    "block_size": 64,
+    "candidate_blocks": 4,
+    "block_radius": 1,
+    "boundary": "paragraph",
+    "beam": 16,
+    "feature_dim": 1024,
+    "unigram_fraction": 0.5,
+    "idf_power": 2.0,
+    "radix": 2,
+    "dtype": "float16",
+    "yarn_factor": 4.0,
+    "original_max_position_embeddings": 32768
+  },
+  "gpu_name": "NVIDIA L4",
+  "archive_sha256": "03E971D58A110EB783BD62E245BC1187BF3F392DC537E537EFF1CD4A1E202C9E",
+  "wall_clock_seconds": 18111.796633108002,
+  "prompts": 288,
+  "by_length": {
+    "16384": {
+      "cases": 36,
+      "dense": {
+        "exact_count": 28,
+        "exact_rate": 0.7777777777777778,
+        "median_request_seconds": 1.8405968575000315,
+        "median_prefill_seconds": 1.6836209090000693,
+        "median_decode_seconds": 0.12558173050001642,
+        "median_input_tokens": 16347.0,
+        "median_peak_memory_allocated_gb": 4.657529856,
+        "sum_request_seconds": 66.15541007200022
+      },
+      "cold": {
+        "exact_count": 32,
+        "exact_rate": 0.8888888888888888,
+        "median_request_seconds": 0.31600824050008214,
+        "median_prefill_seconds": 0.12232764649991168,
+        "median_decode_seconds": 0.12553631549997135,
+        "median_input_tokens": 1736.5,
+        "median_peak_memory_allocated_gb": 3.262410752,
+        "sum_request_seconds": 11.129295136000565,
+        "median_selection_ms": 2.1602535000511125,
+        "median_index_ms": 4.268880000040554
+      },
+      "cached": {
+        "exact_count": 32,
+        "exact_rate": 0.8888888888888888,
+        "median_request_seconds": 0.25813496800003577,
+        "median_prefill_seconds": 0.12285191350008517,
+        "median_decode_seconds": 0.12569445949986857,
+        "median_input_tokens": 1736.5,
+        "median_peak_memory_allocated_gb": 3.262410752,
+        "sum_request_seconds": 9.045135580998931,
+        "median_selection_ms": 2.3394214999825635
+      },
+      "build": {
+        "median_build_seconds": 0.05853925400015214,
+        "median_layout_seconds": 0.05390351650009961,
+        "median_index_seconds": 0.004278901500128995,
+        "median_index_bytes": 534496.0,
+        "median_tree_levels": 9.0
+      },
+      "decoy": {
+        "count": 72,
+        "median_request_seconds": 0.2629343495000285
+      },
+      "speedup": {
+        "cold_vs_dense": 5.944258757053135,
+        "cached_vs_dense": 7.313921331480376,
+        "cached_vs_cold": 1.2304177241278524
+      },
+      "amortization": {
+        "build_seconds": 0.05853925400015214,
+        "cold_seconds": 0.31600824050008214,
+        "cached_seconds": 0.25813496800003577,
+        "crossover_k": 1.0115075832303286
+      }
+    },
+    "32768": {
+      "cases": 36,
+      "dense": {
+        "exact_count": 27,
+        "exact_rate": 0.75,
+        "median_request_seconds": 4.383242030500014,
+        "median_prefill_seconds": 4.161376471500034,
+        "median_decode_seconds": 0.1262491144999558,
+        "median_input_tokens": 32730.0,
+        "median_peak_memory_allocated_gb": 6.2193960960000005,
+        "sum_request_seconds": 157.9881447199989
+      },
+      "cold": {
+        "exact_count": 32,
+        "exact_rate": 0.8888888888888888,
+        "median_request_seconds": 0.38286614550008835,
+        "median_prefill_seconds": 0.12699889950022225,
+        "median_decode_seconds": 0.12646876600001633,
+        "median_input_tokens": 1870.0,
+        "median_peak_memory_allocated_gb": 3.275652608,
+        "sum_request_seconds": 13.703382732998989,
+        "median_selection_ms": 2.4123779999172257,
+        "median_index_ms": 7.303027500029202
+      },
+      "cached": {
+        "exact_count": 32,
+        "exact_rate": 0.8888888888888888,
+        "median_request_seconds": 0.2639619064997305,
+        "median_prefill_seconds": 0.12726790649981012,
+        "median_decode_seconds": 0.12619408349996775,
+        "median_input_tokens": 1870.0,
+        "median_peak_memory_allocated_gb": 3.275652608,
+        "sum_request_seconds": 9.3871865849992,
+        "median_selection_ms": 2.566082999919672
+      },
+      "build": {
+        "median_build_seconds": 0.12126926600001298,
+        "median_layout_seconds": 0.11350252600004751,
+        "median_index_seconds": 0.007398643499982427,
+        "median_index_bytes": 1068016.0,
+        "median_tree_levels": 10.0
+      },
+      "decoy": {
+        "count": 72,
+        "median_request_seconds": 0.2583387985001764
+      },
+      "speedup": {
+        "cold_vs_dense": 11.529134652245325,
+        "cached_vs_dense": 16.83019116424779,
+        "cached_vs_cold": 1.4597965651281617
+      },
+      "amortization": {
+        "build_seconds": 0.12126926600001298,
+        "cold_seconds": 0.38286614550008835,
+        "cached_seconds": 0.2639619064997305,
+        "crossover_k": 1.0198901823815383
+      }
+    },
+    "49152": {
+      "cases": 36,
+      "dense": {
+        "exact_count": 24,
+        "exact_rate": 0.6666666666666666,
+        "median_request_seconds": 7.8477336105002,
+        "median_prefill_seconds": 7.5582795265002005,
+        "median_decode_seconds": 0.13522027099975276,
+        "median_input_tokens": 49114.0,
+        "median_peak_memory_allocated_gb": 7.780089856,
+        "sum_request_seconds": 282.51238312099986
+      },
+      "cold": {
+        "exact_count": 31,
+        "exact_rate": 0.8611111111111112,
+        "median_request_seconds": 0.4441166369997518,
+        "median_prefill_seconds": 0.1271012739998696,
+        "median_decode_seconds": 0.12622249400010332,
+        "median_input_tokens": 1805.5,
+        "median_peak_memory_allocated_gb": 3.269508352,
+        "sum_request_seconds": 16.1116480099995,
+        "median_selection_ms": 2.594038499864837,
+        "median_index_ms": 9.163686499960022
+      },
+      "cached": {
+        "exact_count": 31,
+        "exact_rate": 0.8611111111111112,
+        "median_request_seconds": 0.2656440614998701,
+        "median_prefill_seconds": 0.12779763149978862,
+        "median_decode_seconds": 0.12571899649992702,
+        "median_input_tokens": 1805.5,
+        "median_peak_memory_allocated_gb": 3.269508352,
+        "sum_request_seconds": 9.454578572999253,
+        "median_selection_ms": 2.7639635000014096
+      },
+      "build": {
+        "median_build_seconds": 0.18787639300012415,
+        "median_layout_seconds": 0.17796038849996876,
+        "median_index_seconds": 0.009221349999961603,
+        "median_index_bytes": 1600496.0,
+        "median_tree_levels": 11.0
+      },
+      "decoy": {
+        "count": 72,
+        "median_request_seconds": 0.2545480434998808
+      },
+      "speedup": {
+        "cold_vs_dense": 17.53466702758538,
+        "cached_vs_dense": 29.881012774890838,
+        "cached_vs_cold": 1.7041106470902636
+      },
+      "amortization": {
+        "build_seconds": 0.18787639300012415,
+        "cold_seconds": 0.4441166369997518,
+        "cached_seconds": 0.2656440614998701,
+        "crossover_k": 1.0526905462864724
+      }
+    },
+    "65536": {
+      "cases": 36,
+      "dense": {
+        "exact_count": 23,
+        "exact_rate": 0.6388888888888888,
+        "median_request_seconds": 12.058774969500064,
+        "median_prefill_seconds": 11.681908303499767,
+        "median_decode_seconds": 0.16084360500008188,
+        "median_input_tokens": 65498.0,
+        "median_peak_memory_allocated_gb": 9.34076416,
+        "sum_request_seconds": 434.2090623020017
+      },
+      "cold": {
+        "exact_count": 33,
+        "exact_rate": 0.9166666666666666,
+        "median_request_seconds": 0.5117397255000924,
+        "median_prefill_seconds": 0.12741020700013905,
+        "median_decode_seconds": 0.12626168599990706,
+        "median_input_tokens": 1938.5,
+        "median_peak_memory_allocated_gb": 3.28217728,
+        "sum_request_seconds": 18.58394762299895,
+        "median_selection_ms": 2.6421845000186295,
+        "median_index_ms": 11.602998500393369
+      },
+      "cached": {
+        "exact_count": 33,
+        "exact_rate": 0.9166666666666666,
+        "median_request_seconds": 0.26327998950023357,
+        "median_prefill_seconds": 0.127531751999868,
+        "median_decode_seconds": 0.1259544409999762,
+        "median_input_tokens": 1938.5,
+        "median_peak_memory_allocated_gb": 3.28217728,
+        "sum_request_seconds": 9.607988376000776,
+        "median_selection_ms": 2.8086484996947547
+      },
+      "build": {
+        "median_build_seconds": 0.2528079024996259,
+        "median_layout_seconds": 0.24049821199992039,
+        "median_index_seconds": 0.011666005000279256,
+        "median_index_bytes": 2132456.0,
+        "median_tree_levels": 11.0
+      },
+      "decoy": {
+        "count": 72,
+        "median_request_seconds": 0.2652962160000243
+      },
+      "speedup": {
+        "cold_vs_dense": 23.364737735519515,
+        "cached_vs_dense": 45.1925049562494,
+        "cached_vs_cold": 1.934218370769337
+      },
+      "amortization": {
+        "build_seconds": 0.2528079024996259,
+        "cold_seconds": 0.5117397255000924,
+        "cached_seconds": 0.26327998950023357,
+        "crossover_k": 1.0175004874824851
+      }
+    },
+    "81920": {
+      "cases": 36,
+      "dense": {
+        "exact_count": 20,
+        "exact_rate": 0.5555555555555556,
+        "median_request_seconds": 17.1989899754999,
+        "median_prefill_seconds": 16.732576895499733,
+        "median_decode_seconds": 0.18686559150000903,
+        "median_input_tokens": 81883.5,
+        "median_peak_memory_allocated_gb": 10.901435648,
+        "sum_request_seconds": 618.8647250689983
+      },
+      "cold": {
+        "exact_count": 31,
+        "exact_rate": 0.8611111111111112,
+        "median_request_seconds": 0.5614710439995179,
+        "median_prefill_seconds": 0.12420124250002118,
+        "median_decode_seconds": 0.12589993449955728,
+        "median_input_tokens": 1876.0,
+        "median_peak_memory_allocated_gb": 3.2762234880000003,
+        "sum_request_seconds": 20.570576152003923,
+        "median_selection_ms": 2.7565169998524652,
+        "median_index_ms": 13.44397899993055
+      },
+      "cached": {
+        "exact_count": 31,
+        "exact_rate": 0.8611111111111112,
+        "median_request_seconds": 0.2440575044997786,
+        "median_prefill_seconds": 0.1251342159998785,
+        "median_decode_seconds": 0.1266207865000979,
+        "median_input_tokens": 1876.0,
+        "median_peak_memory_allocated_gb": 3.2762234880000003,
+        "sum_request_seconds": 9.410207681001339,
+        "median_selection_ms": 2.970893000565411
+      },
+      "build": {
+        "median_build_seconds": 0.3151309160002711,
+        "median_layout_seconds": 0.3010523205002755,
+        "median_index_seconds": 0.013570196499586018,
+        "median_index_bytes": 2667016.0,
+        "median_tree_levels": 12.0
+      },
+      "decoy": {
+        "count": 72,
+        "median_request_seconds": 0.26205427649983903
+      },
+      "speedup": {
+        "cold_vs_dense": 30.084948544754802,
+        "cached_vs_dense": 65.76525684108441,
+        "cached_vs_cold": 2.185985352218604
+      },
+      "amortization": {
+        "build_seconds": 0.3151309160002711,
+        "cold_seconds": 0.5614710439995179,
+        "cached_seconds": 0.2440575044997786,
+        "crossover_k": 0.9928086763309917
+      }
+    },
+    "98304": {
+      "cases": 36,
+      "dense": {
+        "exact_count": 22,
+        "exact_rate": 0.6111111111111112,
+        "median_request_seconds": 22.95356311100022,
+        "median_prefill_seconds": 22.391501858000993,
+        "median_decode_seconds": 0.21136887500006196,
+        "median_input_tokens": 98267.0,
+        "median_peak_memory_allocated_gb": 12.462117376,
+        "sum_request_seconds": 826.2878598110019
+      },
+      "cold": {
+        "exact_count": 32,
+        "exact_rate": 0.8888888888888888,
+        "median_request_seconds": 0.6495534925002175,
+        "median_prefill_seconds": 0.12511053200069,
+        "median_decode_seconds": 0.12645714999962365,
+        "median_input_tokens": 1924.0,
+        "median_peak_memory_allocated_gb": 3.28079616,
+        "sum_request_seconds": 23.783606019007493,
+        "median_selection_ms": 2.8267154993955046,
+        "median_index_ms": 15.841240999179718
+      },
+      "cached": {
+        "exact_count": 32,
+        "exact_rate": 0.8888888888888888,
+        "median_request_seconds": 0.2672278089999054,
+        "median_prefill_seconds": 0.12569221749981807,
+        "median_decode_seconds": 0.12672256499990908,
+        "median_input_tokens": 1924.0,
+        "median_peak_memory_allocated_gb": 3.28079616,
+        "sum_request_seconds": 9.812552997997955,
+        "median_selection_ms": 3.057627000089269
+      },
+      "build": {
+        "median_build_seconds": 0.3930876690005789,
+        "median_layout_seconds": 0.3766407514999628,
+        "median_index_seconds": 0.01607904450065689,
+        "median_index_bytes": 3197936.0,
+        "median_tree_levels": 12.0
+      },
+      "decoy": {
+        "count": 72,
+        "median_request_seconds": 0.2553552170002149
+      },
+      "speedup": {
+        "cold_vs_dense": 34.741908319144095,
+        "cached_vs_dense": 84.20722517163358,
+        "cached_vs_cold": 2.423793891748665
+      },
+      "amortization": {
+        "build_seconds": 0.3930876690005789,
+        "cold_seconds": 0.6495534925002175,
+        "cached_seconds": 0.2672278089999054,
+        "crossover_k": 1.0281487380124124
+      }
+    },
+    "114688": {
+      "cases": 36,
+      "dense": {
+        "exact_count": 24,
+        "exact_rate": 0.6666666666666666,
+        "median_request_seconds": 31.75981402849993,
+        "median_prefill_seconds": 31.109495605999655,
+        "median_decode_seconds": 0.23609696600033203,
+        "median_input_tokens": 114649.0,
+        "median_peak_memory_allocated_gb": 14.022821376,
+        "sum_request_seconds": 1142.3570331360024
+      },
+      "cold": {
+        "exact_count": 33,
+        "exact_rate": 0.9166666666666666,
+        "median_request_seconds": 0.7111775189996479,
+        "median_prefill_seconds": 0.12567097400005878,
+        "median_decode_seconds": 0.12617214899910323,
+        "median_input_tokens": 1937.5,
+        "median_peak_memory_allocated_gb": 3.282082048,
+        "sum_request_seconds": 25.970634070994493,
+        "median_selection_ms": 2.869136000299477,
+        "median_index_ms": 17.866295499516127
+      },
+      "cached": {
+        "exact_count": 33,
+        "exact_rate": 0.9166666666666666,
+        "median_request_seconds": 0.2647274410010141,
+        "median_prefill_seconds": 0.1253407164995224,
+        "median_decode_seconds": 0.12658251150060096,
+        "median_input_tokens": 1937.5,
+        "median_peak_memory_allocated_gb": 3.282082048,
+        "sum_request_seconds": 9.67149966800389,
+        "median_selection_ms": 3.1148939997365233
+      },
+      "build": {
+        "median_build_seconds": 0.45631804799904785,
+        "median_layout_seconds": 0.4387460790003388,
+        "median_index_seconds": 0.01776566799981083,
+        "median_index_bytes": 3730416.0,
+        "median_tree_levels": 12.0
+      },
+      "decoy": {
+        "count": 72,
+        "median_request_seconds": 0.26019722300043213
+      },
+      "speedup": {
+        "cold_vs_dense": 43.986489895210255,
+        "cached_vs_dense": 118.11581164762369,
+        "cached_vs_cold": 2.6852747725270407
+      },
+      "amortization": {
+        "build_seconds": 0.45631804799904785,
+        "cold_seconds": 0.7111775189996479,
+        "cached_seconds": 0.2647274410010141,
+        "crossover_k": 1.022103187986103
+      }
+    },
+    "131072": {
+      "cases": 36,
+      "dense": {
+        "exact_count": 24,
+        "exact_rate": 0.6666666666666666,
+        "median_request_seconds": 43.89246190599988,
+        "median_prefill_seconds": 43.196485161000055,
+        "median_decode_seconds": 0.26143402000161586,
+        "median_input_tokens": 131033.0,
+        "median_peak_memory_allocated_gb": 15.58349568,
+        "sum_request_seconds": 1580.1875695769813
+      },
+      "cold": {
+        "exact_count": 31,
+        "exact_rate": 0.8611111111111112,
+        "median_request_seconds": 0.7747919319990615,
+        "median_prefill_seconds": 0.12429549349963054,
+        "median_decode_seconds": 0.12572961150090123,
+        "median_input_tokens": 1875.5,
+        "median_peak_memory_allocated_gb": 3.2765957119999998,
+        "sum_request_seconds": 27.982623109992346,
+        "median_selection_ms": 2.9305170000952785,
+        "median_index_ms": 20.549387500068406
+      },
+      "cached": {
+        "exact_count": 31,
+        "exact_rate": 0.8611111111111112,
+        "median_request_seconds": 0.2647739439998986,
+        "median_prefill_seconds": 0.12496247299986862,
+        "median_decode_seconds": 0.12600419800037344,
+        "median_input_tokens": 1875.5,
+        "median_peak_memory_allocated_gb": 3.2765957119999998,
+        "sum_request_seconds": 9.279586379001557,
+        "median_selection_ms": 3.1051739988470217
+      },
+      "build": {
+        "median_build_seconds": 0.5290021840000918,
+        "median_layout_seconds": 0.5076540684995052,
+        "median_index_seconds": 0.020386711999890395,
+        "median_index_bytes": 4262376.0,
+        "median_tree_levels": 12.0
+      },
+      "decoy": {
+        "count": 72,
+        "median_request_seconds": 0.261323643500873
+      },
+      "speedup": {
+        "cold_vs_dense": 56.47031600167285,
+        "cached_vs_dense": 170.28642280357786,
+        "cached_vs_cold": 3.0155032742960635
+      },
+      "amortization": {
+        "build_seconds": 0.5290021840000918,
+        "cold_seconds": 0.7747919319990615,
+        "cached_seconds": 0.2647739439998986,
+        "crossover_k": 1.0372226008643446
+      }
+    }
+  },
+  "fits": {
+    "cached_ms_per_ki_token": {
+      "slope": 0.026658677087134548,
+      "intercept": 259.55652824978466,
+      "r2": 0.019300809639014593
+    },
+    "traversal_ms_per_tree_level": {
+      "slope": 0.27242420072010937,
+      "intercept": 0.14046014208622282,
+      "r2": 0.9856883314518132
+    },
+    "build_seconds_per_token": {
+      "slope": 4.102755055379785e-06,
+      "intercept": -0.013233970660552707,
+      "r2": 0.9993736167251561
+    }
+  },
+  "overall": {
+    "dense": {
+      "exact_count": 192,
+      "exact_rate": 0.6666666666666666,
+      "median_request_seconds": 14.65396807749994,
+      "sum_request_seconds": 5108.562187807985
+    },
+    "cold": {
+      "exact_count": 255,
+      "exact_rate": 0.8854166666666666,
+      "median_request_seconds": 0.542874045499957,
+      "sum_request_seconds": 157.83571285399626
+    },
+    "cached": {
+      "exact_count": 255,
+      "exact_rate": 0.8854166666666666,
+      "median_request_seconds": 0.2639931335006622,
+      "sum_request_seconds": 75.6687358410029
+    },
+    "speedup": {
+      "cold_vs_dense": 32.366326323964394,
+      "cached_vs_dense": 67.51219154159291,
+      "cached_vs_cold": 2.085877490878726
+    }
+  }
+}

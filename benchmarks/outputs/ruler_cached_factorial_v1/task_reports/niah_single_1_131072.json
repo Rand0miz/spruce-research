@@ -1,0 +1,7460 @@
+{
+  "task": "niah_single_1",
+  "length": 131072,
+  "config": {
+    "model": "Qwen/Qwen2.5-Coder-1.5B-Instruct",
+    "tasks": [
+      "niah_single_1",
+      "niah_single_2",
+      "niah_single_3",
+      "niah_multikey_1",
+      "niah_multikey_2",
+      "niah_multikey_3",
+      "niah_multivalue",
+      "niah_multiquery",
+      "vt",
+      "cwe",
+      "fwe",
+      "qa_1",
+      "qa_2"
+    ],
+    "lengths": [
+      4096,
+      8192,
+      16384,
+      32768,
+      65536,
+      131072
+    ],
+    "num_samples": 20,
+    "tails": [
+      2,
+      3
+    ],
+    "feature_dims": [
+      1024,
+      4096
+    ],
+    "budgets": [
+      4,
+      9
+    ],
+    "beam": 16,
+    "block_size": 64,
+    "block_radius": 1,
+    "boundary": "paragraph",
+    "unigram_fraction": 0.5,
+    "idf_power": 2.0,
+    "radix": 2,
+    "max_occurrences": 256,
+    "yarn_factor": 4.0,
+    "original_context": 32768
+  },
+  "config_fingerprint": "831F0BE5B219F9FA077717675BBFE77BFE7EAA3B077D9AB1617B2C7360B5A583",
+  "created_utc": "2026-08-02T18:36:57.704938+00:00",
+  "cases": [
+    {
+      "task": "niah_single_1",
+      "references": [
+        "2338687"
+      ],
+      "prompt_ceiling": 1.0,
+      "original_prompt_tokens": 130914,
+      "tokenize_layout_seconds": 0.5097216700000899,
+      "cache": {
+        "t2_d1024": {
+          "index_seconds": 0.017138256000180263,
+          "selection_seconds": 0.0026967100000092614,
+          "index_bytes": 4193280,
+          "tree_levels": 12,
+          "visited_nodes": 255,
+          "document_blocks": 2045
+        },
+        "t2_d4096": {
+          "index_seconds": 0.02704449999987446,
+          "selection_seconds": 0.0030543479999778356,
+          "index_bytes": 16773120,
+          "tree_levels": 12,
+          "visited_nodes": 255,
+          "document_blocks": 2045
+        },
+        "t3_d1024": {
+          "index_seconds": 0.016413352999961717,
+          "selection_seconds": 0.0026017689999662252,
+          "index_bytes": 4193280,
+          "tree_levels": 12,
+          "visited_nodes": 255,
+          "document_blocks": 2045
+        },
+        "t3_d4096": {
+          "index_seconds": 0.025460589999966032,
+          "selection_seconds": 0.002946007999980793,
+          "index_bytes": 16773120,
+          "tree_levels": 12,
+          "visited_nodes": 255,
+          "document_blocks": 2045
+        }
+      },
+      "arms": {
+        "t2_d1024_m4": {
+          "ceiling": 1.0,
+          "per_reference": [
+            {
+              "in_document": true,
+              "occurrences": 1,
+              "occurrences_capped": false,
+              "gold_block_count": 1,
+              "selected_hit": true,
+              "expanded_hit": true,
+              "in_packet": true,
+              "verdict": "ok",
+              "rank_in_beam": 0
+            }
+          ],
+          "selected_blocks": [
+            715,
+            0,
+            1,
+            2
+          ],
+          "expanded_blocks": [
+            0,
+            1,
+            2,
+            3,
+            714,
+            715,
+            716
+          ],
+          "compiled_prompt_tokens": 624,
+          "compression_fraction": 0.00476648792336954,
+          "span_count": 2,
+          "compile_seconds": 0.002507967000155986
+        },
+        "t2_d1024_m9": {
+          "ceiling": 1.0,
+          "per_reference": [
+            {
+              "in_document": true,
+              "occurrences": 1,
+              "occurrences_capped": false,
+              "gold_block_count": 1,
+              "selected_hit": true,
+              "expanded_hit": true,
+              "in_packet": true,
+              "verdict": "ok",
+              "rank_in_beam": 0
+            }
+          ],
+          "selected_blocks": [
+            715,
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7
+          ],
+          "expanded_blocks": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            714,
+            715,
+            716
+          ],
+          "compiled_prompt_tokens": 944,
+          "compression_fraction": 0.007210840704584689,
+          "span_count": 2,
+          "compile_seconds": 0.0033053629999812983
+        },
+        "t2_d4096_m4": {
+          "ceiling": 1.0,
+          "per_reference": [
+            {
+              "in_document": true,
+              "occurrences": 1,
+              "occurrences_capped": false,
+              "gold_block_count": 1,
+              "selected_hit": true,
+              "expanded_hit": true,
+              "in_packet": true,
+              "verdict": "ok",
+              "rank_in_beam": 0
+            }
+          ],
+          "selected_blocks": [
+            715,
+            0,
+            1,
+            2
+          ],
+          "expanded_blocks": [
+            0,
+            1,
+            2,
+            3,
+            714,
+            715,
+            716
+          ],
+          "compiled_prompt_tokens": 624,
+          "compression_fraction": 0.00476648792336954,
+          "span_count": 2,
+          "compile_seconds": 0.002503922999949282
+        },
+        "t2_d4096_m9": {
+          "ceiling": 1.0,
+          "per_reference": [
+            {
+              "in_document": true,
+              "occurrences": 1,
+              "occurrences_capped": false,
+              "gold_block_count": 1,
+              "selected_hit": true,
+              "expanded_hit": true,
+              "in_packet": true,
+              "verdict": "ok",
+              "rank_in_beam": 0
+            }
+          ],
+          "selected_blocks": [
+            715,
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7
+          ],
+          "expanded_blocks": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            714,
+            715,
+            716
+          ],
+          "compiled_prompt_tokens": 944,
+          "compression_fraction": 0.007210840704584689,
+          "span_count": 2,
+          "compile_seconds": 0.003114843000048495
+        },
+        "t3_d1024_m4": {
+          "ceiling": 1.0,
+          "per_reference": [
+            {
+              "in_document": true,
+              "occurrences": 1,
+              "occurrences_capped": false,
+              "gold_block_count": 1,
+              "selected_hit": true,
+              "expanded_hit": true,
+              "in_packet": true,
+              "verdict": "ok",
+              "rank_in_beam": 0
+            }
+          ],
+          "selected_blocks": [
+            715,
+            0,
+            1,
+            2
+          ],
+          "expanded_blocks": [
+            0,
+            1,
+            2,
+            3,
+            714,
+            715,
+            716
+          ],
+          "compiled_prompt_tokens": 648,
+          "compression_fraction": 0.004949814381960676,
+          "span_count": 2,
+          "compile_seconds": 0.00234824800008937
+        },
+        "t3_d1024_m9": {
+          "ceiling": 1.0,
+          "per_reference": [
+            {
+              "in_document": true,
+              "occurrences": 1,
+              "occurrences_capped": false,
+              "gold_block_count": 1,
+              "selected_hit": true,
+              "expanded_hit": true,
+              "in_packet": true,
+              "verdict": "ok",
+              "rank_in_beam": 0
+            }
+          ],
+          "selected_blocks": [
+            715,
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7
+          ],
+          "expanded_blocks": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            714,
+            715,
+            716
+          ],
+          "compiled_prompt_tokens": 968,
+          "compression_fraction": 0.007394167163175825,
+          "span_count": 2,
+          "compile_seconds": 0.003146922000041741
+        },
+        "t3_d4096_m4": {
+          "ceiling": 1.0,
+          "per_reference": [
+            {
+              "in_document": true,
+              "occurrences": 1,
+              "occurrences_capped": false,
+              "gold_block_count": 1,
+              "selected_hit": true,
+              "expanded_hit": true,
+              "in_packet": true,
+              "verdict": "ok",
+              "rank_in_beam": 0
+            }
+          ],
+          "selected_blocks": [
+            715,
+            0,
+            1,
+            2
+          ],
+          "expanded_blocks": [
+            0,
+            1,
+            2,
+            3,
+            714,
+            715,
+            716
+          ],
+          "compiled_prompt_tokens": 648,
+          "compression_fraction": 0.004949814381960676,
+          "span_count": 2,
+          "compile_seconds": 0.0025715440001476964
+        },
+        "t3_d4096_m9": {
+          "ceiling": 1.0,
+          "per_reference": [
+            {
+              "in_document": true,
+              "occurrences": 1,
+              "occurrences_capped": false,
+              "gold_block_count": 1,
+              "selected_hit": true,
+              "expanded_hit": true,
+              "in_packet": true,
+              "verdict": "ok",
+              "rank_in_beam": 0
+            }
+          ],
+          "selected_blocks": [
+            715,
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7
+          ],
+          "expanded_blocks": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            714,
+            715,
+            716
+          ],
+          "compiled_prompt_tokens": 968,
+          "compression_fraction": 0.007394167163175825,
+          "span_count": 2,
+          "compile_seconds": 0.0030414170000767626
+        }
+      },
+      "pipeline_seconds": 0.6320580750000317,
+      "baseline_checked": false,
+      "baseline_match": null,
+      "index": "171821",
+      "length": 131072
+    },
+    {
+      "task": "niah_single_1",
+      "references": [
+        "5663623"
+      ],
+      "prompt_ceiling": 1.0,
+      "original_prompt_tokens": 130914,
+      "tokenize_layout_seconds": 0.5047975719999158,
+      "cache": {
+        "t2_d1024": {
+          "index_seconds": 0.017557668000108606,
+          "selection_seconds": 0.0025378739999268873,
+          "index_bytes": 4193280,
+          "tree_levels": 12,
+          "visited_nodes": 255,
+          "document_blocks": 2045
+        },
+        "t2_d4096": {
+          "index_seconds": 0.022325238000121317,
+          "selection_seconds": 0.0027204680000068038,
+          "index_bytes": 16773120,
+          "tree_levels": 12,
+          "visited_nodes": 255,
+          "document_blocks": 2045
+        },
+        "t3_d1024": {
+          "index_seconds": 0.0172591040000043,
+          "selection_seconds": 0.0024510040000222943,
+          "index_bytes": 4193280,
+          "tree_levels": 12,
+          "visited_nodes": 255,
+          "document_blocks": 2045
+        },
+        "t3_d4096": {
+          "index_seconds": 0.02099341699999968,
+          "selection_seconds": 0.002646359999971537,
+          "index_bytes": 16773120,
+          "tree_levels": 12,
+          "visited_nodes": 255,
+          "document_blocks": 2045
+        }
+      },
+      "arms": {
+        "t2_d1024_m4": {
+          "ceiling": 1.0,
+          "per_reference": [
+            {
+              "in_document": true,
+              "occurrences": 1,
+              "occurrences_capped": false,
+              "gold_block_count": 1,
+              "selected_hit": true,
+              "expanded_hit": true,
+              "in_packet": true,
+              "verdict": "ok",
+              "rank_in_beam": 0
+            }
+          ],
+          "selected_blocks": [
+            1393,
+            0,
+            1,
+            2
+          ],
+          "expanded_blocks": [
+            0,
+            1,
+            2,
+            3,
+            1392,
+            1393,
+            1394
+          ],
+          "compiled_prompt_tokens": 626,
+          "compression_fraction": 0.004781765128252135,
+          "span_count": 2,
+          "compile_seconds": 0.0026052439998238697
+        },
+        "t2_d1024_m9": {
+          "ceiling": 1.0,
+          "per_reference": [
+            {
+              "in_document": true,
+              "occurrences": 1,
+              "occurrences_capped": false,
+              "gold_block_count": 1,
+              "selected_hit": true,
+              "expanded_hit": true,
+              "in_packet": true,
+              "verdict": "ok",
+              "rank_in_beam": 0
+            }
+          ],
+          "selected_blocks": [
+            1393,
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7
+          ],
+          "expanded_blocks": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            1392,
+            1393,
+            1394
+          ],
+          "compiled_prompt_tokens": 946,
+          "compression_fraction": 0.007226117909467284,
+          "span_count": 2,
+          "compile_seconds": 0.0032489430000168795
+        },
+        "t2_d4096_m4": {
+          "ceiling": 1.0,
+          "per_reference": [
+            {
+              "in_document": true,
+              "occurrences": 1,
+              "occurrences_capped": false,
+              "gold_block_count": 1,
+              "selected_hit": true,
+              "expanded_hit": true,
+              "in_packet": true,
+              "verdict": "ok",
+              "rank_in_beam": 0
+            }
+          ],
+          "selected_blocks": [
+            1393,
+            0,
+            1,
+            2
+          ],
+          "expanded_blocks": [
+            0,
+            1,
+            2,
+            3,
+            1392,
+            1393,
+            1394
+          ],
+          "compiled_prompt_tokens": 626,
+          "compression_fraction": 0.004781765128252135,
+          "span_count": 2,
+          "compile_seconds": 0.0026733179997791012
+        },
+        "t2_d4096_m9": {
+          "ceiling": 1.0,
+          "per_reference": [
+            {
+              "in_document": true,
+              "occurrences": 1,
+              "occurrences_capped": false,
+              "gold_block_count": 1,
+              "selected_hit": true,
+              "expanded_hit": true,
+              "in_packet": true,
+              "verdict": "ok",
+              "rank_in_beam": 0
+            }
+          ],
+          "selected_blocks": [
+            1393,
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7
+          ],
+          "expanded_blocks": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            1392,
+            1393,
+            1394
+          ],
+          "compiled_prompt_tokens": 946,
+          "compression_fraction": 0.007226117909467284,
+          "span_count": 2,
+          "compile_seconds": 0.0034721560000434692
+        },
+        "t3_d1024_m4": {
+          "ceiling": 1.0,
+          "per_reference": [
+            {
+              "in_document": true,
+              "occurrences": 1,
+              "occurrences_capped": false,
+              "gold_block_count": 1,
+              "selected_hit": true,
+              "expanded_hit": true,
+              "in_packet": true,
+              "verdict": "ok",
+              "rank_in_beam": 0
+            }
+          ],
+          "selected_blocks": [
+            1393,
+            0,
+            1,
+            2
+          ],
+          "expanded_blocks": [
+            0,
+            1,
+            2,
+            3,
+            1392,
+            1393,
+            1394
+          ],
+          "compiled_prompt_tokens": 650,
+          "compression_fraction": 0.0049650915868432715,
+          "span_count": 2,
+          "compile_seconds": 0.0022394620000341092
+        },
+        "t3_d1024_m9": {
+          "ceiling": 1.0,
+          "per_reference": [
+            {
+              "in_document": true,
+              "occurrences": 1,
+              "occurrences_capped": false,
+              "gold_block_count": 1,
+              "selected_hit": true,
+              "expanded_hit": true,
+              "in_packet": true,
+              "verdict": "ok",
+              "rank_in_beam": 0
+            }
+          ],
+          "selected_blocks": [
+            1393,
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7
+          ],
+          "expanded_blocks": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            1392,
+            1393,
+            1394
+          ],
+          "compiled_prompt_tokens": 970,
+          "compression_fraction": 0.00740944436805842,
+          "span_count": 2,
+          "compile_seconds": 0.0029012869999860413
+        },
+        "t3_d4096_m4": {
+          "ceiling": 1.0,
+          "per_reference": [
+            {
+              "in_document": true,
+              "occurrences": 1,
+              "occurrences_capped": false,
+              "gold_block_count": 1,
+              "selected_hit": true,
+              "expanded_hit": true,
+              "in_packet": true,
+              "verdict": "ok",
+              "rank_in_beam": 0
+            }
+          ],
+          "selected_blocks": [
+            1393,
+            0,
+            1,
+            2
+          ],
+          "expanded_blocks": [
+            0,
+            1,
+            2,
+            3,
+            1392,
+            1393,
+            1394
+          ],
+          "compiled_prompt_tokens": 650,
+          "compression_fraction": 0.0049650915868432715,
+          "span_count": 2,
+          "compile_seconds": 0.002633112000012261
+        },
+        "t3_d4096_m9": {
+          "ceiling": 1.0,
+          "per_reference": [
+            {
+              "in_document": true,
+              "occurrences": 1,
+              "occurrences_capped": false,
+              "gold_block_count": 1,
+              "selected_hit": true,
+              "expanded_hit": true,
+              "in_packet": true,
+              "verdict": "ok",
+              "rank_in_beam": 0
+            }
+          ],
+          "selected_blocks": [
+            1393,
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7
+          ],
+          "expanded_blocks": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            1392,
+            1393,
+            1394
+          ],
+          "compiled_prompt_tokens": 970,
+          "compression_fraction": 0.00740944436805842,
+          "span_count": 2,
+          "compile_seconds": 0.0034504650000144466
+        }
+      },
+      "pipeline_seconds": 0.6192763850001484,
+      "baseline_checked": false,
+      "baseline_match": null,
+      "index": "334449",
+      "length": 131072
+    },
+    {
+      "task": "niah_single_1",
+      "references": [
+        "7210606"
+      ],
+      "prompt_ceiling": 1.0,
+      "original_prompt_tokens": 130912,
+      "tokenize_layout_seconds": 0.49760609199984174,
+      "cache": {
+        "t2_d1024": {
+          "index_seconds": 0.01633453199997348,
+          "selection_seconds": 0.002595076000034169,
+          "index_bytes": 4193280,
+          "tree_levels": 12,
+          "visited_nodes": 255,
+          "document_blocks": 2045
+        },
+        "t2_d4096": {
+          "index_seconds": 0.021712818999958472,
+          "selection_seconds": 0.0029419350000807754,
+          "index_bytes": 16773120,
+          "tree_levels": 12,
+          "visited_nodes": 255,
+          "document_blocks": 2045
+        },
+        "t3_d1024": {
+          "index_seconds": 0.016369946999930107,
+          "selection_seconds": 0.0025387669998053752,
+          "index_bytes": 4193280,
+          "tree_levels": 12,
+          "visited_nodes": 255,
+          "document_blocks": 2045
+        },
+        "t3_d4096": {
+          "index_seconds": 0.02121346099988841,
+          "selection_seconds": 0.002859506000049805,
+          "index_bytes": 16773120,
+          "tree_levels": 12,
+          "visited_nodes": 255,
+          "document_blocks": 2045
+        }
+      },
+      "arms": {
+        "t2_d1024_m4": {
+          "ceiling": 1.0,
+          "per_reference": [
+            {
+              "in_document": true,
+              "occurrences": 1,
+              "occurrences_capped": false,
+              "gold_block_count": 1,
+              "selected_hit": true,
+              "expanded_hit": true,
+              "in_packet": true,
+              "verdict": "ok",
+              "rank_in_beam": 0
+            }
+          ],
+          "selected_blocks": [
+            1091,
+            0,
+            1,
+            2
+          ],
+          "expanded_blocks": [
+            0,
+            1,
+            2,
+            3,
+            1090,
+            1091,
+            1092
+          ],
+          "compiled_prompt_tokens": 625,
+          "compression_fraction": 0.004774199462234173,
+          "span_count": 2,
+          "compile_seconds": 0.0025132330001724767
+        },
+        "t2_d1024_m9": {
+          "ceiling": 1.0,
+          "per_reference": [
+            {
+              "in_document": true,
+              "occurrences": 1,
+              "occurrences_capped": false,
+              "gold_block_count": 1,
+              "selected_hit": true,
+              "expanded_hit": true,
+              "in_packet": true,
+              "verdict": "ok",
+              "rank_in_beam": 0
+            }
+          ],
+          "selected_blocks": [
+            1091,
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7
+          ],
+          "expanded_blocks": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            1090,
+            1091,
+            1092
+          ],
+          "compiled_prompt_tokens": 945,
+          "compression_fraction": 0.007218589586898069,
+          "span_count": 2,
+          "compile_seconds": 0.0030748319998110674
+        },
+        "t2_d4096_m4": {
+          "ceiling": 1.0,
+          "per_reference": [
+            {
+              "in_document": true,
+              "occurrences": 1,
+              "occurrences_capped": false,
+              "gold_block_count": 1,
+              "selected_hit": true,
+              "expanded_hit": true,
+              "in_packet": true,
+              "verdict": "ok",
+              "rank_in_beam": 0
+            }
+          ],
+          "selected_blocks": [
+            1091,
+            0,
+            1,
+            2
+          ],
+          "expanded_blocks": [
+            0,
+            1,
+            2,
+            3,
+            1090,
+            1091,
+            1092
+          ],
+          "compiled_prompt_tokens": 625,
+          "compression_fraction": 0.004774199462234173,
+          "span_count": 2,
+          "compile_seconds": 0.002461219999986497
+        },
+        "t2_d4096_m9": {
+          "ceiling": 1.0,
+          "per_reference": [
+            {
+              "in_document": true,
+              "occurrences": 1,
+              "occurrences_capped": false,
+              "gold_block_count": 1,
+              "selected_hit": true,
+              "expanded_hit": true,
+              "in_packet": true,
+              "verdict": "ok",
+              "rank_in_beam": 0
+            }
+          ],
+          "selected_blocks": [
+            1091,
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7
+          ],
+          "expanded_blocks": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            1090,
+            1091,
+            1092
+          ],
+          "compiled_prompt_tokens": 945,
+          "compression_fraction": 0.007218589586898069,
+          "span_count": 2,
+          "compile_seconds": 0.0030866019999393757
+        },
+        "t3_d1024_m4": {
+          "ceiling": 1.0,
+          "per_reference": [
+            {
+              "in_document": true,
+              "occurrences": 1,
+              "occurrences_capped": false,
+              "gold_block_count": 1,
+              "selected_hit": true,
+              "expanded_hit": true,
+              "in_packet": true,
+              "verdict": "ok",
+              "rank_in_beam": 0
+            }
+          ],
+          "selected_blocks": [
+            1091,
+            0,
+            1,
+            2
+          ],
+          "expanded_blocks": [
+            0,
+            1,
+            2,
+            3,
+            1090,
+            1091,
+            1092
+          ],
+          "compiled_prompt_tokens": 649,
+          "compression_fraction": 0.0049575287215839646,
+          "span_count": 2,
+          "compile_seconds": 0.002384568000024956
+        },
+        "t3_d1024_m9": {
+          "ceiling": 1.0,
+          "per_reference": [
+            {
+              "in_document": true,
+              "occurrences": 1,
+              "occurrences_capped": false,
+              "gold_block_count": 1,
+              "selected_hit": true,
+              "expanded_hit": true,
+              "in_packet": true,
+              "verdict": "ok",
+              "rank_in_beam": 0
+            }
+          ],
+          "selected_blocks": [
+            1091,
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7
+          ],
+          "expanded_blocks": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            1090,
+            1091,
+            1092
+          ],
+          "compiled_prompt_tokens": 969,
+          "compression_fraction": 0.007401918846247861,
+          "span_count": 2,
+          "compile_seconds": 0.002996871000050305
+        },
+        "t3_d4096_m4": {
+          "ceiling": 1.0,
+          "per_reference": [
+            {
+              "in_document": true,
+              "occurrences": 1,
+              "occurrences_capped": false,
+              "gold_block_count": 1,
+              "selected_hit": true,
+              "expanded_hit": true,
+              "in_packet": true,
+              "verdict": "ok",
+              "rank_in_beam": 0
+            }
+          ],
+          "selected_blocks": [
+            1091,
+            0,
+            1,
+            2
+          ],
+          "expanded_blocks": [
+            0,
+            1,
+            2,
+            3,
+            1090,
+            1091,
+            1092
+          ],
+          "compiled_prompt_tokens": 649,
+          "compression_fraction": 0.0049575287215839646,
+          "span_count": 2,
+          "compile_seconds": 0.0024884360000214656
+        },
+        "t3_d4096_m9": {
+          "ceiling": 1.0,
+          "per_reference": [
+            {
+              "in_document": true,
+              "occurrences": 1,
+              "occurrences_capped": false,
+              "gold_block_count": 1,
+              "selected_hit": true,
+              "expanded_hit": true,
+              "in_packet": true,
+              "verdict": "ok",
+              "rank_in_beam": 0
+            }
+          ],
+          "selected_blocks": [
+            1091,
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7
+          ],
+          "expanded_blocks": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            1090,
+            1091,
+            1092
+          ],
+          "compiled_prompt_tokens": 969,
+          "compression_fraction": 0.007401918846247861,
+          "span_count": 2,
+          "compile_seconds": 0.003269542999987607
+        }
+      },
+      "pipeline_seconds": 0.6089898279999488,
+      "baseline_checked": false,
+      "baseline_match": null,
+      "index": "262091",
+      "length": 131072
+    },
+    {
+      "task": "niah_single_1",
+      "references": [
+        "5479144"
+      ],
+      "prompt_ceiling": 1.0,
+      "original_prompt_tokens": 130914,
+      "tokenize_layout_seconds": 0.5078705059997901,
+      "cache": {
+        "t2_d1024": {
+          "index_seconds": 0.016618097000218768,
+          "selection_seconds": 0.0028429789999790955,
+          "index_bytes": 4193280,
+          "tree_levels": 12,
+          "visited_nodes": 255,
+          "document_blocks": 2045
+        },
+        "t2_d4096": {
+          "index_seconds": 0.022190183999782676,
+          "selection_seconds": 0.0028259670000352344,
+          "index_bytes": 16773120,
+          "tree_levels": 12,
+          "visited_nodes": 255,
+          "document_blocks": 2045
+        },
+        "t3_d1024": {
+          "index_seconds": 0.01763400400000137,
+          "selection_seconds": 0.002818399000034333,
+          "index_bytes": 4193280,
+          "tree_levels": 12,
+          "visited_nodes": 255,
+          "document_blocks": 2045
+        },
+        "t3_d4096": {
+          "index_seconds": 0.021599501999844506,
+          "selection_seconds": 0.0031024570000681706,
+          "index_bytes": 16773120,
+          "tree_levels": 12,
+          "visited_nodes": 255,
+          "document_blocks": 2045
+        }
+      },
+      "arms": {
+        "t2_d1024_m4": {
+          "ceiling": 1.0,
+          "per_reference": [
+            {
+              "in_document": true,
+              "occurrences": 1,
+              "occurrences_capped": false,
+              "gold_block_count": 1,
+              "selected_hit": true,
+              "expanded_hit": true,
+              "in_packet": true,
+              "verdict": "ok",
+              "rank_in_beam": 0
+            }
+          ],
+          "selected_blocks": [
+            1991,
+            0,
+            1990,
+            1
+          ],
+          "expanded_blocks": [
+            0,
+            1,
+            2,
+            1989,
+            1990,
+            1991,
+            1992
+          ],
+          "compiled_prompt_tokens": 627,
+          "compression_fraction": 0.004789403730693432,
+          "span_count": 2,
+          "compile_seconds": 0.002660553999930926
+        },
+        "t2_d1024_m9": {
+          "ceiling": 1.0,
+          "per_reference": [
+            {
+              "in_document": true,
+              "occurrences": 1,
+              "occurrences_capped": false,
+              "gold_block_count": 1,
+              "selected_hit": true,
+              "expanded_hit": true,
+              "in_packet": true,
+              "verdict": "ok",
+              "rank_in_beam": 0
+            }
+          ],
+          "selected_blocks": [
+            1991,
+            0,
+            1990,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6
+          ],
+          "expanded_blocks": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            1989,
+            1990,
+            1991,
+            1992
+          ],
+          "compiled_prompt_tokens": 946,
+          "compression_fraction": 0.007226117909467284,
+          "span_count": 2,
+          "compile_seconds": 0.0034360390000074403
+        },
+        "t2_d4096_m4": {
+          "ceiling": 1.0,
+          "per_reference": [
+            {
+              "in_document": true,
+              "occurrences": 1,
+              "occurrences_capped": false,
+              "gold_block_count": 1,
+              "selected_hit": true,
+              "expanded_hit": true,
+              "in_packet": true,
+              "verdict": "ok",
+              "rank_in_beam": 0
+            }
+          ],
+          "selected_blocks": [
+            1991,
+            0,
+            1990,
+            1
+          ],
+          "expanded_blocks": [
+            0,
+            1,
+            2,
+            1989,
+            1990,
+            1991,
+            1992
+          ],
+          "compiled_prompt_tokens": 627,
+          "compression_fraction": 0.004789403730693432,
+          "span_count": 2,
+          "compile_seconds": 0.0027393039999878965
+        },
+        "t2_d4096_m9": {
+          "ceiling": 1.0,
+          "per_reference": [
+            {
+              "in_document": true,
+              "occurrences": 1,
+              "occurrences_capped": false,
+              "gold_block_count": 1,
+              "selected_hit": true,
+              "expanded_hit": true,
+              "in_packet": true,
+              "verdict": "ok",
+              "rank_in_beam": 0
+            }
+          ],
+          "selected_blocks": [
+            1991,
+            0,
+            1990,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6
+          ],
+          "expanded_blocks": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            1989,
+            1990,
+            1991,
+            1992
+          ],
+          "compiled_prompt_tokens": 946,
+          "compression_fraction": 0.007226117909467284,
+          "span_count": 2,
+          "compile_seconds": 0.003392132999806563
+        },
+        "t3_d1024_m4": {
+          "ceiling": 1.0,
+          "per_reference": [
+            {
+              "in_document": true,
+              "occurrences": 1,
+              "occurrences_capped": false,
+              "gold_block_count": 1,
+              "selected_hit": true,
+              "expanded_hit": true,
+              "in_packet": true,
+              "verdict": "ok",
+              "rank_in_beam": 0
+            }
+          ],
+          "selected_blocks": [
+            1991,
+            0,
+            1990,
+            1
+          ],
+          "expanded_blocks": [
+            0,
+            1,
+            2,
+            1989,
+            1990,
+            1991,
+            1992
+          ],
+          "compiled_prompt_tokens": 651,
+          "compression_fraction": 0.004972730189284569,
+          "span_count": 2,
+          "compile_seconds": 0.0023655990000861493
+        },
+        "t3_d1024_m9": {
+          "ceiling": 1.0,
+          "per_reference": [
+            {
+              "in_document": true,
+              "occurrences": 1,
+              "occurrences_capped": false,
+              "gold_block_count": 1,
+              "selected_hit": true,
+              "expanded_hit": true,
+              "in_packet": true,
+              "verdict": "ok",
+              "rank_in_beam": 0
+            }
+          ],
+          "selected_blocks": [
+            1991,
+            0,
+            1990,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6
+          ],
+          "expanded_blocks": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            1989,
+            1990,
+            1991,
+            1992
+          ],
+          "compiled_prompt_tokens": 970,
+          "compression_fraction": 0.00740944436805842,
+          "span_count": 2,
+          "compile_seconds": 0.0030600219999996625
+        },
+        "t3_d4096_m4": {
+          "ceiling": 1.0,
+          "per_reference": [
+            {
+              "in_document": true,
+              "occurrences": 1,
+              "occurrences_capped": false,
+              "gold_block_count": 1,
+              "selected_hit": true,
+              "expanded_hit": true,
+              "in_packet": true,
+              "verdict": "ok",
+              "rank_in_beam": 0
+            }
+          ],
+          "selected_blocks": [
+            1991,
+            0,
+            1990,
+            1
+          ],
+          "expanded_blocks": [
+            0,
+            1,
+            2,
+            1989,
+            1990,
+            1991,
+            1992
+          ],
+          "compiled_prompt_tokens": 651,
+          "compression_fraction": 0.004972730189284569,
+          "span_count": 2,
+          "compile_seconds": 0.0025229610000678804
+        },
+        "t3_d4096_m9": {
+          "ceiling": 1.0,
+          "per_reference": [
+            {
+              "in_document": true,
+              "occurrences": 1,
+              "occurrences_capped": false,
+              "gold_block_count": 1,
+              "selected_hit": true,
+              "expanded_hit": true,
+              "in_packet": true,
+              "verdict": "ok",
+              "rank_in_beam": 0
+            }
+          ],
+          "selected_blocks": [
+            1991,
+            0,
+            1990,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6
+          ],
+          "expanded_blocks": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            1989,
+            1990,
+            1991,
+            1992
+          ],
+          "compiled_prompt_tokens": 970,
+          "compression_fraction": 0.00740944436805842,
+          "span_count": 2,
+          "compile_seconds": 0.0030664729999898555
+        }
+      },
+      "pipeline_seconds": 0.6233600830000796,
+      "baseline_checked": false,
+      "baseline_match": null,
+      "index": "477909",
+      "length": 131072
+    },
+    {
+      "task": "niah_single_1",
+      "references": [
+        "3871230"
+      ],
+      "prompt_ceiling": 1.0,
+      "original_prompt_tokens": 130912,
+      "tokenize_layout_seconds": 0.49308722899991153,
+      "cache": {
+        "t2_d1024": {
+          "index_seconds": 0.017149512000059985,
+          "selection_seconds": 0.00264431099981266,
+          "index_bytes": 4193280,
+          "tree_levels": 12,
+          "visited_nodes": 255,
+          "document_blocks": 2045
+        },
+        "t2_d4096": {
+          "index_seconds": 0.02217638399997668,
+          "selection_seconds": 0.0029520349999074824,
+          "index_bytes": 16773120,
+          "tree_levels": 12,
+          "visited_nodes": 255,
+          "document_blocks": 2045
+        },
+        "t3_d1024": {
+          "index_seconds": 0.017455718999826786,
+          "selection_seconds": 0.0025964520000343327,
+          "index_bytes": 4193280,
+          "tree_levels": 12,
+          "visited_nodes": 255,
+          "document_blocks": 2045
+        },
+        "t3_d4096": {
+          "index_seconds": 0.02275166000003992,
+          "selection_seconds": 0.00301321500000995,
+          "index_bytes": 16773120,
+          "tree_levels": 12,
+          "visited_nodes": 255,
+          "document_blocks": 2045
+        }
+      },
+      "arms": {
+        "t2_d1024_m4": {
+          "ceiling": 1.0,
+          "per_reference": [
+            {
+              "in_document": true,
+              "occurrences": 1,
+              "occurrences_capped": false,
+              "gold_block_count": 1,
+              "selected_hit": true,
+              "expanded_hit": true,
+              "in_packet": true,
+              "verdict": "ok",
+              "rank_in_beam": 0
+            }
+          ],
+          "selected_blocks": [
+            1641,
+            0,
+            1,
+            2
+          ],
+          "expanded_blocks": [
+            0,
+            1,
+            2,
+            3,
+            1640,
+            1641,
+            1642
+          ],
+          "compiled_prompt_tokens": 627,
+          "compression_fraction": 0.004789476900513322,
+          "span_count": 2,
+          "compile_seconds": 0.002644335000013598
+        },
+        "t2_d1024_m9": {
+          "ceiling": 1.0,
+          "per_reference": [
+            {
+              "in_document": true,
+              "occurrences": 1,
+              "occurrences_capped": false,
+              "gold_block_count": 1,
+              "selected_hit": true,
+              "expanded_hit": true,
+              "in_packet": true,
+              "verdict": "ok",
+              "rank_in_beam": 0
+            }
+          ],
+          "selected_blocks": [
+            1641,
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7
+          ],
+          "expanded_blocks": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            1640,
+            1641,
+            1642
+          ],
+          "compiled_prompt_tokens": 947,
+          "compression_fraction": 0.0072338670251772185,
+          "span_count": 2,
+          "compile_seconds": 0.0031073930001639383
+        },
+        "t2_d4096_m4": {
+          "ceiling": 1.0,
+          "per_reference": [
+            {
+              "in_document": true,
+              "occurrences": 1,
+              "occurrences_capped": false,
+              "gold_block_count": 1,
+              "selected_hit": true,
+              "expanded_hit": true,
+              "in_packet": true,
+              "verdict": "ok",
+              "rank_in_beam": 0
+            }
+          ],
+          "selected_blocks": [
+            1641,
+            0,
+            1,
+            2
+          ],
+          "expanded_blocks": [
+            0,
+            1,
+            2,
+            3,
+            1640,
+            1641,
+            1642
+          ],
+          "compiled_prompt_tokens": 627,
+          "compression_fraction": 0.004789476900513322,
+          "span_count": 2,
+          "compile_seconds": 0.0025110649999078305
+        },
+        "t2_d4096_m9": {
+          "ceiling": 1.0,
+          "per_reference": [
+            {
+              "in_document": true,
+              "occurrences": 1,
+              "occurrences_capped": false,
+              "gold_block_count": 1,
+              "selected_hit": true,
+              "expanded_hit": true,
+              "in_packet": true,
+              "verdict": "ok",
+              "rank_in_beam": 0
+            }
+          ],
+          "selected_blocks": [
+            1641,
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7
+          ],
+          "expanded_blocks": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            1640,
+            1641,
+            1642
+          ],
+          "compiled_prompt_tokens": 947,
+          "compression_fraction": 0.0072338670251772185,
+          "span_count": 2,
+          "compile_seconds": 0.003188536000152453
+        },
+        "t3_d1024_m4": {
+          "ceiling": 1.0,
+          "per_reference": [
+            {
+              "in_document": true,
+              "occurrences": 1,
+              "occurrences_capped": false,
+              "gold_block_count": 1,
+              "selected_hit": true,
+              "expanded_hit": true,
+              "in_packet": true,
+              "verdict": "ok",
+              "rank_in_beam": 0
+            }
+          ],
+          "selected_blocks": [
+            1641,
+            0,
+            1,
+            2
+          ],
+          "expanded_blocks": [
+            0,
+            1,
+            2,
+            3,
+            1640,
+            1641,
+            1642
+          ],
+          "compiled_prompt_tokens": 651,
+          "compression_fraction": 0.004972806159863114,
+          "span_count": 2,
+          "compile_seconds": 0.0024186149998968176
+        },
+        "t3_d1024_m9": {
+          "ceiling": 1.0,
+          "per_reference": [
+            {
+              "in_document": true,
+              "occurrences": 1,
+              "occurrences_capped": false,
+              "gold_block_count": 1,
+              "selected_hit": true,
+              "expanded_hit": true,
+              "in_packet": true,
+              "verdict": "ok",
+              "rank_in_beam": 0
+            }
+          ],
+          "selected_blocks": [
+            1641,
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7
+          ],
+          "expanded_blocks": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            1640,
+            1641,
+            1642
+          ],
+          "compiled_prompt_tokens": 971,
+          "compression_fraction": 0.0074171962845270105,
+          "span_count": 2,
+          "compile_seconds": 0.0030772509999223985
+        },
+        "t3_d4096_m4": {
+          "ceiling": 1.0,
+          "per_reference": [
+            {
+              "in_document": true,
+              "occurrences": 1,
+              "occurrences_capped": false,
+              "gold_block_count": 1,
+              "selected_hit": true,
+              "expanded_hit": true,
+              "in_packet": true,
+              "verdict": "ok",
+              "rank_in_beam": 0
+            }
+          ],
+          "selected_blocks": [
+            1641,
+            0,
+            1,
+            2
+          ],
+          "expanded_blocks": [
+            0,
+            1,
+            2,
+            3,
+            1640,
+            1641,
+            1642
+          ],
+          "compiled_prompt_tokens": 651,
+          "compression_fraction": 0.004972806159863114,
+          "span_count": 2,
+          "compile_seconds": 0.0028865550000318763
+        },
+        "t3_d4096_m9": {
+          "ceiling": 1.0,
+          "per_reference": [
+            {
+              "in_document": true,
+              "occurrences": 1,
+              "occurrences_capped": false,
+              "gold_block_count": 1,
+              "selected_hit": true,
+              "expanded_hit": true,
+              "in_packet": true,
+              "verdict": "ok",
+              "rank_in_beam": 0
+            }
+          ],
+          "selected_blocks": [
+            1641,
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7
+          ],
+          "expanded_blocks": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            1640,
+            1641,
+            1642
+          ],
+          "compiled_prompt_tokens": 971,
+          "compression_fraction": 0.0074171962845270105,
+          "span_count": 2,
+          "compile_seconds": 0.003602941000053761
+        }
+      },
+      "pipeline_seconds": 0.6101888680000229,
+      "baseline_checked": false,
+      "baseline_match": null,
+      "index": "393934",
+      "length": 131072
+    },
+    {
+      "task": "niah_single_1",
+      "references": [
+        "8755439"
+      ],
+      "prompt_ceiling": 1.0,
+      "original_prompt_tokens": 130912,
+      "tokenize_layout_seconds": 0.4994105840000884,
+      "cache": {
+        "t2_d1024": {
+          "index_seconds": 0.01729773500005649,
+          "selection_seconds": 0.002790164000089135,
+          "index_bytes": 4193280,
+          "tree_levels": 12,
+          "visited_nodes": 255,
+          "document_blocks": 2045
+        },
+        "t2_d4096": {
+          "index_seconds": 0.022234651999951893,
+          "selection_seconds": 0.0030600919999415055,
+          "index_bytes": 16773120,
+          "tree_levels": 12,
+          "visited_nodes": 255,
+          "document_blocks": 2045
+        },
+        "t3_d1024": {
+          "index_seconds": 0.016628624000077252,
+          "selection_seconds": 0.0025006670000493614,
+          "index_bytes": 4193280,
+          "tree_levels": 12,
+          "visited_nodes": 255,
+          "document_blocks": 2045
+        },
+        "t3_d4096": {
+          "index_seconds": 0.023947174999875642,
+          "selection_seconds": 0.0030283280000276136,
+          "index_bytes": 16773120,
+          "tree_levels": 12,
+          "visited_nodes": 255,
+          "document_blocks": 2045
+        }
+      },
+      "arms": {
+        "t2_d1024_m4": {
+          "ceiling": 1.0,
+          "per_reference": [
+            {
+              "in_document": true,
+              "occurrences": 1,
+              "occurrences_capped": false,
+              "gold_block_count": 1,
+              "selected_hit": true,
+              "expanded_hit": true,
+              "in_packet": true,
+              "verdict": "ok",
+              "rank_in_beam": 1
+            }
+          ],
+          "selected_blocks": [
+            0,
+            1166,
+            1165,
+            1
+          ],
+          "expanded_blocks": [
+            0,
+            1,
+            2,
+            1164,
+            1165,
+            1166,
+            1167
+          ],
+          "compiled_prompt_tokens": 625,
+          "compression_fraction": 0.004774199462234173,
+          "span_count": 2,
+          "compile_seconds": 0.0026862039999286935
+        },
+        "t2_d1024_m9": {
+          "ceiling": 1.0,
+          "per_reference": [
+            {
+              "in_document": true,
+              "occurrences": 1,
+              "occurrences_capped": false,
+              "gold_block_count": 1,
+              "selected_hit": true,
+              "expanded_hit": true,
+              "in_packet": true,
+              "verdict": "ok",
+              "rank_in_beam": 1
+            }
+          ],
+          "selected_blocks": [
+            0,
+            1166,
+            1165,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6
+          ],
+          "expanded_blocks": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            1164,
+            1165,
+            1166,
+            1167
+          ],
+          "compiled_prompt_tokens": 944,
+          "compression_fraction": 0.007210950867758494,
+          "span_count": 2,
+          "compile_seconds": 0.0034830899999178655
+        },
+        "t2_d4096_m4": {
+          "ceiling": 1.0,
+          "per_reference": [
+            {
+              "in_document": true,
+              "occurrences": 1,
+              "occurrences_capped": false,
+              "gold_block_count": 1,
+              "selected_hit": true,
+              "expanded_hit": true,
+              "in_packet": true,
+              "verdict": "ok",
+              "rank_in_beam": 1
+            }
+          ],
+          "selected_blocks": [
+            0,
+            1166,
+            1165,
+            1
+          ],
+          "expanded_blocks": [
+            0,
+            1,
+            2,
+            1164,
+            1165,
+            1166,
+            1167
+          ],
+          "compiled_prompt_tokens": 625,
+          "compression_fraction": 0.004774199462234173,
+          "span_count": 2,
+          "compile_seconds": 0.0023721559998648445
+        },
+        "t2_d4096_m9": {
+          "ceiling": 1.0,
+          "per_reference": [
+            {
+              "in_document": true,
+              "occurrences": 1,
+              "occurrences_capped": false,
+              "gold_block_count": 1,
+              "selected_hit": true,
+              "expanded_hit": true,
+              "in_packet": true,
+              "verdict": "ok",
+              "rank_in_beam": 1
+            }
+          ],
+          "selected_blocks": [
+            0,
+            1166,
+            1165,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6
+          ],
+          "expanded_blocks": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            1164,
+            1165,
+            1166,
+            1167
+          ],
+          "compiled_prompt_tokens": 944,
+          "compression_fraction": 0.007210950867758494,
+          "span_count": 2,
+          "compile_seconds": 0.003299223999874812
+        },
+        "t3_d1024_m4": {
+          "ceiling": 1.0,
+          "per_reference": [
+            {
+              "in_document": true,
+              "occurrences": 1,
+              "occurrences_capped": false,
+              "gold_block_count": 1,
+              "selected_hit": true,
+              "expanded_hit": true,
+              "in_packet": true,
+              "verdict": "ok",
+              "rank_in_beam": 1
+            }
+          ],
+          "selected_blocks": [
+            0,
+            1166,
+            1165,
+            1
+          ],
+          "expanded_blocks": [
+            0,
+            1,
+            2,
+            1164,
+            1165,
+            1166,
+            1167
+          ],
+          "compiled_prompt_tokens": 649,
+          "compression_fraction": 0.0049575287215839646,
+          "span_count": 2,
+          "compile_seconds": 0.002437229999941337
+        },
+        "t3_d1024_m9": {
+          "ceiling": 1.0,
+          "per_reference": [
+            {
+              "in_document": true,
+              "occurrences": 1,
+              "occurrences_capped": false,
+              "gold_block_count": 1,
+              "selected_hit": true,
+              "expanded_hit": true,
+              "in_packet": true,
+              "verdict": "ok",
+              "rank_in_beam": 1
+            }
+          ],
+          "selected_blocks": [
+            0,
+            1166,
+            1165,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6
+          ],
+          "expanded_blocks": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            1164,
+            1165,
+            1166,
+            1167
+          ],
+          "compiled_prompt_tokens": 968,
+          "compression_fraction": 0.007394280127108286,
+          "span_count": 2,
+          "compile_seconds": 0.003076688000192007
+        },
+        "t3_d4096_m4": {
+          "ceiling": 1.0,
+          "per_reference": [
+            {
+              "in_document": true,
+              "occurrences": 1,
+              "occurrences_capped": false,
+              "gold_block_count": 1,
+              "selected_hit": true,
+              "expanded_hit": true,
+              "in_packet": true,
+              "verdict": "ok",
+              "rank_in_beam": 1
+            }
+          ],
+          "selected_blocks": [
+            0,
+            1166,
+            1165,
+            1
+          ],
+          "expanded_blocks": [
+            0,
+            1,
+            2,
+            1164,
+            1165,
+            1166,
+            1167
+          ],
+          "compiled_prompt_tokens": 649,
+          "compression_fraction": 0.0049575287215839646,
+          "span_count": 2,
+          "compile_seconds": 0.0025139199999557604
+        },
+        "t3_d4096_m9": {
+          "ceiling": 1.0,
+          "per_reference": [
+            {
+              "in_document": true,
+              "occurrences": 1,
+              "occurrences_capped": false,
+              "gold_block_count": 1,
+              "selected_hit": true,
+              "expanded_hit": true,
+              "in_packet": true,
+              "verdict": "ok",
+              "rank_in_beam": 1
+            }
+          ],
+          "selected_blocks": [
+            0,
+            1166,
+            1165,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6
+          ],
+          "expanded_blocks": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            1164,
+            1165,
+            1166,
+            1167
+          ],
+          "compiled_prompt_tokens": 968,
+          "compression_fraction": 0.007394280127108286,
+          "span_count": 2,
+          "compile_seconds": 0.003177811999876212
+        }
+      },
+      "pipeline_seconds": 0.6164459929998429,
+      "baseline_checked": false,
+      "baseline_match": null,
+      "index": "279909",
+      "length": 131072
+    },
+    {
+      "task": "niah_single_1",
+      "references": [
+        "4684531"
+      ],
+      "prompt_ceiling": 1.0,
+      "original_prompt_tokens": 130910,
+      "tokenize_layout_seconds": 0.5000996260000647,
+      "cache": {
+        "t2_d1024": {
+          "index_seconds": 0.020160339000085514,
+          "selection_seconds": 0.002611507999972673,
+          "index_bytes": 4193280,
+          "tree_levels": 12,
+          "visited_nodes": 255,
+          "document_blocks": 2045
+        },
+        "t2_d4096": {
+          "index_seconds": 0.02149891499993828,
+          "selection_seconds": 0.002981893000196578,
+          "index_bytes": 16773120,
+          "tree_levels": 12,
+          "visited_nodes": 255,
+          "document_blocks": 2045
+        },
+        "t3_d1024": {
+          "index_seconds": 0.01622693000012987,
+          "selection_seconds": 0.002344650999930309,
+          "index_bytes": 4193280,
+          "tree_levels": 12,
+          "visited_nodes": 255,
+          "document_blocks": 2045
+        },
+        "t3_d4096": {
+          "index_seconds": 0.023920499000041673,
+          "selection_seconds": 0.0028327089999038435,
+          "index_bytes": 16773120,
+          "tree_levels": 12,
+          "visited_nodes": 255,
+          "document_blocks": 2045
+        }
+      },
+      "arms": {
+        "t2_d1024_m4": {
+          "ceiling": 1.0,
+          "per_reference": [
+            {
+              "in_document": true,
+              "occurrences": 1,
+              "occurrences_capped": false,
+              "gold_block_count": 1,
+              "selected_hit": true,
+              "expanded_hit": true,
+              "in_packet": true,
+              "verdict": "ok",
+              "rank_in_beam": 0
+            }
+          ],
+          "selected_blocks": [
+            996,
+            0,
+            1,
+            2
+          ],
+          "expanded_blocks": [
+            0,
+            1,
+            2,
+            3,
+            995,
+            996,
+            997
+          ],
+          "compiled_prompt_tokens": 622,
+          "compression_fraction": 0.004751355893361852,
+          "span_count": 2,
+          "compile_seconds": 0.002655502999914461
+        },
+        "t2_d1024_m9": {
+          "ceiling": 1.0,
+          "per_reference": [
+            {
+              "in_document": true,
+              "occurrences": 1,
+              "occurrences_capped": false,
+              "gold_block_count": 1,
+              "selected_hit": true,
+              "expanded_hit": true,
+              "in_packet": true,
+              "verdict": "ok",
+              "rank_in_beam": 0
+            }
+          ],
+          "selected_blocks": [
+            996,
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7
+          ],
+          "expanded_blocks": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            995,
+            996,
+            997
+          ],
+          "compiled_prompt_tokens": 942,
+          "compression_fraction": 0.007195783362615537,
+          "span_count": 2,
+          "compile_seconds": 0.003464159000031941
+        },
+        "t2_d4096_m4": {
+          "ceiling": 1.0,
+          "per_reference": [
+            {
+              "in_document": true,
+              "occurrences": 1,
+              "occurrences_capped": false,
+              "gold_block_count": 1,
+              "selected_hit": true,
+              "expanded_hit": true,
+              "in_packet": true,
+              "verdict": "ok",
+              "rank_in_beam": 0
+            }
+          ],
+          "selected_blocks": [
+            996,
+            0,
+            1,
+            2
+          ],
+          "expanded_blocks": [
+            0,
+            1,
+            2,
+            3,
+            995,
+            996,
+            997
+          ],
+          "compiled_prompt_tokens": 622,
+          "compression_fraction": 0.004751355893361852,
+          "span_count": 2,
+          "compile_seconds": 0.0023816030000034516
+        },
+        "t2_d4096_m9": {
+          "ceiling": 1.0,
+          "per_reference": [
+            {
+              "in_document": true,
+              "occurrences": 1,
+              "occurrences_capped": false,
+              "gold_block_count": 1,
+              "selected_hit": true,
+              "expanded_hit": true,
+              "in_packet": true,
+              "verdict": "ok",
+              "rank_in_beam": 0
+            }
+          ],
+          "selected_blocks": [
+            996,
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7
+          ],
+          "expanded_blocks": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            995,
+            996,
+            997
+          ],
+          "compiled_prompt_tokens": 942,
+          "compression_fraction": 0.007195783362615537,
+          "span_count": 2,
+          "compile_seconds": 0.0030163819999415864
+        },
+        "t3_d1024_m4": {
+          "ceiling": 1.0,
+          "per_reference": [
+            {
+              "in_document": true,
+              "occurrences": 1,
+              "occurrences_capped": false,
+              "gold_block_count": 1,
+              "selected_hit": true,
+              "expanded_hit": true,
+              "in_packet": true,
+              "verdict": "ok",
+              "rank_in_beam": 0
+            }
+          ],
+          "selected_blocks": [
+            996,
+            0,
+            1,
+            2
+          ],
+          "expanded_blocks": [
+            0,
+            1,
+            2,
+            3,
+            995,
+            996,
+            997
+          ],
+          "compiled_prompt_tokens": 646,
+          "compression_fraction": 0.0049346879535558785,
+          "span_count": 2,
+          "compile_seconds": 0.002335924999897543
+        },
+        "t3_d1024_m9": {
+          "ceiling": 1.0,
+          "per_reference": [
+            {
+              "in_document": true,
+              "occurrences": 1,
+              "occurrences_capped": false,
+              "gold_block_count": 1,
+              "selected_hit": true,
+              "expanded_hit": true,
+              "in_packet": true,
+              "verdict": "ok",
+              "rank_in_beam": 0
+            }
+          ],
+          "selected_blocks": [
+            996,
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7
+          ],
+          "expanded_blocks": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            995,
+            996,
+            997
+          ],
+          "compiled_prompt_tokens": 966,
+          "compression_fraction": 0.007379115422809564,
+          "span_count": 2,
+          "compile_seconds": 0.0029148470000563975
+        },
+        "t3_d4096_m4": {
+          "ceiling": 1.0,
+          "per_reference": [
+            {
+              "in_document": true,
+              "occurrences": 1,
+              "occurrences_capped": false,
+              "gold_block_count": 1,
+              "selected_hit": true,
+              "expanded_hit": true,
+              "in_packet": true,
+              "verdict": "ok",
+              "rank_in_beam": 0
+            }
+          ],
+          "selected_blocks": [
+            996,
+            0,
+            1,
+            2
+          ],
+          "expanded_blocks": [
+            0,
+            1,
+            2,
+            3,
+            995,
+            996,
+            997
+          ],
+          "compiled_prompt_tokens": 646,
+          "compression_fraction": 0.0049346879535558785,
+          "span_count": 2,
+          "compile_seconds": 0.0026704059998792218
+        },
+        "t3_d4096_m9": {
+          "ceiling": 1.0,
+          "per_reference": [
+            {
+              "in_document": true,
+              "occurrences": 1,
+              "occurrences_capped": false,
+              "gold_block_count": 1,
+              "selected_hit": true,
+              "expanded_hit": true,
+              "in_packet": true,
+              "verdict": "ok",
+              "rank_in_beam": 0
+            }
+          ],
+          "selected_blocks": [
+            996,
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7
+          ],
+          "expanded_blocks": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            995,
+            996,
+            997
+          ],
+          "compiled_prompt_tokens": 966,
+          "compression_fraction": 0.007379115422809564,
+          "span_count": 2,
+          "compile_seconds": 0.0034386459999495855
+        }
+      },
+      "pipeline_seconds": 0.618089947000044,
+      "baseline_checked": false,
+      "baseline_match": null,
+      "index": "239228",
+      "length": 131072
+    },
+    {
+      "task": "niah_single_1",
+      "references": [
+        "1538552"
+      ],
+      "prompt_ceiling": 1.0,
+      "original_prompt_tokens": 130916,
+      "tokenize_layout_seconds": 0.49789357999998174,
+      "cache": {
+        "t2_d1024": {
+          "index_seconds": 0.01640998699986085,
+          "selection_seconds": 0.002736014999982217,
+          "index_bytes": 4193280,
+          "tree_levels": 12,
+          "visited_nodes": 255,
+          "document_blocks": 2045
+        },
+        "t2_d4096": {
+          "index_seconds": 0.02295502100014346,
+          "selection_seconds": 0.0028588510001554823,
+          "index_bytes": 16773120,
+          "tree_levels": 12,
+          "visited_nodes": 255,
+          "document_blocks": 2045
+        },
+        "t3_d1024": {
+          "index_seconds": 0.016442023000081463,
+          "selection_seconds": 0.0026281469999958063,
+          "index_bytes": 4193280,
+          "tree_levels": 12,
+          "visited_nodes": 255,
+          "document_blocks": 2045
+        },
+        "t3_d4096": {
+          "index_seconds": 0.023271194000017204,
+          "selection_seconds": 0.0032218870001088362,
+          "index_bytes": 16773120,
+          "tree_levels": 12,
+          "visited_nodes": 255,
+          "document_blocks": 2045
+        }
+      },
+      "arms": {
+        "t2_d1024_m4": {
+          "ceiling": 1.0,
+          "per_reference": [
+            {
+              "in_document": true,
+              "occurrences": 1,
+              "occurrences_capped": false,
+              "gold_block_count": 1,
+              "selected_hit": true,
+              "expanded_hit": true,
+              "in_packet": true,
+              "verdict": "ok",
+              "rank_in_beam": 0
+            }
+          ],
+          "selected_blocks": [
+            969,
+            0,
+            1,
+            2
+          ],
+          "expanded_blocks": [
+            0,
+            1,
+            2,
+            3,
+            968,
+            969,
+            970
+          ],
+          "compiled_prompt_tokens": 625,
+          "compression_fraction": 0.004774053591615998,
+          "span_count": 2,
+          "compile_seconds": 0.0026575670001420804
+        },
+        "t2_d1024_m9": {
+          "ceiling": 1.0,
+          "per_reference": [
+            {
+              "in_document": true,
+              "occurrences": 1,
+              "occurrences_capped": false,
+              "gold_block_count": 1,
+              "selected_hit": true,
+              "expanded_hit": true,
+              "in_packet": true,
+              "verdict": "ok",
+              "rank_in_beam": 0
+            }
+          ],
+          "selected_blocks": [
+            969,
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7
+          ],
+          "expanded_blocks": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            968,
+            969,
+            970
+          ],
+          "compiled_prompt_tokens": 945,
+          "compression_fraction": 0.007218369030523389,
+          "span_count": 2,
+          "compile_seconds": 0.0032724039999720844
+        },
+        "t2_d4096_m4": {
+          "ceiling": 1.0,
+          "per_reference": [
+            {
+              "in_document": true,
+              "occurrences": 1,
+              "occurrences_capped": false,
+              "gold_block_count": 1,
+              "selected_hit": true,
+              "expanded_hit": true,
+              "in_packet": true,
+              "verdict": "ok",
+              "rank_in_beam": 0
+            }
+          ],
+          "selected_blocks": [
+            969,
+            0,
+            1,
+            2
+          ],
+          "expanded_blocks": [
+            0,
+            1,
+            2,
+            3,
+            968,
+            969,
+            970
+          ],
+          "compiled_prompt_tokens": 625,
+          "compression_fraction": 0.004774053591615998,
+          "span_count": 2,
+          "compile_seconds": 0.00256668199995147
+        },
+        "t2_d4096_m9": {
+          "ceiling": 1.0,
+          "per_reference": [
+            {
+              "in_document": true,
+              "occurrences": 1,
+              "occurrences_capped": false,
+              "gold_block_count": 1,
+              "selected_hit": true,
+              "expanded_hit": true,
+              "in_packet": true,
+              "verdict": "ok",
+              "rank_in_beam": 0
+            }
+          ],
+          "selected_blocks": [
+            969,
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7
+          ],
+          "expanded_blocks": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            968,
+            969,
+            970
+          ],
+          "compiled_prompt_tokens": 945,
+          "compression_fraction": 0.007218369030523389,
+          "span_count": 2,
+          "compile_seconds": 0.0031200379999063443
+        },
+        "t3_d1024_m4": {
+          "ceiling": 1.0,
+          "per_reference": [
+            {
+              "in_document": true,
+              "occurrences": 1,
+              "occurrences_capped": false,
+              "gold_block_count": 1,
+              "selected_hit": true,
+              "expanded_hit": true,
+              "in_packet": true,
+              "verdict": "ok",
+              "rank_in_beam": 0
+            }
+          ],
+          "selected_blocks": [
+            969,
+            0,
+            1,
+            2
+          ],
+          "expanded_blocks": [
+            0,
+            1,
+            2,
+            3,
+            968,
+            969,
+            970
+          ],
+          "compiled_prompt_tokens": 649,
+          "compression_fraction": 0.004957377249534052,
+          "span_count": 2,
+          "compile_seconds": 0.0024519800001598924
+        },
+        "t3_d1024_m9": {
+          "ceiling": 1.0,
+          "per_reference": [
+            {
+              "in_document": true,
+              "occurrences": 1,
+              "occurrences_capped": false,
+              "gold_block_count": 1,
+              "selected_hit": true,
+              "expanded_hit": true,
+              "in_packet": true,
+              "verdict": "ok",
+              "rank_in_beam": 0
+            }
+          ],
+          "selected_blocks": [
+            969,
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7
+          ],
+          "expanded_blocks": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            968,
+            969,
+            970
+          ],
+          "compiled_prompt_tokens": 969,
+          "compression_fraction": 0.007401692688441443,
+          "span_count": 2,
+          "compile_seconds": 0.0035267540001768793
+        },
+        "t3_d4096_m4": {
+          "ceiling": 1.0,
+          "per_reference": [
+            {
+              "in_document": true,
+              "occurrences": 1,
+              "occurrences_capped": false,
+              "gold_block_count": 1,
+              "selected_hit": true,
+              "expanded_hit": true,
+              "in_packet": true,
+              "verdict": "ok",
+              "rank_in_beam": 0
+            }
+          ],
+          "selected_blocks": [
+            969,
+            0,
+            1,
+            2
+          ],
+          "expanded_blocks": [
+            0,
+            1,
+            2,
+            3,
+            968,
+            969,
+            970
+          ],
+          "compiled_prompt_tokens": 649,
+          "compression_fraction": 0.004957377249534052,
+          "span_count": 2,
+          "compile_seconds": 0.002632714999890595
+        },
+        "t3_d4096_m9": {
+          "ceiling": 1.0,
+          "per_reference": [
+            {
+              "in_document": true,
+              "occurrences": 1,
+              "occurrences_capped": false,
+              "gold_block_count": 1,
+              "selected_hit": true,
+              "expanded_hit": true,
+              "in_packet": true,
+              "verdict": "ok",
+              "rank_in_beam": 0
+            }
+          ],
+          "selected_blocks": [
+            969,
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7
+          ],
+          "expanded_blocks": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            968,
+            969,
+            970
+          ],
+          "compiled_prompt_tokens": 969,
+          "compression_fraction": 0.007401692688441443,
+          "span_count": 2,
+          "compile_seconds": 0.003139188999966791
+        }
+      },
+      "pipeline_seconds": 0.6143607920000704,
+      "baseline_checked": false,
+      "baseline_match": null,
+      "index": "232747",
+      "length": 131072
+    },
+    {
+      "task": "niah_single_1",
+      "references": [
+        "2110460"
+      ],
+      "prompt_ceiling": 1.0,
+      "original_prompt_tokens": 130916,
+      "tokenize_layout_seconds": 0.5042469689999507,
+      "cache": {
+        "t2_d1024": {
+          "index_seconds": 0.016835042999900907,
+          "selection_seconds": 0.00274601299997812,
+          "index_bytes": 4193280,
+          "tree_levels": 12,
+          "visited_nodes": 255,
+          "document_blocks": 2045
+        },
+        "t2_d4096": {
+          "index_seconds": 0.02226750800014088,
+          "selection_seconds": 0.002677495000170893,
+          "index_bytes": 16773120,
+          "tree_levels": 12,
+          "visited_nodes": 255,
+          "document_blocks": 2045
+        },
+        "t3_d1024": {
+          "index_seconds": 0.017586534999963988,
+          "selection_seconds": 0.002637088000028598,
+          "index_bytes": 4193280,
+          "tree_levels": 12,
+          "visited_nodes": 255,
+          "document_blocks": 2045
+        },
+        "t3_d4096": {
+          "index_seconds": 0.021817815999838786,
+          "selection_seconds": 0.0028298869999616727,
+          "index_bytes": 16773120,
+          "tree_levels": 12,
+          "visited_nodes": 255,
+          "document_blocks": 2045
+        }
+      },
+      "arms": {
+        "t2_d1024_m4": {
+          "ceiling": 1.0,
+          "per_reference": [
+            {
+              "in_document": true,
+              "occurrences": 1,
+              "occurrences_capped": false,
+              "gold_block_count": 1,
+              "selected_hit": true,
+              "expanded_hit": true,
+              "in_packet": true,
+              "verdict": "ok",
+              "rank_in_beam": 0
+            }
+          ],
+          "selected_blocks": [
+            648,
+            0,
+            1,
+            2
+          ],
+          "expanded_blocks": [
+            0,
+            1,
+            2,
+            3,
+            647,
+            648,
+            649
+          ],
+          "compiled_prompt_tokens": 625,
+          "compression_fraction": 0.004774053591615998,
+          "span_count": 2,
+          "compile_seconds": 0.002654935000009573
+        },
+        "t2_d1024_m9": {
+          "ceiling": 1.0,
+          "per_reference": [
+            {
+              "in_document": true,
+              "occurrences": 1,
+              "occurrences_capped": false,
+              "gold_block_count": 1,
+              "selected_hit": true,
+              "expanded_hit": true,
+              "in_packet": true,
+              "verdict": "ok",
+              "rank_in_beam": 0
+            }
+          ],
+          "selected_blocks": [
+            648,
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7
+          ],
+          "expanded_blocks": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            647,
+            648,
+            649
+          ],
+          "compiled_prompt_tokens": 945,
+          "compression_fraction": 0.007218369030523389,
+          "span_count": 2,
+          "compile_seconds": 0.0031154310001966223
+        },
+        "t2_d4096_m4": {
+          "ceiling": 1.0,
+          "per_reference": [
+            {
+              "in_document": true,
+              "occurrences": 1,
+              "occurrences_capped": false,
+              "gold_block_count": 1,
+              "selected_hit": true,
+              "expanded_hit": true,
+              "in_packet": true,
+              "verdict": "ok",
+              "rank_in_beam": 0
+            }
+          ],
+          "selected_blocks": [
+            648,
+            0,
+            1,
+            2
+          ],
+          "expanded_blocks": [
+            0,
+            1,
+            2,
+            3,
+            647,
+            648,
+            649
+          ],
+          "compiled_prompt_tokens": 625,
+          "compression_fraction": 0.004774053591615998,
+          "span_count": 2,
+          "compile_seconds": 0.002447827999958463
+        },
+        "t2_d4096_m9": {
+          "ceiling": 1.0,
+          "per_reference": [
+            {
+              "in_document": true,
+              "occurrences": 1,
+              "occurrences_capped": false,
+              "gold_block_count": 1,
+              "selected_hit": true,
+              "expanded_hit": true,
+              "in_packet": true,
+              "verdict": "ok",
+              "rank_in_beam": 0
+            }
+          ],
+          "selected_blocks": [
+            648,
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7
+          ],
+          "expanded_blocks": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            647,
+            648,
+            649
+          ],
+          "compiled_prompt_tokens": 945,
+          "compression_fraction": 0.007218369030523389,
+          "span_count": 2,
+          "compile_seconds": 0.0036482440000327188
+        },
+        "t3_d1024_m4": {
+          "ceiling": 1.0,
+          "per_reference": [
+            {
+              "in_document": true,
+              "occurrences": 1,
+              "occurrences_capped": false,
+              "gold_block_count": 1,
+              "selected_hit": true,
+              "expanded_hit": true,
+              "in_packet": true,
+              "verdict": "ok",
+              "rank_in_beam": 0
+            }
+          ],
+          "selected_blocks": [
+            648,
+            0,
+            1,
+            2
+          ],
+          "expanded_blocks": [
+            0,
+            1,
+            2,
+            3,
+            647,
+            648,
+            649
+          ],
+          "compiled_prompt_tokens": 649,
+          "compression_fraction": 0.004957377249534052,
+          "span_count": 2,
+          "compile_seconds": 0.002199328999950012
+        },
+        "t3_d1024_m9": {
+          "ceiling": 1.0,
+          "per_reference": [
+            {
+              "in_document": true,
+              "occurrences": 1,
+              "occurrences_capped": false,
+              "gold_block_count": 1,
+              "selected_hit": true,
+              "expanded_hit": true,
+              "in_packet": true,
+              "verdict": "ok",
+              "rank_in_beam": 0
+            }
+          ],
+          "selected_blocks": [
+            648,
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7
+          ],
+          "expanded_blocks": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            647,
+            648,
+            649
+          ],
+          "compiled_prompt_tokens": 969,
+          "compression_fraction": 0.007401692688441443,
+          "span_count": 2,
+          "compile_seconds": 0.003113857000016651
+        },
+        "t3_d4096_m4": {
+          "ceiling": 1.0,
+          "per_reference": [
+            {
+              "in_document": true,
+              "occurrences": 1,
+              "occurrences_capped": false,
+              "gold_block_count": 1,
+              "selected_hit": true,
+              "expanded_hit": true,
+              "in_packet": true,
+              "verdict": "ok",
+              "rank_in_beam": 0
+            }
+          ],
+          "selected_blocks": [
+            648,
+            0,
+            1,
+            2
+          ],
+          "expanded_blocks": [
+            0,
+            1,
+            2,
+            3,
+            647,
+            648,
+            649
+          ],
+          "compiled_prompt_tokens": 649,
+          "compression_fraction": 0.004957377249534052,
+          "span_count": 2,
+          "compile_seconds": 0.0023646440001812152
+        },
+        "t3_d4096_m9": {
+          "ceiling": 1.0,
+          "per_reference": [
+            {
+              "in_document": true,
+              "occurrences": 1,
+              "occurrences_capped": false,
+              "gold_block_count": 1,
+              "selected_hit": true,
+              "expanded_hit": true,
+              "in_packet": true,
+              "verdict": "ok",
+              "rank_in_beam": 0
+            }
+          ],
+          "selected_blocks": [
+            648,
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7
+          ],
+          "expanded_blocks": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            647,
+            648,
+            649
+          ],
+          "compiled_prompt_tokens": 969,
+          "compression_fraction": 0.007401692688441443,
+          "span_count": 2,
+          "compile_seconds": 0.0029930339999282296
+        }
+      },
+      "pipeline_seconds": 0.6185518719998981,
+      "baseline_checked": false,
+      "baseline_match": null,
+      "index": "155708",
+      "length": 131072
+    },
+    {
+      "task": "niah_single_1",
+      "references": [
+        "9375710"
+      ],
+      "prompt_ceiling": 1.0,
+      "original_prompt_tokens": 130914,
+      "tokenize_layout_seconds": 0.5201237629999014,
+      "cache": {
+        "t2_d1024": {
+          "index_seconds": 0.022941151999930298,
+          "selection_seconds": 0.003233880000152567,
+          "index_bytes": 4193280,
+          "tree_levels": 12,
+          "visited_nodes": 255,
+          "document_blocks": 2045
+        },
+        "t2_d4096": {
+          "index_seconds": 0.032722410000133095,
+          "selection_seconds": 0.003929156999902261,
+          "index_bytes": 16773120,
+          "tree_levels": 12,
+          "visited_nodes": 255,
+          "document_blocks": 2045
+        },
+        "t3_d1024": {
+          "index_seconds": 0.022873915999980454,
+          "selection_seconds": 0.003281150000020716,
+          "index_bytes": 4193280,
+          "tree_levels": 12,
+          "visited_nodes": 255,
+          "document_blocks": 2045
+        },
+        "t3_d4096": {
+          "index_seconds": 0.03291588199999751,
+          "selection_seconds": 0.0040356140000312735,
+          "index_bytes": 16773120,
+          "tree_levels": 12,
+          "visited_nodes": 255,
+          "document_blocks": 2045
+        }
+      },
+      "arms": {
+        "t2_d1024_m4": {
+          "ceiling": 1.0,
+          "per_reference": [
+            {
+              "in_document": true,
+              "occurrences": 1,
+              "occurrences_capped": false,
+              "gold_block_count": 1,
+              "selected_hit": true,
+              "expanded_hit": true,
+              "in_packet": true,
+              "verdict": "ok",
+              "rank_in_beam": 2
+            }
+          ],
+          "selected_blocks": [
+            1215,
+            0,
+            1216,
+            1
+          ],
+          "expanded_blocks": [
+            0,
+            1,
+            2,
+            1214,
+            1215,
+            1216,
+            1217
+          ],
+          "compiled_prompt_tokens": 626,
+          "compression_fraction": 0.004781765128252135,
+          "span_count": 2,
+          "compile_seconds": 0.003108676000010746
+        },
+        "t2_d1024_m9": {
+          "ceiling": 1.0,
+          "per_reference": [
+            {
+              "in_document": true,
+              "occurrences": 1,
+              "occurrences_capped": false,
+              "gold_block_count": 1,
+              "selected_hit": true,
+              "expanded_hit": true,
+              "in_packet": true,
+              "verdict": "ok",
+              "rank_in_beam": 2
+            }
+          ],
+          "selected_blocks": [
+            1215,
+            0,
+            1216,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6
+          ],
+          "expanded_blocks": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            1214,
+            1215,
+            1216,
+            1217
+          ],
+          "compiled_prompt_tokens": 945,
+          "compression_fraction": 0.007218479307025986,
+          "span_count": 2,
+          "compile_seconds": 0.003946965000068303
+        },
+        "t2_d4096_m4": {
+          "ceiling": 1.0,
+          "per_reference": [
+            {
+              "in_document": true,
+              "occurrences": 1,
+              "occurrences_capped": false,
+              "gold_block_count": 1,
+              "selected_hit": false,
+              "expanded_hit": true,
+              "in_packet": true,
+              "verdict": "ok",
+              "rank_in_beam": null
+            }
+          ],
+          "selected_blocks": [
+            1215,
+            0,
+            1,
+            2
+          ],
+          "expanded_blocks": [
+            0,
+            1,
+            2,
+            3,
+            1214,
+            1215,
+            1216
+          ],
+          "compiled_prompt_tokens": 626,
+          "compression_fraction": 0.004781765128252135,
+          "span_count": 2,
+          "compile_seconds": 0.0031589469999744324
+        },
+        "t2_d4096_m9": {
+          "ceiling": 1.0,
+          "per_reference": [
+            {
+              "in_document": true,
+              "occurrences": 1,
+              "occurrences_capped": false,
+              "gold_block_count": 1,
+              "selected_hit": false,
+              "expanded_hit": true,
+              "in_packet": true,
+              "verdict": "ok",
+              "rank_in_beam": null
+            }
+          ],
+          "selected_blocks": [
+            1215,
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7
+          ],
+          "expanded_blocks": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            1214,
+            1215,
+            1216
+          ],
+          "compiled_prompt_tokens": 946,
+          "compression_fraction": 0.007226117909467284,
+          "span_count": 2,
+          "compile_seconds": 0.003912700000000768
+        },
+        "t3_d1024_m4": {
+          "ceiling": 1.0,
+          "per_reference": [
+            {
+              "in_document": true,
+              "occurrences": 1,
+              "occurrences_capped": false,
+              "gold_block_count": 1,
+              "selected_hit": true,
+              "expanded_hit": true,
+              "in_packet": true,
+              "verdict": "ok",
+              "rank_in_beam": 2
+            }
+          ],
+          "selected_blocks": [
+            1215,
+            0,
+            1216,
+            1
+          ],
+          "expanded_blocks": [
+            0,
+            1,
+            2,
+            1214,
+            1215,
+            1216,
+            1217
+          ],
+          "compiled_prompt_tokens": 650,
+          "compression_fraction": 0.0049650915868432715,
+          "span_count": 2,
+          "compile_seconds": 0.0030837030001293897
+        },
+        "t3_d1024_m9": {
+          "ceiling": 1.0,
+          "per_reference": [
+            {
+              "in_document": true,
+              "occurrences": 1,
+              "occurrences_capped": false,
+              "gold_block_count": 1,
+              "selected_hit": true,
+              "expanded_hit": true,
+              "in_packet": true,
+              "verdict": "ok",
+              "rank_in_beam": 2
+            }
+          ],
+          "selected_blocks": [
+            1215,
+            0,
+            1216,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6
+          ],
+          "expanded_blocks": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            1214,
+            1215,
+            1216,
+            1217
+          ],
+          "compiled_prompt_tokens": 969,
+          "compression_fraction": 0.007401805765617123,
+          "span_count": 2,
+          "compile_seconds": 0.003919564999932845
+        },
+        "t3_d4096_m4": {
+          "ceiling": 1.0,
+          "per_reference": [
+            {
+              "in_document": true,
+              "occurrences": 1,
+              "occurrences_capped": false,
+              "gold_block_count": 1,
+              "selected_hit": false,
+              "expanded_hit": true,
+              "in_packet": true,
+              "verdict": "ok",
+              "rank_in_beam": null
+            }
+          ],
+          "selected_blocks": [
+            1215,
+            0,
+            1,
+            2
+          ],
+          "expanded_blocks": [
+            0,
+            1,
+            2,
+            3,
+            1214,
+            1215,
+            1216
+          ],
+          "compiled_prompt_tokens": 650,
+          "compression_fraction": 0.0049650915868432715,
+          "span_count": 2,
+          "compile_seconds": 0.0031435870000677824
+        },
+        "t3_d4096_m9": {
+          "ceiling": 1.0,
+          "per_reference": [
+            {
+              "in_document": true,
+              "occurrences": 1,
+              "occurrences_capped": false,
+              "gold_block_count": 1,
+              "selected_hit": false,
+              "expanded_hit": true,
+              "in_packet": true,
+              "verdict": "ok",
+              "rank_in_beam": null
+            }
+          ],
+          "selected_blocks": [
+            1215,
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7
+          ],
+          "expanded_blocks": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            1214,
+            1215,
+            1216
+          ],
+          "compiled_prompt_tokens": 970,
+          "compression_fraction": 0.00740944436805842,
+          "span_count": 2,
+          "compile_seconds": 0.0038456580000456597
+        }
+      },
+      "pipeline_seconds": 0.6771132549999948,
+      "baseline_checked": false,
+      "baseline_match": null,
+      "index": "291874",
+      "length": 131072
+    },
+    {
+      "task": "niah_single_1",
+      "references": [
+        "5443951"
+      ],
+      "prompt_ceiling": 1.0,
+      "original_prompt_tokens": 130914,
+      "tokenize_layout_seconds": 0.49869433999992907,
+      "cache": {
+        "t2_d1024": {
+          "index_seconds": 0.021953029000087554,
+          "selection_seconds": 0.003035228000044299,
+          "index_bytes": 4193280,
+          "tree_levels": 12,
+          "visited_nodes": 255,
+          "document_blocks": 2045
+        },
+        "t2_d4096": {
+          "index_seconds": 0.03143606300000101,
+          "selection_seconds": 0.0038489319999825966,
+          "index_bytes": 16773120,
+          "tree_levels": 12,
+          "visited_nodes": 255,
+          "document_blocks": 2045
+        },
+        "t3_d1024": {
+          "index_seconds": 0.02268860100002712,
+          "selection_seconds": 0.003345208000155253,
+          "index_bytes": 4193280,
+          "tree_levels": 12,
+          "visited_nodes": 255,
+          "document_blocks": 2045
+        },
+        "t3_d4096": {
+          "index_seconds": 0.032614781000120274,
+          "selection_seconds": 0.003922110999837969,
+          "index_bytes": 16773120,
+          "tree_levels": 12,
+          "visited_nodes": 255,
+          "document_blocks": 2045
+        }
+      },
+      "arms": {
+        "t2_d1024_m4": {
+          "ceiling": 1.0,
+          "per_reference": [
+            {
+              "in_document": true,
+              "occurrences": 1,
+              "occurrences_capped": false,
+              "gold_block_count": 1,
+              "selected_hit": true,
+              "expanded_hit": true,
+              "in_packet": true,
+              "verdict": "ok",
+              "rank_in_beam": 0
+            }
+          ],
+          "selected_blocks": [
+            429,
+            0,
+            1,
+            2
+          ],
+          "expanded_blocks": [
+            0,
+            1,
+            2,
+            3,
+            428,
+            429,
+            430
+          ],
+          "compiled_prompt_tokens": 624,
+          "compression_fraction": 0.00476648792336954,
+          "span_count": 2,
+          "compile_seconds": 0.003108509999947273
+        },
+        "t2_d1024_m9": {
+          "ceiling": 1.0,
+          "per_reference": [
+            {
+              "in_document": true,
+              "occurrences": 1,
+              "occurrences_capped": false,
+              "gold_block_count": 1,
+              "selected_hit": true,
+              "expanded_hit": true,
+              "in_packet": true,
+              "verdict": "ok",
+              "rank_in_beam": 0
+            }
+          ],
+          "selected_blocks": [
+            429,
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7
+          ],
+          "expanded_blocks": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            428,
+            429,
+            430
+          ],
+          "compiled_prompt_tokens": 944,
+          "compression_fraction": 0.007210840704584689,
+          "span_count": 2,
+          "compile_seconds": 0.0038708940001015435
+        },
+        "t2_d4096_m4": {
+          "ceiling": 1.0,
+          "per_reference": [
+            {
+              "in_document": true,
+              "occurrences": 1,
+              "occurrences_capped": false,
+              "gold_block_count": 1,
+              "selected_hit": true,
+              "expanded_hit": true,
+              "in_packet": true,
+              "verdict": "ok",
+              "rank_in_beam": 0
+            }
+          ],
+          "selected_blocks": [
+            429,
+            0,
+            1,
+            2
+          ],
+          "expanded_blocks": [
+            0,
+            1,
+            2,
+            3,
+            428,
+            429,
+            430
+          ],
+          "compiled_prompt_tokens": 624,
+          "compression_fraction": 0.00476648792336954,
+          "span_count": 2,
+          "compile_seconds": 0.0031655029999910766
+        },
+        "t2_d4096_m9": {
+          "ceiling": 1.0,
+          "per_reference": [
+            {
+              "in_document": true,
+              "occurrences": 1,
+              "occurrences_capped": false,
+              "gold_block_count": 1,
+              "selected_hit": true,
+              "expanded_hit": true,
+              "in_packet": true,
+              "verdict": "ok",
+              "rank_in_beam": 0
+            }
+          ],
+          "selected_blocks": [
+            429,
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7
+          ],
+          "expanded_blocks": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            428,
+            429,
+            430
+          ],
+          "compiled_prompt_tokens": 944,
+          "compression_fraction": 0.007210840704584689,
+          "span_count": 2,
+          "compile_seconds": 0.004074812999988353
+        },
+        "t3_d1024_m4": {
+          "ceiling": 1.0,
+          "per_reference": [
+            {
+              "in_document": true,
+              "occurrences": 1,
+              "occurrences_capped": false,
+              "gold_block_count": 1,
+              "selected_hit": true,
+              "expanded_hit": true,
+              "in_packet": true,
+              "verdict": "ok",
+              "rank_in_beam": 0
+            }
+          ],
+          "selected_blocks": [
+            429,
+            0,
+            1,
+            2
+          ],
+          "expanded_blocks": [
+            0,
+            1,
+            2,
+            3,
+            428,
+            429,
+            430
+          ],
+          "compiled_prompt_tokens": 648,
+          "compression_fraction": 0.004949814381960676,
+          "span_count": 2,
+          "compile_seconds": 0.0033151349998661317
+        },
+        "t3_d1024_m9": {
+          "ceiling": 1.0,
+          "per_reference": [
+            {
+              "in_document": true,
+              "occurrences": 1,
+              "occurrences_capped": false,
+              "gold_block_count": 1,
+              "selected_hit": true,
+              "expanded_hit": true,
+              "in_packet": true,
+              "verdict": "ok",
+              "rank_in_beam": 0
+            }
+          ],
+          "selected_blocks": [
+            429,
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7
+          ],
+          "expanded_blocks": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            428,
+            429,
+            430
+          ],
+          "compiled_prompt_tokens": 968,
+          "compression_fraction": 0.007394167163175825,
+          "span_count": 2,
+          "compile_seconds": 0.003967494000107763
+        },
+        "t3_d4096_m4": {
+          "ceiling": 1.0,
+          "per_reference": [
+            {
+              "in_document": true,
+              "occurrences": 1,
+              "occurrences_capped": false,
+              "gold_block_count": 1,
+              "selected_hit": true,
+              "expanded_hit": true,
+              "in_packet": true,
+              "verdict": "ok",
+              "rank_in_beam": 0
+            }
+          ],
+          "selected_blocks": [
+            429,
+            0,
+            1,
+            2
+          ],
+          "expanded_blocks": [
+            0,
+            1,
+            2,
+            3,
+            428,
+            429,
+            430
+          ],
+          "compiled_prompt_tokens": 648,
+          "compression_fraction": 0.004949814381960676,
+          "span_count": 2,
+          "compile_seconds": 0.0029988820001563
+        },
+        "t3_d4096_m9": {
+          "ceiling": 1.0,
+          "per_reference": [
+            {
+              "in_document": true,
+              "occurrences": 1,
+              "occurrences_capped": false,
+              "gold_block_count": 1,
+              "selected_hit": true,
+              "expanded_hit": true,
+              "in_packet": true,
+              "verdict": "ok",
+              "rank_in_beam": 0
+            }
+          ],
+          "selected_blocks": [
+            429,
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7
+          ],
+          "expanded_blocks": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            428,
+            429,
+            430
+          ],
+          "compiled_prompt_tokens": 968,
+          "compression_fraction": 0.007394167163175825,
+          "span_count": 2,
+          "compile_seconds": 0.0038944890000038868
+        }
+      },
+      "pipeline_seconds": 0.6526877030000833,
+      "baseline_checked": false,
+      "baseline_match": null,
+      "index": "103059",
+      "length": 131072
+    },
+    {
+      "task": "niah_single_1",
+      "references": [
+        "5408072"
+      ],
+      "prompt_ceiling": 1.0,
+      "original_prompt_tokens": 130914,
+      "tokenize_layout_seconds": 0.5159856150000905,
+      "cache": {
+        "t2_d1024": {
+          "index_seconds": 0.022608848000118087,
+          "selection_seconds": 0.003148249999867403,
+          "index_bytes": 4193280,
+          "tree_levels": 12,
+          "visited_nodes": 255,
+          "document_blocks": 2045
+        },
+        "t2_d4096": {
+          "index_seconds": 0.03126219000000674,
+          "selection_seconds": 0.0036495009999271133,
+          "index_bytes": 16773120,
+          "tree_levels": 12,
+          "visited_nodes": 255,
+          "document_blocks": 2045
+        },
+        "t3_d1024": {
+          "index_seconds": 0.021860221999986607,
+          "selection_seconds": 0.0030588839999836637,
+          "index_bytes": 4193280,
+          "tree_levels": 12,
+          "visited_nodes": 255,
+          "document_blocks": 2045
+        },
+        "t3_d4096": {
+          "index_seconds": 0.034441899000057674,
+          "selection_seconds": 0.0040463419998104655,
+          "index_bytes": 16773120,
+          "tree_levels": 12,
+          "visited_nodes": 255,
+          "document_blocks": 2045
+        }
+      },
+      "arms": {
+        "t2_d1024_m4": {
+          "ceiling": 1.0,
+          "per_reference": [
+            {
+              "in_document": true,
+              "occurrences": 1,
+              "occurrences_capped": false,
+              "gold_block_count": 1,
+              "selected_hit": true,
+              "expanded_hit": true,
+              "in_packet": true,
+              "verdict": "ok",
+              "rank_in_beam": 1
+            }
+          ],
+          "selected_blocks": [
+            0,
+            1796,
+            1795,
+            1
+          ],
+          "expanded_blocks": [
+            0,
+            1,
+            2,
+            1794,
+            1795,
+            1796,
+            1797
+          ],
+          "compiled_prompt_tokens": 627,
+          "compression_fraction": 0.004789403730693432,
+          "span_count": 2,
+          "compile_seconds": 0.003096053000035681
+        },
+        "t2_d1024_m9": {
+          "ceiling": 1.0,
+          "per_reference": [
+            {
+              "in_document": true,
+              "occurrences": 1,
+              "occurrences_capped": false,
+              "gold_block_count": 1,
+              "selected_hit": true,
+              "expanded_hit": true,
+              "in_packet": true,
+              "verdict": "ok",
+              "rank_in_beam": 1
+            }
+          ],
+          "selected_blocks": [
+            0,
+            1796,
+            1795,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6
+          ],
+          "expanded_blocks": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            1794,
+            1795,
+            1796,
+            1797
+          ],
+          "compiled_prompt_tokens": 946,
+          "compression_fraction": 0.007226117909467284,
+          "span_count": 2,
+          "compile_seconds": 0.004039843000100518
+        },
+        "t2_d4096_m4": {
+          "ceiling": 1.0,
+          "per_reference": [
+            {
+              "in_document": true,
+              "occurrences": 1,
+              "occurrences_capped": false,
+              "gold_block_count": 1,
+              "selected_hit": true,
+              "expanded_hit": true,
+              "in_packet": true,
+              "verdict": "ok",
+              "rank_in_beam": 0
+            }
+          ],
+          "selected_blocks": [
+            1796,
+            0,
+            1795,
+            1
+          ],
+          "expanded_blocks": [
+            0,
+            1,
+            2,
+            1794,
+            1795,
+            1796,
+            1797
+          ],
+          "compiled_prompt_tokens": 627,
+          "compression_fraction": 0.004789403730693432,
+          "span_count": 2,
+          "compile_seconds": 0.002878334999877552
+        },
+        "t2_d4096_m9": {
+          "ceiling": 1.0,
+          "per_reference": [
+            {
+              "in_document": true,
+              "occurrences": 1,
+              "occurrences_capped": false,
+              "gold_block_count": 1,
+              "selected_hit": true,
+              "expanded_hit": true,
+              "in_packet": true,
+              "verdict": "ok",
+              "rank_in_beam": 0
+            }
+          ],
+          "selected_blocks": [
+            1796,
+            0,
+            1795,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6
+          ],
+          "expanded_blocks": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            1794,
+            1795,
+            1796,
+            1797
+          ],
+          "compiled_prompt_tokens": 946,
+          "compression_fraction": 0.007226117909467284,
+          "span_count": 2,
+          "compile_seconds": 0.0036748830000306043
+        },
+        "t3_d1024_m4": {
+          "ceiling": 1.0,
+          "per_reference": [
+            {
+              "in_document": true,
+              "occurrences": 1,
+              "occurrences_capped": false,
+              "gold_block_count": 1,
+              "selected_hit": true,
+              "expanded_hit": true,
+              "in_packet": true,
+              "verdict": "ok",
+              "rank_in_beam": 1
+            }
+          ],
+          "selected_blocks": [
+            0,
+            1796,
+            1795,
+            1
+          ],
+          "expanded_blocks": [
+            0,
+            1,
+            2,
+            1794,
+            1795,
+            1796,
+            1797
+          ],
+          "compiled_prompt_tokens": 651,
+          "compression_fraction": 0.004972730189284569,
+          "span_count": 2,
+          "compile_seconds": 0.002801439999984723
+        },
+        "t3_d1024_m9": {
+          "ceiling": 1.0,
+          "per_reference": [
+            {
+              "in_document": true,
+              "occurrences": 1,
+              "occurrences_capped": false,
+              "gold_block_count": 1,
+              "selected_hit": true,
+              "expanded_hit": true,
+              "in_packet": true,
+              "verdict": "ok",
+              "rank_in_beam": 1
+            }
+          ],
+          "selected_blocks": [
+            0,
+            1796,
+            1795,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6
+          ],
+          "expanded_blocks": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            1794,
+            1795,
+            1796,
+            1797
+          ],
+          "compiled_prompt_tokens": 970,
+          "compression_fraction": 0.00740944436805842,
+          "span_count": 2,
+          "compile_seconds": 0.003962989000001471
+        },
+        "t3_d4096_m4": {
+          "ceiling": 1.0,
+          "per_reference": [
+            {
+              "in_document": true,
+              "occurrences": 1,
+              "occurrences_capped": false,
+              "gold_block_count": 1,
+              "selected_hit": true,
+              "expanded_hit": true,
+              "in_packet": true,
+              "verdict": "ok",
+              "rank_in_beam": 0
+            }
+          ],
+          "selected_blocks": [
+            1796,
+            0,
+            1795,
+            1
+          ],
+          "expanded_blocks": [
+            0,
+            1,
+            2,
+            1794,
+            1795,
+            1796,
+            1797
+          ],
+          "compiled_prompt_tokens": 651,
+          "compression_fraction": 0.004972730189284569,
+          "span_count": 2,
+          "compile_seconds": 0.0034372919999441365
+        },
+        "t3_d4096_m9": {
+          "ceiling": 1.0,
+          "per_reference": [
+            {
+              "in_document": true,
+              "occurrences": 1,
+              "occurrences_capped": false,
+              "gold_block_count": 1,
+              "selected_hit": true,
+              "expanded_hit": true,
+              "in_packet": true,
+              "verdict": "ok",
+              "rank_in_beam": 0
+            }
+          ],
+          "selected_blocks": [
+            1796,
+            0,
+            1795,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6
+          ],
+          "expanded_blocks": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            1794,
+            1795,
+            1796,
+            1797
+          ],
+          "compiled_prompt_tokens": 970,
+          "compression_fraction": 0.00740944436805842,
+          "span_count": 2,
+          "compile_seconds": 0.004077523999967525
+        }
+      },
+      "pipeline_seconds": 0.6709997479999856,
+      "baseline_checked": false,
+      "baseline_match": null,
+      "index": "431105",
+      "length": 131072
+    },
+    {
+      "task": "niah_single_1",
+      "references": [
+        "7700828"
+      ],
+      "prompt_ceiling": 1.0,
+      "original_prompt_tokens": 130912,
+      "tokenize_layout_seconds": 0.5302252520000366,
+      "cache": {
+        "t2_d1024": {
+          "index_seconds": 0.02261621100001321,
+          "selection_seconds": 0.003314799000008861,
+          "index_bytes": 4193280,
+          "tree_levels": 12,
+          "visited_nodes": 255,
+          "document_blocks": 2045
+        },
+        "t2_d4096": {
+          "index_seconds": 0.032444338999994216,
+          "selection_seconds": 0.003792068999928233,
+          "index_bytes": 16773120,
+          "tree_levels": 12,
+          "visited_nodes": 255,
+          "document_blocks": 2045
+        },
+        "t3_d1024": {
+          "index_seconds": 0.022015315000089686,
+          "selection_seconds": 0.0030670629998894583,
+          "index_bytes": 4193280,
+          "tree_levels": 12,
+          "visited_nodes": 255,
+          "document_blocks": 2045
+        },
+        "t3_d4096": {
+          "index_seconds": 0.03210807499999646,
+          "selection_seconds": 0.004001795000021957,
+          "index_bytes": 16773120,
+          "tree_levels": 12,
+          "visited_nodes": 255,
+          "document_blocks": 2045
+        }
+      },
+      "arms": {
+        "t2_d1024_m4": {
+          "ceiling": 1.0,
+          "per_reference": [
+            {
+              "in_document": true,
+              "occurrences": 1,
+              "occurrences_capped": false,
+              "gold_block_count": 1,
+              "selected_hit": true,
+              "expanded_hit": true,
+              "in_packet": true,
+              "verdict": "ok",
+              "rank_in_beam": 0
+            }
+          ],
+          "selected_blocks": [
+            1112,
+            0,
+            1,
+            2
+          ],
+          "expanded_blocks": [
+            0,
+            1,
+            2,
+            3,
+            1111,
+            1112,
+            1113
+          ],
+          "compiled_prompt_tokens": 625,
+          "compression_fraction": 0.004774199462234173,
+          "span_count": 2,
+          "compile_seconds": 0.003128344000060679
+        },
+        "t2_d1024_m9": {
+          "ceiling": 1.0,
+          "per_reference": [
+            {
+              "in_document": true,
+              "occurrences": 1,
+              "occurrences_capped": false,
+              "gold_block_count": 1,
+              "selected_hit": true,
+              "expanded_hit": true,
+              "in_packet": true,
+              "verdict": "ok",
+              "rank_in_beam": 0
+            }
+          ],
+          "selected_blocks": [
+            1112,
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7
+          ],
+          "expanded_blocks": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            1111,
+            1112,
+            1113
+          ],
+          "compiled_prompt_tokens": 945,
+          "compression_fraction": 0.007218589586898069,
+          "span_count": 2,
+          "compile_seconds": 0.0038510070000938867
+        },
+        "t2_d4096_m4": {
+          "ceiling": 1.0,
+          "per_reference": [
+            {
+              "in_document": true,
+              "occurrences": 1,
+              "occurrences_capped": false,
+              "gold_block_count": 1,
+              "selected_hit": true,
+              "expanded_hit": true,
+              "in_packet": true,
+              "verdict": "ok",
+              "rank_in_beam": 0
+            }
+          ],
+          "selected_blocks": [
+            1112,
+            0,
+            1,
+            2
+          ],
+          "expanded_blocks": [
+            0,
+            1,
+            2,
+            3,
+            1111,
+            1112,
+            1113
+          ],
+          "compiled_prompt_tokens": 625,
+          "compression_fraction": 0.004774199462234173,
+          "span_count": 2,
+          "compile_seconds": 0.0030679689998578397
+        },
+        "t2_d4096_m9": {
+          "ceiling": 1.0,
+          "per_reference": [
+            {
+              "in_document": true,
+              "occurrences": 1,
+              "occurrences_capped": false,
+              "gold_block_count": 1,
+              "selected_hit": true,
+              "expanded_hit": true,
+              "in_packet": true,
+              "verdict": "ok",
+              "rank_in_beam": 0
+            }
+          ],
+          "selected_blocks": [
+            1112,
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7
+          ],
+          "expanded_blocks": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            1111,
+            1112,
+            1113
+          ],
+          "compiled_prompt_tokens": 945,
+          "compression_fraction": 0.007218589586898069,
+          "span_count": 2,
+          "compile_seconds": 0.003916467999943052
+        },
+        "t3_d1024_m4": {
+          "ceiling": 1.0,
+          "per_reference": [
+            {
+              "in_document": true,
+              "occurrences": 1,
+              "occurrences_capped": false,
+              "gold_block_count": 1,
+              "selected_hit": true,
+              "expanded_hit": true,
+              "in_packet": true,
+              "verdict": "ok",
+              "rank_in_beam": 0
+            }
+          ],
+          "selected_blocks": [
+            1112,
+            0,
+            1,
+            2
+          ],
+          "expanded_blocks": [
+            0,
+            1,
+            2,
+            3,
+            1111,
+            1112,
+            1113
+          ],
+          "compiled_prompt_tokens": 649,
+          "compression_fraction": 0.0049575287215839646,
+          "span_count": 2,
+          "compile_seconds": 0.00277850300017235
+        },
+        "t3_d1024_m9": {
+          "ceiling": 1.0,
+          "per_reference": [
+            {
+              "in_document": true,
+              "occurrences": 1,
+              "occurrences_capped": false,
+              "gold_block_count": 1,
+              "selected_hit": true,
+              "expanded_hit": true,
+              "in_packet": true,
+              "verdict": "ok",
+              "rank_in_beam": 0
+            }
+          ],
+          "selected_blocks": [
+            1112,
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7
+          ],
+          "expanded_blocks": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            1111,
+            1112,
+            1113
+          ],
+          "compiled_prompt_tokens": 969,
+          "compression_fraction": 0.007401918846247861,
+          "span_count": 2,
+          "compile_seconds": 0.003788639000049443
+        },
+        "t3_d4096_m4": {
+          "ceiling": 1.0,
+          "per_reference": [
+            {
+              "in_document": true,
+              "occurrences": 1,
+              "occurrences_capped": false,
+              "gold_block_count": 1,
+              "selected_hit": true,
+              "expanded_hit": true,
+              "in_packet": true,
+              "verdict": "ok",
+              "rank_in_beam": 0
+            }
+          ],
+          "selected_blocks": [
+            1112,
+            0,
+            1,
+            2
+          ],
+          "expanded_blocks": [
+            0,
+            1,
+            2,
+            3,
+            1111,
+            1112,
+            1113
+          ],
+          "compiled_prompt_tokens": 649,
+          "compression_fraction": 0.0049575287215839646,
+          "span_count": 2,
+          "compile_seconds": 0.003184861000136152
+        },
+        "t3_d4096_m9": {
+          "ceiling": 1.0,
+          "per_reference": [
+            {
+              "in_document": true,
+              "occurrences": 1,
+              "occurrences_capped": false,
+              "gold_block_count": 1,
+              "selected_hit": true,
+              "expanded_hit": true,
+              "in_packet": true,
+              "verdict": "ok",
+              "rank_in_beam": 0
+            }
+          ],
+          "selected_blocks": [
+            1112,
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7
+          ],
+          "expanded_blocks": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            1111,
+            1112,
+            1113
+          ],
+          "compiled_prompt_tokens": 969,
+          "compression_fraction": 0.007401918846247861,
+          "span_count": 2,
+          "compile_seconds": 0.003771340999946915
+        }
+      },
+      "pipeline_seconds": 0.6839363939998293,
+      "baseline_checked": false,
+      "baseline_match": null,
+      "index": "267037",
+      "length": 131072
+    },
+    {
+      "task": "niah_single_1",
+      "references": [
+        "9548432"
+      ],
+      "prompt_ceiling": 1.0,
+      "original_prompt_tokens": 130912,
+      "tokenize_layout_seconds": 0.49625427000000855,
+      "cache": {
+        "t2_d1024": {
+          "index_seconds": 0.016438516000107484,
+          "selection_seconds": 0.002630884000154765,
+          "index_bytes": 4193280,
+          "tree_levels": 12,
+          "visited_nodes": 255,
+          "document_blocks": 2045
+        },
+        "t2_d4096": {
+          "index_seconds": 0.022799732000066797,
+          "selection_seconds": 0.002976771000021472,
+          "index_bytes": 16773120,
+          "tree_levels": 12,
+          "visited_nodes": 255,
+          "document_blocks": 2045
+        },
+        "t3_d1024": {
+          "index_seconds": 0.01610844500009989,
+          "selection_seconds": 0.0025609110000459623,
+          "index_bytes": 4193280,
+          "tree_levels": 12,
+          "visited_nodes": 255,
+          "document_blocks": 2045
+        },
+        "t3_d4096": {
+          "index_seconds": 0.022176259999923786,
+          "selection_seconds": 0.0028047190000961564,
+          "index_bytes": 16773120,
+          "tree_levels": 12,
+          "visited_nodes": 255,
+          "document_blocks": 2045
+        }
+      },
+      "arms": {
+        "t2_d1024_m4": {
+          "ceiling": 1.0,
+          "per_reference": [
+            {
+              "in_document": true,
+              "occurrences": 1,
+              "occurrences_capped": false,
+              "gold_block_count": 1,
+              "selected_hit": true,
+              "expanded_hit": true,
+              "in_packet": true,
+              "verdict": "ok",
+              "rank_in_beam": 0
+            }
+          ],
+          "selected_blocks": [
+            1516,
+            0,
+            1,
+            2
+          ],
+          "expanded_blocks": [
+            0,
+            1,
+            2,
+            3,
+            1515,
+            1516,
+            1517
+          ],
+          "compiled_prompt_tokens": 624,
+          "compression_fraction": 0.0047665607430945976,
+          "span_count": 2,
+          "compile_seconds": 0.0027661819999593718
+        },
+        "t2_d1024_m9": {
+          "ceiling": 1.0,
+          "per_reference": [
+            {
+              "in_document": true,
+              "occurrences": 1,
+              "occurrences_capped": false,
+              "gold_block_count": 1,
+              "selected_hit": true,
+              "expanded_hit": true,
+              "in_packet": true,
+              "verdict": "ok",
+              "rank_in_beam": 0
+            }
+          ],
+          "selected_blocks": [
+            1516,
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7
+          ],
+          "expanded_blocks": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            1515,
+            1516,
+            1517
+          ],
+          "compiled_prompt_tokens": 944,
+          "compression_fraction": 0.007210950867758494,
+          "span_count": 2,
+          "compile_seconds": 0.003111707999778446
+        },
+        "t2_d4096_m4": {
+          "ceiling": 1.0,
+          "per_reference": [
+            {
+              "in_document": true,
+              "occurrences": 1,
+              "occurrences_capped": false,
+              "gold_block_count": 1,
+              "selected_hit": true,
+              "expanded_hit": true,
+              "in_packet": true,
+              "verdict": "ok",
+              "rank_in_beam": 0
+            }
+          ],
+          "selected_blocks": [
+            1516,
+            0,
+            1,
+            2
+          ],
+          "expanded_blocks": [
+            0,
+            1,
+            2,
+            3,
+            1515,
+            1516,
+            1517
+          ],
+          "compiled_prompt_tokens": 624,
+          "compression_fraction": 0.0047665607430945976,
+          "span_count": 2,
+          "compile_seconds": 0.0026391599999442406
+        },
+        "t2_d4096_m9": {
+          "ceiling": 1.0,
+          "per_reference": [
+            {
+              "in_document": true,
+              "occurrences": 1,
+              "occurrences_capped": false,
+              "gold_block_count": 1,
+              "selected_hit": true,
+              "expanded_hit": true,
+              "in_packet": true,
+              "verdict": "ok",
+              "rank_in_beam": 0
+            }
+          ],
+          "selected_blocks": [
+            1516,
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7
+          ],
+          "expanded_blocks": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            1515,
+            1516,
+            1517
+          ],
+          "compiled_prompt_tokens": 944,
+          "compression_fraction": 0.007210950867758494,
+          "span_count": 2,
+          "compile_seconds": 0.0031417899999723886
+        },
+        "t3_d1024_m4": {
+          "ceiling": 1.0,
+          "per_reference": [
+            {
+              "in_document": true,
+              "occurrences": 1,
+              "occurrences_capped": false,
+              "gold_block_count": 1,
+              "selected_hit": true,
+              "expanded_hit": true,
+              "in_packet": true,
+              "verdict": "ok",
+              "rank_in_beam": 0
+            }
+          ],
+          "selected_blocks": [
+            1516,
+            0,
+            1,
+            2
+          ],
+          "expanded_blocks": [
+            0,
+            1,
+            2,
+            3,
+            1515,
+            1516,
+            1517
+          ],
+          "compiled_prompt_tokens": 648,
+          "compression_fraction": 0.00494989000244439,
+          "span_count": 2,
+          "compile_seconds": 0.0022889780000241444
+        },
+        "t3_d1024_m9": {
+          "ceiling": 1.0,
+          "per_reference": [
+            {
+              "in_document": true,
+              "occurrences": 1,
+              "occurrences_capped": false,
+              "gold_block_count": 1,
+              "selected_hit": true,
+              "expanded_hit": true,
+              "in_packet": true,
+              "verdict": "ok",
+              "rank_in_beam": 0
+            }
+          ],
+          "selected_blocks": [
+            1516,
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7
+          ],
+          "expanded_blocks": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            1515,
+            1516,
+            1517
+          ],
+          "compiled_prompt_tokens": 968,
+          "compression_fraction": 0.007394280127108286,
+          "span_count": 2,
+          "compile_seconds": 0.003010018999930253
+        },
+        "t3_d4096_m4": {
+          "ceiling": 1.0,
+          "per_reference": [
+            {
+              "in_document": true,
+              "occurrences": 1,
+              "occurrences_capped": false,
+              "gold_block_count": 1,
+              "selected_hit": true,
+              "expanded_hit": true,
+              "in_packet": true,
+              "verdict": "ok",
+              "rank_in_beam": 0
+            }
+          ],
+          "selected_blocks": [
+            1516,
+            0,
+            1,
+            2
+          ],
+          "expanded_blocks": [
+            0,
+            1,
+            2,
+            3,
+            1515,
+            1516,
+            1517
+          ],
+          "compiled_prompt_tokens": 648,
+          "compression_fraction": 0.00494989000244439,
+          "span_count": 2,
+          "compile_seconds": 0.0024818659999255033
+        },
+        "t3_d4096_m9": {
+          "ceiling": 1.0,
+          "per_reference": [
+            {
+              "in_document": true,
+              "occurrences": 1,
+              "occurrences_capped": false,
+              "gold_block_count": 1,
+              "selected_hit": true,
+              "expanded_hit": true,
+              "in_packet": true,
+              "verdict": "ok",
+              "rank_in_beam": 0
+            }
+          ],
+          "selected_blocks": [
+            1516,
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7
+          ],
+          "expanded_blocks": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            1515,
+            1516,
+            1517
+          ],
+          "compiled_prompt_tokens": 968,
+          "compression_fraction": 0.007394280127108286,
+          "span_count": 2,
+          "compile_seconds": 0.0029898050001975207
+        }
+      },
+      "pipeline_seconds": 0.6098637590000635,
+      "baseline_checked": false,
+      "baseline_match": null,
+      "index": "363965",
+      "length": 131072
+    },
+    {
+      "task": "niah_single_1",
+      "references": [
+        "2839607"
+      ],
+      "prompt_ceiling": 1.0,
+      "original_prompt_tokens": 130912,
+      "tokenize_layout_seconds": 0.4976827469999989,
+      "cache": {
+        "t2_d1024": {
+          "index_seconds": 0.016990783999972336,
+          "selection_seconds": 0.002661007999904541,
+          "index_bytes": 4193280,
+          "tree_levels": 12,
+          "visited_nodes": 255,
+          "document_blocks": 2045
+        },
+        "t2_d4096": {
+          "index_seconds": 0.021993689000055383,
+          "selection_seconds": 0.002814901000192549,
+          "index_bytes": 16773120,
+          "tree_levels": 12,
+          "visited_nodes": 255,
+          "document_blocks": 2045
+        },
+        "t3_d1024": {
+          "index_seconds": 0.016003915999817764,
+          "selection_seconds": 0.002618057000063345,
+          "index_bytes": 4193280,
+          "tree_levels": 12,
+          "visited_nodes": 255,
+          "document_blocks": 2045
+        },
+        "t3_d4096": {
+          "index_seconds": 0.023925810000037018,
+          "selection_seconds": 0.0030791770000178076,
+          "index_bytes": 16773120,
+          "tree_levels": 12,
+          "visited_nodes": 255,
+          "document_blocks": 2045
+        }
+      },
+      "arms": {
+        "t2_d1024_m4": {
+          "ceiling": 1.0,
+          "per_reference": [
+            {
+              "in_document": true,
+              "occurrences": 1,
+              "occurrences_capped": false,
+              "gold_block_count": 1,
+              "selected_hit": true,
+              "expanded_hit": true,
+              "in_packet": true,
+              "verdict": "ok",
+              "rank_in_beam": 0
+            }
+          ],
+          "selected_blocks": [
+            470,
+            0,
+            469,
+            1
+          ],
+          "expanded_blocks": [
+            0,
+            1,
+            2,
+            468,
+            469,
+            470,
+            471
+          ],
+          "compiled_prompt_tokens": 623,
+          "compression_fraction": 0.004758922023955023,
+          "span_count": 2,
+          "compile_seconds": 0.002650381000194102
+        },
+        "t2_d1024_m9": {
+          "ceiling": 1.0,
+          "per_reference": [
+            {
+              "in_document": true,
+              "occurrences": 1,
+              "occurrences_capped": false,
+              "gold_block_count": 1,
+              "selected_hit": true,
+              "expanded_hit": true,
+              "in_packet": true,
+              "verdict": "ok",
+              "rank_in_beam": 0
+            }
+          ],
+          "selected_blocks": [
+            470,
+            0,
+            469,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6
+          ],
+          "expanded_blocks": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            468,
+            469,
+            470,
+            471
+          ],
+          "compiled_prompt_tokens": 942,
+          "compression_fraction": 0.007195673429479345,
+          "span_count": 2,
+          "compile_seconds": 0.003159548999974504
+        },
+        "t2_d4096_m4": {
+          "ceiling": 1.0,
+          "per_reference": [
+            {
+              "in_document": true,
+              "occurrences": 1,
+              "occurrences_capped": false,
+              "gold_block_count": 1,
+              "selected_hit": true,
+              "expanded_hit": true,
+              "in_packet": true,
+              "verdict": "ok",
+              "rank_in_beam": 1
+            }
+          ],
+          "selected_blocks": [
+            0,
+            470,
+            469,
+            1
+          ],
+          "expanded_blocks": [
+            0,
+            1,
+            2,
+            468,
+            469,
+            470,
+            471
+          ],
+          "compiled_prompt_tokens": 623,
+          "compression_fraction": 0.004758922023955023,
+          "span_count": 2,
+          "compile_seconds": 0.002414851999901657
+        },
+        "t2_d4096_m9": {
+          "ceiling": 1.0,
+          "per_reference": [
+            {
+              "in_document": true,
+              "occurrences": 1,
+              "occurrences_capped": false,
+              "gold_block_count": 1,
+              "selected_hit": true,
+              "expanded_hit": true,
+              "in_packet": true,
+              "verdict": "ok",
+              "rank_in_beam": 1
+            }
+          ],
+          "selected_blocks": [
+            0,
+            470,
+            469,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6
+          ],
+          "expanded_blocks": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            468,
+            469,
+            470,
+            471
+          ],
+          "compiled_prompt_tokens": 942,
+          "compression_fraction": 0.007195673429479345,
+          "span_count": 2,
+          "compile_seconds": 0.0031101109998417087
+        },
+        "t3_d1024_m4": {
+          "ceiling": 1.0,
+          "per_reference": [
+            {
+              "in_document": true,
+              "occurrences": 1,
+              "occurrences_capped": false,
+              "gold_block_count": 1,
+              "selected_hit": true,
+              "expanded_hit": true,
+              "in_packet": true,
+              "verdict": "ok",
+              "rank_in_beam": 0
+            }
+          ],
+          "selected_blocks": [
+            470,
+            0,
+            469,
+            1
+          ],
+          "expanded_blocks": [
+            0,
+            1,
+            2,
+            468,
+            469,
+            470,
+            471
+          ],
+          "compiled_prompt_tokens": 647,
+          "compression_fraction": 0.004942251283304815,
+          "span_count": 2,
+          "compile_seconds": 0.0023396879998927034
+        },
+        "t3_d1024_m9": {
+          "ceiling": 1.0,
+          "per_reference": [
+            {
+              "in_document": true,
+              "occurrences": 1,
+              "occurrences_capped": false,
+              "gold_block_count": 1,
+              "selected_hit": true,
+              "expanded_hit": true,
+              "in_packet": true,
+              "verdict": "ok",
+              "rank_in_beam": 0
+            }
+          ],
+          "selected_blocks": [
+            470,
+            0,
+            469,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6
+          ],
+          "expanded_blocks": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            468,
+            469,
+            470,
+            471
+          ],
+          "compiled_prompt_tokens": 966,
+          "compression_fraction": 0.007379002688829137,
+          "span_count": 2,
+          "compile_seconds": 0.003029070999900796
+        },
+        "t3_d4096_m4": {
+          "ceiling": 1.0,
+          "per_reference": [
+            {
+              "in_document": true,
+              "occurrences": 1,
+              "occurrences_capped": false,
+              "gold_block_count": 1,
+              "selected_hit": true,
+              "expanded_hit": true,
+              "in_packet": true,
+              "verdict": "ok",
+              "rank_in_beam": 1
+            }
+          ],
+          "selected_blocks": [
+            0,
+            470,
+            469,
+            1
+          ],
+          "expanded_blocks": [
+            0,
+            1,
+            2,
+            468,
+            469,
+            470,
+            471
+          ],
+          "compiled_prompt_tokens": 647,
+          "compression_fraction": 0.004942251283304815,
+          "span_count": 2,
+          "compile_seconds": 0.002472582000109469
+        },
+        "t3_d4096_m9": {
+          "ceiling": 1.0,
+          "per_reference": [
+            {
+              "in_document": true,
+              "occurrences": 1,
+              "occurrences_capped": false,
+              "gold_block_count": 1,
+              "selected_hit": true,
+              "expanded_hit": true,
+              "in_packet": true,
+              "verdict": "ok",
+              "rank_in_beam": 1
+            }
+          ],
+          "selected_blocks": [
+            0,
+            470,
+            469,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6
+          ],
+          "expanded_blocks": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            468,
+            469,
+            470,
+            471
+          ],
+          "compiled_prompt_tokens": 966,
+          "compression_fraction": 0.007379002688829137,
+          "span_count": 2,
+          "compile_seconds": 0.003231835000178762
+        }
+      },
+      "pipeline_seconds": 0.6127481539999735,
+      "baseline_checked": false,
+      "baseline_match": null,
+      "index": "112870",
+      "length": 131072
+    },
+    {
+      "task": "niah_single_1",
+      "references": [
+        "8082668"
+      ],
+      "prompt_ceiling": 1.0,
+      "original_prompt_tokens": 130912,
+      "tokenize_layout_seconds": 0.496971971999983,
+      "cache": {
+        "t2_d1024": {
+          "index_seconds": 0.02186704399991868,
+          "selection_seconds": 0.0030966250001256412,
+          "index_bytes": 4193280,
+          "tree_levels": 12,
+          "visited_nodes": 255,
+          "document_blocks": 2045
+        },
+        "t2_d4096": {
+          "index_seconds": 0.02157978200011712,
+          "selection_seconds": 0.002886959999841565,
+          "index_bytes": 16773120,
+          "tree_levels": 12,
+          "visited_nodes": 255,
+          "document_blocks": 2045
+        },
+        "t3_d1024": {
+          "index_seconds": 0.015907241000149952,
+          "selection_seconds": 0.0024066759999641363,
+          "index_bytes": 4193280,
+          "tree_levels": 12,
+          "visited_nodes": 255,
+          "document_blocks": 2045
+        },
+        "t3_d4096": {
+          "index_seconds": 0.023699905000057697,
+          "selection_seconds": 0.0029847450000488607,
+          "index_bytes": 16773120,
+          "tree_levels": 12,
+          "visited_nodes": 255,
+          "document_blocks": 2045
+        }
+      },
+      "arms": {
+        "t2_d1024_m4": {
+          "ceiling": 1.0,
+          "per_reference": [
+            {
+              "in_document": true,
+              "occurrences": 1,
+              "occurrences_capped": false,
+              "gold_block_count": 1,
+              "selected_hit": true,
+              "expanded_hit": true,
+              "in_packet": true,
+              "verdict": "ok",
+              "rank_in_beam": 0
+            }
+          ],
+          "selected_blocks": [
+            1832,
+            0,
+            1,
+            2
+          ],
+          "expanded_blocks": [
+            0,
+            1,
+            2,
+            3,
+            1831,
+            1832,
+            1833
+          ],
+          "compiled_prompt_tokens": 627,
+          "compression_fraction": 0.004789476900513322,
+          "span_count": 2,
+          "compile_seconds": 0.0024159829999916838
+        },
+        "t2_d1024_m9": {
+          "ceiling": 1.0,
+          "per_reference": [
+            {
+              "in_document": true,
+              "occurrences": 1,
+              "occurrences_capped": false,
+              "gold_block_count": 1,
+              "selected_hit": true,
+              "expanded_hit": true,
+              "in_packet": true,
+              "verdict": "ok",
+              "rank_in_beam": 0
+            }
+          ],
+          "selected_blocks": [
+            1832,
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7
+          ],
+          "expanded_blocks": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            1831,
+            1832,
+            1833
+          ],
+          "compiled_prompt_tokens": 947,
+          "compression_fraction": 0.0072338670251772185,
+          "span_count": 2,
+          "compile_seconds": 0.0033150419999401493
+        },
+        "t2_d4096_m4": {
+          "ceiling": 1.0,
+          "per_reference": [
+            {
+              "in_document": true,
+              "occurrences": 1,
+              "occurrences_capped": false,
+              "gold_block_count": 1,
+              "selected_hit": true,
+              "expanded_hit": true,
+              "in_packet": true,
+              "verdict": "ok",
+              "rank_in_beam": 0
+            }
+          ],
+          "selected_blocks": [
+            1832,
+            0,
+            1,
+            2
+          ],
+          "expanded_blocks": [
+            0,
+            1,
+            2,
+            3,
+            1831,
+            1832,
+            1833
+          ],
+          "compiled_prompt_tokens": 627,
+          "compression_fraction": 0.004789476900513322,
+          "span_count": 2,
+          "compile_seconds": 0.002482611999994333
+        },
+        "t2_d4096_m9": {
+          "ceiling": 1.0,
+          "per_reference": [
+            {
+              "in_document": true,
+              "occurrences": 1,
+              "occurrences_capped": false,
+              "gold_block_count": 1,
+              "selected_hit": true,
+              "expanded_hit": true,
+              "in_packet": true,
+              "verdict": "ok",
+              "rank_in_beam": 0
+            }
+          ],
+          "selected_blocks": [
+            1832,
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7
+          ],
+          "expanded_blocks": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            1831,
+            1832,
+            1833
+          ],
+          "compiled_prompt_tokens": 947,
+          "compression_fraction": 0.0072338670251772185,
+          "span_count": 2,
+          "compile_seconds": 0.002937654999868755
+        },
+        "t3_d1024_m4": {
+          "ceiling": 1.0,
+          "per_reference": [
+            {
+              "in_document": true,
+              "occurrences": 1,
+              "occurrences_capped": false,
+              "gold_block_count": 1,
+              "selected_hit": true,
+              "expanded_hit": true,
+              "in_packet": true,
+              "verdict": "ok",
+              "rank_in_beam": 0
+            }
+          ],
+          "selected_blocks": [
+            1832,
+            0,
+            1,
+            2
+          ],
+          "expanded_blocks": [
+            0,
+            1,
+            2,
+            3,
+            1831,
+            1832,
+            1833
+          ],
+          "compiled_prompt_tokens": 651,
+          "compression_fraction": 0.004972806159863114,
+          "span_count": 2,
+          "compile_seconds": 0.0024565530000018043
+        },
+        "t3_d1024_m9": {
+          "ceiling": 1.0,
+          "per_reference": [
+            {
+              "in_document": true,
+              "occurrences": 1,
+              "occurrences_capped": false,
+              "gold_block_count": 1,
+              "selected_hit": true,
+              "expanded_hit": true,
+              "in_packet": true,
+              "verdict": "ok",
+              "rank_in_beam": 0
+            }
+          ],
+          "selected_blocks": [
+            1832,
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7
+          ],
+          "expanded_blocks": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            1831,
+            1832,
+            1833
+          ],
+          "compiled_prompt_tokens": 971,
+          "compression_fraction": 0.0074171962845270105,
+          "span_count": 2,
+          "compile_seconds": 0.0030701339999268384
+        },
+        "t3_d4096_m4": {
+          "ceiling": 1.0,
+          "per_reference": [
+            {
+              "in_document": true,
+              "occurrences": 1,
+              "occurrences_capped": false,
+              "gold_block_count": 1,
+              "selected_hit": true,
+              "expanded_hit": true,
+              "in_packet": true,
+              "verdict": "ok",
+              "rank_in_beam": 0
+            }
+          ],
+          "selected_blocks": [
+            1832,
+            0,
+            1,
+            2
+          ],
+          "expanded_blocks": [
+            0,
+            1,
+            2,
+            3,
+            1831,
+            1832,
+            1833
+          ],
+          "compiled_prompt_tokens": 651,
+          "compression_fraction": 0.004972806159863114,
+          "span_count": 2,
+          "compile_seconds": 0.0026314460001231055
+        },
+        "t3_d4096_m9": {
+          "ceiling": 1.0,
+          "per_reference": [
+            {
+              "in_document": true,
+              "occurrences": 1,
+              "occurrences_capped": false,
+              "gold_block_count": 1,
+              "selected_hit": true,
+              "expanded_hit": true,
+              "in_packet": true,
+              "verdict": "ok",
+              "rank_in_beam": 0
+            }
+          ],
+          "selected_blocks": [
+            1832,
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7
+          ],
+          "expanded_blocks": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            1831,
+            1832,
+            1833
+          ],
+          "compiled_prompt_tokens": 971,
+          "compression_fraction": 0.0074171962845270105,
+          "span_count": 2,
+          "compile_seconds": 0.0033745630000794336
+        }
+      },
+      "pipeline_seconds": 0.6166590469999846,
+      "baseline_checked": false,
+      "baseline_match": null,
+      "index": "439835",
+      "length": 131072
+    },
+    {
+      "task": "niah_single_1",
+      "references": [
+        "7402509"
+      ],
+      "prompt_ceiling": 1.0,
+      "original_prompt_tokens": 130912,
+      "tokenize_layout_seconds": 0.4969911329999377,
+      "cache": {
+        "t2_d1024": {
+          "index_seconds": 0.01671436500009804,
+          "selection_seconds": 0.002595563999875594,
+          "index_bytes": 4193280,
+          "tree_levels": 12,
+          "visited_nodes": 255,
+          "document_blocks": 2045
+        },
+        "t2_d4096": {
+          "index_seconds": 0.022831833000054758,
+          "selection_seconds": 0.003025714000159496,
+          "index_bytes": 16773120,
+          "tree_levels": 12,
+          "visited_nodes": 255,
+          "document_blocks": 2045
+        },
+        "t3_d1024": {
+          "index_seconds": 0.01646929799994723,
+          "selection_seconds": 0.0024475469999742927,
+          "index_bytes": 4193280,
+          "tree_levels": 12,
+          "visited_nodes": 255,
+          "document_blocks": 2045
+        },
+        "t3_d4096": {
+          "index_seconds": 0.021851985000012064,
+          "selection_seconds": 0.0030469780001567415,
+          "index_bytes": 16773120,
+          "tree_levels": 12,
+          "visited_nodes": 255,
+          "document_blocks": 2045
+        }
+      },
+      "arms": {
+        "t2_d1024_m4": {
+          "ceiling": 1.0,
+          "per_reference": [
+            {
+              "in_document": true,
+              "occurrences": 1,
+              "occurrences_capped": false,
+              "gold_block_count": 1,
+              "selected_hit": false,
+              "expanded_hit": true,
+              "in_packet": true,
+              "verdict": "ok",
+              "rank_in_beam": null
+            }
+          ],
+          "selected_blocks": [
+            1830,
+            0,
+            1,
+            2
+          ],
+          "expanded_blocks": [
+            0,
+            1,
+            2,
+            3,
+            1829,
+            1830,
+            1831
+          ],
+          "compiled_prompt_tokens": 627,
+          "compression_fraction": 0.004789476900513322,
+          "span_count": 2,
+          "compile_seconds": 0.0026710740000908118
+        },
+        "t2_d1024_m9": {
+          "ceiling": 1.0,
+          "per_reference": [
+            {
+              "in_document": true,
+              "occurrences": 1,
+              "occurrences_capped": false,
+              "gold_block_count": 1,
+              "selected_hit": false,
+              "expanded_hit": true,
+              "in_packet": true,
+              "verdict": "ok",
+              "rank_in_beam": null
+            }
+          ],
+          "selected_blocks": [
+            1830,
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7
+          ],
+          "expanded_blocks": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            1829,
+            1830,
+            1831
+          ],
+          "compiled_prompt_tokens": 947,
+          "compression_fraction": 0.0072338670251772185,
+          "span_count": 2,
+          "compile_seconds": 0.003233079000210637
+        },
+        "t2_d4096_m4": {
+          "ceiling": 1.0,
+          "per_reference": [
+            {
+              "in_document": true,
+              "occurrences": 1,
+              "occurrences_capped": false,
+              "gold_block_count": 1,
+              "selected_hit": false,
+              "expanded_hit": true,
+              "in_packet": true,
+              "verdict": "ok",
+              "rank_in_beam": null
+            }
+          ],
+          "selected_blocks": [
+            1830,
+            0,
+            1,
+            2
+          ],
+          "expanded_blocks": [
+            0,
+            1,
+            2,
+            3,
+            1829,
+            1830,
+            1831
+          ],
+          "compiled_prompt_tokens": 627,
+          "compression_fraction": 0.004789476900513322,
+          "span_count": 2,
+          "compile_seconds": 0.0025134339998658106
+        },
+        "t2_d4096_m9": {
+          "ceiling": 1.0,
+          "per_reference": [
+            {
+              "in_document": true,
+              "occurrences": 1,
+              "occurrences_capped": false,
+              "gold_block_count": 1,
+              "selected_hit": false,
+              "expanded_hit": true,
+              "in_packet": true,
+              "verdict": "ok",
+              "rank_in_beam": null
+            }
+          ],
+          "selected_blocks": [
+            1830,
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7
+          ],
+          "expanded_blocks": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            1829,
+            1830,
+            1831
+          ],
+          "compiled_prompt_tokens": 947,
+          "compression_fraction": 0.0072338670251772185,
+          "span_count": 2,
+          "compile_seconds": 0.003034072999980708
+        },
+        "t3_d1024_m4": {
+          "ceiling": 1.0,
+          "per_reference": [
+            {
+              "in_document": true,
+              "occurrences": 1,
+              "occurrences_capped": false,
+              "gold_block_count": 1,
+              "selected_hit": false,
+              "expanded_hit": true,
+              "in_packet": true,
+              "verdict": "ok",
+              "rank_in_beam": null
+            }
+          ],
+          "selected_blocks": [
+            1830,
+            0,
+            1,
+            2
+          ],
+          "expanded_blocks": [
+            0,
+            1,
+            2,
+            3,
+            1829,
+            1830,
+            1831
+          ],
+          "compiled_prompt_tokens": 651,
+          "compression_fraction": 0.004972806159863114,
+          "span_count": 2,
+          "compile_seconds": 0.0023258189999069145
+        },
+        "t3_d1024_m9": {
+          "ceiling": 1.0,
+          "per_reference": [
+            {
+              "in_document": true,
+              "occurrences": 1,
+              "occurrences_capped": false,
+              "gold_block_count": 1,
+              "selected_hit": false,
+              "expanded_hit": true,
+              "in_packet": true,
+              "verdict": "ok",
+              "rank_in_beam": null
+            }
+          ],
+          "selected_blocks": [
+            1830,
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7
+          ],
+          "expanded_blocks": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            1829,
+            1830,
+            1831
+          ],
+          "compiled_prompt_tokens": 971,
+          "compression_fraction": 0.0074171962845270105,
+          "span_count": 2,
+          "compile_seconds": 0.003053184999998848
+        },
+        "t3_d4096_m4": {
+          "ceiling": 1.0,
+          "per_reference": [
+            {
+              "in_document": true,
+              "occurrences": 1,
+              "occurrences_capped": false,
+              "gold_block_count": 1,
+              "selected_hit": false,
+              "expanded_hit": true,
+              "in_packet": true,
+              "verdict": "ok",
+              "rank_in_beam": null
+            }
+          ],
+          "selected_blocks": [
+            1830,
+            0,
+            1,
+            2
+          ],
+          "expanded_blocks": [
+            0,
+            1,
+            2,
+            3,
+            1829,
+            1830,
+            1831
+          ],
+          "compiled_prompt_tokens": 651,
+          "compression_fraction": 0.004972806159863114,
+          "span_count": 2,
+          "compile_seconds": 0.0027937619997828733
+        },
+        "t3_d4096_m9": {
+          "ceiling": 1.0,
+          "per_reference": [
+            {
+              "in_document": true,
+              "occurrences": 1,
+              "occurrences_capped": false,
+              "gold_block_count": 1,
+              "selected_hit": false,
+              "expanded_hit": true,
+              "in_packet": true,
+              "verdict": "ok",
+              "rank_in_beam": null
+            }
+          ],
+          "selected_blocks": [
+            1830,
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7
+          ],
+          "expanded_blocks": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            1829,
+            1830,
+            1831
+          ],
+          "compiled_prompt_tokens": 971,
+          "compression_fraction": 0.0074171962845270105,
+          "span_count": 2,
+          "compile_seconds": 0.003134282000019084
+        }
+      },
+      "pipeline_seconds": 0.6112741580000147,
+      "baseline_checked": false,
+      "baseline_match": null,
+      "index": "439475",
+      "length": 131072
+    },
+    {
+      "task": "niah_single_1",
+      "references": [
+        "5218028"
+      ],
+      "prompt_ceiling": 1.0,
+      "original_prompt_tokens": 130912,
+      "tokenize_layout_seconds": 0.49371570099992823,
+      "cache": {
+        "t2_d1024": {
+          "index_seconds": 0.016596607000110453,
+          "selection_seconds": 0.002814480000097319,
+          "index_bytes": 4193280,
+          "tree_levels": 12,
+          "visited_nodes": 255,
+          "document_blocks": 2045
+        },
+        "t2_d4096": {
+          "index_seconds": 0.02223971399985203,
+          "selection_seconds": 0.0028523769999537762,
+          "index_bytes": 16773120,
+          "tree_levels": 12,
+          "visited_nodes": 255,
+          "document_blocks": 2045
+        },
+        "t3_d1024": {
+          "index_seconds": 0.015955721999944217,
+          "selection_seconds": 0.0026223879999633937,
+          "index_bytes": 4193280,
+          "tree_levels": 12,
+          "visited_nodes": 255,
+          "document_blocks": 2045
+        },
+        "t3_d4096": {
+          "index_seconds": 0.0231516300000294,
+          "selection_seconds": 0.0028448909999951866,
+          "index_bytes": 16773120,
+          "tree_levels": 12,
+          "visited_nodes": 255,
+          "document_blocks": 2045
+        }
+      },
+      "arms": {
+        "t2_d1024_m4": {
+          "ceiling": 1.0,
+          "per_reference": [
+            {
+              "in_document": true,
+              "occurrences": 1,
+              "occurrences_capped": false,
+              "gold_block_count": 1,
+              "selected_hit": true,
+              "expanded_hit": true,
+              "in_packet": true,
+              "verdict": "ok",
+              "rank_in_beam": 1
+            }
+          ],
+          "selected_blocks": [
+            0,
+            1700,
+            1699,
+            1
+          ],
+          "expanded_blocks": [
+            0,
+            1,
+            2,
+            1698,
+            1699,
+            1700,
+            1701
+          ],
+          "compiled_prompt_tokens": 627,
+          "compression_fraction": 0.004789476900513322,
+          "span_count": 2,
+          "compile_seconds": 0.0024854050000158168
+        },
+        "t2_d1024_m9": {
+          "ceiling": 1.0,
+          "per_reference": [
+            {
+              "in_document": true,
+              "occurrences": 1,
+              "occurrences_capped": false,
+              "gold_block_count": 1,
+              "selected_hit": true,
+              "expanded_hit": true,
+              "in_packet": true,
+              "verdict": "ok",
+              "rank_in_beam": 1
+            }
+          ],
+          "selected_blocks": [
+            0,
+            1700,
+            1699,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6
+          ],
+          "expanded_blocks": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            1698,
+            1699,
+            1700,
+            1701
+          ],
+          "compiled_prompt_tokens": 946,
+          "compression_fraction": 0.0072262283060376435,
+          "span_count": 2,
+          "compile_seconds": 0.003218200999981491
+        },
+        "t2_d4096_m4": {
+          "ceiling": 1.0,
+          "per_reference": [
+            {
+              "in_document": true,
+              "occurrences": 1,
+              "occurrences_capped": false,
+              "gold_block_count": 1,
+              "selected_hit": true,
+              "expanded_hit": true,
+              "in_packet": true,
+              "verdict": "ok",
+              "rank_in_beam": 0
+            }
+          ],
+          "selected_blocks": [
+            1700,
+            0,
+            1699,
+            1
+          ],
+          "expanded_blocks": [
+            0,
+            1,
+            2,
+            1698,
+            1699,
+            1700,
+            1701
+          ],
+          "compiled_prompt_tokens": 627,
+          "compression_fraction": 0.004789476900513322,
+          "span_count": 2,
+          "compile_seconds": 0.0026113519998034462
+        },
+        "t2_d4096_m9": {
+          "ceiling": 1.0,
+          "per_reference": [
+            {
+              "in_document": true,
+              "occurrences": 1,
+              "occurrences_capped": false,
+              "gold_block_count": 1,
+              "selected_hit": true,
+              "expanded_hit": true,
+              "in_packet": true,
+              "verdict": "ok",
+              "rank_in_beam": 0
+            }
+          ],
+          "selected_blocks": [
+            1700,
+            0,
+            1699,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6
+          ],
+          "expanded_blocks": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            1698,
+            1699,
+            1700,
+            1701
+          ],
+          "compiled_prompt_tokens": 946,
+          "compression_fraction": 0.0072262283060376435,
+          "span_count": 2,
+          "compile_seconds": 0.0030676730000323005
+        },
+        "t3_d1024_m4": {
+          "ceiling": 1.0,
+          "per_reference": [
+            {
+              "in_document": true,
+              "occurrences": 1,
+              "occurrences_capped": false,
+              "gold_block_count": 1,
+              "selected_hit": true,
+              "expanded_hit": true,
+              "in_packet": true,
+              "verdict": "ok",
+              "rank_in_beam": 1
+            }
+          ],
+          "selected_blocks": [
+            0,
+            1700,
+            1699,
+            1
+          ],
+          "expanded_blocks": [
+            0,
+            1,
+            2,
+            1698,
+            1699,
+            1700,
+            1701
+          ],
+          "compiled_prompt_tokens": 651,
+          "compression_fraction": 0.004972806159863114,
+          "span_count": 2,
+          "compile_seconds": 0.00251672299987149
+        },
+        "t3_d1024_m9": {
+          "ceiling": 1.0,
+          "per_reference": [
+            {
+              "in_document": true,
+              "occurrences": 1,
+              "occurrences_capped": false,
+              "gold_block_count": 1,
+              "selected_hit": true,
+              "expanded_hit": true,
+              "in_packet": true,
+              "verdict": "ok",
+              "rank_in_beam": 1
+            }
+          ],
+          "selected_blocks": [
+            0,
+            1700,
+            1699,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6
+          ],
+          "expanded_blocks": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            1698,
+            1699,
+            1700,
+            1701
+          ],
+          "compiled_prompt_tokens": 970,
+          "compression_fraction": 0.007409557565387435,
+          "span_count": 2,
+          "compile_seconds": 0.0032541690000016388
+        },
+        "t3_d4096_m4": {
+          "ceiling": 1.0,
+          "per_reference": [
+            {
+              "in_document": true,
+              "occurrences": 1,
+              "occurrences_capped": false,
+              "gold_block_count": 1,
+              "selected_hit": true,
+              "expanded_hit": true,
+              "in_packet": true,
+              "verdict": "ok",
+              "rank_in_beam": 0
+            }
+          ],
+          "selected_blocks": [
+            1700,
+            0,
+            1699,
+            1
+          ],
+          "expanded_blocks": [
+            0,
+            1,
+            2,
+            1698,
+            1699,
+            1700,
+            1701
+          ],
+          "compiled_prompt_tokens": 651,
+          "compression_fraction": 0.004972806159863114,
+          "span_count": 2,
+          "compile_seconds": 0.0026924409999082854
+        },
+        "t3_d4096_m9": {
+          "ceiling": 1.0,
+          "per_reference": [
+            {
+              "in_document": true,
+              "occurrences": 1,
+              "occurrences_capped": false,
+              "gold_block_count": 1,
+              "selected_hit": true,
+              "expanded_hit": true,
+              "in_packet": true,
+              "verdict": "ok",
+              "rank_in_beam": 0
+            }
+          ],
+          "selected_blocks": [
+            1700,
+            0,
+            1699,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6
+          ],
+          "expanded_blocks": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            1698,
+            1699,
+            1700,
+            1701
+          ],
+          "compiled_prompt_tokens": 970,
+          "compression_fraction": 0.007409557565387435,
+          "span_count": 2,
+          "compile_seconds": 0.003085865000002741
+        }
+      },
+      "pipeline_seconds": 0.6083158690000801,
+      "baseline_checked": false,
+      "baseline_match": null,
+      "index": "408072",
+      "length": 131072
+    },
+    {
+      "task": "niah_single_1",
+      "references": [
+        "2921859"
+      ],
+      "prompt_ceiling": 1.0,
+      "original_prompt_tokens": 130912,
+      "tokenize_layout_seconds": 0.49772575999986657,
+      "cache": {
+        "t2_d1024": {
+          "index_seconds": 0.017565221000040765,
+          "selection_seconds": 0.0027909830000680813,
+          "index_bytes": 4193280,
+          "tree_levels": 12,
+          "visited_nodes": 255,
+          "document_blocks": 2045
+        },
+        "t2_d4096": {
+          "index_seconds": 0.02272701100014274,
+          "selection_seconds": 0.0029910760001712333,
+          "index_bytes": 16773120,
+          "tree_levels": 12,
+          "visited_nodes": 255,
+          "document_blocks": 2045
+        },
+        "t3_d1024": {
+          "index_seconds": 0.01656701100000646,
+          "selection_seconds": 0.002664490999904956,
+          "index_bytes": 4193280,
+          "tree_levels": 12,
+          "visited_nodes": 255,
+          "document_blocks": 2045
+        },
+        "t3_d4096": {
+          "index_seconds": 0.02217969399998765,
+          "selection_seconds": 0.00315856299994266,
+          "index_bytes": 16773120,
+          "tree_levels": 12,
+          "visited_nodes": 255,
+          "document_blocks": 2045
+        }
+      },
+      "arms": {
+        "t2_d1024_m4": {
+          "ceiling": 1.0,
+          "per_reference": [
+            {
+              "in_document": true,
+              "occurrences": 1,
+              "occurrences_capped": false,
+              "gold_block_count": 1,
+              "selected_hit": true,
+              "expanded_hit": true,
+              "in_packet": true,
+              "verdict": "ok",
+              "rank_in_beam": 0
+            }
+          ],
+          "selected_blocks": [
+            1649,
+            0,
+            1,
+            2
+          ],
+          "expanded_blocks": [
+            0,
+            1,
+            2,
+            3,
+            1648,
+            1649,
+            1650
+          ],
+          "compiled_prompt_tokens": 627,
+          "compression_fraction": 0.004789476900513322,
+          "span_count": 2,
+          "compile_seconds": 0.002650335999987874
+        },
+        "t2_d1024_m9": {
+          "ceiling": 1.0,
+          "per_reference": [
+            {
+              "in_document": true,
+              "occurrences": 1,
+              "occurrences_capped": false,
+              "gold_block_count": 1,
+              "selected_hit": true,
+              "expanded_hit": true,
+              "in_packet": true,
+              "verdict": "ok",
+              "rank_in_beam": 0
+            }
+          ],
+          "selected_blocks": [
+            1649,
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7
+          ],
+          "expanded_blocks": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            1648,
+            1649,
+            1650
+          ],
+          "compiled_prompt_tokens": 947,
+          "compression_fraction": 0.0072338670251772185,
+          "span_count": 2,
+          "compile_seconds": 0.003297963000022719
+        },
+        "t2_d4096_m4": {
+          "ceiling": 1.0,
+          "per_reference": [
+            {
+              "in_document": true,
+              "occurrences": 1,
+              "occurrences_capped": false,
+              "gold_block_count": 1,
+              "selected_hit": true,
+              "expanded_hit": true,
+              "in_packet": true,
+              "verdict": "ok",
+              "rank_in_beam": 0
+            }
+          ],
+          "selected_blocks": [
+            1649,
+            0,
+            1,
+            2
+          ],
+          "expanded_blocks": [
+            0,
+            1,
+            2,
+            3,
+            1648,
+            1649,
+            1650
+          ],
+          "compiled_prompt_tokens": 627,
+          "compression_fraction": 0.004789476900513322,
+          "span_count": 2,
+          "compile_seconds": 0.0025238480000098207
+        },
+        "t2_d4096_m9": {
+          "ceiling": 1.0,
+          "per_reference": [
+            {
+              "in_document": true,
+              "occurrences": 1,
+              "occurrences_capped": false,
+              "gold_block_count": 1,
+              "selected_hit": true,
+              "expanded_hit": true,
+              "in_packet": true,
+              "verdict": "ok",
+              "rank_in_beam": 0
+            }
+          ],
+          "selected_blocks": [
+            1649,
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7
+          ],
+          "expanded_blocks": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            1648,
+            1649,
+            1650
+          ],
+          "compiled_prompt_tokens": 947,
+          "compression_fraction": 0.0072338670251772185,
+          "span_count": 2,
+          "compile_seconds": 0.0030874439999024617
+        },
+        "t3_d1024_m4": {
+          "ceiling": 1.0,
+          "per_reference": [
+            {
+              "in_document": true,
+              "occurrences": 1,
+              "occurrences_capped": false,
+              "gold_block_count": 1,
+              "selected_hit": true,
+              "expanded_hit": true,
+              "in_packet": true,
+              "verdict": "ok",
+              "rank_in_beam": 0
+            }
+          ],
+          "selected_blocks": [
+            1649,
+            0,
+            1,
+            2
+          ],
+          "expanded_blocks": [
+            0,
+            1,
+            2,
+            3,
+            1648,
+            1649,
+            1650
+          ],
+          "compiled_prompt_tokens": 651,
+          "compression_fraction": 0.004972806159863114,
+          "span_count": 2,
+          "compile_seconds": 0.0023565840001538163
+        },
+        "t3_d1024_m9": {
+          "ceiling": 1.0,
+          "per_reference": [
+            {
+              "in_document": true,
+              "occurrences": 1,
+              "occurrences_capped": false,
+              "gold_block_count": 1,
+              "selected_hit": true,
+              "expanded_hit": true,
+              "in_packet": true,
+              "verdict": "ok",
+              "rank_in_beam": 0
+            }
+          ],
+          "selected_blocks": [
+            1649,
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7
+          ],
+          "expanded_blocks": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            1648,
+            1649,
+            1650
+          ],
+          "compiled_prompt_tokens": 971,
+          "compression_fraction": 0.0074171962845270105,
+          "span_count": 2,
+          "compile_seconds": 0.0028845829999681882
+        },
+        "t3_d4096_m4": {
+          "ceiling": 1.0,
+          "per_reference": [
+            {
+              "in_document": true,
+              "occurrences": 1,
+              "occurrences_capped": false,
+              "gold_block_count": 1,
+              "selected_hit": true,
+              "expanded_hit": true,
+              "in_packet": true,
+              "verdict": "ok",
+              "rank_in_beam": 0
+            }
+          ],
+          "selected_blocks": [
+            1649,
+            0,
+            1,
+            2
+          ],
+          "expanded_blocks": [
+            0,
+            1,
+            2,
+            3,
+            1648,
+            1649,
+            1650
+          ],
+          "compiled_prompt_tokens": 651,
+          "compression_fraction": 0.004972806159863114,
+          "span_count": 2,
+          "compile_seconds": 0.0027321140000822197
+        },
+        "t3_d4096_m9": {
+          "ceiling": 1.0,
+          "per_reference": [
+            {
+              "in_document": true,
+              "occurrences": 1,
+              "occurrences_capped": false,
+              "gold_block_count": 1,
+              "selected_hit": true,
+              "expanded_hit": true,
+              "in_packet": true,
+              "verdict": "ok",
+              "rank_in_beam": 0
+            }
+          ],
+          "selected_blocks": [
+            1649,
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7
+          ],
+          "expanded_blocks": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            1648,
+            1649,
+            1650
+          ],
+          "compiled_prompt_tokens": 971,
+          "compression_fraction": 0.0074171962845270105,
+          "span_count": 2,
+          "compile_seconds": 0.0032221200001458783
+        }
+      },
+      "pipeline_seconds": 0.6137412539999332,
+      "baseline_checked": false,
+      "baseline_match": null,
+      "index": "396003",
+      "length": 131072
+    },
+    {
+      "task": "niah_single_1",
+      "references": [
+        "6707197"
+      ],
+      "prompt_ceiling": 1.0,
+      "original_prompt_tokens": 130912,
+      "tokenize_layout_seconds": 0.5037308610001219,
+      "cache": {
+        "t2_d1024": {
+          "index_seconds": 0.017595690999996805,
+          "selection_seconds": 0.0027149319998898136,
+          "index_bytes": 4193280,
+          "tree_levels": 12,
+          "visited_nodes": 255,
+          "document_blocks": 2045
+        },
+        "t2_d4096": {
+          "index_seconds": 0.02231771599986132,
+          "selection_seconds": 0.003711611999960951,
+          "index_bytes": 16773120,
+          "tree_levels": 12,
+          "visited_nodes": 255,
+          "document_blocks": 2045
+        },
+        "t3_d1024": {
+          "index_seconds": 0.017084513000099832,
+          "selection_seconds": 0.0026652669998838974,
+          "index_bytes": 4193280,
+          "tree_levels": 12,
+          "visited_nodes": 255,
+          "document_blocks": 2045
+        },
+        "t3_d4096": {
+          "index_seconds": 0.022091532000104053,
+          "selection_seconds": 0.002983496000069863,
+          "index_bytes": 16773120,
+          "tree_levels": 12,
+          "visited_nodes": 255,
+          "document_blocks": 2045
+        }
+      },
+      "arms": {
+        "t2_d1024_m4": {
+          "ceiling": 1.0,
+          "per_reference": [
+            {
+              "in_document": true,
+              "occurrences": 1,
+              "occurrences_capped": false,
+              "gold_block_count": 1,
+              "selected_hit": true,
+              "expanded_hit": true,
+              "in_packet": true,
+              "verdict": "ok",
+              "rank_in_beam": 2
+            }
+          ],
+          "selected_blocks": [
+            342,
+            0,
+            343,
+            1
+          ],
+          "expanded_blocks": [
+            0,
+            1,
+            2,
+            341,
+            342,
+            343,
+            344
+          ],
+          "compiled_prompt_tokens": 622,
+          "compression_fraction": 0.004751283304815448,
+          "span_count": 2,
+          "compile_seconds": 0.0026767800000015995
+        },
+        "t2_d1024_m9": {
+          "ceiling": 1.0,
+          "per_reference": [
+            {
+              "in_document": true,
+              "occurrences": 1,
+              "occurrences_capped": false,
+              "gold_block_count": 1,
+              "selected_hit": true,
+              "expanded_hit": true,
+              "in_packet": true,
+              "verdict": "ok",
+              "rank_in_beam": 2
+            }
+          ],
+          "selected_blocks": [
+            342,
+            0,
+            343,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6
+          ],
+          "expanded_blocks": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            341,
+            342,
+            343,
+            344
+          ],
+          "compiled_prompt_tokens": 941,
+          "compression_fraction": 0.00718803471033977,
+          "span_count": 2,
+          "compile_seconds": 0.003338243999905899
+        },
+        "t2_d4096_m4": {
+          "ceiling": 1.0,
+          "per_reference": [
+            {
+              "in_document": true,
+              "occurrences": 1,
+              "occurrences_capped": false,
+              "gold_block_count": 1,
+              "selected_hit": false,
+              "expanded_hit": true,
+              "in_packet": true,
+              "verdict": "ok",
+              "rank_in_beam": null
+            }
+          ],
+          "selected_blocks": [
+            342,
+            0,
+            1,
+            2
+          ],
+          "expanded_blocks": [
+            0,
+            1,
+            2,
+            3,
+            341,
+            342,
+            343
+          ],
+          "compiled_prompt_tokens": 623,
+          "compression_fraction": 0.004758922023955023,
+          "span_count": 2,
+          "compile_seconds": 0.0028484580000167625
+        },
+        "t2_d4096_m9": {
+          "ceiling": 1.0,
+          "per_reference": [
+            {
+              "in_document": true,
+              "occurrences": 1,
+              "occurrences_capped": false,
+              "gold_block_count": 1,
+              "selected_hit": false,
+              "expanded_hit": true,
+              "in_packet": true,
+              "verdict": "ok",
+              "rank_in_beam": null
+            }
+          ],
+          "selected_blocks": [
+            342,
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7
+          ],
+          "expanded_blocks": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            341,
+            342,
+            343
+          ],
+          "compiled_prompt_tokens": 943,
+          "compression_fraction": 0.007203312148618919,
+          "span_count": 2,
+          "compile_seconds": 0.003477636000070561
+        },
+        "t3_d1024_m4": {
+          "ceiling": 1.0,
+          "per_reference": [
+            {
+              "in_document": true,
+              "occurrences": 1,
+              "occurrences_capped": false,
+              "gold_block_count": 1,
+              "selected_hit": true,
+              "expanded_hit": true,
+              "in_packet": true,
+              "verdict": "ok",
+              "rank_in_beam": 2
+            }
+          ],
+          "selected_blocks": [
+            342,
+            0,
+            343,
+            1
+          ],
+          "expanded_blocks": [
+            0,
+            1,
+            2,
+            341,
+            342,
+            343,
+            344
+          ],
+          "compiled_prompt_tokens": 646,
+          "compression_fraction": 0.004934612564165241,
+          "span_count": 2,
+          "compile_seconds": 0.0023482760000206326
+        },
+        "t3_d1024_m9": {
+          "ceiling": 1.0,
+          "per_reference": [
+            {
+              "in_document": true,
+              "occurrences": 1,
+              "occurrences_capped": false,
+              "gold_block_count": 1,
+              "selected_hit": true,
+              "expanded_hit": true,
+              "in_packet": true,
+              "verdict": "ok",
+              "rank_in_beam": 2
+            }
+          ],
+          "selected_blocks": [
+            342,
+            0,
+            343,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6
+          ],
+          "expanded_blocks": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            341,
+            342,
+            343,
+            344
+          ],
+          "compiled_prompt_tokens": 965,
+          "compression_fraction": 0.007371363969689563,
+          "span_count": 2,
+          "compile_seconds": 0.0029176549999192503
+        },
+        "t3_d4096_m4": {
+          "ceiling": 1.0,
+          "per_reference": [
+            {
+              "in_document": true,
+              "occurrences": 1,
+              "occurrences_capped": false,
+              "gold_block_count": 1,
+              "selected_hit": false,
+              "expanded_hit": true,
+              "in_packet": true,
+              "verdict": "ok",
+              "rank_in_beam": null
+            }
+          ],
+          "selected_blocks": [
+            342,
+            0,
+            1,
+            2
+          ],
+          "expanded_blocks": [
+            0,
+            1,
+            2,
+            3,
+            341,
+            342,
+            343
+          ],
+          "compiled_prompt_tokens": 647,
+          "compression_fraction": 0.004942251283304815,
+          "span_count": 2,
+          "compile_seconds": 0.002643956999918373
+        },
+        "t3_d4096_m9": {
+          "ceiling": 1.0,
+          "per_reference": [
+            {
+              "in_document": true,
+              "occurrences": 1,
+              "occurrences_capped": false,
+              "gold_block_count": 1,
+              "selected_hit": false,
+              "expanded_hit": true,
+              "in_packet": true,
+              "verdict": "ok",
+              "rank_in_beam": null
+            }
+          ],
+          "selected_blocks": [
+            342,
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7
+          ],
+          "expanded_blocks": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            341,
+            342,
+            343
+          ],
+          "compiled_prompt_tokens": 967,
+          "compression_fraction": 0.007386641407968712,
+          "span_count": 2,
+          "compile_seconds": 0.003178423000008479
+        }
+      },
+      "pipeline_seconds": 0.620659243000091,
+      "baseline_checked": false,
+      "baseline_match": null,
+      "index": "82355",
+      "length": 131072
+    }
+  ],
+  "errors": [],
+  "status": "completed",
+  "completed_utc": "2026-08-02T18:37:12.302806+00:00"
+}

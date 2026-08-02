@@ -1,0 +1,1114 @@
+{
+  "kind": "spruce_ruler_cached_factorial_v1",
+  "created_utc": "2026-08-02T18:45:35.981985+00:00",
+  "archive_sha256": "F543C540F5732D2B43EAF60DA9B6B8DA82C89C877910AC369BBE0E73EC562D85",
+  "config": {
+    "model": "Qwen/Qwen2.5-Coder-1.5B-Instruct",
+    "tasks": [
+      "niah_single_1",
+      "niah_single_2",
+      "niah_single_3",
+      "niah_multikey_1",
+      "niah_multikey_2",
+      "niah_multikey_3",
+      "niah_multivalue",
+      "niah_multiquery",
+      "vt",
+      "cwe",
+      "fwe",
+      "qa_1",
+      "qa_2"
+    ],
+    "lengths": [
+      4096,
+      8192,
+      16384,
+      32768,
+      65536,
+      131072
+    ],
+    "num_samples": 20,
+    "tails": [
+      2,
+      3
+    ],
+    "feature_dims": [
+      1024,
+      4096
+    ],
+    "budgets": [
+      4,
+      9
+    ],
+    "beam": 16,
+    "block_size": 64,
+    "block_radius": 1,
+    "boundary": "paragraph",
+    "unigram_fraction": 0.5,
+    "idf_power": 2.0,
+    "radix": 2,
+    "max_occurrences": 256,
+    "yarn_factor": 4.0,
+    "original_context": 32768
+  },
+  "config_fingerprint": "831F0BE5B219F9FA077717675BBFE77BFE7EAA3B077D9AB1617B2C7360B5A583",
+  "arms": [
+    "t2_d1024_m4",
+    "t2_d1024_m9",
+    "t2_d4096_m4",
+    "t2_d4096_m9",
+    "t3_d1024_m4",
+    "t3_d1024_m9",
+    "t3_d4096_m4",
+    "t3_d4096_m9"
+  ],
+  "baseline_arm": "t3_d1024_m4",
+  "run_complete": true,
+  "completed_pairs": 78,
+  "expected_pairs": 78,
+  "sample_count": 1546,
+  "wall_clock_minutes": 17.7615375021,
+  "error_count": 0,
+  "baseline_validation": {
+    "available_rows": 0,
+    "checked": 0,
+    "mismatches": 0,
+    "prefix_configurations_validated": [
+      [
+        2,
+        1024
+      ],
+      [
+        2,
+        4096
+      ],
+      [
+        3,
+        1024
+      ],
+      [
+        3,
+        4096
+      ]
+    ]
+  },
+  "cache_accounting": {
+    "actual_tokenizations": 1546,
+    "naive_tokenizations": 12368,
+    "actual_index_builds": 6184,
+    "naive_index_builds": 12368,
+    "actual_traversals": 6184,
+    "naive_traversals": 12368,
+    "actual_compiles": 12368,
+    "median_pipeline_seconds": 0.2399079699998765
+  },
+  "overall": {
+    "t2_d1024_m4": {
+      "samples": 1546,
+      "references": 4330,
+      "ceiling": 0.8020698576972833,
+      "prompt_ceiling": 0.9967658473479948,
+      "perfect_ceiling_fraction": 0.7865459249676585,
+      "compiler_miss_samples": 330,
+      "in_document": 0.4224018475750577,
+      "selected_hit": 0.18822170900692842,
+      "expanded_hit": 0.2096997690531178,
+      "in_packet": 0.7958429561200924,
+      "verdicts": {
+        "ok": 950,
+        "data": 2501,
+        "selector": 878,
+        "stitch": 1
+      },
+      "verdict_fractions": {
+        "ok": 0.21939953810623555,
+        "data": 0.5775981524249423,
+        "selector": 0.20277136258660508,
+        "stitch": 0.00023094688221709007
+      },
+      "median_compiled_tokens": 3918.0,
+      "median_compression_fraction": 1.000771428134977,
+      "median_compile_seconds": 0.0089563060000728
+    },
+    "t2_d1024_m9": {
+      "samples": 1546,
+      "references": 4330,
+      "ceiling": 0.8822768434670116,
+      "prompt_ceiling": 0.9967658473479948,
+      "perfect_ceiling_fraction": 0.8589909443725744,
+      "compiler_miss_samples": 218,
+      "in_document": 0.4224018475750577,
+      "selected_hit": 0.2921478060046189,
+      "expanded_hit": 0.31339491916859125,
+      "in_packet": 0.9087759815242494,
+      "verdicts": {
+        "ok": 1439,
+        "data": 2501,
+        "selector": 389,
+        "stitch": 1
+      },
+      "verdict_fractions": {
+        "ok": 0.3323325635103926,
+        "data": 0.5775981524249423,
+        "selector": 0.08983833718244803,
+        "stitch": 0.00023094688221709007
+      },
+      "median_compiled_tokens": 4108.0,
+      "median_compression_fraction": 1.0007714399193426,
+      "median_compile_seconds": 0.011559892000036598
+    },
+    "t2_d4096_m4": {
+      "samples": 1546,
+      "references": 4330,
+      "ceiling": 0.8328589909443725,
+      "prompt_ceiling": 0.9967658473479948,
+      "perfect_ceiling_fraction": 0.8169469598965071,
+      "compiler_miss_samples": 283,
+      "in_document": 0.4224018475750577,
+      "selected_hit": 0.19838337182448038,
+      "expanded_hit": 0.22771362586605082,
+      "in_packet": 0.8124711316397228,
+      "verdicts": {
+        "ok": 1022,
+        "data": 2501,
+        "selector": 806,
+        "stitch": 1
+      },
+      "verdict_fractions": {
+        "ok": 0.23602771362586605,
+        "data": 0.5775981524249423,
+        "selector": 0.1861431870669746,
+        "stitch": 0.00023094688221709007
+      },
+      "median_compiled_tokens": 3883.0,
+      "median_compression_fraction": 1.0007714251889532,
+      "median_compile_seconds": 0.008778082999924663
+    },
+    "t2_d4096_m9": {
+      "samples": 1546,
+      "references": 4330,
+      "ceiling": 0.8981888745148771,
+      "prompt_ceiling": 0.9967658473479948,
+      "perfect_ceiling_fraction": 0.8680465717981889,
+      "compiler_miss_samples": 204,
+      "in_document": 0.4224018475750577,
+      "selected_hit": 0.28706697459584296,
+      "expanded_hit": 0.31524249422632794,
+      "in_packet": 0.9048498845265589,
+      "verdicts": {
+        "ok": 1422,
+        "data": 2501,
+        "selector": 406,
+        "stitch": 1
+      },
+      "verdict_fractions": {
+        "ok": 0.32840646651270206,
+        "data": 0.5775981524249423,
+        "selector": 0.09376443418013856,
+        "stitch": 0.00023094688221709007
+      },
+      "median_compiled_tokens": 4105.0,
+      "median_compression_fraction": 1.0007714399193426,
+      "median_compile_seconds": 0.011629903499965621
+    },
+    "t3_d1024_m4": {
+      "samples": 1546,
+      "references": 4330,
+      "ceiling": 0.6965717981888745,
+      "prompt_ceiling": 0.9967658473479948,
+      "perfect_ceiling_fraction": 0.6138421733505821,
+      "compiler_miss_samples": 597,
+      "in_document": 0.7163972286374134,
+      "selected_hit": 0.3713625866050808,
+      "expanded_hit": 0.41293302540415705,
+      "in_packet": 0.7184757505773672,
+      "verdicts": {
+        "ok": 1888,
+        "data": 1228,
+        "selector": 1212,
+        "stitch": 2
+      },
+      "verdict_fractions": {
+        "ok": 0.43602771362586606,
+        "data": 0.2836027713625866,
+        "selector": 0.27990762124711316,
+        "stitch": 0.00046189376443418013
+      },
+      "median_compiled_tokens": 1520.0,
+      "median_compression_fraction": 0.08026381284221006,
+      "median_compile_seconds": 0.005032985500065479
+    },
+    "t3_d1024_m9": {
+      "samples": 1546,
+      "references": 4330,
+      "ceiling": 0.8111578266494178,
+      "prompt_ceiling": 0.9967658473479948,
+      "perfect_ceiling_fraction": 0.7522639068564037,
+      "compiler_miss_samples": 383,
+      "in_document": 0.7163972286374134,
+      "selected_hit": 0.5120092378752887,
+      "expanded_hit": 0.5621247113163972,
+      "in_packet": 0.8618937644341801,
+      "verdicts": {
+        "ok": 2509,
+        "data": 1228,
+        "selector": 591,
+        "stitch": 2
+      },
+      "verdict_fractions": {
+        "ok": 0.579445727482679,
+        "data": 0.2836027713625866,
+        "selector": 0.13648960739030022,
+        "stitch": 0.00046189376443418013
+      },
+      "median_compiled_tokens": 2964.5,
+      "median_compression_fraction": 0.16027338278852551,
+      "median_compile_seconds": 0.008562856500020644
+    },
+    "t3_d4096_m4": {
+      "samples": 1546,
+      "references": 4330,
+      "ceiling": 0.7734476067270375,
+      "prompt_ceiling": 0.9967658473479948,
+      "perfect_ceiling_fraction": 0.7063389391979301,
+      "compiler_miss_samples": 454,
+      "in_document": 0.7163972286374134,
+      "selected_hit": 0.41593533487297923,
+      "expanded_hit": 0.46420323325635104,
+      "in_packet": 0.7674364896073903,
+      "verdicts": {
+        "ok": 2100,
+        "data": 1228,
+        "selector": 1001,
+        "stitch": 1
+      },
+      "verdict_fractions": {
+        "ok": 0.48498845265588914,
+        "data": 0.2836027713625866,
+        "selector": 0.23117782909930715,
+        "stitch": 0.00023094688221709007
+      },
+      "median_compiled_tokens": 1443.0,
+      "median_compression_fraction": 0.07093880340362121,
+      "median_compile_seconds": 0.0048863240000400765
+    },
+    "t3_d4096_m9": {
+      "samples": 1546,
+      "references": 4330,
+      "ceiling": 0.8534605433376455,
+      "prompt_ceiling": 0.9967658473479948,
+      "perfect_ceiling_fraction": 0.8117723156532989,
+      "compiler_miss_samples": 291,
+      "in_document": 0.7163972286374134,
+      "selected_hit": 0.5267898383371824,
+      "expanded_hit": 0.5801385681293303,
+      "in_packet": 0.8773672055427252,
+      "verdicts": {
+        "ok": 2576,
+        "data": 1228,
+        "selector": 525,
+        "stitch": 1
+      },
+      "verdict_fractions": {
+        "ok": 0.5949191685912241,
+        "data": 0.2836027713625866,
+        "selector": 0.12124711316397228,
+        "stitch": 0.00023094688221709007
+      },
+      "median_compiled_tokens": 3064.5,
+      "median_compression_fraction": 0.15797486151122725,
+      "median_compile_seconds": 0.008980400499922325
+    }
+  },
+  "pairwise_vs_baseline": {
+    "t2_d1024_m4": {
+      "samples": 1546,
+      "mean_ceiling_delta": 0.10549805950840879,
+      "wins": 292,
+      "losses": 26,
+      "ties": 1228
+    },
+    "t2_d1024_m9": {
+      "samples": 1546,
+      "mean_ceiling_delta": 0.18570504527813714,
+      "wins": 443,
+      "losses": 15,
+      "ties": 1088
+    },
+    "t2_d4096_m4": {
+      "samples": 1546,
+      "mean_ceiling_delta": 0.13628719275549805,
+      "wins": 338,
+      "losses": 24,
+      "ties": 1184
+    },
+    "t2_d4096_m9": {
+      "samples": 1546,
+      "mean_ceiling_delta": 0.2016170763260026,
+      "wins": 467,
+      "losses": 10,
+      "ties": 1069
+    },
+    "t3_d1024_m4": {
+      "samples": 1546,
+      "mean_ceiling_delta": 0.0,
+      "wins": 0,
+      "losses": 0,
+      "ties": 1546
+    },
+    "t3_d1024_m9": {
+      "samples": 1546,
+      "mean_ceiling_delta": 0.11458602846054335,
+      "wins": 283,
+      "losses": 0,
+      "ties": 1263
+    },
+    "t3_d4096_m4": {
+      "samples": 1546,
+      "mean_ceiling_delta": 0.076875808538163,
+      "wins": 208,
+      "losses": 41,
+      "ties": 1297
+    },
+    "t3_d4096_m9": {
+      "samples": 1546,
+      "mean_ceiling_delta": 0.15688874514877102,
+      "wins": 402,
+      "losses": 18,
+      "ties": 1126
+    }
+  },
+  "crosstab": {
+    "t2_d1024_m4": {
+      "joined": 1174,
+      "counts": {
+        "ok": 536,
+        "model_side": 433,
+        "compiler_side": 191,
+        "answered_without_evidence": 14
+      },
+      "by_task": {
+        "cwe": {
+          "ok": 0,
+          "model_side": 80,
+          "compiler_side": 0,
+          "answered_without_evidence": 0
+        },
+        "fwe": {
+          "ok": 13,
+          "model_side": 67,
+          "compiler_side": 0,
+          "answered_without_evidence": 0
+        },
+        "niah_multikey_1": {
+          "ok": 84,
+          "model_side": 16,
+          "compiler_side": 0,
+          "answered_without_evidence": 0
+        },
+        "niah_multikey_2": {
+          "ok": 75,
+          "model_side": 10,
+          "compiler_side": 14,
+          "answered_without_evidence": 1
+        },
+        "niah_multikey_3": {
+          "ok": 3,
+          "model_side": 70,
+          "compiler_side": 22,
+          "answered_without_evidence": 0
+        },
+        "niah_multiquery": {
+          "ok": 30,
+          "model_side": 57,
+          "compiler_side": 0,
+          "answered_without_evidence": 0
+        },
+        "niah_multivalue": {
+          "ok": 30,
+          "model_side": 68,
+          "compiler_side": 0,
+          "answered_without_evidence": 0
+        },
+        "niah_single_1": {
+          "ok": 99,
+          "model_side": 0,
+          "compiler_side": 0,
+          "answered_without_evidence": 0
+        },
+        "niah_single_2": {
+          "ok": 74,
+          "model_side": 21,
+          "compiler_side": 0,
+          "answered_without_evidence": 0
+        },
+        "niah_single_3": {
+          "ok": 95,
+          "model_side": 5,
+          "compiler_side": 0,
+          "answered_without_evidence": 0
+        },
+        "qa_1": {
+          "ok": 14,
+          "model_side": 16,
+          "compiler_side": 42,
+          "answered_without_evidence": 8
+        },
+        "qa_2": {
+          "ok": 19,
+          "model_side": 21,
+          "compiler_side": 35,
+          "answered_without_evidence": 5
+        },
+        "vt": {
+          "ok": 0,
+          "model_side": 2,
+          "compiler_side": 78,
+          "answered_without_evidence": 0
+        }
+      },
+      "compiler_side_share_of_failures": 0.3060897435897436
+    },
+    "t2_d1024_m9": {
+      "joined": 1174,
+      "counts": {
+        "ok": 542,
+        "model_side": 507,
+        "compiler_side": 117,
+        "answered_without_evidence": 8
+      },
+      "by_task": {
+        "cwe": {
+          "ok": 0,
+          "model_side": 80,
+          "compiler_side": 0,
+          "answered_without_evidence": 0
+        },
+        "fwe": {
+          "ok": 13,
+          "model_side": 67,
+          "compiler_side": 0,
+          "answered_without_evidence": 0
+        },
+        "niah_multikey_1": {
+          "ok": 84,
+          "model_side": 16,
+          "compiler_side": 0,
+          "answered_without_evidence": 0
+        },
+        "niah_multikey_2": {
+          "ok": 76,
+          "model_side": 15,
+          "compiler_side": 9,
+          "answered_without_evidence": 0
+        },
+        "niah_multikey_3": {
+          "ok": 3,
+          "model_side": 74,
+          "compiler_side": 18,
+          "answered_without_evidence": 0
+        },
+        "niah_multiquery": {
+          "ok": 30,
+          "model_side": 57,
+          "compiler_side": 0,
+          "answered_without_evidence": 0
+        },
+        "niah_multivalue": {
+          "ok": 30,
+          "model_side": 68,
+          "compiler_side": 0,
+          "answered_without_evidence": 0
+        },
+        "niah_single_1": {
+          "ok": 99,
+          "model_side": 0,
+          "compiler_side": 0,
+          "answered_without_evidence": 0
+        },
+        "niah_single_2": {
+          "ok": 74,
+          "model_side": 21,
+          "compiler_side": 0,
+          "answered_without_evidence": 0
+        },
+        "niah_single_3": {
+          "ok": 95,
+          "model_side": 5,
+          "compiler_side": 0,
+          "answered_without_evidence": 0
+        },
+        "qa_1": {
+          "ok": 18,
+          "model_side": 25,
+          "compiler_side": 33,
+          "answered_without_evidence": 4
+        },
+        "qa_2": {
+          "ok": 20,
+          "model_side": 29,
+          "compiler_side": 27,
+          "answered_without_evidence": 4
+        },
+        "vt": {
+          "ok": 0,
+          "model_side": 50,
+          "compiler_side": 30,
+          "answered_without_evidence": 0
+        }
+      },
+      "compiler_side_share_of_failures": 0.1875
+    },
+    "t2_d4096_m4": {
+      "joined": 1174,
+      "counts": {
+        "ok": 534,
+        "model_side": 464,
+        "compiler_side": 160,
+        "answered_without_evidence": 16
+      },
+      "by_task": {
+        "cwe": {
+          "ok": 0,
+          "model_side": 80,
+          "compiler_side": 0,
+          "answered_without_evidence": 0
+        },
+        "fwe": {
+          "ok": 13,
+          "model_side": 67,
+          "compiler_side": 0,
+          "answered_without_evidence": 0
+        },
+        "niah_multikey_1": {
+          "ok": 84,
+          "model_side": 16,
+          "compiler_side": 0,
+          "answered_without_evidence": 0
+        },
+        "niah_multikey_2": {
+          "ok": 76,
+          "model_side": 21,
+          "compiler_side": 3,
+          "answered_without_evidence": 0
+        },
+        "niah_multikey_3": {
+          "ok": 3,
+          "model_side": 84,
+          "compiler_side": 8,
+          "answered_without_evidence": 0
+        },
+        "niah_multiquery": {
+          "ok": 30,
+          "model_side": 57,
+          "compiler_side": 0,
+          "answered_without_evidence": 0
+        },
+        "niah_multivalue": {
+          "ok": 30,
+          "model_side": 68,
+          "compiler_side": 0,
+          "answered_without_evidence": 0
+        },
+        "niah_single_1": {
+          "ok": 99,
+          "model_side": 0,
+          "compiler_side": 0,
+          "answered_without_evidence": 0
+        },
+        "niah_single_2": {
+          "ok": 74,
+          "model_side": 21,
+          "compiler_side": 0,
+          "answered_without_evidence": 0
+        },
+        "niah_single_3": {
+          "ok": 95,
+          "model_side": 5,
+          "compiler_side": 0,
+          "answered_without_evidence": 0
+        },
+        "qa_1": {
+          "ok": 14,
+          "model_side": 22,
+          "compiler_side": 36,
+          "answered_without_evidence": 8
+        },
+        "qa_2": {
+          "ok": 16,
+          "model_side": 21,
+          "compiler_side": 35,
+          "answered_without_evidence": 8
+        },
+        "vt": {
+          "ok": 0,
+          "model_side": 2,
+          "compiler_side": 78,
+          "answered_without_evidence": 0
+        }
+      },
+      "compiler_side_share_of_failures": 0.2564102564102564
+    },
+    "t2_d4096_m9": {
+      "joined": 1174,
+      "counts": {
+        "ok": 541,
+        "model_side": 518,
+        "compiler_side": 106,
+        "answered_without_evidence": 9
+      },
+      "by_task": {
+        "cwe": {
+          "ok": 0,
+          "model_side": 80,
+          "compiler_side": 0,
+          "answered_without_evidence": 0
+        },
+        "fwe": {
+          "ok": 13,
+          "model_side": 67,
+          "compiler_side": 0,
+          "answered_without_evidence": 0
+        },
+        "niah_multikey_1": {
+          "ok": 84,
+          "model_side": 16,
+          "compiler_side": 0,
+          "answered_without_evidence": 0
+        },
+        "niah_multikey_2": {
+          "ok": 76,
+          "model_side": 21,
+          "compiler_side": 3,
+          "answered_without_evidence": 0
+        },
+        "niah_multikey_3": {
+          "ok": 3,
+          "model_side": 85,
+          "compiler_side": 7,
+          "answered_without_evidence": 0
+        },
+        "niah_multiquery": {
+          "ok": 30,
+          "model_side": 57,
+          "compiler_side": 0,
+          "answered_without_evidence": 0
+        },
+        "niah_multivalue": {
+          "ok": 30,
+          "model_side": 68,
+          "compiler_side": 0,
+          "answered_without_evidence": 0
+        },
+        "niah_single_1": {
+          "ok": 99,
+          "model_side": 0,
+          "compiler_side": 0,
+          "answered_without_evidence": 0
+        },
+        "niah_single_2": {
+          "ok": 74,
+          "model_side": 21,
+          "compiler_side": 0,
+          "answered_without_evidence": 0
+        },
+        "niah_single_3": {
+          "ok": 95,
+          "model_side": 5,
+          "compiler_side": 0,
+          "answered_without_evidence": 0
+        },
+        "qa_1": {
+          "ok": 20,
+          "model_side": 39,
+          "compiler_side": 19,
+          "answered_without_evidence": 2
+        },
+        "qa_2": {
+          "ok": 17,
+          "model_side": 30,
+          "compiler_side": 26,
+          "answered_without_evidence": 7
+        },
+        "vt": {
+          "ok": 0,
+          "model_side": 29,
+          "compiler_side": 51,
+          "answered_without_evidence": 0
+        }
+      },
+      "compiler_side_share_of_failures": 0.16987179487179488
+    },
+    "t3_d1024_m4": {
+      "joined": 1174,
+      "counts": {
+        "ok": 538,
+        "model_side": 248,
+        "compiler_side": 376,
+        "answered_without_evidence": 12
+      },
+      "by_task": {
+        "cwe": {
+          "ok": 0,
+          "model_side": 80,
+          "compiler_side": 0,
+          "answered_without_evidence": 0
+        },
+        "fwe": {
+          "ok": 13,
+          "model_side": 67,
+          "compiler_side": 0,
+          "answered_without_evidence": 0
+        },
+        "niah_multikey_1": {
+          "ok": 84,
+          "model_side": 1,
+          "compiler_side": 15,
+          "answered_without_evidence": 0
+        },
+        "niah_multikey_2": {
+          "ok": 76,
+          "model_side": 1,
+          "compiler_side": 23,
+          "answered_without_evidence": 0
+        },
+        "niah_multikey_3": {
+          "ok": 3,
+          "model_side": 56,
+          "compiler_side": 36,
+          "answered_without_evidence": 0
+        },
+        "niah_multiquery": {
+          "ok": 30,
+          "model_side": 4,
+          "compiler_side": 53,
+          "answered_without_evidence": 0
+        },
+        "niah_multivalue": {
+          "ok": 30,
+          "model_side": 9,
+          "compiler_side": 59,
+          "answered_without_evidence": 0
+        },
+        "niah_single_1": {
+          "ok": 99,
+          "model_side": 0,
+          "compiler_side": 0,
+          "answered_without_evidence": 0
+        },
+        "niah_single_2": {
+          "ok": 74,
+          "model_side": 0,
+          "compiler_side": 21,
+          "answered_without_evidence": 0
+        },
+        "niah_single_3": {
+          "ok": 95,
+          "model_side": 0,
+          "compiler_side": 5,
+          "answered_without_evidence": 0
+        },
+        "qa_1": {
+          "ok": 17,
+          "model_side": 16,
+          "compiler_side": 42,
+          "answered_without_evidence": 5
+        },
+        "qa_2": {
+          "ok": 17,
+          "model_side": 12,
+          "compiler_side": 44,
+          "answered_without_evidence": 7
+        },
+        "vt": {
+          "ok": 0,
+          "model_side": 2,
+          "compiler_side": 78,
+          "answered_without_evidence": 0
+        }
+      },
+      "compiler_side_share_of_failures": 0.6025641025641025
+    },
+    "t3_d1024_m9": {
+      "joined": 1174,
+      "counts": {
+        "ok": 543,
+        "model_side": 426,
+        "compiler_side": 198,
+        "answered_without_evidence": 7
+      },
+      "by_task": {
+        "cwe": {
+          "ok": 0,
+          "model_side": 80,
+          "compiler_side": 0,
+          "answered_without_evidence": 0
+        },
+        "fwe": {
+          "ok": 13,
+          "model_side": 67,
+          "compiler_side": 0,
+          "answered_without_evidence": 0
+        },
+        "niah_multikey_1": {
+          "ok": 84,
+          "model_side": 13,
+          "compiler_side": 3,
+          "answered_without_evidence": 0
+        },
+        "niah_multikey_2": {
+          "ok": 76,
+          "model_side": 8,
+          "compiler_side": 16,
+          "answered_without_evidence": 0
+        },
+        "niah_multikey_3": {
+          "ok": 3,
+          "model_side": 62,
+          "compiler_side": 30,
+          "answered_without_evidence": 0
+        },
+        "niah_multiquery": {
+          "ok": 30,
+          "model_side": 44,
+          "compiler_side": 13,
+          "answered_without_evidence": 0
+        },
+        "niah_multivalue": {
+          "ok": 30,
+          "model_side": 41,
+          "compiler_side": 27,
+          "answered_without_evidence": 0
+        },
+        "niah_single_1": {
+          "ok": 99,
+          "model_side": 0,
+          "compiler_side": 0,
+          "answered_without_evidence": 0
+        },
+        "niah_single_2": {
+          "ok": 74,
+          "model_side": 9,
+          "compiler_side": 12,
+          "answered_without_evidence": 0
+        },
+        "niah_single_3": {
+          "ok": 95,
+          "model_side": 2,
+          "compiler_side": 3,
+          "answered_without_evidence": 0
+        },
+        "qa_1": {
+          "ok": 20,
+          "model_side": 26,
+          "compiler_side": 32,
+          "answered_without_evidence": 2
+        },
+        "qa_2": {
+          "ok": 19,
+          "model_side": 24,
+          "compiler_side": 32,
+          "answered_without_evidence": 5
+        },
+        "vt": {
+          "ok": 0,
+          "model_side": 50,
+          "compiler_side": 30,
+          "answered_without_evidence": 0
+        }
+      },
+      "compiler_side_share_of_failures": 0.3173076923076923
+    },
+    "t3_d4096_m4": {
+      "joined": 1174,
+      "counts": {
+        "ok": 525,
+        "model_side": 357,
+        "compiler_side": 267,
+        "answered_without_evidence": 25
+      },
+      "by_task": {
+        "cwe": {
+          "ok": 0,
+          "model_side": 80,
+          "compiler_side": 0,
+          "answered_without_evidence": 0
+        },
+        "fwe": {
+          "ok": 13,
+          "model_side": 67,
+          "compiler_side": 0,
+          "answered_without_evidence": 0
+        },
+        "niah_multikey_1": {
+          "ok": 83,
+          "model_side": 14,
+          "compiler_side": 2,
+          "answered_without_evidence": 1
+        },
+        "niah_multikey_2": {
+          "ok": 76,
+          "model_side": 18,
+          "compiler_side": 6,
+          "answered_without_evidence": 0
+        },
+        "niah_multikey_3": {
+          "ok": 3,
+          "model_side": 77,
+          "compiler_side": 15,
+          "answered_without_evidence": 0
+        },
+        "niah_multiquery": {
+          "ok": 26,
+          "model_side": 21,
+          "compiler_side": 36,
+          "answered_without_evidence": 4
+        },
+        "niah_multivalue": {
+          "ok": 26,
+          "model_side": 27,
+          "compiler_side": 41,
+          "answered_without_evidence": 4
+        },
+        "niah_single_1": {
+          "ok": 99,
+          "model_side": 0,
+          "compiler_side": 0,
+          "answered_without_evidence": 0
+        },
+        "niah_single_2": {
+          "ok": 73,
+          "model_side": 9,
+          "compiler_side": 12,
+          "answered_without_evidence": 1
+        },
+        "niah_single_3": {
+          "ok": 94,
+          "model_side": 5,
+          "compiler_side": 0,
+          "answered_without_evidence": 1
+        },
+        "qa_1": {
+          "ok": 16,
+          "model_side": 22,
+          "compiler_side": 36,
+          "answered_without_evidence": 6
+        },
+        "qa_2": {
+          "ok": 16,
+          "model_side": 15,
+          "compiler_side": 41,
+          "answered_without_evidence": 8
+        },
+        "vt": {
+          "ok": 0,
+          "model_side": 2,
+          "compiler_side": 78,
+          "answered_without_evidence": 0
+        }
+      },
+      "compiler_side_share_of_failures": 0.42788461538461536
+    },
+    "t3_d4096_m9": {
+      "joined": 1174,
+      "counts": {
+        "ok": 540,
+        "model_side": 480,
+        "compiler_side": 144,
+        "answered_without_evidence": 10
+      },
+      "by_task": {
+        "cwe": {
+          "ok": 0,
+          "model_side": 80,
+          "compiler_side": 0,
+          "answered_without_evidence": 0
+        },
+        "fwe": {
+          "ok": 13,
+          "model_side": 67,
+          "compiler_side": 0,
+          "answered_without_evidence": 0
+        },
+        "niah_multikey_1": {
+          "ok": 83,
+          "model_side": 15,
+          "compiler_side": 1,
+          "answered_without_evidence": 1
+        },
+        "niah_multikey_2": {
+          "ok": 76,
+          "model_side": 20,
+          "compiler_side": 4,
+          "answered_without_evidence": 0
+        },
+        "niah_multikey_3": {
+          "ok": 3,
+          "model_side": 77,
+          "compiler_side": 15,
+          "answered_without_evidence": 0
+        },
+        "niah_multiquery": {
+          "ok": 30,
+          "model_side": 55,
+          "compiler_side": 2,
+          "answered_without_evidence": 0
+        },
+        "niah_multivalue": {
+          "ok": 30,
+          "model_side": 60,
+          "compiler_side": 8,
+          "answered_without_evidence": 0
+        },
+        "niah_single_1": {
+          "ok": 99,
+          "model_side": 0,
+          "compiler_side": 0,
+          "answered_without_evidence": 0
+        },
+        "niah_single_2": {
+          "ok": 73,
+          "model_side": 14,
+          "compiler_side": 7,
+          "answered_without_evidence": 1
+        },
+        "niah_single_3": {
+          "ok": 95,
+          "model_side": 5,
+          "compiler_side": 0,
+          "answered_without_evidence": 0
+        },
+        "qa_1": {
+          "ok": 20,
+          "model_side": 32,
+          "compiler_side": 26,
+          "answered_without_evidence": 2
+        },
+        "qa_2": {
+          "ok": 18,
+          "model_side": 25,
+          "compiler_side": 31,
+          "answered_without_evidence": 6
+        },
+        "vt": {
+          "ok": 0,
+          "model_side": 30,
+          "compiler_side": 50,
+          "answered_without_evidence": 0
+        }
+      },
+      "compiler_side_share_of_failures": 0.23076923076923078
+    }
+  },
+  "figures": [
+    "01_overall_ceiling",
+    "02_joined_compiler_misses",
+    "03_ceiling_by_length",
+    "04_feature_dim_effect",
+    "05_query_tail_effect",
+    "06_block_budget_effect",
+    "07_task_delta_heatmap",
+    "08_index_storage",
+    "09_cache_work_saved"
+  ]
+}

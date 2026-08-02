@@ -13,9 +13,505 @@ One dated entry per experiment. Format:
 Rules (from CLAUDE.md):
 - Numbers reported on held-out documents only. `eval_gate.py --targets` must point at docs the gate did NOT train on, or the number is overfit and meaningless.
 - `recall@k` is a **block-level proxy**, not the KS1 ">95% of dense RULER" number. True RULER needs the sparse generate path (kernel + Qwen swap), which does not exist yet.
-- All latency numbers on ONE fixed GPU (one A100-80GB or H200). Laptop timings are development signal, not paper numbers.
+- All primary latency numbers use one fixed **NVIDIA L4**, the
+  deployment-relevant reporting GPU. Every speedup compares methods on that
+  same L4 at matched lengths/settings. A100/H200 numbers are optional secondary
+  hardware-sensitivity rows and never enter an L4 speedup. Laptop timings are
+  development signal, not paper numbers.
 - **Locked default is `feature_dim=1024`** as of 2026-08-01 (see that day's sweep entry). D=512 is the superseded published setting; any number quoted at 512 must say so.
-- Complexity has three cases; name the one you mean. Uncached request O(n) — every measured number here is currently this case. Selector alone O(βD log(n/B)). Cached index O(log n) per query, only the first query on a document paying the O(n) build; sub-linear **per query** is a true and permitted claim, scoped to that case. Never attach sublinearity to a measured number until the warm-index run exists. Never write "linear selection" — selection is logarithmic. Supersedes the old blanket ban on "sub-linear total," which over-corrected.
+- Complexity has three cases; name the one you mean. Uncached request O(n).
+  Selector alone O(βD log(n/B)). Cached index O(log n) per query, only the
+  first query on a document paying the O(n) build. The 2026-08-02
+  `cached_index_v2` run is the first measured warm-index result: sub-linear
+  **per query** is supported over 16K-128K only for this cached compiler case.
+  It does not apply to cold requests, index construction, or Stage-3 sparse
+  attention. Never write "linear selection" — selection is logarithmic.
+  Supersedes the old blanket ban on "sub-linear total," which over-corrected.
+
+---
+
+## 2026-08-02 — paired D=1024 versus D=4096 end-to-end L4 notebook prepared
+**Question:** Does the compiler-only evidence gain from D=4096 at tail=3/M=9
+translate into higher generated RULER accuracy than D=1024 on the fixed L4,
+rather than merely reclassifying existing wrong answers as model-side errors?
+
+**Config:** New `colab/run_ruler_paired_feature_e2e_l4.ipynb` and
+`benchmarks/ruler_paired_feature_e2e.py`; Qwen2.5-Coder-1.5B-Instruct, FP16,
+static YaRN 4x, NVIDIA L4 required by a hard device-name assertion. All 13
+RULER tasks x 4K/8K/16K/32K/64K/128K x up to 20 cached samples. Both arms use
+tail=3, M=9, beam=16, B=64, radius=1, paragraph repair, unigram fraction 0.5,
+and IDF power 2; only D {1024,4096} changes. Greedy decode is capped at 64 new
+tokens. Output checkpoints to
+`SPRUCE_COLAB/outputs/ruler_paired_d1024_d4096_m9_l4_v1/`, with a 300-minute
+session budget and exact resume fingerprinting.
+
+**Number / implementation check:** The runner loads the model once for the
+entire length grid and reuses the completed factorial's exact selected-block
+routes when present. It tokenizes/locates each source prompt once, compiles
+both packets, generates byte-identical packets once, and otherwise evaluates
+the two arms together in one greedy batch. This preserves exact paired
+accuracy while avoiding redundant model loads, selector work, and identical
+generation. It records per-arm RULER score, answer, evidence availability,
+packet tokens, compression, route provenance, paired wins/ties/losses, and a
+deterministic paired-bootstrap 95% CI. Eight PNG/PDF figure sets cover overall
+accuracy, length, task delta, paired outcomes, evidence, packet size, exact
+packet reuse, and paired batch time. Focused verification across the paired
+runner, factorial cache, selector, and compiler: 18 passed, 2 skipped. Notebook
+JSON and all Python cells parse; metadata requests an L4 and the final cell calls
+`runtime.unassign()`. Rebuilt source archive: 224 entries, 7,450,908 bytes,
+SHA-256 `88B56AE43A89F012B6FE58BEB1FB3A1B99C64F1A413655D7A752AF16CE833D97`;
+the prior archive is preserved as
+`spruce_colab_train_source.pre_rebuild_20260802_151245.zip`. No measured model
+result exists yet.
+
+**Conclusion:** Run this notebook on the fixed L4 and do not use its paired
+batch time as independent per-arm latency. The decision metric is the paired
+generated-score delta and its task/length consistency, especially 64K/128K
+NIAH and the known `vt` regression. Do not promote D=4096 to the global default
+from compiler ceiling alone; update this entry only after the complete 78-pair
+generation is in. This planned run does not yet change KS1.
+
+---
+
+## 2026-08-02 — cached RULER factorial complete: D=4096 helps long context, M=9 helps more
+**Question:** At a valid fixed query boundary, how much of the 376 joined
+compiler-side missed-evidence cases is fixed by D=4096 versus M=9, and is the
+gain broad enough to change the locked D=1024 default?
+
+**Config:** `benchmarks/outputs/ruler_cached_factorial_v1/`; complete paired
+compiler-only factorial over all 13 RULER tasks x 4K/8K/16K/32K/64K/128K x up
+to 20 samples, 1,546 samples and 4,330 references. Arms were tail {2,3} x D
+{1024,4096} x M {4,9}, with B=64, beam=16, radius=1, paragraph repair,
+unigram fraction 0.5, and IDF power 2. Qwen2.5-Coder-1.5B-Instruct tokenizer
+only; no model weights and no meaningful GPU work. Complete 78/78 pairs, zero
+errors, 17.762 CPU minutes. Source archive SHA-256
+`F543C540F5732D2B43EAF60DA9B6B8DA82C89C877910AC369BBE0E73EC562D85`.
+
+**Number — valid tail=3 factorial:** At M=4, D=1024 -> 4096 raised compiler
+ceiling **69.657% -> 77.345%** (+7.688 points), raised conditional
+in-document reference recall **60.86% -> 67.70%**, reduced selector misses
+**1,212 -> 1,001**, and reduced joined compiler-side misses **376 -> 267**
+(-109, 29.0%). At M=9 the same D change raised ceiling **81.116% -> 85.346%**
+(+4.230 points), raised conditional recall **80.88% -> 83.04%**, reduced
+selector misses **591 -> 525**, and reduced joined compiler-side misses
+**198 -> 144** (-54, 27.3%). The paired D effect at tail=3 was 208 wins / 41
+losses / 1,297 ties at M=4 and 175 / 94 / 1,277 at M=9.
+
+M was the larger direct lever. At D=1024, M=4 -> 9 raised ceiling by 11.459
+points and cut joined compiler-side misses **376 -> 198** (-178, 47.3%). At
+D=4096 it raised ceiling by 8.001 points and cut misses **267 -> 144** (-123,
+46.1%). Relative to the original D=1024/M=4 baseline, D=4096/M=9 raised
+ceiling by **15.689 points**, reduced selector misses **1,212 -> 525** (-687,
+56.7%), and reclassified **232/376 (61.7%)** joined compiler misses, leaving
+144. Its median packet fraction was **15.80%**, versus 8.03% for the baseline,
+so the evidence gain approximately doubles the packet that a subsequent model
+would process.
+
+**Number — length/task consistency:** The D=4096 ceiling delta at tail=3/M=9
+was +0.16, -1.49, +1.98, +6.08, +7.71, and **+10.85 points** from 4K through
+128K; at M=4 it was -1.08, +4.42, +9.01, +10.33, +11.53, and **+11.80**.
+Thus the wider sketch has its clearest value at long context. At M=9 it helped
+every non-saturated NIAH family, was neutral on `niah_single_1`, and improved
+both QA tasks, but regressed `vt` by 17.17 ceiling points and added 20 joined
+compiler misses there. This is a broad long-context gain, not a universal one.
+
+**Tail=2 invalidation:** Do not interpret the tail=2 ceiling of 80.21%-89.82%
+as a sparse-selector win. Its overall median packet was **100.08%** of the
+source prompt. For `niah_single_2`, `niah_single_3`, `niah_multikey_1`,
+`niah_multiquery`, and `niah_multivalue`, the locator collapsed the median
+document from roughly 377-500 blocks to **one block**, leaving nearly the full
+haystack in the preserved prefix; those task packets were about 100.3%-100.5%
+of the original prompt. Tail=3 remains the valid global heuristic in this run.
+The apparent tail=2 joined-miss reductions are therefore near-dense packet
+effects, not evidence that a cleaner two-line query improved sparse routing.
+
+**Cost and validation:** D=4096 uses exactly 4x the Boolean-index storage. At
+128K the observed maximum was 16.00 MiB versus 4.00 MiB; median index build was
+24.86 versus 18.03 ms and traversal 3.22 versus 2.89 ms. Caching performed
+1,546 tokenizations rather than 12,368 and 6,184 index builds/traversals rather
+than 12,368; all 12,368 packets were compiled, and all four low-M prefix
+checks passed. The Colab could not see the prior baseline reports and recorded
+0 casewise checks. A local post-run comparison covered all 1,546 baseline
+cases: **zero ceiling differences**; 1,426 matched all inspected fields, 106
+differed only in beam-rank metadata, and 14 had route differences from the
+fixed cached-index path (13 changed packet length) without changing ceiling.
+
+**Conclusion:** D=4096 materially improves long-context compiler recall, but
+it does **not** fix all 376 misses: it fixes 109 at M=4 and only 54 on top of
+M=9. M=9 is the stronger intervention; D=4096/M=9 is the best valid
+compiler-only RULER candidate, leaving 144 joined misses at a roughly 2x packet
+size. Keep the cross-benchmark default at D=1024 for now because D=4096 was
+slightly worse on natural exact accuracy and regresses `vt` here. The next
+decision run is paired end-to-end RULER on the fixed L4 at tail=3/M=9,
+D=1024 versus D=4096. The joined counts above reuse existing generations and
+are counterfactual evidence-availability attribution, not measured accuracy
+for the new packets; this run does not clear KS1.
+
+---
+
+## 2026-08-02 — cached RULER factorial notebook prepared around the M=9 elbow
+**Question:** Does D=4096 reduce the compiler's 376 joined missed-evidence
+cases once the random query-tail contamination and the evidence budget are
+controlled independently, and does recall flatten enough around M=9 that
+larger budgets are unlikely to be cost-effective?
+
+**Config:** New `colab/run_ruler_cached_factorial.ipynb` and
+`benchmarks/ruler_cached_factorial.py`; compiler-only paired factorial over all
+13 RULER tasks x 4K/8K/16K/32K/64K/128K x up to 20 samples. The eight exact
+arms are tail {2,3} x D {1024,4096} x M {4,9}, with B=64, beam=16, radius=1,
+paragraph repair, unigram fraction 0.5, and IDF power 2. No model weights or GPU
+are needed. The notebook reuses the exact Drive-backed RULER JSONL cache and
+the existing D=1024/M=4 compiler reports for casewise validation, and joins
+each arm to the existing end-to-end RULER reports for model/compiler
+attribution.
+
+**Number / implementation check:** The observed raw reference-hit curve is
+37.136% at M=4, 51.201% at M=9, and 54.226% at M=16, so only 3.025 percentage
+points remain between M=9 and M=16. Each sample is tokenized once instead of
+eight times; four indices are built (one per tail/D pair); four M=9 traversals
+are reused exactly for their M=4 prefixes; all eight packets are still compiled
+and scored independently. Prefix equality is asserted in the runner. Reports
+checkpoint after each sample and are fingerprinted for safe resume. The output
+includes PNG and PDF graphs for overall ceiling, joined compiler misses,
+length, D, tail, M, task-delta heatmap, index storage, and cache work saved.
+Focused verification: 15 tests passed, 2 skipped; the notebook JSON and Python
+cells parse successfully. Rebuilt source archive: 221 entries, 7,436,143 bytes,
+SHA-256 `F543C540F5732D2B43EAF60DA9B6B8DA82C89C877910AC369BBE0E73EC562D85`;
+the prior archive is preserved as
+`spruce_colab_train_source.pre_rebuild_20260802_141506.zip`. This entry
+describes a prepared experiment, not a completed RULER run.
+
+**Conclusion:** Treat M=9 as the budget elbow and compare M=4 versus M=9 in
+the factorial rather than spending a primary arm on M=16. Accept D=4096 only
+if its paired effect is broad at fixed tail/M—especially at 64K/128K NIAH—and
+it materially reduces the 376 joined compiler-side misses; a gain caused by
+tail=2 or M=9 must not be attributed to feature width. Keep D=1024 locked until
+the notebook produces that evidence.
+
+---
+
+## 2026-08-02 — compiler-only RULER attribution at D=1024
+**Question:** When end-to-end RULER gives a wrong answer, how often did the
+compiler omit required evidence versus the model failing to use evidence that
+was present, and is increasing the lexical sketch from D=1024 to D=4096 the
+right next fix?
+
+**Config:** `benchmarks/outputs/ruler_compiler_only_1024/`; all 13 NVIDIA RULER
+synthetic tasks x 6 lengths (4K-128K), up to 20 samples per pair, 1,546 actual
+samples and 4,330 references. Qwen2.5-Coder-1.5B-Instruct tokenizer only; no
+model weights loaded and the present A100 was unused. B=64, M=4, radius 1,
+paragraph repair, beam 16, D=1024, unigram fraction 0.5, IDF power 2, and
+`QUERY_TAIL_LINES=3`. Complete 78/78 task-length pairs, 0 runtime errors, 7.455
+minutes CPU wall clock. Source archive SHA-256
+`03E971D58A110EB783BD62E245BC1187BF3F392DC537E537EFF1CD4A1E202C9E`.
+
+**Number — compiler ceiling:** overall ceiling **69.657%**; full-prompt ceiling
+**99.677%**; **61.384%** of samples had a perfect compiler ceiling. Reference
+fates were **1,888 ok, 1,228 data/literal-reference-absent, 1,212 selector
+misses, and 2 stitch misses**. Thus the large count is not software exceptions,
+and the stitch is effectively exonerated. Raw reference hit rates were 37.136%
+at M=4, 51.201% at M=9, and 54.226% at M=16; 71.640% of all references were
+literally present in the document under this diagnostic. Median compiled packet
+was 1,520.5 tokens, 8.026% of the 30,135.5-token median source prompt.
+
+Of the 1,212 selector-missed references, **618 (51.0%) survived into the final
+beam but ranked 5th-16th**, while **594 (49.0%) fell outside the 16-leaf beam**.
+Outside-beam misses increased with length: 36 at 4K, 49 at 8K, 81 at 16K, 100
+at 32K, 141 at 64K, and 187 at 128K. The largest reference-level miss sources
+were `vt` 467, `qa_1` 289, `niah_multiquery` 118, `niah_multivalue` 108, and
+`qa_2` 79. In `vt`, 438/467 misses were already ranked 5th-16th; in `qa_1`,
+256/289 were outside the beam.
+
+**Number — joined attribution:** 1,174 samples joined exactly to the partial
+end-to-end `ruler_v1` run: **538 correct with evidence present, 248 model-side
+failures with evidence present, 376 compiler-side failures with evidence
+absent, and 12 answers correct without literal evidence**. Of the 624 joined
+wrong answers, 39.7% were model-side and **60.3% compiler-side**. The 376
+compiler-side cases were concentrated in `vt` 78, `niah_multivalue` 59,
+`niah_multiquery` 53, `qa_2` 44, `qa_1` 42, and `niah_multikey_3` 36, with the
+remaining 64 spread across the other NIAH tasks.
+
+**Query-boundary diagnostic:** using the same D=1024 selector, the
+task/length-cell macro ceiling was **0.68 at tail=3, 0.79 at tail=2, and 0.74 at
+tail=1**. Tail=2 reached 1.0 mean ceiling for `niah_multikey_1`,
+`niah_multiquery`, `niah_multivalue`, and all three single-needle tasks; tail=3
+was 0.817, 0.729, 0.746, 1.0/0.733/0.867 respectively. `vt` stayed near 0.22
+under every tail and `qa_1` remained poor. This directly confirms that the
+three-line heuristic, which hashes two random haystack paragraphs with the real
+instruction, causes a substantial share of the apparent selector failures.
+
+**Assessment — will D=4096 fix the 376?** **It may fix a subset, but the current
+evidence does not support expecting it to fix all or most of them.** A wider
+Boolean sketch reduces unigram/bigram hash collisions and delays internal-node
+saturation, so it is a credible intervention for the 594 outside-beam misses,
+especially because those misses grow with length and RULER haystacks are
+lexically diverse. It is not a direct fix for the other mechanisms:
+
+- The 1,228 absent-source references and 2 stitch misses are independent of D.
+- The 618 rank-5-16 misses already survived the D=1024 beam. Increasing M is the
+  direct capacity intervention; increasing D can reorder them but still returns
+  only four blocks.
+- `vt` often needs several distributed facts and contributes 438 rank-5-16
+  misses, so M=4 is a binding evidence-budget limit.
+- `qa_1` is mostly outside the beam and insensitive to the query-tail change,
+  consistent with weak lexical alignment; more collision buckets do not create
+  semantic signal that is absent.
+- At the same D=1024/M=4, tail=2 already removes the measured ceiling deficit on
+  several NIAH families, so query extraction is a demonstrated larger lever
+  than feature width for those tasks.
+- On the sealed natural benchmark, D=4096 did **not** beat D=1024: expanded
+  recall tied at 288/288, exact accuracy was 252/288 versus 255/288, median index
+  time was 17.55 versus 13.09 ms, and traversal was 3.251 versus 2.772 ms.
+  D=4096 also makes the Boolean index approximately 4x wider in memory.
+
+**Conclusion / decision:** keep D=1024 as the locked default for now. The next
+cheap experiment should reuse the exact same compiler-only rows and report a
+paired factorial ablation: tail {2,3} x D {1024,4096} at fixed M=4/beam=16,
+followed by M {4,9} at the winning tail/D. The D-only comparison at tail=3
+isolates collision relief; tail=2 tests the clean query; M=9 tests the 618
+known budget misses. Judge D=4096 on paired in-document reference recall,
+compiler ceiling, the joined compiler-side miss count, and per-task/per-length
+consistency—especially 64K/128K NIAH—not on `cwe`/`fwe` common-word ceilings.
+Do not change the locked width or regenerate paper figures until this ablation
+shows a material, broad gain that justifies the extra index memory and cost.
+This result does not clear KS1: the end-to-end RULER grid is still partial and
+the present run measures a pre-Qwen evidence compiler, not Stage-3 sparse
+attention.
+
+---
+
+## 2026-08-02 — fixed cached index clears its scaling check; RULER v1 partial checkpoint
+**Question:** After fixing the full-document stitch scan and restoring D=1024,
+is a warm cached request measurably sub-linear in context length, and does the
+same compiler preserve retrieval across the broader RULER task set?
+
+### Run A — cached index v2, fixed stitch, D=1024
+**Config:** `benchmarks/outputs/cached_index_v2/`; sealed
+`natural_paper_untouched` bank (12 cases x 8 lengths x 3 depths = 288 prompts),
+SHA-256 `74ACE23201F9FA73D3EE7AE633583215E44D37F4E6A84D82000B9B6B366DF5CE`;
+Qwen2.5-Coder-1.5B-Instruct, NVIDIA L4, FP16, static YaRN
+4x, 16K-128K, three repeats, B=64, beam 16, M=4, radius 1, paragraph repair,
+D=1024. Three arms per prompt: dense, cold compiler, and compiler with a
+prebuilt document index. Two additional decoy queries reused each index. Wall
+clock 18,111.8 s (301.9 min); archive SHA-256
+`03E971D58A110EB783BD62E245BC1187BF3F392DC537E537EFF1CD4A1E202C9E`.
+The L4 is the fixed primary reporting GPU, so these are the authoritative
+same-hardware latency measurements for this configuration.
+
+**Number:** dense **192/288 (66.667%)**, cold **255/288 (88.542%)**, cached
+**255/288 (88.542%)**. Cold and cached had **0 selected-block mismatches and 0
+answer mismatches**, so caching changed cost only. Median request time was
+dense **14.654 s**, cold **0.543 s**, cached **0.264 s**. Sum-weighted speedup:
+cold/dense **32.366x**, cached/dense **67.512x**, cached/cold **2.086x**.
+
+Across 16K -> 128K, cached median request time was **0.258 -> 0.265 s** (all
+eight medians within 0.244-0.267 s). Its fitted slope was **+0.0267 ms per Ki
+token, R2=0.0193**: no detectable linear trend. Traversal was **2.339 -> 3.105
+ms**, fitting **+0.2724 ms per tree level, R2=0.9857**, while the tree grew 9 ->
+12 levels. The fixed stitch was **6.566 -> 6.862 ms** (6.518-7.197 ms over all
+lengths), compact tokenization **5.428 -> 5.703 ms**, prefill **122.852 ->
+124.962 ms**, and decode **125.694 -> 126.004 ms**. Index construction remained
+linear as expected: **0.0585 -> 0.5290 s**, **+4.1028 us/token, R2=0.9994**;
+index storage grew **0.510 -> 4.065 MiB**. The amortized crossover k* was
+0.99-1.05, so reuse pays from the second query.
+
+**Conclusion:** the stitch regression is fixed in the real L4 pipeline, the
+run exactly reproduces the D=1024 accuracy target of 255/288, and warm cached
+compiler requests are empirically consistent with O(log n), not O(n), over
+16K-128K. This clears the cached-index measurement prerequisite for a scoped
+"sub-linear per query" claim. The scope is load-bearing:
+building and storing the index are O(n), cold requests remain O(n), and this
+measures the evidence-compiler path rather than the not-yet-integrated Stage-3
+sparse-attention forward pass. Compared with v1/D=512, accuracy rises 237 ->
+255, cached median falls 0.296 -> 0.264 s, and the former stitch-driven linear
+request trend (+0.852 ms/Ki, R2=0.928) disappears. Re-run the latency table on
+the same L4 after any method/configuration change; do not mix the historical
+A100 measurements into these speedups.
+
+### Artifact check — natural YaRN paper figures at D=1024
+`benchmarks/outputs/natural_yarn_beam16_paper_v2/locked_config.json` confirms
+`feature_dim=1024`, 12 semantic cases, 288 paired prompts, 16K-128K, beam 16,
+M=4, and YaRN factor 4. Its final `paper_artifacts/figures/` contains **12
+numbered figures**, each in PDF and PNG form (24 files total). These are the
+updated natural-YaRN paper figures; they are distinct from the cached-index and
+RULER figure sets.
+
+### Run B — RULER v1, five-hour resumable checkpoint
+**Config:** `benchmarks/outputs/ruler_v1/`; NVIDIA RULER synthetic generator,
+13 tasks x 6 requested lengths (4K, 8K, 16K, 32K, 64K, 128K) x up to 50
+samples; dense vs SPRUCE compiler. Qwen2.5-Coder-1.5B-Instruct, NVIDIA L4,
+FP16, static YaRN 4x, max 64 new tokens, B=64, beam 16, M=4, radius 1,
+paragraph repair, D=1024. Selector query = last three non-empty prompt lines.
+Session wall clock 18,014.3 s (300.2 min); archive SHA-256
+`03E971D58A110EB783BD62E245BC1187BF3F392DC537E537EFF1CD4A1E202C9E`.
+
+**Completeness:** **partial: 59/78 task-length pairs complete**, 2,875 paired
+samples on disk, 0 recorded runtime errors. No 128K pair has run. At 64K,
+seven tasks are complete and `niah_multiquery` has 7/50 samples, so the 64K
+aggregate is composition-biased. The complete 4K-32K rectangle contains all
+52 task-length pairs and 2,527 actual samples; several RULER-generated JSONL
+files contain fewer than the requested 50 rows, which explains the shortfall
+from 2,600 despite zero recorded errors.
+
+**Number — complete 4K-32K rectangle only:** dense **52.274%**, SPRUCE
+**59.145%**, delta **+6.871 points**; SPRUCE scored higher on 579 samples and
+dense on 360. Sum-weighted request speedup was **3.272x**. By length:
+
+| length | n | dense | SPRUCE | delta | sum-weighted speedup | SPRUCE/dense input-token ratio |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| 4K | 624 | 53.411% | 66.993% | +13.582 pt | 2.238x | 66.35% |
+| 8K | 628 | 56.614% | 57.569% | +0.955 pt | 2.568x | 36.52% |
+| 16K | 635 | 50.192% | 57.635% | +7.444 pt | 3.252x | 20.00% |
+| 32K | 640 | 48.974% | 54.539% | +5.565 pt | 4.509x | 12.72% |
+
+The positive mean is not uniform. Over the same complete rectangle, the
+largest task gains were `fwe` **+41.167 pt**, `niah_multiquery` **+33.875 pt**,
+`niah_multivalue` **+32.487 pt**, and `niah_single_1` **+16.923 pt**. Material
+losses were `niah_multikey_1` **-12.245 pt**, `niah_single_2` **-10.582 pt**,
+`vt` **-9.100 pt**, `qa_1` **-4.000 pt**, `niah_single_3` **-3.046 pt**, and
+`qa_2` **-3.000 pt**. `niah_multikey_3` was near floor in both arms (dense
+0.613%, SPRUCE 4.294%), so its positive delta is not evidence of task success.
+
+**Preliminary 64K warning:** the incomplete 64K slice is **-8.333 pt** overall
+and must not be compared directly with the complete shorter grid. It does,
+however, expose a concrete failure pattern worth diagnosing: on
+`niah_single_2`, SPRUCE moves from **-28.261 pt at 32K to -54.167 pt at 64K**;
+`niah_multikey_2` is -22.000 pt at 64K and both `niah_multikey_1` and
+`niah_single_3` are -16.000 pt. Other completed 64K tasks remain strong, so
+this is task-dependent retrieval loss rather than a universal length cliff.
+
+**Conclusion:** this checkpoint is promising for compression and throughput
+but **does not clear KS1 and is not a reportable final RULER number**. It shows
+that the earlier natural-needle result does not establish uniform retrieval
+preservation: some RULER families improve substantially while several lose,
+with `niah_single_2` showing a sharp length-dependent collapse. The query
+heuristic is also a serious confound: RULER places the instruction and answer
+prefix on the final line, so `QUERY_TAIL_LINES=3` hashes two haystack paragraphs
+as if they were query text. No uncertainty interval or task-clustered analysis
+has been computed, so the row-weighted +6.871-point mean is descriptive rather
+than a significance claim. Finish `ruler_v1` unchanged so the checkpoint stays
+internally consistent; do not resume its directory after changing that value.
+Then run a separately named tail-1 A/B, starting with `niah_single_2`,
+`niah_multikey_1/2`, `vt`, and the strong `fwe`/multiquery controls. Only after
+that ablation and the missing 64K/128K pairs should the result inform KS1 or
+Stage-2b. The L4 timings are on the correct reporting GPU, but remain
+non-reportable as a final RULER result until the grid and attribution tests are
+complete.
+
+### Colab runtime-release maintenance
+All 16 notebooks under `colab/` now end, after artifact/checkpoint writes, with
+`from google.colab import runtime` followed by `runtime.unassign()`. Every
+workspace notebook and every notebook embedded in the rebuilt source archive
+was JSON-parsed and checked for exactly one final release cell. The refreshed
+`spruce_colab_train_source.zip` has 218 entries, 7,418,182 bytes, and SHA-256
+`424993A79D8C643499BED90D29E1BB2CA37ADA3BD03B87F0321C01D906456E5C`.
+The prior archive remains recoverable as
+`spruce_colab_train_source.pre_rebuild_20260802_132939.zip`. This maintenance
+does not change the archived hash/config attached to the completed experiments
+above; the new hash identifies future runs.
+
+---
+
+## 2026-08-01 — stitch fix verified against the sealed bank; RULER notebook repaired
+**Question:** Is the bounded-window stitch actually flat in n, does it hand the
+model the same packet the published run did, and why did the RULER notebook die?
+
+### Run A — stitch A/B on the real sealed bank, CPU
+**Config:** `natural_paper_untouched` (12 cases x 8 lengths x 3 depths = 288
+prompts), seed 20260728, beam 16, M=4, radius 1, B=64, D=1024, real Qwen
+tokenizer, no model loaded. Old compiler = `HEAD:interfaces/evidence_compiler.py`,
+new = working tree. One laptop CPU; these are development signal, not paper
+numbers.
+**Number:** **288/288 compiled prompts byte-identical** between old and new.
+Median `compile_evidence_packet_from_layout`, 16K -> 128K: **new 4.236 -> 4.056 ms
+(flat, no slope), old 10.298 -> 53.067 ms (linear, 5.2x over 8x length).**
+**Conclusion:** the stitch is no longer linear in n and the packet is unchanged,
+so the cached re-run must reproduce 255/288. If it does not, the cause is
+elsewhere, not the compiler.
+
+### Correction to the 2026-08-01 stitch-fix entry below
+That entry claimed the bounded window "returns token ranges identical to the old
+full scan". It did not. A synthetic A/B over 216 selections found **13 genuine
+mismatches**, all at document edges: the old `_expand_to_paragraph` fell back to
+`lower`/`upper` (the document bounds) when no blank line existed on that side,
+which is the right answer for a span inside the first or last paragraph, and the
+first fix replaced it with the span itself unconditionally. `_expand_to_paragraph`
+now snaps to the document edge when the search window actually reached that edge
+and falls back to the span only when the window stopped short — the pathological
+case the bound exists for. After that change: 216/216 synthetic and 288/288 real
+packets identical, 0 window misses in 875 span lookups, and the no-delimiter
+document covers 2.4% of itself at 32K instead of 100%.
+**Repo tests now run** (torch/pytest/transformers/matplotlib installed on the
+laptop): `pytest tests/` = **203 passed, 13 skipped**. The earlier "have NOT run"
+caveat is discharged.
+
+### Scope of the sublinearity claim, unchanged
+Still not measured. This shows the stitch component is flat and the packet is
+identical; traversal, compact tokenize, prefill and decode were already flat in
+the L4 run below. The cached *request* being flat remains a prediction until
+`cached_index_v2` runs on an L4. No sublinearity claim may attach to a measured
+number before then, and `paper/main.tex` still carries "Sublinear Per-Query" in
+its title unsupported.
+
+### RULER notebook — why it died, and what else was wrong
+**Root cause:** RULER's `prepare.py` writes `save_dir/<task>/<subset>.jsonl` and
+puts the sequence length nowhere in the path. Cell 4 globbed for a path
+containing the length, so it matched nothing, reported every one of the 78
+task/length pairs as FAILED, and left `GENERATED` empty; cell 7 then aggregated
+an empty list and raised. The same bug would have had all six lengths overwrite
+one file. Fixed by giving each length its own `save_dir` and addressing the file
+directly, with a hard assert in cell 4 so the failure surfaces where it happens.
+Also fixed, all verified against RULER upstream rather than from memory:
+- **nltk data.** `niah.py` and `qa.py` call `sent_tokenize`; RULER's Dockerfile
+  runs `nltk.download('punkt')` and nltk >= 3.9 (what Colab ships) needs
+  `punkt_tab`. Cell 2 now fetches both and asserts the tokenizer works.
+- **Scoring mapping.** `scripts/eval/synthetic/constants.py` selects the metric
+  by task *type*: niah, variable_tracking, common_words_extraction and
+  freq_words_extraction use `string_match_all`, only qa uses `string_match_part`.
+  Cell 5 had six niah keys on `string_match_part`. Numerically identical for
+  single-reference niah, but now faithful.
+- **Query extraction.** The old heuristic rejoined stripped lines, so the result
+  was not a substring of the prompt and `locate_prompt_layout`'s
+  `endswith(question)` check would raise on any prompt with trailing whitespace.
+  Now an exact suffix via `splitlines(keepends=True)`.
+- **Long runs.** 13 tasks x 6 lengths x 50 samples x 2 arms is many hours on one
+  L4. Added `SESSION_BUDGET_MINUTES` (default 300) for a clean checkpointed stop,
+  per-sample error capture so one bad prompt cannot discard the run, and
+  aggregates rebuilt from disk so a resumed session sums what actually exists.
+  `summary.json` now carries `run_complete`, `error_count` and `errors`.
+**Verification — read this precisely, the notebook has NOT been run.** All 11
+cells were `ast.parse` syntax-checked. Cell 5 (scoring) was exec'd in full and
+its assertions pass. Cell 7 was exec'd only above `STARTED = time.perf_counter()`,
+so `extract_query` and `ruler_target` are the notebook's real code and were
+called; `extract_query` returns an exact prompt suffix under five trailing-
+whitespace variants. The pipeline timings below come from a script mirroring
+`run_spruce`'s body, not from calling it: RULER-shaped niah sample, 59,073 prompt
+tokens, locate 0.230 s, index 0.019 s, select 0.005 s, stitch 0.015 s, packet
+1,326 tokens (2.24% of the prompt), needle present.
+**Cells 1, 2, 4, 6, 8, 9 and 10 have never executed** — including cell 4, the one
+rewritten to fix the crash. Its correction is derived from reading RULER's
+`prepare.py` at source (the save-path line is quoted above), which is evidence
+about the cause, not a test of the fix. Running it needs their corpora clone and
+a tokenizer pass over 78 task/length pairs, neither available on the dev laptop.
+The first real test of this notebook is the L4 run.
+**Known weakness, not fixed:** at `QUERY_TAIL_LINES = 3` the extracted query
+pulls in two whole haystack paragraphs alongside the real instruction, because
+RULER puts the question and its answer_prefix on one final line. That is noise in
+the hashed query. Setting it to 1 is a one-token change but it is a measurement
+choice, so it stays at the authored value until decided deliberately.
+
+### Archive
+`spruce_colab_train_source.zip` rebuilt: 217 entries, 7,397,786 bytes,
+SHA-256 `03E971D58A110EB783BD62E245BC1187BF3F392DC537E537EFF1CD4A1E202C9E`
+(previous archive backed up as `..._pre_rebuild_20260801_205605.zip`). Verified
+that the compiler and both notebooks inside the zip byte-match the workspace and
+that every file each notebook's cell 1 asserts is present.
+`rebuild_source_archive.ps1` now requires `benchmarks/compare_dense_sparse.py`,
+`configs/long_context.py`, `scripts/extract_teacher_targets.py` and the three
+newer notebooks, so a zip that would fail cell 1 in Colab fails at build time.
+**Still stale:** `release/spruce/src/spruce_attn/compiler.py`, the shipped
+sprucekit copy, carries both original defects. Not in the Colab zip, so it does
+not affect these runs.
 
 ---
 
