@@ -30,6 +30,840 @@ Rules (from CLAUDE.md):
 
 ---
 
+## 2026-08-03 — qa_2@4K v4 passes real HotpotQA twice and preserves every source-context document
+**Question:** Why did the v3 repair still fail at sample 7, and can the exact
+notebook transform be accepted only after a real, deterministic end-to-end
+generation and an independent evidence audit?
+
+**Config:** Clean NVIDIA RULER checkout at commit
+`c3f5e3b4f87f97e048793bb510a3a6b19a46bf3a`; real 61,065,698-byte
+`hotpotqa.json`; `Qwen/Qwen2.5-Coder-1.5B-Instruct` HF tokenizer; `qa_2`,
+4,096-token budget including 32 generation tokens, test split, seed 314159,
+50 samples. Applied the exact code extracted from
+`colab/run_ruler_paper_accuracy_l4.ipynb`, then invoked the transformed
+`qa.py` twice in separate output directories. This is dataset-generation
+verification only; no model accuracy or latency benchmark ran.
+
+**Root cause:** V3 initialized
+`used_docs = max(num_docs, len(QAS[sample_index]['context']))`, but retained
+the original first retry `used_docs -= incremental`. With global
+`num_docs=29`, a candidate requiring 30 source-context documents started at
+30 and then jumped to 20, below its evidence floor, causing
+`random.sample(..., -10)`. The traceback at the generation call was therefore
+consistent with v3; initialization alone did not constrain later retries.
+
+**Repair:** Provenance identifier is
+`qa_filter_feasible_clamp_evidence_floor_v4`. Every retry now uses
+`max(len(QAS[sample_index]['context']), used_docs - incremental)` and raises
+if the mandatory floor itself cannot fit. The feasible-candidate scan remains,
+and generated rows now record `source_index` so source context can be audited.
+The notebook independently re-tokenizes `input + answer_prefix`, checks the
+reported length and 4K budget, matches source question/answer, and requires
+every HotpotQA source-context document to occur in the emitted prompt before
+freezing the dataset manifest. In-progress unpatched/v1/v2/v3 configs may
+migrate to v4; the existing 77 valid cached cells remain untouched.
+
+**Number — operational validation:** Both real runs completed **50/50**. Their
+JSONLs were byte-identical, SHA-256
+`6E09249B614B59151CF48AF873532E1A49E712214A3E273BD9D23C72E6AE2D62`.
+Independent validation found token-budget range **2,368–4,092 / 4,096**,
+document-count range **10–29**, **0 missing source-context documents**, and
+**0 question/answer mismatches**. Source rows were unique, ordered **0–49**;
+none of the first 50 mandatory-only prompts needed filtering. The exact
+transformed `qa.py` parsed and had SHA-256
+`26C4776D8E6DFCBEF3DBFD4B3E13DBA3EC14D6BFC69637454BC83EF8B47BDF32`.
+Notebook JSON/all Python cells/final `runtime.unassign()` and archive parity
+passed; `tests/test_ruler_paper_accuracy.py` passed **10/10**. Rebuilt source
+archive SHA-256:
+`4C61EA2BAF24F3DB52E36739C13E4B332CC994D47B5D706BA25F9C317BD2E01F`.
+
+**Conclusion:** V4 is the first repair accepted against the actual failing
+cell rather than a synthetic transform smoke. Rerun notebook Cells 1–3 using
+the rebuilt archive; 77 cells should be cache hits and only `qa_2@4096` should
+generate. The dataset manifest is written only after the new evidence audit
+passes.
+
+---
+
+## 2026-08-03 — qa_2@4K v3 preserves mandatory-document floors above the global 29-doc target
+**Question:** Why did feasible-candidate filtering still fail at sample 7 with
+a negative HotpotQA sample size, and what invariant was missing from v2?
+
+**Config:** User-provided v2 log for the sole missing `qa_2@4096` cell. The
+official binary search selected `num_docs=29` after measuring 3974/4096 tokens.
+V2 filtered candidates by whether all mandatory documents fit, but the original
+sample loop still initialized every candidate with `used_docs = num_docs`.
+
+**Number — operational only:** Generation again reached **7/50** and failed in
+**0.4 minutes**, code 0 from the outer wrapper but `valid=False`, at
+`random.sample(curr_more, num_docs-len(curr_docs))`. This demonstrates that a
+feasible Hotpot candidate can require **more than the global 29-document
+target**; beginning it at 29 is already below its mandatory context count. The
+other **77/78 files remain valid cache hits**. No model benchmark ran.
+
+**Repair:** Provenance identifier is now
+`qa_filter_unfit_required_context_and_floor_v3`. It retains v2's deterministic
+first-50 feasible-candidate filter and changes per-sample initialization to
+`used_docs = max(num_docs, len(QAS[sample_index]['context']))`. The retry lower
+bound remains the same mandatory count, so supporting evidence is neither
+omitted initially nor removed later. In-progress configs may migrate only from
+unpatched/v1/v2 to v3. An executable transform smoke includes (1) an impossible
+candidate and (2) a feasible candidate with 30 mandatory documents against a
+29-doc global target; v3 skips the former, preserves the latter at >=30, and
+returns deterministic indices `[1,2,3,4,5]`. Notebook and transformed source
+parse successfully. Rebuilt archive SHA-256:
+`72D5EA042388D86B87E1D7578F4CC9EB723A11822F3BA35A7B5EE9FDB2B5F8C7`.
+
+**Conclusion:** Rerun Cells 1-3 with v3. This fixes the missing mandatory-floor
+invariant without truncating evidence or changing the other 77 cached cells.
+If the final cell still fails, preserve its complete traceback; do not relax
+the 4K budget or supporting-document requirement.
+
+---
+
+## 2026-08-03 — qa_2@4K requires feasible-candidate filtering, not dropping mandatory Hotpot evidence
+**Question:** Why did the structurally patched `qa_2@4096` generator exit
+after seven samples with `Sample larger than population or is negative`, and
+what policy completes the cell without deleting required supporting documents?
+
+**Config:** User-provided generator log from the only missing cell. The frozen
+RULER QA binary search chose 29 documents at a nominal **3974/4096 tokens**.
+Generation reached **7/50** before a HotpotQA candidate remained over budget as
+the retry approached its mandatory supporting-document count. The v1 patch
+allowed `used_docs` to fall below `len(curr_docs)`; upstream then called
+`random.sample(curr_more, num_docs-len(curr_docs))` with a negative sample
+size. The inner QA process raised, but outer `prepare.py` caught its
+`CalledProcessError` and returned code 0, so the notebook correctly rejected
+the cell via `valid=False` after **0.4 minutes**.
+
+**Number — operational only:** The failure produced no valid `qa_2@4K` JSONL;
+the other **77/78 files remain valid cache hits**. It proves at least one of
+the first 50 seeded HotpotQA candidates has mandatory evidence that cannot fit
+the 4K input budget. No benchmark result was produced.
+
+**Repair:** Replaced v1 with provenance identifier
+`qa_filter_unfit_required_context_v2`. Before the official sample loop, the
+patched cloned generator deterministically scans HotpotQA order and retains
+the first `num_samples + pre_samples` candidates whose mandatory supporting
+documents alone fit `max_seq_length` including the generation budget. The
+normal distractor-fill/retry logic then runs, but its lower bound is
+`len(QAS[sample_index]['context'])`; mandatory evidence is never removed. The
+in-progress generation config may migrate only from no patch or v1 to v2, and
+the final manifest records v2. A local executable transform smoke places an
+impossible candidate first and confirms outputs shift deterministically to the
+next five feasible candidates `[1,2,3,4,5]`, retain the mandatory-document
+lower bound, and parse as Python. Rebuilt archive SHA-256:
+`A9235548157948449EB7D17062E5C56CDCA2226E2187E260E489DD3D423DB7DC`.
+
+**Conclusion:** Rerun Cells 1-3 with the updated notebook/archive. The policy
+changes only the previously impossible 4K HotpotQA candidate selection, must
+be disclosed, and is preferable to truncating evidence or silently exceeding
+4K. If v2 cannot find 50 feasible candidates, it fails explicitly rather than
+hanging or emitting an invalid benchmark cell.
+
+---
+
+## 2026-08-03 — QA recovery patch matcher made commit-tolerant after safe assertion; 77 cached cells remain intact
+**Question:** Why did the patched notebook stop before regenerating
+`qa_2@4096` with `expected one byte-exact fallback block`, and can it identify
+the same upstream retry logic in the dataset's frozen RULER commit without
+performing an ambiguous edit?
+
+**Config:** Cell-3 failure occurred while patching the freshly cloned/frozen
+`scripts/data/synthetic/qa.py`, before launching any generator. The first
+matcher required byte-identical exception spelling and whitespace from current
+RULER main. The test bank's recorded commit formats that handler differently,
+so `qa_source.count(old_qa_fallback)` returned a value other than one and the
+fail-closed assertion aborted as designed.
+
+**Number — operational only:** **0 files were modified or regenerated by the
+failed attempt**; the existing **77/78 valid JSONLs** on Drive remain available
+as cache hits. No model or benchmark measurement was produced. The replacement
+matcher locates exactly one structural sequence: an exception handler followed
+by `if used_docs > incremental:` and `used_docs -= incremental`. It preserves
+the commit's exception syntax/comments/indentation and inserts only the
+10->9->...->1 fallback. It still aborts unless exactly one candidate exists,
+and it is idempotent when already patched. Local executable checks cover a bare
+`except`, a named exception with a comment, and the already-patched form; all
+resulting Python parses successfully. Rebuilt archive SHA-256:
+`A1D201698A1A39DE5533C53B7909C712F81C0F71ECC31E456F1A9B6A2F4D0403`.
+
+**Conclusion:** Open the updated notebook and rerun Cells 1-3 with the rebuilt
+archive. The 77 files should remain cache hits; only `qa_2@4096` should run.
+The assertion was a safe compatibility stop, not dataset loss.
+
+---
+
+## 2026-08-03 — parallel generation reaches 77/78 in 6.1 minutes; qa_2@4K upstream infinite loop identified and patched
+**Question:** Did the eight-worker repair actually fix dataset throughput, and
+why did the only remaining `qa_2@4096` cell hit its 45-minute timeout with no
+valid file?
+
+**Config:** User-provided Cell-3 console output from the rebuilt notebook,
+fresh RULER test seed 314159, 50 examples per cell, 12 cached 4K cells and 66
+pending, up to eight independent generators scheduled longest-first. Exact
+upstream `scripts/data/synthetic/qa.py` behavior was checked against source.
+`qa_2` uses HotpotQA. Its sample-fitting loop starts with a 10-document
+increment, catches every exception, and subtracts 10 only while
+`used_docs > incremental`. If a Hotpot sample remains over 4K at exactly 10
+documents, the exception path changes no state and the `while True` loop can
+never terminate.
+
+**Number — operational, not a benchmark result:** The parallel run generated
+**65 new valid cells in 6.1 wall-clock minutes**, moving from **12/78 to 77/78**
+and completing every 8K-128K cell. Individual completed cells took about
+0.3-1.9 minutes. Only `qa_2@4096` remained; it ran without output until the
+declared **45.0-minute timeout**, then exited code -1 with `valid=False`.
+Therefore the earlier “12 cells in six hours” observation did **not** imply a
+30-minute normal cell rate or a 39-hour dataset build: most of that wait was
+the same `qa_2@4K` infinite loop. This entry supersedes that projection. No
+dense/SPRUCE score, model speed, or memory number exists yet.
+
+**Repair:** Cell 3 now applies one narrowly scoped, fail-closed patch to the
+cloned frozen RULER source: preserve the official 10-document decrements, then
+reduce 10->9->...->1 only when the prompt still exceeds the token budget; if
+one document cannot fit, re-raise. The patch identifier
+`qa_reduce_below_incremental_until_fit_v1` is added to both generation config
+and final dataset manifest. Existing in-progress configs migrate only this new
+field, and the 77 already validated JSONLs remain cache hits because this
+fallback never affected them. Notebook JSON/code parsing and archive-content
+checks pass. Rebuilt source archive SHA-256:
+`3E54FB91AA85D34023F1A021E589008A855AB67BCB9F588C0E0C35EC3C5D07E4`.
+
+**Conclusion:** Upload the new archive and rerun Cells 1-3. It should report
+77 cache hits, generate only patched `qa_2@4096`, freeze the 78-file SHA-256
+manifest, and then permit the L4 paired evaluation. The generator patch must
+be disclosed with any result because the final 4K HotpotQA cell is not produced
+by byte-identical upstream code, even though scoring/task semantics are
+unchanged.
+
+---
+
+## 2026-08-03 — RULER test-bank generation bottleneck repaired after 12/78 cells took about six hours
+**Question:** Why did the full dense-versus-SPRUCE notebook appear to remain at
+4096 for six hours, was it actually evaluating 128K, and can dataset creation
+resume without discarding the completed held-out cells?
+
+**Config:** User-observed output from Cell 3 of
+`colab/run_ruler_paper_accuracy_l4.ipynb`: sequential upstream NVIDIA RULER
+`prepare.py` subprocesses, fresh `test` subset, seed 314159, 50 samples per
+task-length cell, Qwen2.5-Coder-1.5B tokenizer. The completed lines cover all
+4K tasks from `niah_single_1` through `qa_1`; `qa_2@4K` and every 8K-128K
+cell had not completed. This was dataset generation, not model inference. Cell
+3 iterated `LENGTHS` upward, whereas the later paired model runner deliberately
+iterates them downward.
+
+**Number — operational progress, no benchmark result:** Approximately **6
+hours produced 12/78 valid dataset cells (15.38%)**, leaving **66 cells**. At a
+constant per-cell rate the old sequential path implied roughly 39 hours total,
+and longer inputs could make that optimistic. No dense/SPRUCE accuracy, speed,
+or memory measurement was produced. The generated JSONLs remain valid cache
+entries because every completed cell has exactly 50 rows and is rechecked
+before reuse.
+
+**Repair:** Cell 3 now preserves every valid completed JSONL and schedules up
+to **8 independent task-length generators concurrently**, longest contexts
+first to minimize the wall-clock tail. Every job remains a separate official
+seeded RULER process and writes a distinct `<length>/<task>/test.jsonl`, so
+scheduling order cannot couple RNG state or mix outputs. It prints start,
+per-cell elapsed time, total `n/78` progress, and wall time; length-aware
+timeouts are 45/45/45/45/90/180 minutes from 4K through 128K. Each subprocess
+runs in its own process group so timeout, failure, or notebook interruption can
+terminate descendants cleanly. The manifest and all 78 SHA-256 hashes are
+still created only after the entire grid validates. Notebook JSON and every
+code cell parse successfully. Rebuilt source archive SHA-256:
+`BAE4ECDADDF50F73C6791A9E4DC8509315139E544B1FC5439AED7E1706D9FA48`.
+
+**Conclusion:** Stop the obsolete sequential Cell 3, upload the rebuilt source
+archive, and rerun Cells 1-3. The first 12 files will print as cache hits; only
+the remaining 66 are scheduled. Do not interpret `generated ... 4096` as a
+128K evaluation line or as any paper result.
+
+---
+
+## 2026-08-02 — paired RULER report expanded with fully charged L4 speed telemetry and ten figure families; no test result yet
+**Question:** Can the held-out dense-versus-SPRUCE accuracy run produce a
+detailed, auditable speed/resource appendix without doubling the dense work or
+misrepresenting a single-pass accuracy evaluation as a dedicated latency
+benchmark?
+
+**Config:** Extended `benchmarks/ruler_paper_accuracy.py`,
+`colab/run_ruler_paper_accuracy_l4.ipynb`, and the focused regression tests.
+The experimental candidate and data protocol are unchanged: one required
+NVIDIA L4; Qwen2.5-Coder-1.5B-Instruct FP16; static YaRN 4; greedy generation;
+D=4096, beam=64, M=32, B=64, radius 1, paragraph boundary; all 13 legacy
+synthetic RULER tasks at 4K-128K; fresh test seed 314159; 50 examples per cell.
+The result directory is bumped to
+`ruler_paper_accuracy_d4096_b64_m32_seed314159_n50_l4_v3`, and
+`telemetry_schema=synchronized_ttft_fully_charged_v1` enters the config
+fingerprint so no v2 checkpoint can mix with the new row schema. Generation
+order is counterbalanced inside every 50-example cell by position parity:
+25 dense-first and 25 SPRUCE-first. Source archive SHA-256:
+`6D8115BEFF6BC40541590EB4069ECE37AE27CA788D57B877B40C16E5E9954A2E`.
+
+**Number — instrumentation/report surface only:** Each arm now records input
+and generated tokens, synchronized time to the first generation logits-
+processor callback, post-first-token decode time and throughput, complete
+request time, and peak PyTorch allocated GPU memory. The SPRUCE row separately
+records prompt layout, cold per-sample D=4096 index construction, selection,
+packet compilation, compact-reader request, and their fully charged sum.
+Aggregate speed uses dense summed request time divided by summed fully charged
+SPRUCE time; it also reports summed fully charged TTFT speedup, time reduction,
+and descriptive per-pair P10/P50/P90 speedups. No latency CI is manufactured
+from the single timing observation per prompt.
+
+Complete and partial reports now emit **10 figure families**, each as PNG and
+PDF: accuracy/delta by length, accuracy-delta task heatmap, accuracy by task,
+absolute time plus request/TTFT speedup by length, compiler/reader time
+decomposition, prompt compression, reader-side peak allocated GPU memory,
+task-length speedup heatmap, decode throughput, and the accuracy-speed
+tradeoff. They also emit **4 detailed CSV tables** by length, task, task-length,
+and paired case, alongside the raw per-case task JSON, aggregate JSON, and
+expanded Markdown summary. Partial plots retain the `NOT FOR PAPER` watermark. Focused
+verification is **21 passed, 1 skipped**; synthetic report smokes produced all
+**10 PNG + 10 PDF figures**, the three aggregate CSVs, and the 29-column paired-
+case CSV, and every
+notebook code cell parses with `runtime.unassign()` still last.
+
+**Conclusion:** The notebook now captures as much useful accuracy, speed,
+compression, memory, task, and length detail as the same run can support. Its
+speed telemetry is fully charged and order-balanced, but remains secondary
+single-pass evidence; the repeated fixed-L4 benchmark remains the primary
+latency claim. No held-out RULER score or new speed number exists until the v3
+run completes the 78-cell/3,900-pair/zero-error gate.
+
+---
+
+## 2026-08-02 — full paired RULER protocol updated to the validation-best universal candidate; no test result yet
+**Question:** Before spending the fixed-L4 run, what single universal compiler
+configuration gives the best already-measured validation ceiling without
+task-specific fallbacks, and can the dense-versus-SPRUCE comparison remove the
+known CWe/FWe query-boundary leak while preserving a frozen held-out protocol?
+
+**Config:** Updated `benchmarks/ruler_paper_accuracy.py`,
+`colab/run_ruler_paper_accuracy_l4.ipynb`, and
+`tests/test_ruler_paper_accuracy.py`. The paired run remains
+Qwen2.5-Coder-1.5B-Instruct, FP16, greedy decoding, static YaRN 4, one required
+NVIDIA L4, all 13 legacy synthetic RULER tasks, and all six lengths from
+4K-128K. It uses the fresh `test` bank at seed 314159, 50 samples per
+task/length cell, exact per-file SHA-256 manifest, official `answer_prefix`,
+and task-specific generation budgets. The SPRUCE arm is now frozen at
+**D=4096, beam=64, M=32**, B=64, radius 1, paragraph boundary, unigram
+fraction 0.5, IDF power 2, radix 2. This is the highest aggregate-ceiling arm
+already measured on the separate validation sweep; it is not the repo-wide
+D=1024 default and must be described as validation-selected. No task-aware
+dense fallback, excluded task, test-set tuning, or cached route is used.
+
+The old generic `tail=3` split was removed from this runner. A fail-closed
+`nvidia_ruler_legacy_templates_v1` parser now uses NVIDIA's final `What`/
+`Question:` markers and QA's repeated reader instruction to separate source
+data from the lexical selector query. This is essential for CWe/FWe, whose
+entire context is serialized on one line; under tail=3 it could be copied into
+the supposed question and defeat the comparison. A changed template now
+raises an error rather than silently changing the packet. The output directory
+is versioned as `ruler_paper_accuracy_d4096_b64_m32_seed314159_n50_l4_v2`, so
+it cannot resume or mix with the superseded M9/beam16 reports. Current source
+archive SHA-256:
+`4D242EAEB5469481CE92523FFB7B4A2ACF5CFC5218B8B572AED2558889D39CA4`.
+
+**Number — protocol only, not a new accuracy result:** The independent
+validation sweep previously measured beam64/M32 at **0.9363 in-scope lexical
+ceiling** and **0.9334 all-task ceiling**, the highest of its eight tested
+arms, versus 0.8385/0.8541 for beam16/M9. Its minimum in-scope cell remained
+0.4000, so this choice maximizes the tested aggregate ceiling but does not
+erase the documented long-context QA limitation or pass the 0.95 cell-floor
+gate. The held-out run still requires **78/78 task-length cells, 3,900/3,900
+paired examples, and zero errors** for unwatermarked figures. Local focused
+verification is **20 passed, 1 skipped** across the paper runner, cached-
+factorial, and evidence-compiler tests; notebook JSON/code validation and the
+mandatory final `runtime.unassign()` check also pass.
+
+**Conclusion:** The L4 comparison is ready with the strongest tested universal
+configuration and the known prompt-boundary leak removed. This is the most
+defensible accuracy-maximizing run available without inventing task-specific
+fallbacks, but it remains a reduced-sample legacy-RULER system comparison, not
+an official leaderboard submission and not evidence for 86% until the complete
+held-out result exists. Do not quote a new dense/SPRUCE accuracy number or
+update a kill switch before the zero-error completion gate passes.
+
+---
+
+## 2026-08-02 — fixed-L4 baselines complete: 9.07x fully charged at 16K/32K, YaRN is not the accuracy gap, and tree only ties flat/BM25
+**Question:** On the fixed reporting L4, (1) is the dense-versus-compiled
+natural-retrieval gap an artifact of applying static YaRN at native lengths,
+(2) does the recursive tree beat matched-budget selectors or naive packet
+placement, and (3) what end-to-end request time and peak allocated memory does
+the compiler+dense-reader path achieve against dense on identical prompts?
+
+**Config:** Audit of `benchmarks/outputs/paper_baselines_l4_v1/report.json`.
+Qwen2.5-Coder-1.5B-Instruct, FP16, greedy generation up to 32 new tokens,
+three repetitions per row summarized by their median; sealed unscreened natural
+prose bank SHA-256
+`74ACE23201F9FA73D3EE7AE633583215E44D37F4E6A84D82000B9B6B366DF5CE`,
+12 source cases, seed 20260728, depths {0.1,0.5,0.9}. Compiler settings
+D=1024, M=4, beam=16, B=64, radius=1, paragraph boundary, unigram fraction
+0.5, IDF power 2, radix 2. Matched-budget phase: tree/flat/BM25/lead/tail/
+stride/random over 16K-128K (288 prompts per arm) with static YaRN 4. Dense
+was intentionally omitted from that long phase. YaRN-confound phase: paired
+dense/tree at 16K and 32K only, under factors 1 and 4 (72 matched prompts per
+factor). Report SHA-256:
+`1A3DB8FE086A2AE384B5ACCD29FF8C26066BEDFE0629100E4C1F2EC51F2273CB`.
+
+**Number — integrity and hardware:** Status is **completed**, with
+**2,304/2,304 unique row IDs**, exact aggregate recomputation, nonnegative
+timings/memory throughout, identical prompt hashes across arms for every
+matched candidate, and **2,304/2,304 three-repeat answers byte-matching**.
+Runtime metadata records **NVIDIA L4**, 23.659 GB, compute capability 8.9;
+Python 3.12.13, PyTorch 2.11.0+cu128, CUDA 12.8, Transformers 5.13.1, Triton
+3.6.0. `SUMMARY.md` incorrectly prints `GPU: None` because the writer reads
+`runtime.gpu_name` while metadata is nested at `runtime.gpu.name`; this is a
+presentation bug, not missing hardware evidence. The report does not record
+the uploaded source-archive hash.
+
+**Number — fully charged L4 time and memory (paired YaRN-4 phase):** Across
+the 72 identical 16K/32K prompts, dense sums to **235.254 s** versus
+**25.931 s** for live tree selection + compilation + dense packet read:
+**9.072x speedup** (paired-prompt bootstrap 95% CI **[8.333x,9.809x]**) or
+**88.98% lower total request time**. This request timer charges prompt layout,
+cold D=1024 index construction, query weights, tree traversal, stitching,
+compact tokenization, transfer, prefill, and dense decode. By length the
+factor-4 sum speedups are **5.889x at 16K** (95% CI [5.583x,6.217x]) and
+**11.668x at 32K** (95% CI [11.055x,12.312x]). Median request time is
+**3.2594 s dense vs 0.3427 s tree**; median model-prefill time is
+3.0504 vs 0.1278 s, and summed model-prefill speedup is **25.31x**. Decode is
+unchanged (median 0.1302 vs 0.1295 s), so the smaller overall request speedup
+correctly reflects common decode plus compiler preprocessing. Median input is
+**24,538 vs 1,820 tokens** (92.58% reduction). Median peak allocated memory is
+**5.437 vs 3.271 GB**, a **39.83% reduction**. These are compiler+dense-reader
+numbers, not Stage-3 sparse-attention kernel speed and not evidence of a
+64K-128K dense speedup; dense was not run at those lengths here. Bootstrap
+captures variation across the 72 prompt-level median timings, not within-row
+run-to-run timing because individual repetitions were not retained.
+
+**Number — accuracy and YaRN confound:** At YaRN factor 4, dense scores
+**55/72 (0.7639)** and tree **64/72 (0.8889)**, delta **+12.50 points**;
+paired outcomes are 55 both correct, 9 tree-only, 0 dense-only, 8 neither
+(exact McNemar/binomial p=0.003906). At factor 1, dense is **54/72 (0.7500)**
+and tree **63/72 (0.8750)**, also +12.50 points (11 tree-only, 2 dense-only,
+p=0.02246). Comparing rotary factors on the same prompt/arm, dense changes by
+only one net case (factor1->4 transitions: 50 both correct, 13 both wrong,
+5 improve, 4 regress) and tree also changes by one (63 both correct, 8 both
+wrong, 1 improves, 0 regresses). Static YaRN therefore does **not** explain
+the dense-versus-compiled accuracy gap on these native-length prompts; factor
+4 is, if anything, one sample higher in both arms.
+
+**Number — matched-budget selectors:** Over the 288 natural prompts at
+16K-128K, tree is **255/288 (0.8854)**, flat **254/288 (0.8819)**, and BM25
+**254/288 (0.8819)**. Pairwise, tree versus flat is 253 both correct, 2
+tree-only, 1 flat-only, 32 neither; versus BM25 it is 252 both, 3 tree-only,
+2 BM25-only, 31 neither. All three have expanded-needle recall **1.0000**.
+Thus the one-case accuracy difference is not a meaningful tree win; these
+query-aware selectors are accuracy-equivalent on this bank once radius repair
+is applied. In contrast, lead/tail/stride/random score **0/288, 1/288,
+3/288, and 12/288**, so success is query-aware selection, not packet size or
+position alone. Fully charged times also do not establish a tree cost win:
+tree sums **162.704 s**, flat **162.347 s**, and BM25 **161.366 s** (tree is
+0.22% slower than flat and 0.83% slower than BM25); median requests are
+0.5667/0.5641/0.5631 s. Cold linear layout/index construction plus the common
+dense packet read dominates the selector-only asymptotic difference.
+
+**Figures/claim audit:** The three plots accurately reflect the stored
+aggregates, but the summary's `GPU: None` label must be repaired before use.
+The accuracy plot needs uncertainty/paired annotations if promoted to the
+paper, and the memory chart mixes the seven 16K-128K compiled arms with the
+16K/32K yarn-confound dense/tree arms, so its populations must be labeled or
+separated. The sealed bank is held out from model/selector training, but it has
+already been used for method development; treat this run as the fixed-natural
+benchmark, not the fresh external RULER test result.
+
+**Conclusion:** These L4 results support three defensible statements: the live
+compiler+dense-reader path is **5.89x at 16K and 11.67x at 32K** on the same L4
+with substantially lower allocated memory; static YaRN does not create the
+accuracy advantage; and query-aware retrieval is essential. They do **not**
+show that the recursive tree is more accurate or faster end-to-end than flat
+or BM25, do not cover dense speed at 64K-128K, and do not satisfy KS2's
+tree-versus-flat cost condition. Keep KS2 unresolved until Stage-3 matched
+sparse-prefill baselines exist. Fix the summary GPU field and figure
+population labels before paper use, and use the fresh hashed RULER run for the
+external accuracy figure.
+
+---
+
+## 2026-08-02 — ceiling-knee complete: wider beam/M helps strongly, but no tested arm clears the 95% cell-floor gate
+**Question:** At D=4096/tail=3, is the compiler still the binding accuracy
+constraint, and is its remaining loss primarily fixed by widening the tree
+beam, increasing selected-block budget M, or both?
+
+**Config:** Audit of `benchmarks/outputs/ruler_ceiling_knee_v1/report.json`.
+Compiler-only CPU run; Qwen2.5-Coder-1.5B-Instruct tokenizer, no model weights;
+D=4096, tail=3, beam {16,32,64}, M {9,16,32} with M<=beam, B=64,
+radius=1, paragraph boundaries, unigram fraction 0.5, IDF power 2, radix 2.
+All 13 cached RULER validation tasks, lengths 4K/8K/16K/32K/64K/128K,
+20 samples per task/length. The pre-declared engineering rule was: every one
+of the 60 in-scope task-length cells (the eight NIAH tasks plus QA1/QA2;
+VT/CWe/FWe excluded before inspection) must have compiler ceiling >=0.95.
+This is a tuning/diagnostic run on the reused validation cache, not the fresh
+held-out paper RULER test bank. Report SHA-256:
+`89E116608435F49D93D427F5280FBBAF496972458623467600E87C7CC326FC88`.
+
+**Number — integrity/completeness:** Status is **completed**, with
+**1,560/1,560 unique samples**, all eight arms present on every sample,
+positions 0-19 complete in every one of the 78 task-length cells, no duplicate
+keys, a matching config fingerprint
+`32F21D4F7A70FFADB1AEA00ACC620D0ECD478C2B652441A8B5CFF222B4D8C53D`,
+and an exact aggregate recomputation. Full-prompt lexical ceiling was
+**0.9968**. The report does not record a dataset manifest/RULER commit or
+source-archive hash, so its cached-input identity is weaker than the new paper
+runner's frozen-manifest protocol.
+
+**Number — declared gate:** **0/8 arms pass** the 0.95 minimum-cell rule.
+The current end-to-end candidate, beam16/M9, has all-task ceiling **0.8541**,
+in-scope ceiling **0.8385**, minimum cell **0.2500**
+(`qa_1@131072`), median packet **3,067 tokens / 0.1592** of the source prompt.
+The highest-ceiling tested arm, beam64/M32, reaches all-task **0.9334** and
+in-scope **0.9363**, but its cell floor is still only **0.4000**
+(`qa_2@131072`) while its median packet grows to **7,056 tokens / 0.3945**.
+Relative to beam16/M9, that is +9.77 in-scope ceiling points for +23.53 packet-
+fraction points (about 2.48x the median fraction), yet the hard cell-floor gate
+still fails badly.
+
+**Number — beam versus M and length:** At fixed M=9, beam16->32 raises the
+in-scope ceiling **0.8385->0.8763 (+3.77 points)**, while beam32->64 adds only
+**+0.10 point**; beam≈32 is therefore the observed M=9 traversal knee.
+At beam32, M9/M16/M32 scores **0.8763/0.9027/0.9250** in-scope with median
+packet fractions **0.1610/0.2504/0.3658**. At beam64 they are
+**0.8773/0.9054/0.9363**, with fractions **0.1600/0.2473/0.3945**. The
+beam16/M9 -> beam64/M32 in-scope ceiling by length is
+**0.9700->0.9900 (4K), 0.9100->0.9850 (8K), 0.8950->0.9600 (16K),
+0.8488->0.9150 (32K), 0.7462->0.9050 (64K), and 0.6613->0.8625
+(128K)**. The residual long-context bottlenecks are concentrated in QA and
+one multikey family: at 128K, beam64/M32 is **0.650 QA1, 0.400 QA2, and
+0.650 NIAH multikey-3**; the other seven in-scope task families are 0.95-1.00.
+
+**Audit caveat — miss-cause split is not valid as labeled:** Do not quote the
+reported **278 `selector_outside_beam`** misses at beam64/M32 as proof that all
+278 require a wider beam. `ruler_ceiling_knee.py` calls
+`select_pre_qwen_blocks(top_m=max_budget)`, and `PreQwenSelection.blocks`
+returns only those top-M blocks. Thus for beam64/M32, `rank_in_beam` sees only
+32 returned blocks, not all 64 final beam candidates; a missing reference in
+candidate ranks 32-63 is incorrectly indistinguishable from one pruned during
+descent. The 0 `selector_in_beam` / 278 `selector_outside_beam` decomposition
+therefore conflates M and traversal loss. The miss-cause figure is diagnostic-
+invalid until the selector exposes/ranks all final beam candidates (or the
+sweep calls top_m=beam and slices that ranking for each M).
+
+**Audit caveat — boundary/data labels and figures:** Of the reported 1,228
+`data_absent` references, **1,190 are CWe**. Tail=3 places CWe's long word-list
+line inside the inferred final-question suffix, so those answers are outside
+the inferred document but copied into every packet question; this is why CWe
+can show ceiling 1.0 while almost every reference is labeled absent. CWe is
+pre-declared out of scope, so this does not change the 60-cell decision gate,
+but it makes the global miss-cause chart misleading. The length figure also
+plots all-task rather than in-scope ceiling, and the knee plot labels overlap;
+none of the three figures is paper-ready in its present form. The summary's
+`beam32_M32` recommendation is only the first arm tied for the best 0.40 cell
+floor: beam64/M32 ties that floor, has higher in-scope ceiling
+(0.9363 vs 0.9250), and costs a larger packet (0.3945 vs 0.3658). It is a
+tradeoff, not a unique empirical winner.
+
+**Conclusion:** The trustworthy result is that the compiler remains binding
+under the declared worst-cell rule, especially at 64K-128K QA, and that both
+beam16->32 and M9->32 buy substantial ceiling. Do **not** spend the final L4
+paper run on beam16/M9 as though this diagnostic passed, but also do not simply
+declare “use a wider beam” from the current miss labels. First fix final-beam
+candidate reporting, repair/declare task-specific prompt boundaries, and run a
+focused QA/multikey-3 sweep including the full candidate ranking (for example
+beam {32,64,128}, M {32,64} where reachable). Keep this validation result out
+of the paper accuracy table; the fresh hashed RULER test split remains the
+external paper measurement.
+
+---
+
+## 2026-08-02 — ceiling-knee notebook cache-path failure fixed; no ceiling result yet
+**Question:** Why did the beam-by-budget ceiling notebook stop before the run
+with `no <length>/<task>/validation.jsonl`, and can the notebook reuse the
+existing 20-sample RULER bank without manual Drive path editing?
+
+**Config:** `colab/run_ruler_ceiling_knee.ipynb`, CPU-only tokenizer/compiler
+sweep, D=4096, tail=3, beams {16,32,64}, M {9,16,32}, B=64, radius=1,
+paragraph boundary, all 13 RULER tasks at 4K-128K, maximum 20 samples per
+task/length. The failed cell pointed at the obsolete
+`SPRUCE_COLAB/ruler_data` location. The earlier cached-factorial and paired
+notebooks actually store this bank under
+`SPRUCE_COLAB/outputs/ruler_data_cache/Qwen2.5-Coder-1.5B-Instruct_20samples`.
+
+**Number — failure/repair only:** The incorrect directory contained **0**
+matching validation files, so no experimental rows or ceiling values were
+produced. The corrected notebook targets the canonical cache, verifies exactly
+**20 rows in each of 78 task/length files**, reuses valid files, and generates
+only missing or incomplete cells with NVIDIA's RULER generator. Rebuilt source
+archive SHA-256:
+`6871B0FA20FE89CE1E289474C9A5FC6AFBF75E8C15C74591CD9E5403FD402E12`.
+
+**Conclusion:** This was a notebook path bug, not a selector/compiler result.
+Upload the rebuilt archive and rerun from cell 1; the cache cell now either
+reports a 78-file hit or fills only the missing cells. Do not infer anything
+about the beam/M knee until `report.json` contains the completed sweep.
+
+---
+
+## 2026-08-02 — held-out paper RULER notebook frozen; accuracy run not yet executed
+**Question:** On a fresh external NVIDIA RULER test bank, how does the same
+Qwen reader score with the complete dense prompt versus the SPRUCE evidence
+compiler at the best current candidate settings, and is any difference stable
+across context lengths and task families?
+
+**Config:** Added `colab/run_ruler_paper_accuracy_l4.ipynb` and
+`benchmarks/ruler_paper_accuracy.py`. Qwen2.5-Coder-1.5B-Instruct, FP16,
+greedy decoding, static YaRN factor 4 with original context 32,768, one
+required NVIDIA L4. SPRUCE candidate D=4096, tail=3, M=9, beam=16, B=64,
+radius=1, paragraph boundaries, unigram fraction 0.5, IDF power 2, radix 2.
+The notebook generates a fresh NVIDIA RULER `test` split at seed 314159,
+records the exact RULER commit, and freezes every JSONL by SHA-256 before
+inference. It uses all 13 tasks and lengths 4K/8K/16K/32K/64K/128K. Both arms
+use the official appended `answer_prefix` at the literal generation boundary
+and the official task-family output budgets (NIAH 128, VT 30, CWe 120, FWe
+50, QA 32). The SPRUCE arm builds its D=4096 route live from the matching
+held-out sample; it never reuses the stale development factorial route cache.
+Source archive SHA-256:
+`6871B0FA20FE89CE1E289474C9A5FC6AFBF75E8C15C74591CD9E5403FD402E12`.
+
+**Number — protocol only, not an accuracy result:** The default reduced-sample
+run is **50 samples per task/length cell**, **78 cells**, and **3,900 paired
+examples**. Completion requires **78/78 cells, 3,900/3,900 pairs, and zero
+errors**. Partial summaries are checkpointed, but figures are named `PARTIAL`
+and watermarked `NOT FOR PAPER`; only a complete run emits unwatermarked PNG
+and PDF accuracy/delta figures. The upstream standard 500-sample setting is
+not being claimed by this reduced-sample notebook. Local validation is
+**15 passed, 1 skipped** across the new runner, cached-factorial, and evidence-
+compiler test files.
+
+**Conclusion:** The reproducible decision run is ready but has produced no new
+RULER accuracy number yet. Do not change the locked D=1024 default, update KS1,
+or quote a dense-versus-SPRUCE paper result until the L4 output passes the
+complete-grid/zero-error gate. This benchmark evaluates compiler + dense
+reader accuracy, not Stage-3 sparse attention and not speed.
+
+---
+
+## 2026-08-02 — paired RULER audit: strong D=4096 signal, but 89 operational misses block the final claim
+**Question:** Is the downloaded paired L4 result actually complete, what caused
+the missing rows, and does the observed D=4096 accuracy gain behave like a real
+evidence-retrieval effect rather than generation noise?
+
+**Config:** Audit of
+`benchmarks/outputs/ruler_paired_d1024_d4096_m9_l4_v1/` and all 78 task-report
+files. Qwen2.5-Coder-1.5B-Instruct, FP16, static YaRN 4x, NVIDIA L4; paired
+tail=3/M=9/beam=16/B=64 packets with cached factorial routes, D {1024,4096},
+greedy decode to 64 new tokens. This entry supersedes any interpretation of the
+65/78 aggregate below as a complete run.
+
+**Number — completeness/error audit:** The directory contains 78 report files,
+but only **65 are `completed`**; 13 are `completed_with_errors`. The aggregate
+has **1,471/1,560 paired samples and 89 errors**, not a complete grid. Of those,
+**74 are factorial-route reference mismatches, 14 are route-cache positions
+that do not exist, and 1 is an L4 OOM** on `cwe` 128K. Thus 88/89 failures are
+an input/cache identity problem: regenerated RULER files diverge from the old
+factorial cache after an initially matching prefix, so position-based route
+reuse correctly refuses the wrong sample. Missing rows are concentrated in
+`niah_single_2` 44, `niah_multikey_3` 28, `niah_multivalue` 14,
+`niah_single_1` 2, and `cwe` 1. By length they are 17/17/15/10/20/10 from
+4K through 128K. A plain `--rerun-errors` with the same stale route cache will
+repeat 88 failures; mismatches must fall back to live route construction (or
+use a route cache built from the exact JSONL), while the one OOM should be
+retried in a fresh L4 process.
+
+**Number — observed subset only:** On the 1,471 successful pairs, D=1024 scored
+**0.5567** and D=4096 **0.6009**, delta **+0.0442**, with observed-subset paired
+bootstrap 95% CI **[+0.0295,+0.0591]** and wins/ties/losses **179/1,220/72**.
+Perfect-sample rate rose **45.62% -> 52.07%** and packet evidence score rose
+**0.8144 -> 0.8514**. Median packet tokens were similar, 2,959 versus 3,053;
+18.83% of packet pairs were byte-identical and necessarily tied. Because the
+89 missing rows are task-concentrated rather than a random sample, that CI is
+not a final-grid CI. With only the score range [-1,+1] assumed for each missing
+paired delta, the full-grid delta remains bounded by **-0.0154 to +0.0988**, so
+the incomplete run cannot by itself exclude zero.
+
+**Number — length and mechanism:** The short-context subset is flat: pooled
+4K-8K delta **+0.00007** over 486 pairs (21/447/18 wins/ties/losses). At
+16K-128K the delta is **+0.0660** over 985 pairs (158/773/54), and at 64K-128K
+it is **+0.0865** over 490 pairs (98/362/30). Individual length deltas are
+-0.14, +0.16, +4.13, +5.01, +9.81, and +7.53 points. The effect tracks evidence
+causally enough to be persuasive as a preliminary result: among **162 cases
+where D=4096 increased packet evidence**, generated score improved in 111,
+tied in 48, and fell in only 3 (mean delta +0.441). Among 92 evidence-loss
+cases it improved in 4, tied in 67, and fell in 21 (mean -0.172). With evidence
+unchanged, mean score delta was only +0.0077. This supports the mechanism, but
+does not repair the missing-grid validity problem.
+
+**Cross-check — other new test:** `selector_baselines_cpu_v1/report.json` is
+independently complete with status `completed`, **288/288 rows**, and its
+recorded tree/flat/BM25 and naive-packet numbers match the preceding CPU
+baseline log entry. It has no analogous missing-row issue.
+
+**Conclusion:** Treat D=4096's +4.42-point observed gain as a strong preliminary
+signal concentrated exactly where expected (16K+), not the final RULER result.
+The error pattern is operational and fixable, but non-random; complete the 89
+missing paired rows with exact/live routes before changing the frozen default,
+quoting a final CI, or updating KS1. No latency/speed claim follows from the
+1.432-second median paired-batch instrumentation because the arms share a GPU
+batch and cached routes.
+
+---
+
+## 2026-08-02 — CPU baselines complete: the tree is a cost result, and no naive packet works
+**Question:** At the locked D=1024 configuration over the full sealed bank,
+does the recursive tree find evidence a flat scan misses, does BM25 already
+solve the problem, and would any compact packet at the same block budget do?
+
+**Config:** `benchmarks/outputs/selector_baselines_cpu_v1/`; complete 288/288
+prompts (12 cases x 8 lengths 16K-128K x 3 depths), sealed
+`natural_paper_untouched` bank, D=1024, M=4, beam=16, B=64, radius 1, paragraph
+repair, radix 2, seed 20260728. Seven arms through the identical compiler and
+packet format: `tree`, `flat`, `bm25` (Okapi over the same block grid, k1=1.5,
+b=0.75), and question-independent `lead`/`tail`/`stride`/`random`. Tokenizer
+only, no model weights, no GPU. Documents span 255 to 2,048 blocks and 9 to 12
+tree levels.
+
+**Number — recall:** expanded evidence recall after paragraph repair is
+**1.0000 for tree, flat and bm25 at every one of the eight lengths**. Direct
+recall before repair is **tree 0.9028, flat 0.9028, bm25 0.9340**. The four
+question-independent arms are **0.0000 direct** and 0.0000 expanded, except
+`random` at 0.0347 expanded, which is chance. Their packets are the right size
+(`stride` 1,898 and `random` 1,900 median tokens against the tree's 1,892), so
+this is not a packet-size effect: a correctly sized packet with the wrong
+contents retrieves nothing.
+
+**Number — tree versus flat:** the two arms return **different block sets on
+130 of 288 prompts** (identical-set rate 0.5486, mean Jaccard 0.7767), yet
+**top-1 agreement is 1.0000** and, decisively, **tree-hit-flat-miss = 0 and
+flat-hit-tree-miss = 0**. Every disagreement is confined to ranks 2-4 and none
+changes whether the evidence is found. Against BM25 the tree loses on the
+merits: **bm25-hit-tree-miss = 10, tree-hit-bm25-miss = 1**.
+
+**Number — where the log-depth advantage actually appears:** median selection
+time 16K -> 128K is **tree 1.03 -> 1.39 ms** (159 -> 255 nodes scored) against
+**flat 0.39 -> 2.07 ms** (255 -> 2,048 blocks scored). Document blocks grow 8x;
+tree nodes scored grow 1.6x and flat blocks scored grow 8x, exactly as the
+complexity classes predict. But the **crossover is near 80K** (tree 1.35 ms,
+flat 1.37 ms): below it the flat scan is *faster in wall clock*, and at 128K the
+tree wins by only 1.49x on a component worth about 1.4 ms inside a 264 ms cached
+request. BM25 costs 2.88 -> 14.57 ms, 7-10x either. Index build is linear,
+3.4 -> 22.0 ms.
+
+**Conclusion:** two claims change and one is confirmed. **The tree cannot be
+presented as an accuracy contribution on this bank** — flat scanning recovers
+the identical evidence on all 288 prompts, and BM25 recovers strictly more
+before repair. The tree is a cost contribution whose measured advantage begins
+around 80K and reaches 1.49x at 128K on a sub-millisecond component; state the
+crossover rather than implying the advantage holds at all lengths. **The
+mechanism the paper should claim is the compile-repair-re-encode pipeline, not
+the selector:** paragraph repair is what lifts every query-aware arm from about
+0.90 to 1.0000, and it does so regardless of which selector fed it. Confirmed
+and strengthened: the matched-budget naive arms fail completely at the correct
+packet size, which kills the "any short prompt would do" objection outright.
+The selector is interchangeable here only on *this* bank, where recall is
+already saturated at D=1024; the RULER entry below shows feature width still
+matters where it is not. This run reports no generated accuracy and does not
+touch KS1.
+
+---
+
+## 2026-08-02 — paired end-to-end RULER: D=4096 beats D=1024 by 4.4 points (partial)
+**Question:** Does the compiler-only ceiling gain from D=4096 at tail=3/M=9
+survive into generated RULER accuracy on the fixed L4, or does it merely
+reclassify wrong answers as model-side errors?
+
+**Config:** `benchmarks/outputs/ruler_paired_d1024_d4096_m9_l4_v1/`;
+Qwen2.5-Coder-1.5B-Instruct, FP16, static YaRN 4x, NVIDIA L4. Both arms fixed at
+tail=3, M=9, beam=16, B=64, radius 1, paragraph repair, unigram fraction 0.5,
+IDF power 2; only D changes. Cached factorial routes reused where available.
+**Partial: 65/78 task-length pairs, 1,471 paired samples.**
+
+**Number:** D=1024 **0.5567**, D=4096 **0.6009**, paired delta **+0.0442**,
+paired bootstrap 95% CI **[+0.0295, +0.0591]** — excludes zero. Wins/ties/losses
+for D=4096: **179 / 1,220 / 72**. The gain is monotone in length and absent at
+short context: **-0.001 at 4K, +0.002 at 8K, +0.041 at 16K, +0.050 at 32K,
++0.098 at 64K, +0.075 at 128K**. By task it helps the NIAH family broadly
+(`niah_multikey_2` +0.125, `niah_single_2` +0.105, `niah_multiquery` +0.081,
+`niah_multivalue` +0.080, `niah_multikey_1` +0.058) and both QA tasks (+0.042,
++0.058). `fwe` is the only material loss at -0.025; `cwe` and `niah_single_1`
+are flat.
+
+**The predicted `vt` regression did not appear.** Compiler-only measurement had
+D=4096 costing 17.17 ceiling points on `vt`; end-to-end it is **+0.007**. A
+ceiling delta on a task the model cannot do anyway does not reach generated
+accuracy, which is a general warning about promoting compiler-only findings.
+
+**Conclusion:** this **reverses the earlier reason for keeping D=1024**. That
+decision rested on D=4096 being slightly worse on natural exact accuracy and
+regressing `vt`; the first holds only where recall is already saturated, and the
+second is now measured false end-to-end. The honest statement is that feature
+width buys nothing at 4K-8K and buys 4-10 points from 16K upward, which is
+precisely the regime the paper is about. Do not simply reset the global default
+to 4096 and quote RULER at 4096: D would then be chosen on RULER and reported on
+RULER. Report D=1024 as the frozen default chosen on the natural bank, report
+this as a pre-declared sensitivity analysis with its CI, and state the length
+threshold. Still partial at 65/78 with 13 pairs missing, so it is not the final
+RULER number and does not clear KS1.
+
+---
+
+## 2026-08-02 — baseline and YaRN-confound notebooks prepared (no result yet)
+**Question:** Before the paper rewrite, which pre-rewrite checks are cheap
+enough to be unconditional, and can they run without touching the in-flight
+RULER D/M sweep? A four-voice review cut a 15-test list to five: the static
+YaRN confound, matched-budget naive arms, BM25, flat-versus-tree, and the L4
+memory re-measure. Every RULER-dependent item was cut by owner instruction
+because that grid is already running.
+
+**Config:** New `selector/baselines.py` (flat scan reusing the tree's own
+`_node_scores`; Okapi BM25 over the same 64-token block grid with tokenizer IDs
+as terms; question-independent `lead`/`tail`/`stride`/`random`), plus two
+runners and two notebooks. `benchmarks/selector_baselines_cpu.py` +
+`colab/run_selector_baselines_cpu.ipynb` measure selection only — evidence
+recall and packet size, no model weights, CPU runtime.
+`benchmarks/paper_baselines_l4.py` + `colab/run_paper_baselines_l4.ipynb`
+measure generated accuracy on the fixed L4 in two phases: `yarn` (dense and
+tree at factor 4 versus factor 1, 16K/32K only, since factor 1 is illegal above
+the 32,768 native context) and `baselines` (all seven selectors at all eight
+lengths). Both use the sealed `natural_paper_untouched` bank, asserted by
+SHA-256 `74ACE232...6DF5CE`, at the locked D=1024 / M=4 / beam=16 / B=64 /
+radius-1 / paragraph configuration. Every arm feeds the identical compiler and
+packet format, so the selection rule is the only variable. The L4 runner
+hard-aborts on any other GPU unless `--allow-any-gpu` is passed. The dense arm
+is off by default in the baselines phase because dense on this exact bank, seed
+and GPU is already 192/288 in `cached_index_v2`.
+
+**Number / implementation check:** `pytest tests/` = **230 passed, 13 skipped**
+(baseline was 203/13; the new `tests/test_selector_baselines.py` adds 27). All
+four Python files and both notebooks `ast.parse` cleanly; each notebook's final
+cell calls `runtime.unassign()`. A completed 12-prompt CPU smoke at 4K/depth
+0.5 exercised the whole runner: tree, flat and BM25 each reached **1.000**
+direct and expanded needle recall, all four question-independent arms reached
+**0.000**, and tree versus flat agreed on **12/12** prompts by set, order and
+top-1. Median select time was 1.82 ms for the tree (95 nodes scored) against
+0.71 ms for the flat scan (63 blocks) — at 4K the flat scan is *cheaper*,
+because a 63-block document is too small for a log-depth descent to pay for
+itself. **This is a smoke test at one length on twelve prompts, not a result;**
+the question the runners exist to answer is what happens at 16K-128K, where the
+block count is 20-30x larger.
+
+**Conclusion:** Run the CPU notebook first — it is free and it alone decides
+whether the tree is an accuracy contribution or a cost contribution. If flat
+matches the tree across 16K-128K, the paper's selector framing changes before a
+single GPU hour is spent. Then run the L4 notebook; its `yarn` phase is the
+single test most likely to move the headline, because static factor-4 scaling
+is applied at lengths that never needed it and only the dense arm pays for it.
+Two items are editorial, not experimental, and cost nothing: freeze D=1024 as
+chosen on the natural bank and report the in-flight RULER sweep as a
+sensitivity analysis rather than adopting its winner, which removes the
+tune-on-what-you-report contamination; and delete "model-agnostic" from the
+paper, since only Qwen2.5-Coder-1.5B has ever been run. No measured result
+exists yet and nothing here changes any kill switch.
+
+---
+
 ## 2026-08-02 — paired D=1024 versus D=4096 end-to-end L4 notebook prepared
 **Question:** Does the compiler-only evidence gain from D=4096 at tail=3/M=9
 translate into higher generated RULER accuracy than D=1024 on the fixed L4,

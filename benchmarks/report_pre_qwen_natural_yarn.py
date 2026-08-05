@@ -503,38 +503,71 @@ def make_figures(summary, figures_dir):
         fig, figures_dir, "02_paired_outcomes")
     plt.close(fig)
 
-    fig, axes = plt.subplots(1, 2, figsize=(11.2, 4.4))
-    axes[0].plot(
-        lengths,
-        [item["median_dense_request_seconds"]
-         for _length, item in length_data],
-        marker="o", linewidth=2, color=COLORS["dense"],
-        label="Dense YaRN teacher")
-    axes[0].plot(
-        lengths,
-        [item["median_compiled_request_seconds"]
-         for _length, item in length_data],
-        marker="o", linewidth=2, color=COLORS["compiled"],
-        label="SPRUCE compiler")
-    axes[0].set(
-        title="Fully charged request latency",
-        xlabel="Requested context (Ki tokens)", ylabel="Seconds",
-        xticks=lengths)
-    axes[0].grid(True)
-    axes[0].legend()
-    axes[1].axhline(1.0, color="black", linestyle="--", linewidth=1)
-    axes[1].plot(
-        lengths,
-        [item["sum_weighted_speedup"] for _length, item in length_data],
-        marker="o", linewidth=2, color="#5E35B1")
-    axes[1].set(
-        title="Sum-weighted dense / compiler speedup",
-        xlabel="Requested context (Ki tokens)", ylabel="Speedup (×)",
-        xticks=lengths)
-    axes[1].grid(True)
-    outputs["03_latency_and_speedup"] = _save_figure(
-        fig, figures_dir, "03_latency_and_speedup")
-    plt.close(fig)
+    paper_style = {
+        "font.family": "serif",
+        "font.serif": ["Nimbus Roman", "Times New Roman", "DejaVu Serif"],
+        "font.size": 8,
+        "axes.labelsize": 8,
+        "axes.titlesize": 8.5,
+        "xtick.labelsize": 7.5,
+        "ytick.labelsize": 7.5,
+        "legend.fontsize": 7.5,
+        "axes.linewidth": 0.6,
+        "lines.linewidth": 1.3,
+        "lines.markersize": 3.6,
+        "grid.linewidth": 0.4,
+        "xtick.major.width": 0.6,
+        "ytick.major.width": 0.6,
+        "figure.dpi": 220,
+    }
+    with plt.rc_context(paper_style):
+        positions = list(range(len(length_data)))
+        figure, axes = plt.subplots(1, 2, figsize=(7.16, 2.10))
+        axes[0].plot(
+            positions,
+            [item["median_dense_request_seconds"]
+             for _length, item in length_data],
+            "o-", color="#2b2b2b", label="Dense")
+        axes[0].plot(
+            positions,
+            [item["median_compiled_request_seconds"]
+             for _length, item in length_data],
+            "o-", color="#009e73", label="SPRUCE")
+        axes[0].legend(frameon=False, loc="upper left")
+        axes[0].set_title("(a) Fully charged request latency")
+        axes[0].set_ylabel("Median request time (s)")
+        axes[0].set_ylim(bottom=0)
+
+        axes[1].axhline(
+            1.0, color="#666666", linestyle="--", linewidth=0.8)
+        axes[1].plot(
+            positions,
+            [item["sum_weighted_speedup"]
+             for _length, item in length_data],
+            "o-", color="#5B4BD6")
+        axes[1].text(
+            0.12, 1.18, "parity", color="#666666", fontsize=7.5)
+        axes[1].set_title("(b) Sum-weighted dense / SPRUCE speedup")
+        axes[1].set_ylabel("Speedup (×)")
+        axes[1].set_ylim(bottom=0)
+
+        for axis in axes:
+            axis.set_xticks(positions)
+            axis.set_xticklabels(
+                [int(length / 1024) for length, _item in length_data])
+            axis.set_xlabel("Requested context (Ki tokens)")
+            axis.grid(alpha=0.3, linewidth=0.4)
+            axis.spines["top"].set_visible(False)
+            axis.spines["right"].set_visible(False)
+        figure.tight_layout(pad=0.3, w_pad=1.0)
+        figures = Path(figures_dir)
+        figures.mkdir(parents=True, exist_ok=True)
+        png = figures / "03_latency_and_speedup.png"
+        pdf = figures / "03_latency_and_speedup.pdf"
+        figure.savefig(png, dpi=220)
+        figure.savefig(pdf)
+        outputs["03_latency_and_speedup"] = (str(png), str(pdf))
+        plt.close(figure)
 
     fig, axis = plt.subplots(figsize=(8.6, 5.0))
     component_keys = [
@@ -616,62 +649,88 @@ def make_figures(summary, figures_dir):
         fig, figures_dir, "06_evidence_recall")
     plt.close(fig)
 
-    depths = sorted(
-        float(depth) for depth in summary["by_depth"])
-    matrices = []
-    for mode in ("dense", "compiled"):
+    heatmap_style = {
+        "font.family": "serif",
+        "font.serif": ["Nimbus Roman", "Times New Roman", "DejaVu Serif"],
+        "font.size": 8,
+        "axes.labelsize": 8,
+        "axes.titlesize": 8.5,
+        "xtick.labelsize": 7.5,
+        "ytick.labelsize": 7.5,
+        "legend.fontsize": 7.5,
+        "axes.linewidth": 0.6,
+        "axes.spines.top": True,
+        "axes.spines.right": True,
+        "lines.linewidth": 1.3,
+        "lines.markersize": 3.6,
+        "grid.linewidth": 0.4,
+        "xtick.major.width": 0.6,
+        "ytick.major.width": 0.6,
+        "figure.dpi": 220,
+    }
+    with plt.rc_context(heatmap_style):
+        depths = sorted(
+            (float(depth) for depth in summary["by_depth"]), reverse=True)
+        matrices = []
+        for mode in ("dense", "compiled"):
+            matrices.append([
+                [
+                    summary["by_length_depth"][
+                        f"{int(length * 1024)}:{depth}"
+                    ][mode]["exact_rate"]
+                    for length in lengths
+                ]
+                for depth in depths
+            ])
         matrices.append([
             [
                 summary["by_length_depth"][
                     f"{int(length * 1024)}:{depth}"
-                ][mode]["exact_rate"]
+                ]["paired"]["accuracy_delta"]
                 for length in lengths
             ]
             for depth in depths
         ])
-    matrices.append([
-        [
-            summary["by_length_depth"][
-                f"{int(length * 1024)}:{depth}"
-            ]["paired"]["accuracy_delta"]
-            for length in lengths
-        ]
-        for depth in depths
-    ])
-    fig, axes = plt.subplots(1, 3, figsize=(15.0, 4.4), constrained_layout=True)
-    titles = ("Dense exact", "Compiler exact", "Compiler − dense")
-    cmaps = ("Greys", "YlGnBu", "RdYlGn")
-    limits = ((0, 1), (0, 1), (-1, 1))
-    for panel_index, (
-            axis, matrix, title, cmap, (vmin, vmax)) in enumerate(zip(
-                axes, matrices, titles, cmaps, limits)):
-        image = axis.imshow(
-            matrix, aspect="auto", origin="lower", cmap=cmap,
-            vmin=vmin, vmax=vmax)
-        axis.set(
-            title=title, xlabel="Context (Ki tokens)",
-            ylabel="Evidence depth", xticks=range(len(lengths)),
-            xticklabels=[int(value) for value in lengths],
-            yticks=range(len(depths)), yticklabels=depths)
-        for row_index, row in enumerate(matrix):
-            for column_index, value in enumerate(row):
-                text_color = (
-                    "white"
-                    if (
-                        value >= 0.58
-                        if panel_index < 2
-                        else abs(value) >= 0.58
+        fig, axes = plt.subplots(1, 3, figsize=(7.16, 1.74))
+        for axis, matrix, cmap, title, (vmin, vmax) in (
+                (axes[0], matrices[0], "Greys", "(a) Dense exact", (0, 1)),
+                (axes[1], matrices[1], "Blues", "(b) SPRUCE exact", (0, 1)),
+                (axes[2], matrices[2], "RdYlGn",
+                 "(c) SPRUCE $-$ dense", (-1, 1))):
+            image = axis.imshow(
+                matrix, cmap=cmap, vmin=vmin, vmax=vmax, aspect="auto")
+            axis.set_xticks(range(len(lengths)))
+            axis.set_xticklabels([int(value) for value in lengths])
+            axis.set_yticks(range(len(depths)))
+            axis.set_yticklabels([f"{depth:.1f}" for depth in depths])
+            axis.set_xlabel("Context (Ki tokens)")
+            if axis is axes[0]:
+                axis.set_ylabel("Evidence depth")
+            axis.set_title(title)
+            for row_index, row in enumerate(matrix):
+                for column_index, value in enumerate(row):
+                    dark = (
+                        (value - vmin) / (vmax - vmin) > 0.6
+                        if cmap != "RdYlGn"
+                        else False
                     )
-                    else "black"
-                )
-                axis.text(
-                    column_index, row_index, f"{value:.2f}",
-                    ha="center", va="center", fontsize=8,
-                    color=text_color)
-        fig.colorbar(image, ax=axis, shrink=0.82)
-    outputs["07_length_depth_heatmaps"] = _save_figure(
-        fig, figures_dir, "07_length_depth_heatmaps")
-    plt.close(fig)
+                    axis.text(
+                        column_index, row_index, f"{value:.2f}",
+                        ha="center", va="center", fontsize=6.2,
+                        color="white" if dark else "black")
+            colorbar = fig.colorbar(
+                image, ax=axis, fraction=0.045, pad=0.03)
+            colorbar.ax.tick_params(labelsize=6)
+            colorbar.outline.set_linewidth(0.5)
+        fig.tight_layout(pad=0.3, w_pad=1.0)
+        figures = Path(figures_dir)
+        figures.mkdir(parents=True, exist_ok=True)
+        png = figures / "07_length_depth_heatmaps.png"
+        pdf = figures / "07_length_depth_heatmaps.pdf"
+        fig.savefig(png, dpi=220)
+        fig.savefig(pdf)
+        outputs["07_length_depth_heatmaps"] = (str(png), str(pdf))
+        plt.close(fig)
 
     case_items = sorted(summary["by_semantic_case"].items())
     case_labels = [case_id.replace("paper_", "") for case_id, _ in case_items]
@@ -733,37 +792,22 @@ def make_figures(summary, figures_dir):
         fig, figures_dir, "09_paper_overview")
     plt.close(fig)
 
-    fig, axes = plt.subplots(1, 2, figsize=(11.2, 4.4))
-    axes[0].plot(
+    fig, axis = plt.subplots(figsize=(8.2, 4.8))
+    axis.plot(
         lengths,
         [item["median_dense_peak_memory_allocated_gb"]
          for _length, item in length_data],
         marker="o", color=COLORS["dense"], label="Dense")
-    axes[0].plot(
+    axis.plot(
         lengths,
         [item["median_compiled_peak_memory_allocated_gb"]
          for _length, item in length_data],
         marker="o", color=COLORS["compiled"], label="Compiler")
-    axes[0].set(
+    axis.set(
         title="Peak allocated GPU memory", ylabel="GiB",
         xlabel="Requested context (Ki tokens)", xticks=lengths)
-    axes[0].grid(True)
-    axes[0].legend()
-    axes[1].plot(
-        lengths,
-        [item["median_dense_peak_memory_reserved_gb"]
-         for _length, item in length_data],
-        marker="o", color=COLORS["dense"], label="Dense")
-    axes[1].plot(
-        lengths,
-        [item["median_compiled_peak_memory_reserved_gb"]
-         for _length, item in length_data],
-        marker="o", color=COLORS["compiled"], label="Compiler")
-    axes[1].set(
-        title="Peak reserved GPU memory", ylabel="GiB",
-        xlabel="Requested context (Ki tokens)", xticks=lengths)
-    axes[1].grid(True)
-    axes[1].legend()
+    axis.grid(True)
+    axis.legend()
     outputs["10_peak_gpu_memory"] = _save_figure(
         fig, figures_dir, "10_peak_gpu_memory")
     plt.close(fig)

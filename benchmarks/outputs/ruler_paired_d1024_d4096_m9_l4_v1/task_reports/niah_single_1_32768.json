@@ -1,0 +1,2301 @@
+{
+  "kind": "spruce_ruler_paired_feature_e2e_task_v1",
+  "task": "niah_single_1",
+  "length": 32768,
+  "gpu_name": "NVIDIA L4",
+  "config": {
+    "model": "Qwen/Qwen2.5-Coder-1.5B-Instruct",
+    "tasks": [
+      "niah_single_1",
+      "niah_single_2",
+      "niah_single_3",
+      "niah_multikey_1",
+      "niah_multikey_2",
+      "niah_multikey_3",
+      "niah_multivalue",
+      "niah_multiquery",
+      "vt",
+      "cwe",
+      "fwe",
+      "qa_1",
+      "qa_2"
+    ],
+    "lengths": [
+      4096,
+      8192,
+      16384,
+      32768,
+      65536,
+      131072
+    ],
+    "num_samples": 20,
+    "max_new_tokens": 64,
+    "query_tail_lines": 3,
+    "feature_dims": [
+      1024,
+      4096
+    ],
+    "candidate_blocks": 9,
+    "beam": 16,
+    "block_size": 64,
+    "block_radius": 1,
+    "boundary": "paragraph",
+    "unigram_fraction": 0.5,
+    "idf_power": 2.0,
+    "radix": 2,
+    "yarn_factor": 4.0,
+    "original_context": 32768,
+    "generation": "greedy paired batch; identical packets generated once"
+  },
+  "config_fingerprint": "2FF07B81AB2B1A275062C25E599D6AB3BBD71C63FCE9C6C10EDEF65C8227C992",
+  "created_utc": "2026-08-02T19:43:53.094363+00:00",
+  "cases": [
+    {
+      "index": 0,
+      "source_index": 12967,
+      "task": "niah_single_1",
+      "length": 32768,
+      "references": [
+        "4226067"
+      ],
+      "query_chars": 263,
+      "layout_seconds": 0.10668455300015012,
+      "original_prompt_tokens": 32612,
+      "route_source": "factorial_cache",
+      "identical_packet": false,
+      "arms": {
+        "d1024": {
+          "feature_dim": 1024,
+          "route_source": "factorial_cache",
+          "selected_blocks": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            53,
+            54
+          ],
+          "expanded_blocks": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            52,
+            53,
+            54,
+            55
+          ],
+          "span_count": 2,
+          "input_tokens": 964,
+          "original_input_tokens": 32612,
+          "compression_fraction": 0.029559671286642955,
+          "evidence_score": 1.0,
+          "index_seconds": 0.0,
+          "selection_seconds": 0.0,
+          "compile_seconds": 0.0038004089999503776,
+          "answer": "4226067",
+          "score": 1.0,
+          "perfect": true
+        },
+        "d4096": {
+          "feature_dim": 4096,
+          "route_source": "factorial_cache",
+          "selected_blocks": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            53
+          ],
+          "expanded_blocks": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            52,
+            53,
+            54
+          ],
+          "span_count": 2,
+          "input_tokens": 965,
+          "original_input_tokens": 32612,
+          "compression_fraction": 0.029590334846068933,
+          "evidence_score": 1.0,
+          "index_seconds": 0.0,
+          "selection_seconds": 0.0,
+          "compile_seconds": 0.0032104330000493064,
+          "answer": "4226067",
+          "score": 1.0,
+          "perfect": true
+        }
+      },
+      "paired_batch": {
+        "unique_prompts": 2,
+        "input_tokens": [
+          964,
+          965
+        ],
+        "generated_tokens": [
+          8,
+          8
+        ],
+        "tokenize_seconds": 0.0057967539999026485,
+        "transfer_seconds": 0.0001906489999328187,
+        "model_seconds": 0.3750321059999351,
+        "batch_seconds": 0.38178003299981356,
+        "peak_memory_allocated_gb": 3.283683328,
+        "latency_scope": "shared paired batch; not independent per-arm latency"
+      },
+      "score_delta_d4096_minus_d1024": 0.0
+    },
+    {
+      "index": 1,
+      "source_index": 53467,
+      "task": "niah_single_1",
+      "length": 32768,
+      "references": [
+        "4823498"
+      ],
+      "query_chars": 263,
+      "layout_seconds": 0.10222968199991556,
+      "original_prompt_tokens": 32608,
+      "route_source": "factorial_cache",
+      "identical_packet": true,
+      "arms": {
+        "d1024": {
+          "feature_dim": 1024,
+          "route_source": "factorial_cache",
+          "selected_blocks": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            222
+          ],
+          "expanded_blocks": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            221,
+            222,
+            223
+          ],
+          "span_count": 2,
+          "input_tokens": 967,
+          "original_input_tokens": 32608,
+          "compression_fraction": 0.02965529931305201,
+          "evidence_score": 1.0,
+          "index_seconds": 0.0,
+          "selection_seconds": 0.0,
+          "compile_seconds": 0.003947916000015539,
+          "answer": "4823498",
+          "score": 1.0,
+          "perfect": true
+        },
+        "d4096": {
+          "feature_dim": 4096,
+          "route_source": "factorial_cache",
+          "selected_blocks": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            222
+          ],
+          "expanded_blocks": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            221,
+            222,
+            223
+          ],
+          "span_count": 2,
+          "input_tokens": 967,
+          "original_input_tokens": 32608,
+          "compression_fraction": 0.02965529931305201,
+          "evidence_score": 1.0,
+          "index_seconds": 0.0,
+          "selection_seconds": 0.0,
+          "compile_seconds": 0.003237416999809284,
+          "answer": "4823498",
+          "score": 1.0,
+          "perfect": true
+        }
+      },
+      "paired_batch": {
+        "unique_prompts": 1,
+        "input_tokens": [
+          967
+        ],
+        "generated_tokens": [
+          8
+        ],
+        "tokenize_seconds": 0.0030185489999894344,
+        "transfer_seconds": 0.00019231300007049867,
+        "model_seconds": 0.26757184300004155,
+        "batch_seconds": 0.27141151999990143,
+        "peak_memory_allocated_gb": 3.189794816,
+        "latency_scope": "shared paired batch; not independent per-arm latency"
+      },
+      "score_delta_d4096_minus_d1024": 0.0
+    },
+    {
+      "index": 2,
+      "source_index": 70207,
+      "task": "niah_single_1",
+      "length": 32768,
+      "references": [
+        "2694522"
+      ],
+      "query_chars": 263,
+      "layout_seconds": 0.10235883800010015,
+      "original_prompt_tokens": 32612,
+      "route_source": "factorial_cache",
+      "identical_packet": true,
+      "arms": {
+        "d1024": {
+          "feature_dim": 1024,
+          "route_source": "factorial_cache",
+          "selected_blocks": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            292
+          ],
+          "expanded_blocks": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            291,
+            292,
+            293
+          ],
+          "span_count": 2,
+          "input_tokens": 969,
+          "original_input_tokens": 32612,
+          "compression_fraction": 0.029712989083772845,
+          "evidence_score": 1.0,
+          "index_seconds": 0.0,
+          "selection_seconds": 0.0,
+          "compile_seconds": 0.004034560000036436,
+          "answer": "2694522",
+          "score": 1.0,
+          "perfect": true
+        },
+        "d4096": {
+          "feature_dim": 4096,
+          "route_source": "factorial_cache",
+          "selected_blocks": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            292
+          ],
+          "expanded_blocks": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            291,
+            292,
+            293
+          ],
+          "span_count": 2,
+          "input_tokens": 969,
+          "original_input_tokens": 32612,
+          "compression_fraction": 0.029712989083772845,
+          "evidence_score": 1.0,
+          "index_seconds": 0.0,
+          "selection_seconds": 0.0,
+          "compile_seconds": 0.003271490999850357,
+          "answer": "2694522",
+          "score": 1.0,
+          "perfect": true
+        }
+      },
+      "paired_batch": {
+        "unique_prompts": 1,
+        "input_tokens": [
+          969
+        ],
+        "generated_tokens": [
+          8
+        ],
+        "tokenize_seconds": 0.0030467120000139403,
+        "transfer_seconds": 0.0001793500000530912,
+        "model_seconds": 0.26973922699994546,
+        "batch_seconds": 0.273567895999804,
+        "peak_memory_allocated_gb": 3.189943296,
+        "latency_scope": "shared paired batch; not independent per-arm latency"
+      },
+      "score_delta_d4096_minus_d1024": 0.0
+    },
+    {
+      "index": 3,
+      "source_index": 30155,
+      "task": "niah_single_1",
+      "length": 32768,
+      "references": [
+        "7120868"
+      ],
+      "query_chars": 261,
+      "layout_seconds": 0.10406655099995987,
+      "original_prompt_tokens": 32612,
+      "route_source": "factorial_cache",
+      "identical_packet": true,
+      "arms": {
+        "d1024": {
+          "feature_dim": 1024,
+          "route_source": "factorial_cache",
+          "selected_blocks": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            125
+          ],
+          "expanded_blocks": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            124,
+            125,
+            126
+          ],
+          "span_count": 2,
+          "input_tokens": 967,
+          "original_input_tokens": 32612,
+          "compression_fraction": 0.02965166196492089,
+          "evidence_score": 1.0,
+          "index_seconds": 0.0,
+          "selection_seconds": 0.0,
+          "compile_seconds": 0.004030445999887888,
+          "answer": "7120868",
+          "score": 1.0,
+          "perfect": true
+        },
+        "d4096": {
+          "feature_dim": 4096,
+          "route_source": "factorial_cache",
+          "selected_blocks": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            125
+          ],
+          "expanded_blocks": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            124,
+            125,
+            126
+          ],
+          "span_count": 2,
+          "input_tokens": 967,
+          "original_input_tokens": 32612,
+          "compression_fraction": 0.02965166196492089,
+          "evidence_score": 1.0,
+          "index_seconds": 0.0,
+          "selection_seconds": 0.0,
+          "compile_seconds": 0.003336518999958571,
+          "answer": "7120868",
+          "score": 1.0,
+          "perfect": true
+        }
+      },
+      "paired_batch": {
+        "unique_prompts": 1,
+        "input_tokens": [
+          967
+        ],
+        "generated_tokens": [
+          8
+        ],
+        "tokenize_seconds": 0.003063902999883794,
+        "transfer_seconds": 0.00019267299990133324,
+        "model_seconds": 0.2678621430000021,
+        "batch_seconds": 0.2717211540000335,
+        "peak_memory_allocated_gb": 3.189794816,
+        "latency_scope": "shared paired batch; not independent per-arm latency"
+      },
+      "score_delta_d4096_minus_d1024": 0.0
+    },
+    {
+      "index": 4,
+      "source_index": 49335,
+      "task": "niah_single_1",
+      "length": 32768,
+      "references": [
+        "4514944"
+      ],
+      "query_chars": 271,
+      "layout_seconds": 0.10234685699992951,
+      "original_prompt_tokens": 32608,
+      "route_source": "factorial_cache",
+      "identical_packet": true,
+      "arms": {
+        "d1024": {
+          "feature_dim": 1024,
+          "route_source": "factorial_cache",
+          "selected_blocks": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            205
+          ],
+          "expanded_blocks": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            204,
+            205,
+            206
+          ],
+          "span_count": 2,
+          "input_tokens": 966,
+          "original_input_tokens": 32608,
+          "compression_fraction": 0.029624631992149167,
+          "evidence_score": 1.0,
+          "index_seconds": 0.0,
+          "selection_seconds": 0.0,
+          "compile_seconds": 0.003756392000013875,
+          "answer": "4514944",
+          "score": 1.0,
+          "perfect": true
+        },
+        "d4096": {
+          "feature_dim": 4096,
+          "route_source": "factorial_cache",
+          "selected_blocks": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            205
+          ],
+          "expanded_blocks": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            204,
+            205,
+            206
+          ],
+          "span_count": 2,
+          "input_tokens": 966,
+          "original_input_tokens": 32608,
+          "compression_fraction": 0.029624631992149167,
+          "evidence_score": 1.0,
+          "index_seconds": 0.0,
+          "selection_seconds": 0.0,
+          "compile_seconds": 0.0033174319999034196,
+          "answer": "4514944",
+          "score": 1.0,
+          "perfect": true
+        }
+      },
+      "paired_batch": {
+        "unique_prompts": 1,
+        "input_tokens": [
+          966
+        ],
+        "generated_tokens": [
+          8
+        ],
+        "tokenize_seconds": 0.0031941560000632307,
+        "transfer_seconds": 0.0001832760001434508,
+        "model_seconds": 0.26778987500006224,
+        "batch_seconds": 0.2717859159999989,
+        "peak_memory_allocated_gb": 3.189720064,
+        "latency_scope": "shared paired batch; not independent per-arm latency"
+      },
+      "score_delta_d4096_minus_d1024": 0.0
+    },
+    {
+      "index": 5,
+      "source_index": 98554,
+      "task": "niah_single_1",
+      "length": 32768,
+      "references": [
+        "3871230"
+      ],
+      "query_chars": 260,
+      "layout_seconds": 0.10226444399995671,
+      "original_prompt_tokens": 32608,
+      "route_source": "factorial_cache",
+      "identical_packet": true,
+      "arms": {
+        "d1024": {
+          "feature_dim": 1024,
+          "route_source": "factorial_cache",
+          "selected_blocks": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            410
+          ],
+          "expanded_blocks": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            409,
+            410,
+            411
+          ],
+          "span_count": 2,
+          "input_tokens": 967,
+          "original_input_tokens": 32608,
+          "compression_fraction": 0.02965529931305201,
+          "evidence_score": 1.0,
+          "index_seconds": 0.0,
+          "selection_seconds": 0.0,
+          "compile_seconds": 0.003830289999996239,
+          "answer": "3871230",
+          "score": 1.0,
+          "perfect": true
+        },
+        "d4096": {
+          "feature_dim": 4096,
+          "route_source": "factorial_cache",
+          "selected_blocks": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            410
+          ],
+          "expanded_blocks": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            409,
+            410,
+            411
+          ],
+          "span_count": 2,
+          "input_tokens": 967,
+          "original_input_tokens": 32608,
+          "compression_fraction": 0.02965529931305201,
+          "evidence_score": 1.0,
+          "index_seconds": 0.0,
+          "selection_seconds": 0.0,
+          "compile_seconds": 0.003227756000114823,
+          "answer": "3871230",
+          "score": 1.0,
+          "perfect": true
+        }
+      },
+      "paired_batch": {
+        "unique_prompts": 1,
+        "input_tokens": [
+          967
+        ],
+        "generated_tokens": [
+          8
+        ],
+        "tokenize_seconds": 0.0030197080000107235,
+        "transfer_seconds": 0.00018757199995889096,
+        "model_seconds": 0.2689963140001055,
+        "batch_seconds": 0.27284905200008325,
+        "peak_memory_allocated_gb": 3.189794816,
+        "latency_scope": "shared paired batch; not independent per-arm latency"
+      },
+      "score_delta_d4096_minus_d1024": 0.0
+    },
+    {
+      "index": 6,
+      "source_index": 70119,
+      "task": "niah_single_1",
+      "length": 32768,
+      "references": [
+        "8755439"
+      ],
+      "query_chars": 265,
+      "layout_seconds": 0.10276762599983158,
+      "original_prompt_tokens": 32608,
+      "route_source": "factorial_cache",
+      "identical_packet": true,
+      "arms": {
+        "d1024": {
+          "feature_dim": 1024,
+          "route_source": "factorial_cache",
+          "selected_blocks": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            291
+          ],
+          "expanded_blocks": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            290,
+            291,
+            292
+          ],
+          "span_count": 2,
+          "input_tokens": 967,
+          "original_input_tokens": 32608,
+          "compression_fraction": 0.02965529931305201,
+          "evidence_score": 1.0,
+          "index_seconds": 0.0,
+          "selection_seconds": 0.0,
+          "compile_seconds": 0.0039155470001333015,
+          "answer": "8755439",
+          "score": 1.0,
+          "perfect": true
+        },
+        "d4096": {
+          "feature_dim": 4096,
+          "route_source": "factorial_cache",
+          "selected_blocks": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            291
+          ],
+          "expanded_blocks": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            290,
+            291,
+            292
+          ],
+          "span_count": 2,
+          "input_tokens": 967,
+          "original_input_tokens": 32608,
+          "compression_fraction": 0.02965529931305201,
+          "evidence_score": 1.0,
+          "index_seconds": 0.0,
+          "selection_seconds": 0.0,
+          "compile_seconds": 0.003266617999997834,
+          "answer": "8755439",
+          "score": 1.0,
+          "perfect": true
+        }
+      },
+      "paired_batch": {
+        "unique_prompts": 1,
+        "input_tokens": [
+          967
+        ],
+        "generated_tokens": [
+          8
+        ],
+        "tokenize_seconds": 0.003051859000152035,
+        "transfer_seconds": 0.00018276500009051233,
+        "model_seconds": 0.26519714700020813,
+        "batch_seconds": 0.26904064599989397,
+        "peak_memory_allocated_gb": 3.189794816,
+        "latency_scope": "shared paired batch; not independent per-arm latency"
+      },
+      "score_delta_d4096_minus_d1024": 0.0
+    },
+    {
+      "index": 7,
+      "source_index": 59948,
+      "task": "niah_single_1",
+      "length": 32768,
+      "references": [
+        "4684531"
+      ],
+      "query_chars": 264,
+      "layout_seconds": 0.09980735799990725,
+      "original_prompt_tokens": 32606,
+      "route_source": "factorial_cache",
+      "identical_packet": true,
+      "arms": {
+        "d1024": {
+          "feature_dim": 1024,
+          "route_source": "factorial_cache",
+          "selected_blocks": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            249
+          ],
+          "expanded_blocks": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            248,
+            249,
+            250
+          ],
+          "span_count": 2,
+          "input_tokens": 966,
+          "original_input_tokens": 32606,
+          "compression_fraction": 0.029626449119793903,
+          "evidence_score": 1.0,
+          "index_seconds": 0.0,
+          "selection_seconds": 0.0,
+          "compile_seconds": 0.003823902000021917,
+          "answer": "4684531",
+          "score": 1.0,
+          "perfect": true
+        },
+        "d4096": {
+          "feature_dim": 4096,
+          "route_source": "factorial_cache",
+          "selected_blocks": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            249
+          ],
+          "expanded_blocks": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            248,
+            249,
+            250
+          ],
+          "span_count": 2,
+          "input_tokens": 966,
+          "original_input_tokens": 32606,
+          "compression_fraction": 0.029626449119793903,
+          "evidence_score": 1.0,
+          "index_seconds": 0.0,
+          "selection_seconds": 0.0,
+          "compile_seconds": 0.00322554600006697,
+          "answer": "4684531",
+          "score": 1.0,
+          "perfect": true
+        }
+      },
+      "paired_batch": {
+        "unique_prompts": 1,
+        "input_tokens": [
+          966
+        ],
+        "generated_tokens": [
+          8
+        ],
+        "tokenize_seconds": 0.003035353000086616,
+        "transfer_seconds": 0.0001787530000001425,
+        "model_seconds": 0.266880343999901,
+        "batch_seconds": 0.2706924540000273,
+        "peak_memory_allocated_gb": 3.189720064,
+        "latency_scope": "shared paired batch; not independent per-arm latency"
+      },
+      "score_delta_d4096_minus_d1024": 0.0
+    },
+    {
+      "index": 8,
+      "source_index": 58327,
+      "task": "niah_single_1",
+      "length": 32768,
+      "references": [
+        "1538552"
+      ],
+      "query_chars": 263,
+      "layout_seconds": 0.10053508600003624,
+      "original_prompt_tokens": 32612,
+      "route_source": "factorial_cache",
+      "identical_packet": true,
+      "arms": {
+        "d1024": {
+          "feature_dim": 1024,
+          "route_source": "factorial_cache",
+          "selected_blocks": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            242
+          ],
+          "expanded_blocks": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            241,
+            242,
+            243
+          ],
+          "span_count": 2,
+          "input_tokens": 969,
+          "original_input_tokens": 32612,
+          "compression_fraction": 0.029712989083772845,
+          "evidence_score": 1.0,
+          "index_seconds": 0.0,
+          "selection_seconds": 0.0,
+          "compile_seconds": 0.003879226999970342,
+          "answer": "The special magic number for flaky-endoderm mentioned in the provided text is 1538552.",
+          "score": 1.0,
+          "perfect": true
+        },
+        "d4096": {
+          "feature_dim": 4096,
+          "route_source": "factorial_cache",
+          "selected_blocks": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            242
+          ],
+          "expanded_blocks": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            241,
+            242,
+            243
+          ],
+          "span_count": 2,
+          "input_tokens": 969,
+          "original_input_tokens": 32612,
+          "compression_fraction": 0.029712989083772845,
+          "evidence_score": 1.0,
+          "index_seconds": 0.0,
+          "selection_seconds": 0.0,
+          "compile_seconds": 0.003222070999981952,
+          "answer": "The special magic number for flaky-endoderm mentioned in the provided text is 1538552.",
+          "score": 1.0,
+          "perfect": true
+        }
+      },
+      "paired_batch": {
+        "unique_prompts": 1,
+        "input_tokens": [
+          969
+        ],
+        "generated_tokens": [
+          26
+        ],
+        "tokenize_seconds": 0.0029856629998903372,
+        "transfer_seconds": 0.00017997800000557618,
+        "model_seconds": 0.7905313969999952,
+        "batch_seconds": 0.7945288040000378,
+        "peak_memory_allocated_gb": 3.189943296,
+        "latency_scope": "shared paired batch; not independent per-arm latency"
+      },
+      "score_delta_d4096_minus_d1024": 0.0
+    },
+    {
+      "index": 9,
+      "source_index": 39068,
+      "task": "niah_single_1",
+      "length": 32768,
+      "references": [
+        "2110460"
+      ],
+      "query_chars": 264,
+      "layout_seconds": 0.10386746700010008,
+      "original_prompt_tokens": 32612,
+      "route_source": "factorial_cache",
+      "identical_packet": true,
+      "arms": {
+        "d1024": {
+          "feature_dim": 1024,
+          "route_source": "factorial_cache",
+          "selected_blocks": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            162
+          ],
+          "expanded_blocks": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            161,
+            162,
+            163
+          ],
+          "span_count": 2,
+          "input_tokens": 969,
+          "original_input_tokens": 32612,
+          "compression_fraction": 0.029712989083772845,
+          "evidence_score": 1.0,
+          "index_seconds": 0.0,
+          "selection_seconds": 0.0,
+          "compile_seconds": 0.0038926280001305713,
+          "answer": "2110460",
+          "score": 1.0,
+          "perfect": true
+        },
+        "d4096": {
+          "feature_dim": 4096,
+          "route_source": "factorial_cache",
+          "selected_blocks": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            162
+          ],
+          "expanded_blocks": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            161,
+            162,
+            163
+          ],
+          "span_count": 2,
+          "input_tokens": 969,
+          "original_input_tokens": 32612,
+          "compression_fraction": 0.029712989083772845,
+          "evidence_score": 1.0,
+          "index_seconds": 0.0,
+          "selection_seconds": 0.0,
+          "compile_seconds": 0.0032616979999602336,
+          "answer": "2110460",
+          "score": 1.0,
+          "perfect": true
+        }
+      },
+      "paired_batch": {
+        "unique_prompts": 1,
+        "input_tokens": [
+          969
+        ],
+        "generated_tokens": [
+          8
+        ],
+        "tokenize_seconds": 0.003012791999935871,
+        "transfer_seconds": 0.00019574400016608706,
+        "model_seconds": 0.26952490199983004,
+        "batch_seconds": 0.27333966700007295,
+        "peak_memory_allocated_gb": 3.189943296,
+        "latency_scope": "shared paired batch; not independent per-arm latency"
+      },
+      "score_delta_d4096_minus_d1024": 0.0
+    },
+    {
+      "index": 10,
+      "source_index": 73084,
+      "task": "niah_single_1",
+      "length": 32768,
+      "references": [
+        "9375710"
+      ],
+      "query_chars": 260,
+      "layout_seconds": 0.10111632699999973,
+      "original_prompt_tokens": 32610,
+      "route_source": "factorial_cache",
+      "identical_packet": true,
+      "arms": {
+        "d1024": {
+          "feature_dim": 1024,
+          "route_source": "factorial_cache",
+          "selected_blocks": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            304
+          ],
+          "expanded_blocks": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            303,
+            304,
+            305
+          ],
+          "span_count": 2,
+          "input_tokens": 968,
+          "original_input_tokens": 32610,
+          "compression_fraction": 0.029684145967494635,
+          "evidence_score": 1.0,
+          "index_seconds": 0.0,
+          "selection_seconds": 0.0,
+          "compile_seconds": 0.0038110400000732625,
+          "answer": "The special magic number for fair-yogurt mentioned in the provided text is 9375710.",
+          "score": 1.0,
+          "perfect": true
+        },
+        "d4096": {
+          "feature_dim": 4096,
+          "route_source": "factorial_cache",
+          "selected_blocks": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            304
+          ],
+          "expanded_blocks": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            303,
+            304,
+            305
+          ],
+          "span_count": 2,
+          "input_tokens": 968,
+          "original_input_tokens": 32610,
+          "compression_fraction": 0.029684145967494635,
+          "evidence_score": 1.0,
+          "index_seconds": 0.0,
+          "selection_seconds": 0.0,
+          "compile_seconds": 0.003208952000022691,
+          "answer": "The special magic number for fair-yogurt mentioned in the provided text is 9375710.",
+          "score": 1.0,
+          "perfect": true
+        }
+      },
+      "paired_batch": {
+        "unique_prompts": 1,
+        "input_tokens": [
+          968
+        ],
+        "generated_tokens": [
+          25
+        ],
+        "tokenize_seconds": 0.0030284140002549975,
+        "transfer_seconds": 0.0001958910002031189,
+        "model_seconds": 0.7636872769999172,
+        "batch_seconds": 0.7677314200000183,
+        "peak_memory_allocated_gb": 3.189868544,
+        "latency_scope": "shared paired batch; not independent per-arm latency"
+      },
+      "score_delta_d4096_minus_d1024": 0.0
+    },
+    {
+      "index": 11,
+      "source_index": 25839,
+      "task": "niah_single_1",
+      "length": 32768,
+      "references": [
+        "5443951"
+      ],
+      "query_chars": 265,
+      "layout_seconds": 0.1025793219996558,
+      "original_prompt_tokens": 32610,
+      "route_source": "factorial_cache",
+      "identical_packet": true,
+      "arms": {
+        "d1024": {
+          "feature_dim": 1024,
+          "route_source": "factorial_cache",
+          "selected_blocks": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            107
+          ],
+          "expanded_blocks": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            106,
+            107,
+            108
+          ],
+          "span_count": 2,
+          "input_tokens": 965,
+          "original_input_tokens": 32610,
+          "compression_fraction": 0.02959214964734744,
+          "evidence_score": 1.0,
+          "index_seconds": 0.0,
+          "selection_seconds": 0.0,
+          "compile_seconds": 0.0038756469998588727,
+          "answer": "5443951",
+          "score": 1.0,
+          "perfect": true
+        },
+        "d4096": {
+          "feature_dim": 4096,
+          "route_source": "factorial_cache",
+          "selected_blocks": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            107
+          ],
+          "expanded_blocks": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            106,
+            107,
+            108
+          ],
+          "span_count": 2,
+          "input_tokens": 965,
+          "original_input_tokens": 32610,
+          "compression_fraction": 0.02959214964734744,
+          "evidence_score": 1.0,
+          "index_seconds": 0.0,
+          "selection_seconds": 0.0,
+          "compile_seconds": 0.003239003000089724,
+          "answer": "5443951",
+          "score": 1.0,
+          "perfect": true
+        }
+      },
+      "paired_batch": {
+        "unique_prompts": 1,
+        "input_tokens": [
+          965
+        ],
+        "generated_tokens": [
+          8
+        ],
+        "tokenize_seconds": 0.0029960480001136602,
+        "transfer_seconds": 0.00018200199974671705,
+        "model_seconds": 0.2641701180000382,
+        "batch_seconds": 0.26793607299987343,
+        "peak_memory_allocated_gb": 3.189646336,
+        "latency_scope": "shared paired batch; not independent per-arm latency"
+      },
+      "score_delta_d4096_minus_d1024": 0.0
+    },
+    {
+      "index": 12,
+      "source_index": 107915,
+      "task": "niah_single_1",
+      "length": 32768,
+      "references": [
+        "5408072"
+      ],
+      "query_chars": 261,
+      "layout_seconds": 0.10184734099993875,
+      "original_prompt_tokens": 32610,
+      "route_source": "factorial_cache",
+      "identical_packet": true,
+      "arms": {
+        "d1024": {
+          "feature_dim": 1024,
+          "route_source": "factorial_cache",
+          "selected_blocks": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            449
+          ],
+          "expanded_blocks": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            448,
+            449,
+            450
+          ],
+          "span_count": 2,
+          "input_tokens": 967,
+          "original_input_tokens": 32610,
+          "compression_fraction": 0.02965348052744557,
+          "evidence_score": 1.0,
+          "index_seconds": 0.0,
+          "selection_seconds": 0.0,
+          "compile_seconds": 0.0038577669997721387,
+          "answer": "5408072",
+          "score": 1.0,
+          "perfect": true
+        },
+        "d4096": {
+          "feature_dim": 4096,
+          "route_source": "factorial_cache",
+          "selected_blocks": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            449
+          ],
+          "expanded_blocks": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            448,
+            449,
+            450
+          ],
+          "span_count": 2,
+          "input_tokens": 967,
+          "original_input_tokens": 32610,
+          "compression_fraction": 0.02965348052744557,
+          "evidence_score": 1.0,
+          "index_seconds": 0.0,
+          "selection_seconds": 0.0,
+          "compile_seconds": 0.0032350070000575215,
+          "answer": "5408072",
+          "score": 1.0,
+          "perfect": true
+        }
+      },
+      "paired_batch": {
+        "unique_prompts": 1,
+        "input_tokens": [
+          967
+        ],
+        "generated_tokens": [
+          8
+        ],
+        "tokenize_seconds": 0.003025681000053737,
+        "transfer_seconds": 0.0001822300000640098,
+        "model_seconds": 0.26906508199999735,
+        "batch_seconds": 0.2728657249999742,
+        "peak_memory_allocated_gb": 3.189794816,
+        "latency_scope": "shared paired batch; not independent per-arm latency"
+      },
+      "score_delta_d4096_minus_d1024": 0.0
+    },
+    {
+      "index": 13,
+      "source_index": 66877,
+      "task": "niah_single_1",
+      "length": 32768,
+      "references": [
+        "7700828"
+      ],
+      "query_chars": 263,
+      "layout_seconds": 0.10059093700010635,
+      "original_prompt_tokens": 32608,
+      "route_source": "factorial_cache",
+      "identical_packet": true,
+      "arms": {
+        "d1024": {
+          "feature_dim": 1024,
+          "route_source": "factorial_cache",
+          "selected_blocks": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            278
+          ],
+          "expanded_blocks": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            277,
+            278,
+            279
+          ],
+          "span_count": 2,
+          "input_tokens": 967,
+          "original_input_tokens": 32608,
+          "compression_fraction": 0.02965529931305201,
+          "evidence_score": 1.0,
+          "index_seconds": 0.0,
+          "selection_seconds": 0.0,
+          "compile_seconds": 0.0038130779998937214,
+          "answer": "The special magic number for solid-sanction mentioned in the provided text is 7700828.",
+          "score": 1.0,
+          "perfect": true
+        },
+        "d4096": {
+          "feature_dim": 4096,
+          "route_source": "factorial_cache",
+          "selected_blocks": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            278
+          ],
+          "expanded_blocks": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            277,
+            278,
+            279
+          ],
+          "span_count": 2,
+          "input_tokens": 967,
+          "original_input_tokens": 32608,
+          "compression_fraction": 0.02965529931305201,
+          "evidence_score": 1.0,
+          "index_seconds": 0.0,
+          "selection_seconds": 0.0,
+          "compile_seconds": 0.0032052190003923897,
+          "answer": "The special magic number for solid-sanction mentioned in the provided text is 7700828.",
+          "score": 1.0,
+          "perfect": true
+        }
+      },
+      "paired_batch": {
+        "unique_prompts": 1,
+        "input_tokens": [
+          967
+        ],
+        "generated_tokens": [
+          24
+        ],
+        "tokenize_seconds": 0.003029330000117625,
+        "transfer_seconds": 0.00019586700000218116,
+        "model_seconds": 0.7298071759996674,
+        "batch_seconds": 0.7338269409997338,
+        "peak_memory_allocated_gb": 3.189794816,
+        "latency_scope": "shared paired batch; not independent per-arm latency"
+      },
+      "score_delta_d4096_minus_d1024": 0.0
+    },
+    {
+      "index": 14,
+      "source_index": 91085,
+      "task": "niah_single_1",
+      "length": 32768,
+      "references": [
+        "9548432"
+      ],
+      "query_chars": 261,
+      "layout_seconds": 0.10167435899984412,
+      "original_prompt_tokens": 32608,
+      "route_source": "factorial_cache",
+      "identical_packet": true,
+      "arms": {
+        "d1024": {
+          "feature_dim": 1024,
+          "route_source": "factorial_cache",
+          "selected_blocks": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            379
+          ],
+          "expanded_blocks": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            378,
+            379,
+            380
+          ],
+          "span_count": 2,
+          "input_tokens": 966,
+          "original_input_tokens": 32608,
+          "compression_fraction": 0.029624631992149167,
+          "evidence_score": 1.0,
+          "index_seconds": 0.0,
+          "selection_seconds": 0.0,
+          "compile_seconds": 0.0037985710000612016,
+          "answer": "The special magic number for dark-boyhood mentioned in the provided text is 9548432.",
+          "score": 1.0,
+          "perfect": true
+        },
+        "d4096": {
+          "feature_dim": 4096,
+          "route_source": "factorial_cache",
+          "selected_blocks": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            379
+          ],
+          "expanded_blocks": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            378,
+            379,
+            380
+          ],
+          "span_count": 2,
+          "input_tokens": 966,
+          "original_input_tokens": 32608,
+          "compression_fraction": 0.029624631992149167,
+          "evidence_score": 1.0,
+          "index_seconds": 0.0,
+          "selection_seconds": 0.0,
+          "compile_seconds": 0.0032666319998497784,
+          "answer": "The special magic number for dark-boyhood mentioned in the provided text is 9548432.",
+          "score": 1.0,
+          "perfect": true
+        }
+      },
+      "paired_batch": {
+        "unique_prompts": 1,
+        "input_tokens": [
+          966
+        ],
+        "generated_tokens": [
+          24
+        ],
+        "tokenize_seconds": 0.003032233999874734,
+        "transfer_seconds": 0.0001831770000535471,
+        "model_seconds": 0.7291296179996607,
+        "batch_seconds": 0.7331933020000179,
+        "peak_memory_allocated_gb": 3.189720064,
+        "latency_scope": "shared paired batch; not independent per-arm latency"
+      },
+      "score_delta_d4096_minus_d1024": 0.0
+    },
+    {
+      "index": 15,
+      "source_index": 28360,
+      "task": "niah_single_1",
+      "length": 32768,
+      "references": [
+        "2839607"
+      ],
+      "query_chars": 266,
+      "layout_seconds": 0.10478436700032034,
+      "original_prompt_tokens": 32608,
+      "route_source": "factorial_cache",
+      "identical_packet": false,
+      "arms": {
+        "d1024": {
+          "feature_dim": 1024,
+          "route_source": "factorial_cache",
+          "selected_blocks": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            117,
+            118
+          ],
+          "expanded_blocks": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            116,
+            117,
+            118,
+            119
+          ],
+          "span_count": 2,
+          "input_tokens": 963,
+          "original_input_tokens": 32608,
+          "compression_fraction": 0.029532630029440628,
+          "evidence_score": 1.0,
+          "index_seconds": 0.0,
+          "selection_seconds": 0.0,
+          "compile_seconds": 0.00392390599972714,
+          "answer": "2839607",
+          "score": 1.0,
+          "perfect": true
+        },
+        "d4096": {
+          "feature_dim": 4096,
+          "route_source": "factorial_cache",
+          "selected_blocks": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            117
+          ],
+          "expanded_blocks": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            116,
+            117,
+            118
+          ],
+          "span_count": 2,
+          "input_tokens": 965,
+          "original_input_tokens": 32608,
+          "compression_fraction": 0.02959396467124632,
+          "evidence_score": 1.0,
+          "index_seconds": 0.0,
+          "selection_seconds": 0.0,
+          "compile_seconds": 0.003291289999651781,
+          "answer": "2839607",
+          "score": 1.0,
+          "perfect": true
+        }
+      },
+      "paired_batch": {
+        "unique_prompts": 2,
+        "input_tokens": [
+          963,
+          965
+        ],
+        "generated_tokens": [
+          8,
+          8
+        ],
+        "tokenize_seconds": 0.005815035000068747,
+        "transfer_seconds": 0.00019165699995937757,
+        "model_seconds": 0.3769364759996279,
+        "batch_seconds": 0.3836803150002197,
+        "peak_memory_allocated_gb": 3.283683328,
+        "latency_scope": "shared paired batch; not independent per-arm latency"
+      },
+      "score_delta_d4096_minus_d1024": 0.0
+    },
+    {
+      "index": 16,
+      "source_index": 110075,
+      "task": "niah_single_1",
+      "length": 32768,
+      "references": [
+        "8082668"
+      ],
+      "query_chars": 261,
+      "layout_seconds": 0.10120535100031702,
+      "original_prompt_tokens": 32608,
+      "route_source": "factorial_cache",
+      "identical_packet": true,
+      "arms": {
+        "d1024": {
+          "feature_dim": 1024,
+          "route_source": "factorial_cache",
+          "selected_blocks": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            458
+          ],
+          "expanded_blocks": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            457,
+            458,
+            459
+          ],
+          "span_count": 2,
+          "input_tokens": 967,
+          "original_input_tokens": 32608,
+          "compression_fraction": 0.02965529931305201,
+          "evidence_score": 1.0,
+          "index_seconds": 0.0,
+          "selection_seconds": 0.0,
+          "compile_seconds": 0.0038467559998025536,
+          "answer": "8082668",
+          "score": 1.0,
+          "perfect": true
+        },
+        "d4096": {
+          "feature_dim": 4096,
+          "route_source": "factorial_cache",
+          "selected_blocks": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            458
+          ],
+          "expanded_blocks": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            457,
+            458,
+            459
+          ],
+          "span_count": 2,
+          "input_tokens": 967,
+          "original_input_tokens": 32608,
+          "compression_fraction": 0.02965529931305201,
+          "evidence_score": 1.0,
+          "index_seconds": 0.0,
+          "selection_seconds": 0.0,
+          "compile_seconds": 0.0034058000001095934,
+          "answer": "8082668",
+          "score": 1.0,
+          "perfect": true
+        }
+      },
+      "paired_batch": {
+        "unique_prompts": 1,
+        "input_tokens": [
+          967
+        ],
+        "generated_tokens": [
+          8
+        ],
+        "tokenize_seconds": 0.003325755999867397,
+        "transfer_seconds": 0.0001818470000216621,
+        "model_seconds": 0.27331239299974186,
+        "batch_seconds": 0.2774561689998336,
+        "peak_memory_allocated_gb": 3.189794816,
+        "latency_scope": "shared paired batch; not independent per-arm latency"
+      },
+      "score_delta_d4096_minus_d1024": 0.0
+    },
+    {
+      "index": 17,
+      "source_index": 109985,
+      "task": "niah_single_1",
+      "length": 32768,
+      "references": [
+        "7402509"
+      ],
+      "query_chars": 261,
+      "layout_seconds": 0.1050635679998777,
+      "original_prompt_tokens": 32608,
+      "route_source": "factorial_cache",
+      "identical_packet": true,
+      "arms": {
+        "d1024": {
+          "feature_dim": 1024,
+          "route_source": "factorial_cache",
+          "selected_blocks": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            457,
+            458
+          ],
+          "expanded_blocks": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            456,
+            457,
+            458,
+            459
+          ],
+          "span_count": 2,
+          "input_tokens": 966,
+          "original_input_tokens": 32608,
+          "compression_fraction": 0.029624631992149167,
+          "evidence_score": 1.0,
+          "index_seconds": 0.0,
+          "selection_seconds": 0.0,
+          "compile_seconds": 0.004221357999995234,
+          "answer": "7402509",
+          "score": 1.0,
+          "perfect": true
+        },
+        "d4096": {
+          "feature_dim": 4096,
+          "route_source": "factorial_cache",
+          "selected_blocks": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            457,
+            458
+          ],
+          "expanded_blocks": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            456,
+            457,
+            458,
+            459
+          ],
+          "span_count": 2,
+          "input_tokens": 966,
+          "original_input_tokens": 32608,
+          "compression_fraction": 0.029624631992149167,
+          "evidence_score": 1.0,
+          "index_seconds": 0.0,
+          "selection_seconds": 0.0,
+          "compile_seconds": 0.0036059419999219244,
+          "answer": "7402509",
+          "score": 1.0,
+          "perfect": true
+        }
+      },
+      "paired_batch": {
+        "unique_prompts": 1,
+        "input_tokens": [
+          966
+        ],
+        "generated_tokens": [
+          8
+        ],
+        "tokenize_seconds": 0.003373203999672114,
+        "transfer_seconds": 0.00018845899967345758,
+        "model_seconds": 0.27055174099996293,
+        "batch_seconds": 0.2747457169998597,
+        "peak_memory_allocated_gb": 3.189720064,
+        "latency_scope": "shared paired batch; not independent per-arm latency"
+      },
+      "score_delta_d4096_minus_d1024": 0.0
+    },
+    {
+      "index": 18,
+      "source_index": 102162,
+      "task": "niah_single_1",
+      "length": 32768,
+      "references": [
+        "5218028"
+      ],
+      "query_chars": 268,
+      "layout_seconds": 0.10732358800032671,
+      "original_prompt_tokens": 32608,
+      "route_source": "factorial_cache",
+      "identical_packet": true,
+      "arms": {
+        "d1024": {
+          "feature_dim": 1024,
+          "route_source": "factorial_cache",
+          "selected_blocks": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            425
+          ],
+          "expanded_blocks": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            424,
+            425,
+            426
+          ],
+          "span_count": 2,
+          "input_tokens": 967,
+          "original_input_tokens": 32608,
+          "compression_fraction": 0.02965529931305201,
+          "evidence_score": 1.0,
+          "index_seconds": 0.0,
+          "selection_seconds": 0.0,
+          "compile_seconds": 0.004020960000161722,
+          "answer": "5218028",
+          "score": 1.0,
+          "perfect": true
+        },
+        "d4096": {
+          "feature_dim": 4096,
+          "route_source": "factorial_cache",
+          "selected_blocks": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            425
+          ],
+          "expanded_blocks": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            424,
+            425,
+            426
+          ],
+          "span_count": 2,
+          "input_tokens": 967,
+          "original_input_tokens": 32608,
+          "compression_fraction": 0.02965529931305201,
+          "evidence_score": 1.0,
+          "index_seconds": 0.0,
+          "selection_seconds": 0.0,
+          "compile_seconds": 0.003345632999753434,
+          "answer": "5218028",
+          "score": 1.0,
+          "perfect": true
+        }
+      },
+      "paired_batch": {
+        "unique_prompts": 1,
+        "input_tokens": [
+          967
+        ],
+        "generated_tokens": [
+          8
+        ],
+        "tokenize_seconds": 0.0031594030001542706,
+        "transfer_seconds": 0.0001844800003709679,
+        "model_seconds": 0.27241976799996337,
+        "batch_seconds": 0.2764053160003641,
+        "peak_memory_allocated_gb": 3.189794816,
+        "latency_scope": "shared paired batch; not independent per-arm latency"
+      },
+      "score_delta_d4096_minus_d1024": 0.0
+    },
+    {
+      "index": 19,
+      "source_index": 99093,
+      "task": "niah_single_1",
+      "length": 32768,
+      "references": [
+        "2921859"
+      ],
+      "query_chars": 259,
+      "layout_seconds": 0.10136785399981818,
+      "original_prompt_tokens": 32608,
+      "route_source": "factorial_cache",
+      "identical_packet": true,
+      "arms": {
+        "d1024": {
+          "feature_dim": 1024,
+          "route_source": "factorial_cache",
+          "selected_blocks": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            412
+          ],
+          "expanded_blocks": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            411,
+            412,
+            413
+          ],
+          "span_count": 2,
+          "input_tokens": 966,
+          "original_input_tokens": 32608,
+          "compression_fraction": 0.029624631992149167,
+          "evidence_score": 1.0,
+          "index_seconds": 0.0,
+          "selection_seconds": 0.0,
+          "compile_seconds": 0.003905663999830722,
+          "answer": "2921859",
+          "score": 1.0,
+          "perfect": true
+        },
+        "d4096": {
+          "feature_dim": 4096,
+          "route_source": "factorial_cache",
+          "selected_blocks": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            412
+          ],
+          "expanded_blocks": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            411,
+            412,
+            413
+          ],
+          "span_count": 2,
+          "input_tokens": 966,
+          "original_input_tokens": 32608,
+          "compression_fraction": 0.029624631992149167,
+          "evidence_score": 1.0,
+          "index_seconds": 0.0,
+          "selection_seconds": 0.0,
+          "compile_seconds": 0.0032395680000263383,
+          "answer": "2921859",
+          "score": 1.0,
+          "perfect": true
+        }
+      },
+      "paired_batch": {
+        "unique_prompts": 1,
+        "input_tokens": [
+          966
+        ],
+        "generated_tokens": [
+          8
+        ],
+        "tokenize_seconds": 0.003038000000287866,
+        "transfer_seconds": 0.00018032800016953843,
+        "model_seconds": 0.26907194500017795,
+        "batch_seconds": 0.2729134620003606,
+        "peak_memory_allocated_gb": 3.189720064,
+        "latency_scope": "shared paired batch; not independent per-arm latency"
+      },
+      "score_delta_d4096_minus_d1024": 0.0
+    }
+  ],
+  "errors": [],
+  "status": "completed",
+  "completed_utc": "2026-08-02T19:44:04.025186+00:00"
+}

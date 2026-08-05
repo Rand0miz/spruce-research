@@ -1,0 +1,68 @@
+\relax 
+\bibstyle{IEEEtran}
+\citation{hip}
+\citation{seer}
+\citation{spot}
+\citation{hisa}
+\citation{dsa}
+\citation{misa}
+\@writefile{toc}{\contentsline {section}{\numberline {I}Introduction}{1}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {II}Background}{1}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {II-A}}Making the model's read cheaper}{1}{}\protected@file@percent }
+\citation{hip}
+\citation{seer}
+\citation{seerr}
+\citation{spot}
+\citation{hisa}
+\citation{quoka}
+\citation{seerr}
+\citation{quoka}
+\citation{hisa}
+\@writefile{lot}{\contentsline {table}{\numberline {I}{\ignorespaces Where selection is applied, and what the model reads}}{2}{}\protected@file@percent }
+\newlabel{tab1}{{I}{2}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {II-B}}Where selection happens}{2}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {II-C}}Data}{2}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {III}Methods}{2}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {III-A}}Design rationale}{2}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {III-B}}Pre-prefill lexical hierarchy}{2}{}\protected@file@percent }
+\newlabel{eq:union}{{1}{2}}
+\citation{qwen}
+\citation{yarn}
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {III-C}}Query weighting and traversal}{3}{}\protected@file@percent }
+\newlabel{eq:score}{{2}{3}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {III-D}}Exact-text compilation}{3}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {III-E}}Complexity, caching, and the cost boundary}{3}{}\protected@file@percent }
+\newlabel{sec:complexity}{{\mbox  {III-E}}{3}}
+\@writefile{lot}{\contentsline {table}{\numberline {II}{\ignorespaces Paired results by requested context length ($n=36$ per row)}}{3}{}\protected@file@percent }
+\newlabel{tab2}{{II}{3}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {III-F}}Experimental configuration}{3}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {IV}Results}{3}{}\protected@file@percent }
+\newlabel{sec:results}{{IV}{3}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {IV-A}}Accuracy}{3}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {IV-B}}Distance from evidence to query}{3}{}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {1}{\ignorespaces Fully charged request cost, 36 prompts per length; every preprocessing, selection, stitching, transfer, prefill, and decode cost of both arms is inside these numbers. (a) Median request latency; dense grows superlinearly from 0.586 s at 16K to 10.709 s at 128K, while the compiled path rises only from 0.230 s to 0.767 s. (b) The resulting sum-weighted speedup, above parity at every length and widening with context because compiled packet size is set by $M$ and the expansion radius, not by the prompt.}}{4}{}\protected@file@percent }
+\newlabel{fig:speedup}{{1}{4}}
+\@writefile{lof}{\contentsline {figure}{\numberline {2}{\ignorespaces Exact accuracy by context length and evidence depth (fraction of the document before the evidence; 0.1 is farthest from the final question). Dense accuracy collapses along the depth-0.1 row as length grows, reaching 0.33 at 80K, while the compiled path stays between 0.75 and 0.92 across that row. Panel (c) shows the gain is concentrated where dense reading is weakest; the single negative cell is $-0.08$.}}{4}{}\protected@file@percent }
+\newlabel{fig:heatmap}{{2}{4}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {IV-C}}Efficiency and memory}{4}{}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {3}{\ignorespaces Median peak \emph  {allocated} GPU memory. The compiled path stays within 0.02 GB of 3.27 GB across a factor of eight in context length, while dense grows linearly from 4.66 GB to 15.58 GB. Reserved memory is not shown: both arms alternate in one process and PyTorch retains cached reservations, so both traces equal the dense high-water mark.}}{4}{}\protected@file@percent }
+\newlabel{fig:memory}{{3}{4}}
+\bibcite{hip}{1}
+\bibcite{seer}{2}
+\bibcite{spot}{3}
+\bibcite{hisa}{4}
+\bibcite{dsa}{5}
+\bibcite{misa}{6}
+\bibcite{seerr}{7}
+\bibcite{quoka}{8}
+\bibcite{qwen}{9}
+\bibcite{yarn}{10}
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {IV-D}}Reusing the index}{5}{}\protected@file@percent }
+\newlabel{sec:reuse}{{\mbox  {IV-D}}{5}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {IV-E}}Where the remaining errors come from}{5}{}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {4}{\ignorespaces Mean fully charged request components for the compiled path. Selection is the thin band barely visible; traversal averages 2.344 ms. Offset tokenization is the only stage that scales with context.}}{5}{}\protected@file@percent }
+\newlabel{fig:latency}{{4}{5}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {IV-F}}Scope of the claim}{5}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {V}Conclusion}{5}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{References}{5}{}\protected@file@percent }
+\gdef \@abspage@last{5}

@@ -1,0 +1,1068 @@
+{
+  "kind": "spruce_ruler_paired_feature_e2e_v1",
+  "created_utc": "2026-08-02T20:27:21.497629+00:00",
+  "archive_sha256": "88B56AE43A89F012B6FE58BEB1FB3A1B99C64F1A413655D7A752AF16CE833D97",
+  "gpu_name": "NVIDIA L4",
+  "gpu_vram_gib": 22.0343017578125,
+  "config": {
+    "model": "Qwen/Qwen2.5-Coder-1.5B-Instruct",
+    "tasks": [
+      "niah_single_1",
+      "niah_single_2",
+      "niah_single_3",
+      "niah_multikey_1",
+      "niah_multikey_2",
+      "niah_multikey_3",
+      "niah_multivalue",
+      "niah_multiquery",
+      "vt",
+      "cwe",
+      "fwe",
+      "qa_1",
+      "qa_2"
+    ],
+    "lengths": [
+      4096,
+      8192,
+      16384,
+      32768,
+      65536,
+      131072
+    ],
+    "num_samples": 20,
+    "max_new_tokens": 64,
+    "query_tail_lines": 3,
+    "feature_dims": [
+      1024,
+      4096
+    ],
+    "candidate_blocks": 9,
+    "beam": 16,
+    "block_size": 64,
+    "block_radius": 1,
+    "boundary": "paragraph",
+    "unigram_fraction": 0.5,
+    "idf_power": 2.0,
+    "radix": 2,
+    "yarn_factor": 4.0,
+    "original_context": 32768,
+    "generation": "greedy paired batch; identical packets generated once"
+  },
+  "config_fingerprint": "2FF07B81AB2B1A275062C25E599D6AB3BBD71C63FCE9C6C10EDEF65C8227C992",
+  "run_complete": false,
+  "completed_pairs": 65,
+  "expected_pairs": 78,
+  "sample_count": 1471,
+  "error_count": 89,
+  "errors": [
+    {
+      "index": 11,
+      "source_index": 11,
+      "error": "OutOfMemoryError('CUDA out of memory. Tried to allocate 4.38 GiB. GPU 0 has a total capacity of 22.03 GiB of which 939.12 MiB is free. Including non-PyTorch memory, this process has 21.11 GiB memory in use. Of the allocated memory 15.26 GiB is allocated by PyTorch, and 5.62 GiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://docs.pytorch.org/docs/stable/notes/cuda.html#optimizing-memory-usage-with-pytorch-cuda-alloc-conf)')",
+      "traceback": "Traceback (most recent call last):\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 732, in main\n    answers, batch = generate_unique_prompts(\n                     ^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 262, in generate_unique_prompts\n    output = model.generate(\n             ^^^^^^^^^^^^^^^\n  File \"/usr/local/lib/python3.12/dist-packages/torch/utils/_contextlib.py\", line 124, in decorate_context\n    return func(*args, **kwargs)\n           ^^^^^^^^^^^^^^^^^^^^^\n  File \"/usr/local/lib/python3.12/dist-packages/transformers/generation/utils.py\", line 2645, in generate\n    result = decoding_method(\n             ^^^^^^^^^^^^^^^^\n  File \"/usr/local/lib/python3.12/dist-packages/transformers/generation/utils.py\", line 2845, in _sample\n    outputs = self._prefill(\n              ^^^^^^^^^^^^^^\n  File \"/usr/local/lib/python3.12/dist-packages/transformers/generation/utils.py\", line 3896, in _prefill\n    return self(**model_inputs, return_dict=True)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/usr/local/lib/python3.12/dist-packages/torch/nn/modules/module.py\", line 1779, in _wrapped_call_impl\n    return self._call_impl(*args, **kwargs)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/usr/local/lib/python3.12/dist-packages/torch/nn/modules/module.py\", line 1790, in _call_impl\n    return forward_call(*args, **kwargs)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/usr/local/lib/python3.12/dist-packages/transformers/utils/generic.py\", line 911, in wrapper\n    output = func(self, *args, **kwargs)\n             ^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/usr/local/lib/python3.12/dist-packages/transformers/models/qwen2/modeling_qwen2.py\", line 462, in forward\n    outputs: BaseModelOutputWithPast = self.model(\n                                       ^^^^^^^^^^^\n  File \"/usr/local/lib/python3.12/dist-packages/torch/nn/modules/module.py\", line 1779, in _wrapped_call_impl\n    return self._call_impl(*args, **kwargs)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/usr/local/lib/python3.12/dist-packages/torch/nn/modules/module.py\", line 1790, in _call_impl\n    return forward_call(*args, **kwargs)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/usr/local/lib/python3.12/dist-packages/transformers/utils/generic.py\", line 1040, in wrapper\n    output = func(self, *args, **kwargs)\n             ^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/usr/local/lib/python3.12/dist-packages/transformers/utils/output_capturing.py\", line 252, in wrapper\n    outputs = func(self, *args, **kwargs)\n              ^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/usr/local/lib/python3.12/dist-packages/transformers/models/qwen2/modeling_qwen2.py\", line 399, in forward\n    hidden_states = decoder_layer(\n                    ^^^^^^^^^^^^^^\n  File \"/usr/local/lib/python3.12/dist-packages/transformers/modeling_layers.py\", line 93, in __call__\n    return super().__call__(*args, **kwargs)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/usr/local/lib/python3.12/dist-packages/torch/nn/modules/module.py\", line 1779, in _wrapped_call_impl\n    return self._call_impl(*args, **kwargs)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/usr/local/lib/python3.12/dist-packages/torch/nn/modules/module.py\", line 1790, in _call_impl\n    return forward_call(*args, **kwargs)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/usr/local/lib/python3.12/dist-packages/transformers/models/qwen2/modeling_qwen2.py\", line 307, in forward\n    hidden_states = self.mlp(hidden_states)\n                    ^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/usr/local/lib/python3.12/dist-packages/torch/nn/modules/module.py\", line 1779, in _wrapped_call_impl\n    return self._call_impl(*args, **kwargs)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/usr/local/lib/python3.12/dist-packages/torch/nn/modules/module.py\", line 1790, in _call_impl\n    return forward_call(*args, **kwargs)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/usr/local/lib/python3.12/dist-packages/transformers/models/qwen2/modeling_qwen2.py\", line 47, in forward\n    down_proj = self.down_proj(self.act_fn(self.gate_proj(x)) * self.up_proj(x))\n                               ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~\ntorch.OutOfMemoryError: CUDA out of memory. Tried to allocate 4.38 GiB. GPU 0 has a total capacity of 22.03 GiB of which 939.12 MiB is free. Including non-PyTorch memory, this process has 21.11 GiB memory in use. Of the allocated memory 15.26 GiB is allocated by PyTorch, and 5.62 GiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://docs.pytorch.org/docs/stable/notes/cuda.html#optimizing-memory-usage-with-pytorch-cuda-alloc-conf)\n"
+    },
+    {
+      "index": 12,
+      "source_index": 773,
+      "error": "ValueError('route-cache reference mismatch at position 12')",
+      "traceback": "Traceback (most recent call last):\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 728, in main\n    case, prompt_by_arm = compile_pair(\n                          ^^^^^^^^^^^^^\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 173, in compile_pair\n    selections = cached_selections(route_report, position, references)\n                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 150, in cached_selections\n    raise ValueError(f\"route-cache reference mismatch at position {position}\")\nValueError: route-cache reference mismatch at position 12\n"
+    },
+    {
+      "index": 13,
+      "source_index": 5447,
+      "error": "ValueError('route-cache reference mismatch at position 13')",
+      "traceback": "Traceback (most recent call last):\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 728, in main\n    case, prompt_by_arm = compile_pair(\n                          ^^^^^^^^^^^^^\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 173, in compile_pair\n    selections = cached_selections(route_report, position, references)\n                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 150, in cached_selections\n    raise ValueError(f\"route-cache reference mismatch at position {position}\")\nValueError: route-cache reference mismatch at position 13\n"
+    },
+    {
+      "index": 14,
+      "source_index": 3965,
+      "error": "ValueError('route-cache reference mismatch at position 14')",
+      "traceback": "Traceback (most recent call last):\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 728, in main\n    case, prompt_by_arm = compile_pair(\n                          ^^^^^^^^^^^^^\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 173, in compile_pair\n    selections = cached_selections(route_report, position, references)\n                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 150, in cached_selections\n    raise ValueError(f\"route-cache reference mismatch at position {position}\")\nValueError: route-cache reference mismatch at position 14\n"
+    },
+    {
+      "index": 15,
+      "source_index": 2369,
+      "error": "ValueError('route-cache reference mismatch at position 15')",
+      "traceback": "Traceback (most recent call last):\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 728, in main\n    case, prompt_by_arm = compile_pair(\n                          ^^^^^^^^^^^^^\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 173, in compile_pair\n    selections = cached_selections(route_report, position, references)\n                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 150, in cached_selections\n    raise ValueError(f\"route-cache reference mismatch at position {position}\")\nValueError: route-cache reference mismatch at position 15\n"
+    },
+    {
+      "index": 16,
+      "source_index": 1001,
+      "error": "ValueError('route-cache reference mismatch at position 16')",
+      "traceback": "Traceback (most recent call last):\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 728, in main\n    case, prompt_by_arm = compile_pair(\n                          ^^^^^^^^^^^^^\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 173, in compile_pair\n    selections = cached_selections(route_report, position, references)\n                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 150, in cached_selections\n    raise ValueError(f\"route-cache reference mismatch at position {position}\")\nValueError: route-cache reference mismatch at position 16\n"
+    },
+    {
+      "index": 17,
+      "source_index": 1115,
+      "error": "IndexError('route cache has no case at position 17')",
+      "traceback": "Traceback (most recent call last):\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 728, in main\n    case, prompt_by_arm = compile_pair(\n                          ^^^^^^^^^^^^^\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 173, in compile_pair\n    selections = cached_selections(route_report, position, references)\n                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 147, in cached_selections\n    raise IndexError(f\"route cache has no case at position {position}\")\nIndexError: route cache has no case at position 17\n"
+    },
+    {
+      "index": 18,
+      "source_index": 3395,
+      "error": "IndexError('route cache has no case at position 18')",
+      "traceback": "Traceback (most recent call last):\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 728, in main\n    case, prompt_by_arm = compile_pair(\n                          ^^^^^^^^^^^^^\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 173, in compile_pair\n    selections = cached_selections(route_report, position, references)\n                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 147, in cached_selections\n    raise IndexError(f\"route cache has no case at position {position}\")\nIndexError: route cache has no case at position 18\n"
+    },
+    {
+      "index": 19,
+      "source_index": 1115,
+      "error": "IndexError('route cache has no case at position 19')",
+      "traceback": "Traceback (most recent call last):\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 728, in main\n    case, prompt_by_arm = compile_pair(\n                          ^^^^^^^^^^^^^\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 173, in compile_pair\n    selections = cached_selections(route_report, position, references)\n                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 147, in cached_selections\n    raise IndexError(f\"route cache has no case at position {position}\")\nIndexError: route cache has no case at position 19\n"
+    },
+    {
+      "index": 8,
+      "source_index": 47171,
+      "error": "ValueError('route-cache reference mismatch at position 8')",
+      "traceback": "Traceback (most recent call last):\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 728, in main\n    case, prompt_by_arm = compile_pair(\n                          ^^^^^^^^^^^^^\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 173, in compile_pair\n    selections = cached_selections(route_report, position, references)\n                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 150, in cached_selections\n    raise ValueError(f\"route-cache reference mismatch at position {position}\")\nValueError: route-cache reference mismatch at position 8\n"
+    },
+    {
+      "index": 9,
+      "source_index": 55721,
+      "error": "ValueError('route-cache reference mismatch at position 9')",
+      "traceback": "Traceback (most recent call last):\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 728, in main\n    case, prompt_by_arm = compile_pair(\n                          ^^^^^^^^^^^^^\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 173, in compile_pair\n    selections = cached_selections(route_report, position, references)\n                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 150, in cached_selections\n    raise ValueError(f\"route-cache reference mismatch at position {position}\")\nValueError: route-cache reference mismatch at position 9\n"
+    },
+    {
+      "index": 10,
+      "source_index": 65639,
+      "error": "ValueError('route-cache reference mismatch at position 10')",
+      "traceback": "Traceback (most recent call last):\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 728, in main\n    case, prompt_by_arm = compile_pair(\n                          ^^^^^^^^^^^^^\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 173, in compile_pair\n    selections = cached_selections(route_report, position, references)\n                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 150, in cached_selections\n    raise ValueError(f\"route-cache reference mismatch at position {position}\")\nValueError: route-cache reference mismatch at position 10\n"
+    },
+    {
+      "index": 11,
+      "source_index": 88439,
+      "error": "ValueError('route-cache reference mismatch at position 11')",
+      "traceback": "Traceback (most recent call last):\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 728, in main\n    case, prompt_by_arm = compile_pair(\n                          ^^^^^^^^^^^^^\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 173, in compile_pair\n    selections = cached_selections(route_report, position, references)\n                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 150, in cached_selections\n    raise ValueError(f\"route-cache reference mismatch at position {position}\")\nValueError: route-cache reference mismatch at position 11\n"
+    },
+    {
+      "index": 12,
+      "source_index": 59825,
+      "error": "ValueError('route-cache reference mismatch at position 12')",
+      "traceback": "Traceback (most recent call last):\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 728, in main\n    case, prompt_by_arm = compile_pair(\n                          ^^^^^^^^^^^^^\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 173, in compile_pair\n    selections = cached_selections(route_report, position, references)\n                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 150, in cached_selections\n    raise ValueError(f\"route-cache reference mismatch at position {position}\")\nValueError: route-cache reference mismatch at position 12\n"
+    },
+    {
+      "index": 13,
+      "source_index": 42041,
+      "error": "ValueError('route-cache reference mismatch at position 13')",
+      "traceback": "Traceback (most recent call last):\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 728, in main\n    case, prompt_by_arm = compile_pair(\n                          ^^^^^^^^^^^^^\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 173, in compile_pair\n    selections = cached_selections(route_report, position, references)\n                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 150, in cached_selections\n    raise ValueError(f\"route-cache reference mismatch at position {position}\")\nValueError: route-cache reference mismatch at position 13\n"
+    },
+    {
+      "index": 14,
+      "source_index": 75899,
+      "error": "ValueError('route-cache reference mismatch at position 14')",
+      "traceback": "Traceback (most recent call last):\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 728, in main\n    case, prompt_by_arm = compile_pair(\n                          ^^^^^^^^^^^^^\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 173, in compile_pair\n    selections = cached_selections(route_report, position, references)\n                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 150, in cached_selections\n    raise ValueError(f\"route-cache reference mismatch at position {position}\")\nValueError: route-cache reference mismatch at position 14\n"
+    },
+    {
+      "index": 15,
+      "source_index": 59939,
+      "error": "ValueError('route-cache reference mismatch at position 15')",
+      "traceback": "Traceback (most recent call last):\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 728, in main\n    case, prompt_by_arm = compile_pair(\n                          ^^^^^^^^^^^^^\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 173, in compile_pair\n    selections = cached_selections(route_report, position, references)\n                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 150, in cached_selections\n    raise ValueError(f\"route-cache reference mismatch at position {position}\")\nValueError: route-cache reference mismatch at position 15\n"
+    },
+    {
+      "index": 16,
+      "source_index": 16391,
+      "error": "ValueError('route-cache reference mismatch at position 16')",
+      "traceback": "Traceback (most recent call last):\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 728, in main\n    case, prompt_by_arm = compile_pair(\n                          ^^^^^^^^^^^^^\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 173, in compile_pair\n    selections = cached_selections(route_report, position, references)\n                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 150, in cached_selections\n    raise ValueError(f\"route-cache reference mismatch at position {position}\")\nValueError: route-cache reference mismatch at position 16\n"
+    },
+    {
+      "index": 17,
+      "source_index": 64841,
+      "error": "ValueError('route-cache reference mismatch at position 17')",
+      "traceback": "Traceback (most recent call last):\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 728, in main\n    case, prompt_by_arm = compile_pair(\n                          ^^^^^^^^^^^^^\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 173, in compile_pair\n    selections = cached_selections(route_report, position, references)\n                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 150, in cached_selections\n    raise ValueError(f\"route-cache reference mismatch at position {position}\")\nValueError: route-cache reference mismatch at position 17\n"
+    },
+    {
+      "index": 18,
+      "source_index": 39533,
+      "error": "ValueError('route-cache reference mismatch at position 18')",
+      "traceback": "Traceback (most recent call last):\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 728, in main\n    case, prompt_by_arm = compile_pair(\n                          ^^^^^^^^^^^^^\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 173, in compile_pair\n    selections = cached_selections(route_report, position, references)\n                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 150, in cached_selections\n    raise ValueError(f\"route-cache reference mismatch at position {position}\")\nValueError: route-cache reference mismatch at position 18\n"
+    },
+    {
+      "index": 19,
+      "source_index": 33035,
+      "error": "IndexError('route cache has no case at position 19')",
+      "traceback": "Traceback (most recent call last):\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 728, in main\n    case, prompt_by_arm = compile_pair(\n                          ^^^^^^^^^^^^^\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 173, in compile_pair\n    selections = cached_selections(route_report, position, references)\n                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 147, in cached_selections\n    raise IndexError(f\"route cache has no case at position {position}\")\nIndexError: route cache has no case at position 19\n"
+    },
+    {
+      "index": 12,
+      "source_index": 4763,
+      "error": "ValueError('route-cache reference mismatch at position 12')",
+      "traceback": "Traceback (most recent call last):\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 728, in main\n    case, prompt_by_arm = compile_pair(\n                          ^^^^^^^^^^^^^\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 173, in compile_pair\n    selections = cached_selections(route_report, position, references)\n                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 150, in cached_selections\n    raise ValueError(f\"route-cache reference mismatch at position {position}\")\nValueError: route-cache reference mismatch at position 12\n"
+    },
+    {
+      "index": 13,
+      "source_index": 2597,
+      "error": "ValueError('route-cache reference mismatch at position 13')",
+      "traceback": "Traceback (most recent call last):\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 728, in main\n    case, prompt_by_arm = compile_pair(\n                          ^^^^^^^^^^^^^\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 173, in compile_pair\n    selections = cached_selections(route_report, position, references)\n                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 150, in cached_selections\n    raise ValueError(f\"route-cache reference mismatch at position {position}\")\nValueError: route-cache reference mismatch at position 13\n"
+    },
+    {
+      "index": 14,
+      "source_index": 4649,
+      "error": "ValueError('route-cache reference mismatch at position 14')",
+      "traceback": "Traceback (most recent call last):\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 728, in main\n    case, prompt_by_arm = compile_pair(\n                          ^^^^^^^^^^^^^\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 173, in compile_pair\n    selections = cached_selections(route_report, position, references)\n                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 150, in cached_selections\n    raise ValueError(f\"route-cache reference mismatch at position {position}\")\nValueError: route-cache reference mismatch at position 14\n"
+    },
+    {
+      "index": 15,
+      "source_index": 2939,
+      "error": "ValueError('route-cache reference mismatch at position 15')",
+      "traceback": "Traceback (most recent call last):\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 728, in main\n    case, prompt_by_arm = compile_pair(\n                          ^^^^^^^^^^^^^\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 173, in compile_pair\n    selections = cached_selections(route_report, position, references)\n                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 150, in cached_selections\n    raise ValueError(f\"route-cache reference mismatch at position {position}\")\nValueError: route-cache reference mismatch at position 15\n"
+    },
+    {
+      "index": 16,
+      "source_index": 1115,
+      "error": "ValueError('route-cache reference mismatch at position 16')",
+      "traceback": "Traceback (most recent call last):\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 728, in main\n    case, prompt_by_arm = compile_pair(\n                          ^^^^^^^^^^^^^\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 173, in compile_pair\n    selections = cached_selections(route_report, position, references)\n                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 150, in cached_selections\n    raise ValueError(f\"route-cache reference mismatch at position {position}\")\nValueError: route-cache reference mismatch at position 16\n"
+    },
+    {
+      "index": 17,
+      "source_index": 203,
+      "error": "ValueError('route-cache reference mismatch at position 17')",
+      "traceback": "Traceback (most recent call last):\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 728, in main\n    case, prompt_by_arm = compile_pair(\n                          ^^^^^^^^^^^^^\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 173, in compile_pair\n    selections = cached_selections(route_report, position, references)\n                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 150, in cached_selections\n    raise ValueError(f\"route-cache reference mismatch at position {position}\")\nValueError: route-cache reference mismatch at position 17\n"
+    },
+    {
+      "index": 18,
+      "source_index": 6701,
+      "error": "ValueError('route-cache reference mismatch at position 18')",
+      "traceback": "Traceback (most recent call last):\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 728, in main\n    case, prompt_by_arm = compile_pair(\n                          ^^^^^^^^^^^^^\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 173, in compile_pair\n    selections = cached_selections(route_report, position, references)\n                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 150, in cached_selections\n    raise ValueError(f\"route-cache reference mismatch at position {position}\")\nValueError: route-cache reference mismatch at position 18\n"
+    },
+    {
+      "index": 19,
+      "source_index": 1913,
+      "error": "IndexError('route cache has no case at position 19')",
+      "traceback": "Traceback (most recent call last):\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 728, in main\n    case, prompt_by_arm = compile_pair(\n                          ^^^^^^^^^^^^^\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 173, in compile_pair\n    selections = cached_selections(route_report, position, references)\n                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 147, in cached_selections\n    raise IndexError(f\"route cache has no case at position {position}\")\nIndexError: route cache has no case at position 19\n"
+    },
+    {
+      "index": 12,
+      "source_index": 72625,
+      "error": "ValueError('route-cache reference mismatch at position 12')",
+      "traceback": "Traceback (most recent call last):\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 728, in main\n    case, prompt_by_arm = compile_pair(\n                          ^^^^^^^^^^^^^\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 173, in compile_pair\n    selections = cached_selections(route_report, position, references)\n                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 150, in cached_selections\n    raise ValueError(f\"route-cache reference mismatch at position {position}\")\nValueError: route-cache reference mismatch at position 12\n"
+    },
+    {
+      "index": 13,
+      "source_index": 63008,
+      "error": "ValueError('route-cache reference mismatch at position 13')",
+      "traceback": "Traceback (most recent call last):\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 728, in main\n    case, prompt_by_arm = compile_pair(\n                          ^^^^^^^^^^^^^\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 173, in compile_pair\n    selections = cached_selections(route_report, position, references)\n                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 150, in cached_selections\n    raise ValueError(f\"route-cache reference mismatch at position {position}\")\nValueError: route-cache reference mismatch at position 13\n"
+    },
+    {
+      "index": 14,
+      "source_index": 42349,
+      "error": "ValueError('route-cache reference mismatch at position 14')",
+      "traceback": "Traceback (most recent call last):\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 728, in main\n    case, prompt_by_arm = compile_pair(\n                          ^^^^^^^^^^^^^\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 173, in compile_pair\n    selections = cached_selections(route_report, position, references)\n                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 150, in cached_selections\n    raise ValueError(f\"route-cache reference mismatch at position {position}\")\nValueError: route-cache reference mismatch at position 14\n"
+    },
+    {
+      "index": 15,
+      "source_index": 75872,
+      "error": "ValueError('route-cache reference mismatch at position 15')",
+      "traceback": "Traceback (most recent call last):\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 728, in main\n    case, prompt_by_arm = compile_pair(\n                          ^^^^^^^^^^^^^\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 173, in compile_pair\n    selections = cached_selections(route_report, position, references)\n                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 150, in cached_selections\n    raise ValueError(f\"route-cache reference mismatch at position {position}\")\nValueError: route-cache reference mismatch at position 15\n"
+    },
+    {
+      "index": 16,
+      "source_index": 31211,
+      "error": "ValueError('route-cache reference mismatch at position 16')",
+      "traceback": "Traceback (most recent call last):\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 728, in main\n    case, prompt_by_arm = compile_pair(\n                          ^^^^^^^^^^^^^\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 173, in compile_pair\n    selections = cached_selections(route_report, position, references)\n                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 150, in cached_selections\n    raise ValueError(f\"route-cache reference mismatch at position {position}\")\nValueError: route-cache reference mismatch at position 16\n"
+    },
+    {
+      "index": 17,
+      "source_index": 39736,
+      "error": "ValueError('route-cache reference mismatch at position 17')",
+      "traceback": "Traceback (most recent call last):\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 728, in main\n    case, prompt_by_arm = compile_pair(\n                          ^^^^^^^^^^^^^\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 173, in compile_pair\n    selections = cached_selections(route_report, position, references)\n                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 150, in cached_selections\n    raise ValueError(f\"route-cache reference mismatch at position {position}\")\nValueError: route-cache reference mismatch at position 17\n"
+    },
+    {
+      "index": 18,
+      "source_index": 64831,
+      "error": "ValueError('route-cache reference mismatch at position 18')",
+      "traceback": "Traceback (most recent call last):\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 728, in main\n    case, prompt_by_arm = compile_pair(\n                          ^^^^^^^^^^^^^\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 173, in compile_pair\n    selections = cached_selections(route_report, position, references)\n                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 150, in cached_selections\n    raise ValueError(f\"route-cache reference mismatch at position {position}\")\nValueError: route-cache reference mismatch at position 18\n"
+    },
+    {
+      "index": 19,
+      "source_index": 72629,
+      "error": "IndexError('route cache has no case at position 19')",
+      "traceback": "Traceback (most recent call last):\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 728, in main\n    case, prompt_by_arm = compile_pair(\n                          ^^^^^^^^^^^^^\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 173, in compile_pair\n    selections = cached_selections(route_report, position, references)\n                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 147, in cached_selections\n    raise IndexError(f\"route cache has no case at position {position}\")\nIndexError: route cache has no case at position 19\n"
+    },
+    {
+      "index": 14,
+      "source_index": 18094,
+      "error": "ValueError('route-cache reference mismatch at position 14')",
+      "traceback": "Traceback (most recent call last):\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 728, in main\n    case, prompt_by_arm = compile_pair(\n                          ^^^^^^^^^^^^^\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 173, in compile_pair\n    selections = cached_selections(route_report, position, references)\n                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 150, in cached_selections\n    raise ValueError(f\"route-cache reference mismatch at position {position}\")\nValueError: route-cache reference mismatch at position 14\n"
+    },
+    {
+      "index": 15,
+      "source_index": 13572,
+      "error": "ValueError('route-cache reference mismatch at position 15')",
+      "traceback": "Traceback (most recent call last):\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 728, in main\n    case, prompt_by_arm = compile_pair(\n                          ^^^^^^^^^^^^^\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 173, in compile_pair\n    selections = cached_selections(route_report, position, references)\n                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 150, in cached_selections\n    raise ValueError(f\"route-cache reference mismatch at position {position}\")\nValueError: route-cache reference mismatch at position 15\n"
+    },
+    {
+      "index": 16,
+      "source_index": 11913,
+      "error": "ValueError('route-cache reference mismatch at position 16')",
+      "traceback": "Traceback (most recent call last):\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 728, in main\n    case, prompt_by_arm = compile_pair(\n                          ^^^^^^^^^^^^^\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 173, in compile_pair\n    selections = cached_selections(route_report, position, references)\n                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 150, in cached_selections\n    raise ValueError(f\"route-cache reference mismatch at position {position}\")\nValueError: route-cache reference mismatch at position 16\n"
+    },
+    {
+      "index": 17,
+      "source_index": 18461,
+      "error": "ValueError('route-cache reference mismatch at position 17')",
+      "traceback": "Traceback (most recent call last):\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 728, in main\n    case, prompt_by_arm = compile_pair(\n                          ^^^^^^^^^^^^^\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 173, in compile_pair\n    selections = cached_selections(route_report, position, references)\n                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 150, in cached_selections\n    raise ValueError(f\"route-cache reference mismatch at position {position}\")\nValueError: route-cache reference mismatch at position 17\n"
+    },
+    {
+      "index": 18,
+      "source_index": 8647,
+      "error": "ValueError('route-cache reference mismatch at position 18')",
+      "traceback": "Traceback (most recent call last):\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 728, in main\n    case, prompt_by_arm = compile_pair(\n                          ^^^^^^^^^^^^^\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 173, in compile_pair\n    selections = cached_selections(route_report, position, references)\n                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 150, in cached_selections\n    raise ValueError(f\"route-cache reference mismatch at position {position}\")\nValueError: route-cache reference mismatch at position 18\n"
+    },
+    {
+      "index": 19,
+      "source_index": 11316,
+      "error": "IndexError('route cache has no case at position 19')",
+      "traceback": "Traceback (most recent call last):\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 728, in main\n    case, prompt_by_arm = compile_pair(\n                          ^^^^^^^^^^^^^\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 173, in compile_pair\n    selections = cached_selections(route_report, position, references)\n                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 147, in cached_selections\n    raise IndexError(f\"route cache has no case at position {position}\")\nIndexError: route cache has no case at position 19\n"
+    },
+    {
+      "index": 18,
+      "source_index": 55085,
+      "error": "ValueError('route-cache reference mismatch at position 18')",
+      "traceback": "Traceback (most recent call last):\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 728, in main\n    case, prompt_by_arm = compile_pair(\n                          ^^^^^^^^^^^^^\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 173, in compile_pair\n    selections = cached_selections(route_report, position, references)\n                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 150, in cached_selections\n    raise ValueError(f\"route-cache reference mismatch at position {position}\")\nValueError: route-cache reference mismatch at position 18\n"
+    },
+    {
+      "index": 19,
+      "source_index": 51132,
+      "error": "IndexError('route cache has no case at position 19')",
+      "traceback": "Traceback (most recent call last):\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 728, in main\n    case, prompt_by_arm = compile_pair(\n                          ^^^^^^^^^^^^^\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 173, in compile_pair\n    selections = cached_selections(route_report, position, references)\n                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 147, in cached_selections\n    raise IndexError(f\"route cache has no case at position {position}\")\nIndexError: route cache has no case at position 19\n"
+    },
+    {
+      "index": 11,
+      "source_index": 592498,
+      "error": "ValueError('route-cache reference mismatch at position 11')",
+      "traceback": "Traceback (most recent call last):\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 728, in main\n    case, prompt_by_arm = compile_pair(\n                          ^^^^^^^^^^^^^\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 173, in compile_pair\n    selections = cached_selections(route_report, position, references)\n                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 150, in cached_selections\n    raise ValueError(f\"route-cache reference mismatch at position {position}\")\nValueError: route-cache reference mismatch at position 11\n"
+    },
+    {
+      "index": 12,
+      "source_index": 545272,
+      "error": "ValueError('route-cache reference mismatch at position 12')",
+      "traceback": "Traceback (most recent call last):\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 728, in main\n    case, prompt_by_arm = compile_pair(\n                          ^^^^^^^^^^^^^\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 173, in compile_pair\n    selections = cached_selections(route_report, position, references)\n                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 150, in cached_selections\n    raise ValueError(f\"route-cache reference mismatch at position {position}\")\nValueError: route-cache reference mismatch at position 12\n"
+    },
+    {
+      "index": 13,
+      "source_index": 527120,
+      "error": "ValueError('route-cache reference mismatch at position 13')",
+      "traceback": "Traceback (most recent call last):\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 728, in main\n    case, prompt_by_arm = compile_pair(\n                          ^^^^^^^^^^^^^\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 173, in compile_pair\n    selections = cached_selections(route_report, position, references)\n                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 150, in cached_selections\n    raise ValueError(f\"route-cache reference mismatch at position {position}\")\nValueError: route-cache reference mismatch at position 13\n"
+    },
+    {
+      "index": 14,
+      "source_index": 107310,
+      "error": "ValueError('route-cache reference mismatch at position 14')",
+      "traceback": "Traceback (most recent call last):\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 728, in main\n    case, prompt_by_arm = compile_pair(\n                          ^^^^^^^^^^^^^\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 173, in compile_pair\n    selections = cached_selections(route_report, position, references)\n                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 150, in cached_selections\n    raise ValueError(f\"route-cache reference mismatch at position {position}\")\nValueError: route-cache reference mismatch at position 14\n"
+    },
+    {
+      "index": 15,
+      "source_index": 446386,
+      "error": "ValueError('route-cache reference mismatch at position 15')",
+      "traceback": "Traceback (most recent call last):\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 728, in main\n    case, prompt_by_arm = compile_pair(\n                          ^^^^^^^^^^^^^\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 173, in compile_pair\n    selections = cached_selections(route_report, position, references)\n                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 150, in cached_selections\n    raise ValueError(f\"route-cache reference mismatch at position {position}\")\nValueError: route-cache reference mismatch at position 15\n"
+    },
+    {
+      "index": 16,
+      "source_index": 496600,
+      "error": "ValueError('route-cache reference mismatch at position 16')",
+      "traceback": "Traceback (most recent call last):\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 728, in main\n    case, prompt_by_arm = compile_pair(\n                          ^^^^^^^^^^^^^\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 173, in compile_pair\n    selections = cached_selections(route_report, position, references)\n                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 150, in cached_selections\n    raise ValueError(f\"route-cache reference mismatch at position {position}\")\nValueError: route-cache reference mismatch at position 16\n"
+    },
+    {
+      "index": 17,
+      "source_index": 290669,
+      "error": "ValueError('route-cache reference mismatch at position 17')",
+      "traceback": "Traceback (most recent call last):\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 728, in main\n    case, prompt_by_arm = compile_pair(\n                          ^^^^^^^^^^^^^\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 173, in compile_pair\n    selections = cached_selections(route_report, position, references)\n                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 150, in cached_selections\n    raise ValueError(f\"route-cache reference mismatch at position {position}\")\nValueError: route-cache reference mismatch at position 17\n"
+    },
+    {
+      "index": 18,
+      "source_index": 156511,
+      "error": "ValueError('route-cache reference mismatch at position 18')",
+      "traceback": "Traceback (most recent call last):\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 728, in main\n    case, prompt_by_arm = compile_pair(\n                          ^^^^^^^^^^^^^\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 173, in compile_pair\n    selections = cached_selections(route_report, position, references)\n                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 150, in cached_selections\n    raise ValueError(f\"route-cache reference mismatch at position {position}\")\nValueError: route-cache reference mismatch at position 18\n"
+    },
+    {
+      "index": 19,
+      "source_index": 478612,
+      "error": "IndexError('route cache has no case at position 19')",
+      "traceback": "Traceback (most recent call last):\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 728, in main\n    case, prompt_by_arm = compile_pair(\n                          ^^^^^^^^^^^^^\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 173, in compile_pair\n    selections = cached_selections(route_report, position, references)\n                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 147, in cached_selections\n    raise IndexError(f\"route cache has no case at position {position}\")\nIndexError: route cache has no case at position 19\n"
+    },
+    {
+      "index": 15,
+      "source_index": 72805,
+      "error": "ValueError('route-cache reference mismatch at position 15')",
+      "traceback": "Traceback (most recent call last):\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 728, in main\n    case, prompt_by_arm = compile_pair(\n                          ^^^^^^^^^^^^^\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 173, in compile_pair\n    selections = cached_selections(route_report, position, references)\n                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 150, in cached_selections\n    raise ValueError(f\"route-cache reference mismatch at position {position}\")\nValueError: route-cache reference mismatch at position 15\n"
+    },
+    {
+      "index": 16,
+      "source_index": 67104,
+      "error": "ValueError('route-cache reference mismatch at position 16')",
+      "traceback": "Traceback (most recent call last):\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 728, in main\n    case, prompt_by_arm = compile_pair(\n                          ^^^^^^^^^^^^^\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 173, in compile_pair\n    selections = cached_selections(route_report, position, references)\n                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 150, in cached_selections\n    raise ValueError(f\"route-cache reference mismatch at position {position}\")\nValueError: route-cache reference mismatch at position 16\n"
+    },
+    {
+      "index": 17,
+      "source_index": 64854,
+      "error": "ValueError('route-cache reference mismatch at position 17')",
+      "traceback": "Traceback (most recent call last):\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 728, in main\n    case, prompt_by_arm = compile_pair(\n                          ^^^^^^^^^^^^^\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 173, in compile_pair\n    selections = cached_selections(route_report, position, references)\n                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 150, in cached_selections\n    raise ValueError(f\"route-cache reference mismatch at position {position}\")\nValueError: route-cache reference mismatch at position 17\n"
+    },
+    {
+      "index": 18,
+      "source_index": 13377,
+      "error": "ValueError('route-cache reference mismatch at position 18')",
+      "traceback": "Traceback (most recent call last):\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 728, in main\n    case, prompt_by_arm = compile_pair(\n                          ^^^^^^^^^^^^^\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 173, in compile_pair\n    selections = cached_selections(route_report, position, references)\n                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 150, in cached_selections\n    raise ValueError(f\"route-cache reference mismatch at position {position}\")\nValueError: route-cache reference mismatch at position 18\n"
+    },
+    {
+      "index": 19,
+      "source_index": 53733,
+      "error": "IndexError('route cache has no case at position 19')",
+      "traceback": "Traceback (most recent call last):\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 728, in main\n    case, prompt_by_arm = compile_pair(\n                          ^^^^^^^^^^^^^\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 173, in compile_pair\n    selections = cached_selections(route_report, position, references)\n                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 147, in cached_selections\n    raise IndexError(f\"route cache has no case at position {position}\")\nIndexError: route cache has no case at position 19\n"
+    },
+    {
+      "index": 10,
+      "source_index": 148591,
+      "error": "ValueError('route-cache reference mismatch at position 10')",
+      "traceback": "Traceback (most recent call last):\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 728, in main\n    case, prompt_by_arm = compile_pair(\n                          ^^^^^^^^^^^^^\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 173, in compile_pair\n    selections = cached_selections(route_report, position, references)\n                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 150, in cached_selections\n    raise ValueError(f\"route-cache reference mismatch at position {position}\")\nValueError: route-cache reference mismatch at position 10\n"
+    },
+    {
+      "index": 11,
+      "source_index": 137341,
+      "error": "ValueError('route-cache reference mismatch at position 11')",
+      "traceback": "Traceback (most recent call last):\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 728, in main\n    case, prompt_by_arm = compile_pair(\n                          ^^^^^^^^^^^^^\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 173, in compile_pair\n    selections = cached_selections(route_report, position, references)\n                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 150, in cached_selections\n    raise ValueError(f\"route-cache reference mismatch at position {position}\")\nValueError: route-cache reference mismatch at position 11\n"
+    },
+    {
+      "index": 12,
+      "source_index": 134106,
+      "error": "ValueError('route-cache reference mismatch at position 12')",
+      "traceback": "Traceback (most recent call last):\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 728, in main\n    case, prompt_by_arm = compile_pair(\n                          ^^^^^^^^^^^^^\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 173, in compile_pair\n    selections = cached_selections(route_report, position, references)\n                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 150, in cached_selections\n    raise ValueError(f\"route-cache reference mismatch at position {position}\")\nValueError: route-cache reference mismatch at position 12\n"
+    },
+    {
+      "index": 13,
+      "source_index": 24839,
+      "error": "ValueError('route-cache reference mismatch at position 13')",
+      "traceback": "Traceback (most recent call last):\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 728, in main\n    case, prompt_by_arm = compile_pair(\n                          ^^^^^^^^^^^^^\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 173, in compile_pair\n    selections = cached_selections(route_report, position, references)\n                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 150, in cached_selections\n    raise ValueError(f\"route-cache reference mismatch at position {position}\")\nValueError: route-cache reference mismatch at position 13\n"
+    },
+    {
+      "index": 14,
+      "source_index": 123483,
+      "error": "ValueError('route-cache reference mismatch at position 14')",
+      "traceback": "Traceback (most recent call last):\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 728, in main\n    case, prompt_by_arm = compile_pair(\n                          ^^^^^^^^^^^^^\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 173, in compile_pair\n    selections = cached_selections(route_report, position, references)\n                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 150, in cached_selections\n    raise ValueError(f\"route-cache reference mismatch at position {position}\")\nValueError: route-cache reference mismatch at position 14\n"
+    },
+    {
+      "index": 15,
+      "source_index": 72150,
+      "error": "ValueError('route-cache reference mismatch at position 15')",
+      "traceback": "Traceback (most recent call last):\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 728, in main\n    case, prompt_by_arm = compile_pair(\n                          ^^^^^^^^^^^^^\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 173, in compile_pair\n    selections = cached_selections(route_report, position, references)\n                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 150, in cached_selections\n    raise ValueError(f\"route-cache reference mismatch at position {position}\")\nValueError: route-cache reference mismatch at position 15\n"
+    },
+    {
+      "index": 16,
+      "source_index": 119419,
+      "error": "ValueError('route-cache reference mismatch at position 16')",
+      "traceback": "Traceback (most recent call last):\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 728, in main\n    case, prompt_by_arm = compile_pair(\n                          ^^^^^^^^^^^^^\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 173, in compile_pair\n    selections = cached_selections(route_report, position, references)\n                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 150, in cached_selections\n    raise ValueError(f\"route-cache reference mismatch at position {position}\")\nValueError: route-cache reference mismatch at position 16\n"
+    },
+    {
+      "index": 17,
+      "source_index": 72155,
+      "error": "ValueError('route-cache reference mismatch at position 17')",
+      "traceback": "Traceback (most recent call last):\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 728, in main\n    case, prompt_by_arm = compile_pair(\n                          ^^^^^^^^^^^^^\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 173, in compile_pair\n    selections = cached_selections(route_report, position, references)\n                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 150, in cached_selections\n    raise ValueError(f\"route-cache reference mismatch at position {position}\")\nValueError: route-cache reference mismatch at position 17\n"
+    },
+    {
+      "index": 18,
+      "source_index": 14290,
+      "error": "ValueError('route-cache reference mismatch at position 18')",
+      "traceback": "Traceback (most recent call last):\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 728, in main\n    case, prompt_by_arm = compile_pair(\n                          ^^^^^^^^^^^^^\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 173, in compile_pair\n    selections = cached_selections(route_report, position, references)\n                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 150, in cached_selections\n    raise ValueError(f\"route-cache reference mismatch at position {position}\")\nValueError: route-cache reference mismatch at position 18\n"
+    },
+    {
+      "index": 19,
+      "source_index": 137336,
+      "error": "IndexError('route cache has no case at position 19')",
+      "traceback": "Traceback (most recent call last):\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 728, in main\n    case, prompt_by_arm = compile_pair(\n                          ^^^^^^^^^^^^^\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 173, in compile_pair\n    selections = cached_selections(route_report, position, references)\n                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 147, in cached_selections\n    raise IndexError(f\"route cache has no case at position {position}\")\nIndexError: route cache has no case at position 19\n"
+    },
+    {
+      "index": 17,
+      "source_index": 18067,
+      "error": "ValueError('route-cache reference mismatch at position 17')",
+      "traceback": "Traceback (most recent call last):\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 728, in main\n    case, prompt_by_arm = compile_pair(\n                          ^^^^^^^^^^^^^\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 173, in compile_pair\n    selections = cached_selections(route_report, position, references)\n                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 150, in cached_selections\n    raise ValueError(f\"route-cache reference mismatch at position {position}\")\nValueError: route-cache reference mismatch at position 17\n"
+    },
+    {
+      "index": 18,
+      "source_index": 16851,
+      "error": "ValueError('route-cache reference mismatch at position 18')",
+      "traceback": "Traceback (most recent call last):\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 728, in main\n    case, prompt_by_arm = compile_pair(\n                          ^^^^^^^^^^^^^\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 173, in compile_pair\n    selections = cached_selections(route_report, position, references)\n                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 150, in cached_selections\n    raise ValueError(f\"route-cache reference mismatch at position {position}\")\nValueError: route-cache reference mismatch at position 18\n"
+    },
+    {
+      "index": 19,
+      "source_index": 16724,
+      "error": "IndexError('route cache has no case at position 19')",
+      "traceback": "Traceback (most recent call last):\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 728, in main\n    case, prompt_by_arm = compile_pair(\n                          ^^^^^^^^^^^^^\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 173, in compile_pair\n    selections = cached_selections(route_report, position, references)\n                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 147, in cached_selections\n    raise IndexError(f\"route cache has no case at position {position}\")\nIndexError: route cache has no case at position 19\n"
+    },
+    {
+      "index": 12,
+      "source_index": 296807,
+      "error": "ValueError('route-cache reference mismatch at position 12')",
+      "traceback": "Traceback (most recent call last):\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 728, in main\n    case, prompt_by_arm = compile_pair(\n                          ^^^^^^^^^^^^^\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 173, in compile_pair\n    selections = cached_selections(route_report, position, references)\n                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 150, in cached_selections\n    raise ValueError(f\"route-cache reference mismatch at position {position}\")\nValueError: route-cache reference mismatch at position 12\n"
+    },
+    {
+      "index": 13,
+      "source_index": 275958,
+      "error": "ValueError('route-cache reference mismatch at position 13')",
+      "traceback": "Traceback (most recent call last):\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 728, in main\n    case, prompt_by_arm = compile_pair(\n                          ^^^^^^^^^^^^^\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 173, in compile_pair\n    selections = cached_selections(route_report, position, references)\n                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 150, in cached_selections\n    raise ValueError(f\"route-cache reference mismatch at position {position}\")\nValueError: route-cache reference mismatch at position 13\n"
+    },
+    {
+      "index": 14,
+      "source_index": 269006,
+      "error": "ValueError('route-cache reference mismatch at position 14')",
+      "traceback": "Traceback (most recent call last):\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 728, in main\n    case, prompt_by_arm = compile_pair(\n                          ^^^^^^^^^^^^^\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 173, in compile_pair\n    selections = cached_selections(route_report, position, references)\n                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 150, in cached_selections\n    raise ValueError(f\"route-cache reference mismatch at position {position}\")\nValueError: route-cache reference mismatch at position 14\n"
+    },
+    {
+      "index": 15,
+      "source_index": 51480,
+      "error": "ValueError('route-cache reference mismatch at position 15')",
+      "traceback": "Traceback (most recent call last):\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 728, in main\n    case, prompt_by_arm = compile_pair(\n                          ^^^^^^^^^^^^^\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 173, in compile_pair\n    selections = cached_selections(route_report, position, references)\n                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 150, in cached_selections\n    raise ValueError(f\"route-cache reference mismatch at position {position}\")\nValueError: route-cache reference mismatch at position 15\n"
+    },
+    {
+      "index": 16,
+      "source_index": 249908,
+      "error": "ValueError('route-cache reference mismatch at position 16')",
+      "traceback": "Traceback (most recent call last):\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 728, in main\n    case, prompt_by_arm = compile_pair(\n                          ^^^^^^^^^^^^^\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 173, in compile_pair\n    selections = cached_selections(route_report, position, references)\n                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 150, in cached_selections\n    raise ValueError(f\"route-cache reference mismatch at position {position}\")\nValueError: route-cache reference mismatch at position 16\n"
+    },
+    {
+      "index": 17,
+      "source_index": 152392,
+      "error": "ValueError('route-cache reference mismatch at position 17')",
+      "traceback": "Traceback (most recent call last):\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 728, in main\n    case, prompt_by_arm = compile_pair(\n                          ^^^^^^^^^^^^^\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 173, in compile_pair\n    selections = cached_selections(route_report, position, references)\n                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 150, in cached_selections\n    raise ValueError(f\"route-cache reference mismatch at position {position}\")\nValueError: route-cache reference mismatch at position 17\n"
+    },
+    {
+      "index": 18,
+      "source_index": 78526,
+      "error": "ValueError('route-cache reference mismatch at position 18')",
+      "traceback": "Traceback (most recent call last):\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 728, in main\n    case, prompt_by_arm = compile_pair(\n                          ^^^^^^^^^^^^^\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 173, in compile_pair\n    selections = cached_selections(route_report, position, references)\n                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 150, in cached_selections\n    raise ValueError(f\"route-cache reference mismatch at position {position}\")\nValueError: route-cache reference mismatch at position 18\n"
+    },
+    {
+      "index": 19,
+      "source_index": 151006,
+      "error": "IndexError('route cache has no case at position 19')",
+      "traceback": "Traceback (most recent call last):\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 728, in main\n    case, prompt_by_arm = compile_pair(\n                          ^^^^^^^^^^^^^\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 173, in compile_pair\n    selections = cached_selections(route_report, position, references)\n                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 147, in cached_selections\n    raise IndexError(f\"route cache has no case at position {position}\")\nIndexError: route cache has no case at position 19\n"
+    },
+    {
+      "index": 11,
+      "source_index": 36679,
+      "error": "ValueError('route-cache reference mismatch at position 11')",
+      "traceback": "Traceback (most recent call last):\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 728, in main\n    case, prompt_by_arm = compile_pair(\n                          ^^^^^^^^^^^^^\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 173, in compile_pair\n    selections = cached_selections(route_report, position, references)\n                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 150, in cached_selections\n    raise ValueError(f\"route-cache reference mismatch at position {position}\")\nValueError: route-cache reference mismatch at position 11\n"
+    },
+    {
+      "index": 12,
+      "source_index": 34009,
+      "error": "ValueError('route-cache reference mismatch at position 12')",
+      "traceback": "Traceback (most recent call last):\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 728, in main\n    case, prompt_by_arm = compile_pair(\n                          ^^^^^^^^^^^^^\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 173, in compile_pair\n    selections = cached_selections(route_report, position, references)\n                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 150, in cached_selections\n    raise ValueError(f\"route-cache reference mismatch at position {position}\")\nValueError: route-cache reference mismatch at position 12\n"
+    },
+    {
+      "index": 13,
+      "source_index": 32588,
+      "error": "ValueError('route-cache reference mismatch at position 13')",
+      "traceback": "Traceback (most recent call last):\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 728, in main\n    case, prompt_by_arm = compile_pair(\n                          ^^^^^^^^^^^^^\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 173, in compile_pair\n    selections = cached_selections(route_report, position, references)\n                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 150, in cached_selections\n    raise ValueError(f\"route-cache reference mismatch at position {position}\")\nValueError: route-cache reference mismatch at position 13\n"
+    },
+    {
+      "index": 14,
+      "source_index": 6900,
+      "error": "ValueError('route-cache reference mismatch at position 14')",
+      "traceback": "Traceback (most recent call last):\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 728, in main\n    case, prompt_by_arm = compile_pair(\n                          ^^^^^^^^^^^^^\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 173, in compile_pair\n    selections = cached_selections(route_report, position, references)\n                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 150, in cached_selections\n    raise ValueError(f\"route-cache reference mismatch at position {position}\")\nValueError: route-cache reference mismatch at position 14\n"
+    },
+    {
+      "index": 15,
+      "source_index": 28296,
+      "error": "ValueError('route-cache reference mismatch at position 15')",
+      "traceback": "Traceback (most recent call last):\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 728, in main\n    case, prompt_by_arm = compile_pair(\n                          ^^^^^^^^^^^^^\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 173, in compile_pair\n    selections = cached_selections(route_report, position, references)\n                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 150, in cached_selections\n    raise ValueError(f\"route-cache reference mismatch at position {position}\")\nValueError: route-cache reference mismatch at position 15\n"
+    },
+    {
+      "index": 16,
+      "source_index": 19248,
+      "error": "ValueError('route-cache reference mismatch at position 16')",
+      "traceback": "Traceback (most recent call last):\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 728, in main\n    case, prompt_by_arm = compile_pair(\n                          ^^^^^^^^^^^^^\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 173, in compile_pair\n    selections = cached_selections(route_report, position, references)\n                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 150, in cached_selections\n    raise ValueError(f\"route-cache reference mismatch at position {position}\")\nValueError: route-cache reference mismatch at position 16\n"
+    },
+    {
+      "index": 17,
+      "source_index": 27320,
+      "error": "ValueError('route-cache reference mismatch at position 17')",
+      "traceback": "Traceback (most recent call last):\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 728, in main\n    case, prompt_by_arm = compile_pair(\n                          ^^^^^^^^^^^^^\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 173, in compile_pair\n    selections = cached_selections(route_report, position, references)\n                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 150, in cached_selections\n    raise ValueError(f\"route-cache reference mismatch at position {position}\")\nValueError: route-cache reference mismatch at position 17\n"
+    },
+    {
+      "index": 18,
+      "source_index": 19253,
+      "error": "ValueError('route-cache reference mismatch at position 18')",
+      "traceback": "Traceback (most recent call last):\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 728, in main\n    case, prompt_by_arm = compile_pair(\n                          ^^^^^^^^^^^^^\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 173, in compile_pair\n    selections = cached_selections(route_report, position, references)\n                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 150, in cached_selections\n    raise ValueError(f\"route-cache reference mismatch at position {position}\")\nValueError: route-cache reference mismatch at position 18\n"
+    },
+    {
+      "index": 19,
+      "source_index": 3461,
+      "error": "IndexError('route cache has no case at position 19')",
+      "traceback": "Traceback (most recent call last):\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 728, in main\n    case, prompt_by_arm = compile_pair(\n                          ^^^^^^^^^^^^^\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 173, in compile_pair\n    selections = cached_selections(route_report, position, references)\n                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/content/SPRUCE/benchmarks/ruler_paired_feature_e2e.py\", line 147, in cached_selections\n    raise IndexError(f\"route cache has no case at position {position}\")\nIndexError: route cache has no case at position 19\n"
+    }
+  ],
+  "session_wall_clock_seconds": 3925.807234875,
+  "overall": {
+    "samples": 1471,
+    "score_d1024": 0.5566961250849762,
+    "score_d4096": 0.6009177430319511,
+    "delta_d4096_minus_d1024": 0.044221617946974844,
+    "delta_bootstrap_95ci": [
+      0.02945813505551779,
+      0.05909868570133695
+    ],
+    "d4096_wins": 179,
+    "d1024_wins": 72,
+    "ties": 1220,
+    "perfect_d1024": 0.45615227736233854,
+    "perfect_d4096": 0.5207341944255608,
+    "evidence_d1024": 0.8144459551325629,
+    "evidence_d4096": 0.8514276002719239,
+    "median_tokens_d1024": 2959,
+    "median_tokens_d4096": 3053,
+    "median_compression_d1024": 0.1602832512315271,
+    "median_compression_d4096": 0.15760685861782872,
+    "identical_packet_fraction": 0.18830727396329028,
+    "median_paired_batch_seconds": 1.4320553919999384
+  },
+  "by_task": {
+    "cwe": {
+      "samples": 119,
+      "score_d1024": 0.09915966386554623,
+      "score_d4096": 0.09915966386554623,
+      "delta_d4096_minus_d1024": 0.0,
+      "delta_bootstrap_95ci": [
+        0.0,
+        0.0
+      ],
+      "d4096_wins": 0,
+      "d1024_wins": 0,
+      "ties": 119,
+      "perfect_d1024": 0.0,
+      "perfect_d4096": 0.0,
+      "evidence_d1024": 1.0,
+      "evidence_d4096": 1.0,
+      "median_tokens_d1024": 16305,
+      "median_tokens_d4096": 16305,
+      "median_compression_d1024": 1.0064193568298254,
+      "median_compression_d4096": 1.0064193568298254,
+      "identical_packet_fraction": 0.9411764705882353,
+      "median_paired_batch_seconds": 3.4570693139999094
+    },
+    "fwe": {
+      "samples": 120,
+      "score_d1024": 0.44166666666666665,
+      "score_d4096": 0.4166666666666667,
+      "delta_d4096_minus_d1024": -0.025,
+      "delta_bootstrap_95ci": [
+        -0.07777777777777777,
+        0.025
+      ],
+      "d4096_wins": 24,
+      "d1024_wins": 24,
+      "ties": 72,
+      "perfect_d1024": 0.06666666666666667,
+      "perfect_d4096": 0.075,
+      "evidence_d1024": 1.0,
+      "evidence_d4096": 1.0,
+      "median_tokens_d1024": 3911.5,
+      "median_tokens_d4096": 3941.0,
+      "median_compression_d1024": 0.17400535210840826,
+      "median_compression_d4096": 0.1765739021658599,
+      "identical_packet_fraction": 0.075,
+      "median_paired_batch_seconds": 1.2373622984998747
+    },
+    "niah_multikey_1": {
+      "samples": 120,
+      "score_d1024": 0.8666666666666667,
+      "score_d4096": 0.925,
+      "delta_d4096_minus_d1024": 0.058333333333333334,
+      "delta_bootstrap_95ci": [
+        0.0,
+        0.11666666666666667
+      ],
+      "d4096_wins": 10,
+      "d1024_wins": 3,
+      "ties": 107,
+      "perfect_d1024": 0.8666666666666667,
+      "perfect_d4096": 0.925,
+      "evidence_d1024": 0.8916666666666667,
+      "evidence_d4096": 0.9333333333333333,
+      "median_tokens_d1024": 2770.5,
+      "median_tokens_d4096": 2690.5,
+      "median_compression_d1024": 0.12168447126767118,
+      "median_compression_d4096": 0.11288378213411358,
+      "identical_packet_fraction": 0.05,
+      "median_paired_batch_seconds": 0.8302592865001088
+    },
+    "niah_multikey_2": {
+      "samples": 120,
+      "score_d1024": 0.7083333333333334,
+      "score_d4096": 0.8333333333333334,
+      "delta_d4096_minus_d1024": 0.125,
+      "delta_bootstrap_95ci": [
+        0.041666666666666664,
+        0.21666666666666667
+      ],
+      "d4096_wins": 23,
+      "d1024_wins": 8,
+      "ties": 89,
+      "perfect_d1024": 0.7083333333333334,
+      "perfect_d4096": 0.8333333333333334,
+      "evidence_d1024": 0.7833333333333333,
+      "evidence_d4096": 0.8916666666666667,
+      "median_tokens_d1024": 3557.5,
+      "median_tokens_d4096": 3507.0,
+      "median_compression_d1024": 0.14624564132008788,
+      "median_compression_d4096": 0.14448603329036552,
+      "identical_packet_fraction": 0.03333333333333333,
+      "median_paired_batch_seconds": 1.4646567229999619
+    },
+    "niah_multikey_3": {
+      "samples": 92,
+      "score_d1024": 0.03260869565217391,
+      "score_d4096": 0.05434782608695652,
+      "delta_d4096_minus_d1024": 0.021739130434782608,
+      "delta_bootstrap_95ci": [
+        -0.03260869565217391,
+        0.07608695652173914
+      ],
+      "d4096_wins": 4,
+      "d1024_wins": 2,
+      "ties": 86,
+      "perfect_d1024": 0.03260869565217391,
+      "perfect_d4096": 0.05434782608695652,
+      "evidence_d1024": 0.6195652173913043,
+      "evidence_d4096": 0.7391304347826086,
+      "median_tokens_d1024": 6212.0,
+      "median_tokens_d4096": 6212.0,
+      "median_compression_d1024": 0.30055283613288775,
+      "median_compression_d4096": 0.2944448008623701,
+      "identical_packet_fraction": 0.0,
+      "median_paired_batch_seconds": 4.095195380499945
+    },
+    "niah_multiquery": {
+      "samples": 120,
+      "score_d1024": 0.8229166666666666,
+      "score_d4096": 0.9041666666666667,
+      "delta_d4096_minus_d1024": 0.08125,
+      "delta_bootstrap_95ci": [
+        0.04583333333333333,
+        0.11875
+      ],
+      "d4096_wins": 37,
+      "d1024_wins": 8,
+      "ties": 75,
+      "perfect_d1024": 0.5583333333333333,
+      "perfect_d4096": 0.7583333333333333,
+      "evidence_d1024": 0.8625,
+      "evidence_d4096": 0.9645833333333333,
+      "median_tokens_d1024": 2296.0,
+      "median_tokens_d4096": 2540.5,
+      "median_compression_d1024": 0.10666330429407325,
+      "median_compression_d4096": 0.11549716391944403,
+      "identical_packet_fraction": 0.03333333333333333,
+      "median_paired_batch_seconds": 1.7697727374998067
+    },
+    "niah_multivalue": {
+      "samples": 106,
+      "score_d1024": 0.8278301886792453,
+      "score_d4096": 0.9080188679245284,
+      "delta_d4096_minus_d1024": 0.08018867924528301,
+      "delta_bootstrap_95ci": [
+        0.04245283018867924,
+        0.1179245283018868
+      ],
+      "d4096_wins": 33,
+      "d1024_wins": 8,
+      "ties": 65,
+      "perfect_d1024": 0.5094339622641509,
+      "perfect_d4096": 0.7075471698113207,
+      "evidence_d1024": 0.8655660377358491,
+      "evidence_d4096": 0.9575471698113207,
+      "median_tokens_d1024": 2547.5,
+      "median_tokens_d4096": 2465.0,
+      "median_compression_d1024": 0.1010116492949111,
+      "median_compression_d4096": 0.09764172915463085,
+      "identical_packet_fraction": 0.03773584905660377,
+      "median_paired_batch_seconds": 2.129151785999966
+    },
+    "niah_single_1": {
+      "samples": 118,
+      "score_d1024": 1.0,
+      "score_d4096": 1.0,
+      "delta_d4096_minus_d1024": 0.0,
+      "delta_bootstrap_95ci": [
+        0.0,
+        0.0
+      ],
+      "d4096_wins": 0,
+      "d1024_wins": 0,
+      "ties": 118,
+      "perfect_d1024": 1.0,
+      "perfect_d4096": 1.0,
+      "evidence_d1024": 1.0,
+      "evidence_d4096": 1.0,
+      "median_tokens_d1024": 967.0,
+      "median_tokens_d4096": 967.5,
+      "median_compression_d1024": 0.03370306024480825,
+      "median_compression_d4096": 0.03370306024480825,
+      "identical_packet_fraction": 0.8389830508474576,
+      "median_paired_batch_seconds": 0.2742530649999253
+    },
+    "niah_single_2": {
+      "samples": 76,
+      "score_d1024": 0.8157894736842105,
+      "score_d4096": 0.9210526315789473,
+      "delta_d4096_minus_d1024": 0.10526315789473684,
+      "delta_bootstrap_95ci": [
+        0.02631578947368421,
+        0.18421052631578946
+      ],
+      "d4096_wins": 9,
+      "d1024_wins": 1,
+      "ties": 66,
+      "perfect_d1024": 0.8157894736842105,
+      "perfect_d4096": 0.9210526315789473,
+      "evidence_d1024": 0.8157894736842105,
+      "evidence_d4096": 0.9210526315789473,
+      "median_tokens_d1024": 2319.0,
+      "median_tokens_d4096": 3282.0,
+      "median_compression_d1024": 0.177660752657467,
+      "median_compression_d4096": 0.1902134430085795,
+      "identical_packet_fraction": 0.0,
+      "median_paired_batch_seconds": 0.9537054529998272
+    },
+    "niah_single_3": {
+      "samples": 120,
+      "score_d1024": 0.9416666666666667,
+      "score_d4096": 0.9833333333333333,
+      "delta_d4096_minus_d1024": 0.041666666666666664,
+      "delta_bootstrap_95ci": [
+        -0.008333333333333333,
+        0.09166666666666666
+      ],
+      "d4096_wins": 7,
+      "d1024_wins": 2,
+      "ties": 111,
+      "perfect_d1024": 0.9416666666666667,
+      "perfect_d4096": 0.9833333333333333,
+      "evidence_d1024": 0.9416666666666667,
+      "evidence_d4096": 0.9833333333333333,
+      "median_tokens_d1024": 2637.5,
+      "median_tokens_d4096": 2614.5,
+      "median_compression_d1024": 0.13991079940474807,
+      "median_compression_d4096": 0.13090755419416356,
+      "identical_packet_fraction": 0.1,
+      "median_paired_batch_seconds": 1.6040483155001084
+    },
+    "qa_1": {
+      "samples": 120,
+      "score_d1024": 0.24166666666666667,
+      "score_d4096": 0.2833333333333333,
+      "delta_d4096_minus_d1024": 0.041666666666666664,
+      "delta_bootstrap_95ci": [
+        -0.041666666666666664,
+        0.125
+      ],
+      "d4096_wins": 15,
+      "d1024_wins": 10,
+      "ties": 95,
+      "perfect_d1024": 0.24166666666666667,
+      "perfect_d4096": 0.2833333333333333,
+      "evidence_d1024": 0.45,
+      "evidence_d4096": 0.5333333333333333,
+      "median_tokens_d1024": 3203.0,
+      "median_tokens_d4096": 3135.5,
+      "median_compression_d1024": 0.15826231578464692,
+      "median_compression_d4096": 0.14716145694467608,
+      "identical_packet_fraction": 0.0,
+      "median_paired_batch_seconds": 0.91117534600005
+    },
+    "qa_2": {
+      "samples": 120,
+      "score_d1024": 0.23333333333333334,
+      "score_d4096": 0.2916666666666667,
+      "delta_d4096_minus_d1024": 0.058333333333333334,
+      "delta_bootstrap_95ci": [
+        0.0,
+        0.11666666666666667
+      ],
+      "d4096_wins": 10,
+      "d1024_wins": 3,
+      "ties": 107,
+      "perfect_d1024": 0.23333333333333334,
+      "perfect_d4096": 0.2916666666666667,
+      "evidence_d1024": 0.43333333333333335,
+      "evidence_d4096": 0.44166666666666665,
+      "median_tokens_d1024": 3047.0,
+      "median_tokens_d4096": 3067.0,
+      "median_compression_d1024": 0.13207923923441464,
+      "median_compression_d4096": 0.15120687901048446,
+      "identical_packet_fraction": 0.0,
+      "median_paired_batch_seconds": 0.7746602350000558
+    },
+    "vt": {
+      "samples": 120,
+      "score_d1024": 0.21333333333333335,
+      "score_d4096": 0.22000000000000003,
+      "delta_d4096_minus_d1024": 0.006666666666666667,
+      "delta_bootstrap_95ci": [
+        -0.0033333333333333335,
+        0.016666666666666666
+      ],
+      "d4096_wins": 7,
+      "d1024_wins": 3,
+      "ties": 110,
+      "perfect_d1024": 0.0,
+      "perfect_d4096": 0.0,
+      "evidence_d1024": 0.89,
+      "evidence_d4096": 0.7183333333333334,
+      "median_tokens_d1024": 1782.5,
+      "median_tokens_d4096": 1611.5,
+      "median_compression_d1024": 0.09980265269787975,
+      "median_compression_d4096": 0.07723215097803031,
+      "identical_packet_fraction": 0.225,
+      "median_paired_batch_seconds": 1.4452412754999386
+    }
+  },
+  "by_length": {
+    "4096": {
+      "samples": 243,
+      "score_d1024": 0.6816186556927297,
+      "score_d4096": 0.6801783264746227,
+      "delta_d4096_minus_d1024": -0.0014403292181069957,
+      "delta_bootstrap_95ci": [
+        -0.0205761316872428,
+        0.016666666666666666
+      ],
+      "d4096_wins": 6,
+      "d1024_wins": 4,
+      "ties": 233,
+      "perfect_d1024": 0.588477366255144,
+      "perfect_d4096": 0.588477366255144,
+      "evidence_d1024": 0.9629629629629629,
+      "evidence_d4096": 0.9646090534979425,
+      "median_tokens_d1024": 3433,
+      "median_tokens_d4096": 3442,
+      "median_compression_d1024": 1.025935162094763,
+      "median_compression_d4096": 1.0259481037924152,
+      "identical_packet_fraction": 0.3045267489711934,
+      "median_paired_batch_seconds": 1.171761083999968
+    },
+    "8192": {
+      "samples": 243,
+      "score_d1024": 0.6272290809327846,
+      "score_d4096": 0.62880658436214,
+      "delta_d4096_minus_d1024": 0.001577503429355281,
+      "delta_bootstrap_95ci": [
+        -0.032030178326474625,
+        0.03484224965706447
+      ],
+      "d4096_wins": 15,
+      "d1024_wins": 14,
+      "ties": 214,
+      "perfect_d1024": 0.5432098765432098,
+      "perfect_d4096": 0.5473251028806584,
+      "evidence_d1024": 0.9220164609053498,
+      "evidence_d4096": 0.9061728395061728,
+      "median_tokens_d1024": 3354,
+      "median_tokens_d4096": 3236,
+      "median_compression_d1024": 0.45283320031923385,
+      "median_compression_d4096": 0.43985516963926513,
+      "identical_packet_fraction": 0.17695473251028807,
+      "median_paired_batch_seconds": 1.6749824839998837
+    },
+    "16384": {
+      "samples": 245,
+      "score_d1024": 0.5774829931972788,
+      "score_d4096": 0.6187755102040816,
+      "delta_d4096_minus_d1024": 0.041292517006802726,
+      "delta_bootstrap_95ci": [
+        0.007821428571428573,
+        0.0773486394557823
+      ],
+      "d4096_wins": 27,
+      "d1024_wins": 12,
+      "ties": 206,
+      "perfect_d1024": 0.49795918367346936,
+      "perfect_d4096": 0.563265306122449,
+      "evidence_d1024": 0.8591836734693877,
+      "evidence_d4096": 0.88,
+      "median_tokens_d1024": 3164,
+      "median_tokens_d4096": 3203,
+      "median_compression_d1024": 0.20186474232071014,
+      "median_compression_d4096": 0.20153988296889436,
+      "identical_packet_fraction": 0.1510204081632653,
+      "median_paired_batch_seconds": 1.5876569730000938
+    },
+    "32768": {
+      "samples": 250,
+      "score_d1024": 0.5528666666666667,
+      "score_d4096": 0.603,
+      "delta_d4096_minus_d1024": 0.050133333333333335,
+      "delta_bootstrap_95ci": [
+        0.017799999999999996,
+        0.08313333333333332
+      ],
+      "d4096_wins": 33,
+      "d1024_wins": 12,
+      "ties": 205,
+      "perfect_d1024": 0.468,
+      "perfect_d4096": 0.532,
+      "evidence_d1024": 0.8,
+      "evidence_d4096": 0.851,
+      "median_tokens_d1024": 3064.5,
+      "median_tokens_d4096": 3177.5,
+      "median_compression_d1024": 0.09427914923169842,
+      "median_compression_d4096": 0.09933351194695861,
+      "identical_packet_fraction": 0.156,
+      "median_paired_batch_seconds": 1.4837213770001654
+    },
+    "65536": {
+      "samples": 240,
+      "score_d1024": 0.49819444444444444,
+      "score_d4096": 0.59625,
+      "delta_d4096_minus_d1024": 0.09805555555555556,
+      "delta_bootstrap_95ci": [
+        0.05486111111111112,
+        0.14229166666666665
+      ],
+      "d4096_wins": 49,
+      "d1024_wins": 11,
+      "ties": 180,
+      "perfect_d1024": 0.35833333333333334,
+      "perfect_d4096": 0.5125,
+      "evidence_d1024": 0.730625,
+      "evidence_d4096": 0.8010416666666667,
+      "median_tokens_d1024": 2080.5,
+      "median_tokens_d4096": 2097.0,
+      "median_compression_d1024": 0.032126096084969746,
+      "median_compression_d4096": 0.03266544602003536,
+      "identical_packet_fraction": 0.175,
+      "median_paired_batch_seconds": 1.3689180965000105
+    },
+    "131072": {
+      "samples": 250,
+      "score_d1024": 0.4063333333333333,
+      "score_d4096": 0.4816666666666667,
+      "delta_d4096_minus_d1024": 0.07533333333333334,
+      "delta_bootstrap_95ci": [
+        0.029,
+        0.12233333333333332
+      ],
+      "d4096_wins": 49,
+      "d1024_wins": 19,
+      "ties": 182,
+      "perfect_d1024": 0.284,
+      "perfect_d4096": 0.384,
+      "evidence_d1024": 0.6166,
+      "evidence_d4096": 0.709,
+      "median_tokens_d1024": 2090.5,
+      "median_tokens_d4096": 2091.0,
+      "median_compression_d1024": 0.0160393498716852,
+      "median_compression_d4096": 0.016044750130651333,
+      "identical_packet_fraction": 0.168,
+      "median_paired_batch_seconds": 1.2848012039999048
+    }
+  },
+  "figures": [
+    "01_overall_accuracy.png",
+    "02_accuracy_by_length.png",
+    "03_delta_by_task.png",
+    "04_paired_outcomes_by_length.png",
+    "05_evidence_by_length.png",
+    "06_packet_tokens_by_length.png",
+    "07_identical_packet_cache.png",
+    "08_paired_batch_time.png"
+  ]
+}
